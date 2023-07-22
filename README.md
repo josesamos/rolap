@@ -14,7 +14,7 @@ You can install the development version of rolap from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
+# install.packages("rolap")
 devtools::install_github("josesamos/rolap")
 ```
 

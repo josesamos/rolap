@@ -79,13 +79,13 @@ define_dimension <- function(star, dimension) {
   stopifnot(("dimension_schema" %in% class(dimension)))
   if (is.null(star$dimensions)) {
     d <- list(dimension)
-    names(d) <- dimension$name
+    names(d) <- snakecase::to_snake_case(trimws(dimension$name))
   } else {
-    stopifnot(!(dimension$name %in% names(star$dimensions)))
+    stopifnot(!(snakecase::to_snake_case(trimws(dimension$name)) %in% names(star$dimensions)))
     d <- star$dimensions
     n <- names(d)
     d[[length(d) + 1]] <- dimension
-    names(d) <- c(n, dimension$name)
+    names(d) <- c(n, snakecase::to_snake_case(trimws(dimension$name)))
   }
   structure(list(facts = star$facts, dimensions = d), class = "star_schema")
 }
