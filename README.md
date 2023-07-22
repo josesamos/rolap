@@ -23,23 +23,30 @@ devtools::install_github("josesamos/rolap")
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-# library(rolap)
-## basic example code
+library(rolap)
+
+s <- star_schema() |>
+  define_facts(fact_schema(
+    name = "mrs_cause",
+    measures = c(
+      "Pneumonia and Influenza Deaths",
+      "Other Deaths"
+    )
+  )) |>
+  define_dimension(dimension_schema(
+    name = "when",
+    attributes = c(
+      "Week Ending Date",
+      "WEEK",
+      "Year"
+    )
+  )) |>
+  define_dimension(dimension_schema(
+    name = "where",
+    attributes = c(
+      "REGION",
+      "State",
+      "City"
+    )
+  ))
 ```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
-
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.

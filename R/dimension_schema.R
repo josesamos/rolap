@@ -1,0 +1,34 @@
+#' `dimension_schema` S3 class
+#'
+#' A `dimension_schema` object is created, we have to define its
+#' name and the set of attributes that make it up.
+#'
+#'  A `dimension_schema` object is part of a `star_schema` object, defines
+#'  a dimension of the star schema.
+#'
+#' @param name A string, name of the dimension.
+#' @param attributes A vector of attribute names.
+#'
+#' @return A `dimension_schema` object.
+#'
+#' @family star schema definition functions
+#' @seealso \code{\link{star_schema}}
+#'
+#' @examples
+#'
+#' d <- dimension_schema(
+#'   name = "when",
+#'   attributes = c(
+#'     "Week Ending Date",
+#'     "WEEK",
+#'     "Year"
+#'   )
+#' )
+#'
+#' @export
+dimension_schema <- function(name = NULL, attributes = NULL) {
+  stopifnot(!is.null(name))
+  stopifnot(length(attributes) > 0)
+  stopifnot(length(attributes) == length(unique(attributes)))
+  structure(list(name = name, attributes = attributes), class = "dimension_schema")
+}

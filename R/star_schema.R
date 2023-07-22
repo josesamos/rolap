@@ -22,7 +22,6 @@ star_schema <- function() {
 }
 
 
-
 #' Define facts in a `star_schema` object.
 #'
 #' @param star A `star_schema` object.
@@ -47,5 +46,46 @@ star_schema <- function() {
 #'   define_facts(f)
 #' @export
 define_facts <- function(star, facts) {
+  stopifnot(("fact_schema" %in% class(facts)))
   structure(list(facts = facts, dimensions = star$dimensions), class = "star_schema")
+}
+
+
+#' Define dimension in a `star_schema` object.
+#'
+#' @param star A `star_schema` object.
+#' @param dimension A `dimension_schema` object.
+#'
+#' @return A `star_schema` object.
+#'
+#' @family star schema definition functions
+#' @seealso \code{\link{star_schema}}
+#'
+#' @examples
+#'
+#' s <- star_schema()
+#' d <- dimension_schema(
+#'   name = "when",
+#'   attributes = c(
+#'     "Week Ending Date",
+#'     "WEEK",
+#'     "Year"
+#'   )
+#' )
+#' s <- s |>
+#'   define_dimension(d)
+#' @export
+define_dimension <- function(star, dimension) {
+  stopifnot(("dimension_schema" %in% class(dimension)))
+  if (is.null(star$dimensions)) {
+    d <- list(dimension)
+    names(d) <- dimension$name
+  } else {
+    stopifnot(!(dimension$name %in% names(star$dimensions)))
+    d <- star$dimensions
+    n <- names(d)
+    d[[length(d) + 1]] <- dimension
+    names(d) <- c(n, dimension$name)
+  }
+  structure(list(facts = star$facts, dimensions = d), class = "star_schema")
 }
