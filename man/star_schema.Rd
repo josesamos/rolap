@@ -15,17 +15,19 @@ and dimensions can be added.
 }
 \details{
 To get a star database (a \code{star_database} object) we need a flat table
-(implemented through a \code{tibble}) and a \code{star_schema} object. The
-definition of facts and dimensions in the \code{star_schema} object is made
-from the flat table columns. Each attribute can only appear once in the
-definition.
+and a \code{star_schema} object. The definition of facts and dimensions in
+the \code{star_schema} object is made from the flat table columns.
 }
 \examples{
 
-sc <- star_schema()
+s <- star_schema()
 
 }
 \seealso{
-\code{\link{star_schema}}
+\code{\link{fact_schema}}
+
+Other star schema definition functions: 
+\code{\link{define_facts}()},
+\code{\link{fact_schema}()}
 }
-\concept{star definition functions}
+\concept{star schema definition functions}
