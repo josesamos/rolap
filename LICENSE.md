@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2023 Jose Samos
+Copyright (c) 2023 rolap authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
