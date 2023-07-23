@@ -5,7 +5,7 @@
 \title{Define facts in a \code{star_schema} object.}
 \usage{
 define_facts(
-  star,
+  schema,
   facts = NULL,
   name = NULL,
   measures = NULL,
@@ -14,7 +14,7 @@ define_facts(
 )
 }
 \arguments{
-\item{star}{A \code{star_schema} object.}
+\item{schema}{A \code{star_schema} object.}
 
 \item{facts}{A \code{fact_schema} object.}
 

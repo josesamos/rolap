@@ -4,10 +4,10 @@
 \alias{define_dimension}
 \title{Define dimension in a \code{star_schema} object.}
 \usage{
-define_dimension(star, dimension = NULL, name = NULL, attributes = NULL)
+define_dimension(schema, dimension = NULL, name = NULL, attributes = NULL)
 }
 \arguments{
-\item{star}{A \code{star_schema} object.}
+\item{schema}{A \code{star_schema} object.}
 
 \item{dimension}{A \code{dimension_schema} object.}
 

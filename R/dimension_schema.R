@@ -32,3 +32,17 @@ dimension_schema <- function(name = NULL, attributes = NULL) {
   stopifnot(length(attributes) == length(unique(attributes)))
   structure(list(name = name, attributes = attributes), class = "dimension_schema")
 }
+
+
+#' Get attribute names
+#'
+#' Get the names of the attributes defined in the dimension schema.
+#'
+#' @param schema A `dimension_schema` object.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+get_attribute_names.dimension_schema <- function(schema) {
+  schema$attributes
+}

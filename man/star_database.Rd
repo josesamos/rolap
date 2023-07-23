@@ -6,6 +6,11 @@
 \usage{
 star_database(schema, instances)
 }
+\arguments{
+\item{schema}{A \code{star_schema} object.}
+
+\item{instances}{A flat table to define the database instances according to the schema.}
+}
 \value{
 A \code{star_database} object.
 }
@@ -19,7 +24,34 @@ the columns of the flat table.
 }
 \examples{
 
-s <- star_schema()
+dput(colnames(ft)) # ft is defined in the package.
+
+s <- star_schema() |>
+  define_facts(fact_schema(
+    name = "mrs_cause",
+    measures = c(
+      "Pneumonia and Influenza Deaths",
+      "Other Deaths"
+    )
+  )) |>
+  define_dimension(dimension_schema(
+    name = "when",
+    attributes = c(
+      "Week Ending Date",
+      "WEEK",
+      "Year"
+    )
+  )) |>
+  define_dimension(dimension_schema(
+    name = "where",
+    attributes = c(
+      "REGION",
+      "State",
+      "City"
+    )
+  ))
+
+db <- star_database(s, ft)
 
 }
 \seealso{

@@ -60,3 +60,17 @@ fact_schema <- function(name = NULL,
     class = "fact_schema"
   )
 }
+
+
+#' Get measure names
+#'
+#' Get the names of the measures defined in the fact schema.
+#'
+#' @param schema A `fact_schema` object.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+get_measure_names.fact_schema <- function(schema) {
+  schema$measures
+}

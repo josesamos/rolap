@@ -36,7 +36,7 @@ star_schema <- function() {
 #' An additional measurement corresponding to the COUNT of aggregated rows can
 #' be added which, together with SUM, allows us to obtain the mean if needed.
 #'
-#' @param star A `star_schema` object.
+#' @param schema A `star_schema` object.
 #' @param facts A `fact_schema` object.
 #' @param name A string, name of the fact.
 #' @param measures A vector of measure names.
@@ -74,7 +74,7 @@ star_schema <- function() {
 #'   define_facts(f)
 #' @export
 define_facts <-
-  function(star,
+  function(schema,
            facts = NULL,
            name = NULL,
            measures = NULL,
@@ -93,7 +93,7 @@ define_facts <-
         nrow_agg = nrow_agg
       )
     }
-    structure(list(facts = facts, dimensions = star$dimensions), class = "star_schema")
+    structure(list(facts = facts, dimensions = schema$dimensions), class = "star_schema")
   }
 
 #' Define dimension in a `star_schema` object.
@@ -101,7 +101,7 @@ define_facts <-
 #' Dimensions are part of a `star_schema` object. They can be defined directly
 #' as a `dimension_schema` object or giving the name and a set of attributes.
 #'
-#' @param star A `star_schema` object.
+#' @param schema A `star_schema` object.
 #' @param dimension A `dimension_schema` object.
 #' @param name A string, name of the dimension.
 #' @param attributes A vector of attribute names.
@@ -135,22 +135,54 @@ define_facts <-
 #' s <- s |>
 #'   define_dimension(d)
 #' @export
-define_dimension <- function(star, dimension = NULL, name = NULL, attributes = NULL) {
+define_dimension <- function(schema, dimension = NULL, name = NULL, attributes = NULL) {
   if (!is.null(dimension)) {
     stopifnot(("dimension_schema" %in% class(dimension)))
     stopifnot(is.null(name) & is.null(attributes))
   } else {
     dimension <- dimension_schema(name = name, attributes = attributes)
   }
-  if (is.null(star$dimensions)) {
+  if (is.null(schema$dimensions)) {
     d <- list(dimension)
     names(d) <- snakecase::to_snake_case(dimension$name)
   } else {
-    stopifnot(!(snakecase::to_snake_case(dimension$name) %in% names(star$dimensions)))
-    d <- star$dimensions
+    stopifnot(!(snakecase::to_snake_case(dimension$name) %in% names(schema$dimensions)))
+    d <- schema$dimensions
     n <- names(d)
     d[[length(d) + 1]] <- dimension
     names(d) <- c(n, snakecase::to_snake_case(dimension$name))
   }
-  structure(list(facts = star$facts, dimensions = d), class = "star_schema")
+  structure(list(facts = schema$facts, dimensions = d), class = "star_schema")
+}
+
+
+#' Get measure names
+#'
+#' Get the names of the measures defined in the fact schema.
+#'
+#' @param schema A `star_schema` object.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+get_measure_names.star_schema <- function(schema) {
+  get_measure_names(schema$facts)
+}
+
+
+#' Get attribute names
+#'
+#' Get the names of the attribute defined in the dimension schemas.
+#'
+#' @param schema A `star_schema` object.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+get_attribute_names.star_schema <- function(schema) {
+  names <- NULL
+  for (dimension in s$dimensions) {
+    names <- c(names, get_attribute_names(dimension))
+  }
+  unique(names)
 }
