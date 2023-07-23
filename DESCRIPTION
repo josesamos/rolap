@@ -14,3 +14,6 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     snakecase
+Depends: 
+    R (>= 2.10)
+LazyData: true

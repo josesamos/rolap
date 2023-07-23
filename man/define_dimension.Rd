@@ -53,6 +53,7 @@ Other star schema definition functions:
 \code{\link{define_facts}()},
 \code{\link{dimension_schema}()},
 \code{\link{fact_schema}()},
+\code{\link{star_database}()},
 \code{\link{star_schema}()}
 }
 \concept{star schema definition functions}
