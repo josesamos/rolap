@@ -4,12 +4,24 @@
 \alias{fact_schema}
 \title{\code{fact_schema} S3 class}
 \usage{
-fact_schema(name = NULL, measures = NULL)
+fact_schema(
+  name = NULL,
+  measures = NULL,
+  agg_functions = NULL,
+  nrow_agg = NULL
+)
 }
 \arguments{
 \item{name}{A string, name of the fact.}
 
 \item{measures}{A vector of measure names.}
+
+\item{agg_functions}{A vector of aggregation function names, each one for its
+corresponding measure. If none is indicated, the default is SUM. Additionally
+they can be MAX or MIN.}
+
+\item{nrow_agg}{A string, name of a new measure that represents the COUNT
+of rows aggregated for each resulting row.}
 }
 \value{
 A \code{fact_schema} object.
@@ -17,11 +29,17 @@ A \code{fact_schema} object.
 \description{
 A \code{fact_schema} object is created, the essential data is a name and
 a set of measurements that can be empty (does not have explicit
-measurements).
+measurements). It is part of a \code{star_schema} object, defines the facts
+of the star schema.
 }
 \details{
-A \code{fact_schema} object is part of a \code{star_schema} object, defines
-the facts of the star schema.
+Associated with each measurement there is an aggregation function that can be
+SUM, MAX or MIN. AVG is not considered among the possible aggregation
+functions: The reason is that calculating AVG by considering subsets of
+data does not necessarily yield the AVG of the total data.
+
+An additional measurement corresponding to the COUNT of aggregated rows can
+be added which, together with SUM, allows us to obtain the mean if needed.
 }
 \examples{
 

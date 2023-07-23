@@ -24,8 +24,27 @@ star_schema <- function() {
 
 #' Define facts in a `star_schema` object.
 #'
+#' Facts are part of a `star_schema` object. They can be defined directly
+#' as a `fact_schema` object or giving the name and a set of measures
+#' that can be empty (does not have explicit measures).
+#'
+#' Associated with each measurement there is an aggregation function that can be
+#' SUM, MAX or MIN. AVG is not considered among the possible aggregation
+#' functions: The reason is that calculating AVG by considering subsets of
+#' data does not necessarily yield the AVG of the total data.
+#'
+#' An additional measurement corresponding to the COUNT of aggregated rows can
+#' be added which, together with SUM, allows us to obtain the mean if needed.
+#'
 #' @param star A `star_schema` object.
 #' @param facts A `fact_schema` object.
+#' @param name A string, name of the fact.
+#' @param measures A vector of measure names.
+#' @param agg_functions A vector of aggregation function names, each one for its
+#'   corresponding measure. If none is indicated, the default is SUM. Additionally
+#'   they can be MAX or MIN.
+#' @param nrow_agg A string, name of a new measure that represents the COUNT
+#'   of rows aggregated for each resulting row.
 #'
 #' @return A `star_schema` object.
 #'
@@ -33,6 +52,15 @@ star_schema <- function() {
 #' @seealso \code{\link{star_schema}}
 #'
 #' @examples
+#'
+#' s <- star_schema() |>
+#'   define_facts(
+#'     name = "mrs_cause",
+#'     measures = c(
+#'       "Pneumonia and Influenza Deaths",
+#'       "Other Deaths"
+#'     )
+#'   )
 #'
 #' s <- star_schema()
 #' f <- fact_schema(
@@ -45,16 +73,38 @@ star_schema <- function() {
 #' s <- s |>
 #'   define_facts(f)
 #' @export
-define_facts <- function(star, facts) {
-  stopifnot(("fact_schema" %in% class(facts)))
-  structure(list(facts = facts, dimensions = star$dimensions), class = "star_schema")
-}
-
+define_facts <-
+  function(star,
+           facts = NULL,
+           name = NULL,
+           measures = NULL,
+           agg_functions = NULL,
+           nrow_agg = NULL) {
+    if (!is.null(facts)) {
+      stopifnot(("fact_schema" %in% class(facts)))
+      stopifnot(is.null(name) &
+                  is.null(measures) &
+                  is.null(agg_functions) & is.null(nrow_agg))
+    } else {
+      facts <- fact_schema(
+        name = name,
+        measures = measures,
+        agg_functions = agg_functions,
+        nrow_agg = nrow_agg
+      )
+    }
+    structure(list(facts = facts, dimensions = star$dimensions), class = "star_schema")
+  }
 
 #' Define dimension in a `star_schema` object.
 #'
+#' Dimensions are part of a `star_schema` object. They can be defined directly
+#' as a `dimension_schema` object or giving the name and a set of attributes.
+#'
 #' @param star A `star_schema` object.
 #' @param dimension A `dimension_schema` object.
+#' @param name A string, name of the dimension.
+#' @param attributes A vector of attribute names.
 #'
 #' @return A `star_schema` object.
 #'
@@ -62,6 +112,16 @@ define_facts <- function(star, facts) {
 #' @seealso \code{\link{star_schema}}
 #'
 #' @examples
+#'
+#' s <- star_schema() |>
+#'   define_dimension(
+#'     name = "when",
+#'     attributes = c(
+#'       "Week Ending Date",
+#'       "WEEK",
+#'       "Year"
+#'     )
+#'   )
 #'
 #' s <- star_schema()
 #' d <- dimension_schema(
@@ -75,17 +135,22 @@ define_facts <- function(star, facts) {
 #' s <- s |>
 #'   define_dimension(d)
 #' @export
-define_dimension <- function(star, dimension) {
-  stopifnot(("dimension_schema" %in% class(dimension)))
+define_dimension <- function(star, dimension = NULL, name = NULL, attributes = NULL) {
+  if (!is.null(dimension)) {
+    stopifnot(("dimension_schema" %in% class(dimension)))
+    stopifnot(is.null(name) & is.null(attributes))
+  } else {
+    dimension <- dimension_schema(name = name, attributes = attributes)
+  }
   if (is.null(star$dimensions)) {
     d <- list(dimension)
-    names(d) <- snakecase::to_snake_case(trimws(dimension$name))
+    names(d) <- snakecase::to_snake_case(dimension$name)
   } else {
-    stopifnot(!(snakecase::to_snake_case(trimws(dimension$name)) %in% names(star$dimensions)))
+    stopifnot(!(snakecase::to_snake_case(dimension$name) %in% names(star$dimensions)))
     d <- star$dimensions
     n <- names(d)
     d[[length(d) + 1]] <- dimension
-    names(d) <- c(n, snakecase::to_snake_case(trimws(dimension$name)))
+    names(d) <- c(n, snakecase::to_snake_case(dimension$name))
   }
   structure(list(facts = star$facts, dimensions = d), class = "star_schema")
 }

@@ -4,20 +4,35 @@
 \alias{define_dimension}
 \title{Define dimension in a \code{star_schema} object.}
 \usage{
-define_dimension(star, dimension)
+define_dimension(star, dimension = NULL, name = NULL, attributes = NULL)
 }
 \arguments{
 \item{star}{A \code{star_schema} object.}
 
 \item{dimension}{A \code{dimension_schema} object.}
+
+\item{name}{A string, name of the dimension.}
+
+\item{attributes}{A vector of attribute names.}
 }
 \value{
 A \code{star_schema} object.
 }
 \description{
-Define dimension in a \code{star_schema} object.
+Dimensions are part of a \code{star_schema} object. They can be defined directly
+as a \code{dimension_schema} object or giving the name and a set of attributes.
 }
 \examples{
+
+s <- star_schema() |>
+  define_dimension(
+    name = "when",
+    attributes = c(
+      "Week Ending Date",
+      "WEEK",
+      "Year"
+    )
+  )
 
 s <- star_schema()
 d <- dimension_schema(

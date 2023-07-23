@@ -26,27 +26,27 @@ This is a basic example which shows you how to solve a common problem:
 library(rolap)
 
 s <- star_schema() |>
-  define_facts(fact_schema(
+  define_facts(
     name = "mrs_cause",
     measures = c(
       "Pneumonia and Influenza Deaths",
       "Other Deaths"
     )
-  )) |>
-  define_dimension(dimension_schema(
+  ) |>
+  define_dimension(
     name = "when",
     attributes = c(
       "Week Ending Date",
       "WEEK",
       "Year"
     )
-  )) |>
-  define_dimension(dimension_schema(
+  ) |>
+  define_dimension(
     name = "where",
     attributes = c(
       "REGION",
       "State",
       "City"
     )
-  ))
+  )
 ```

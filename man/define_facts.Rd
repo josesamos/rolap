@@ -4,20 +4,58 @@
 \alias{define_facts}
 \title{Define facts in a \code{star_schema} object.}
 \usage{
-define_facts(star, facts)
+define_facts(
+  star,
+  facts = NULL,
+  name = NULL,
+  measures = NULL,
+  agg_functions = NULL,
+  nrow_agg = NULL
+)
 }
 \arguments{
 \item{star}{A \code{star_schema} object.}
 
 \item{facts}{A \code{fact_schema} object.}
+
+\item{name}{A string, name of the fact.}
+
+\item{measures}{A vector of measure names.}
+
+\item{agg_functions}{A vector of aggregation function names, each one for its
+corresponding measure. If none is indicated, the default is SUM. Additionally
+they can be MAX or MIN.}
+
+\item{nrow_agg}{A string, name of a new measure that represents the COUNT
+of rows aggregated for each resulting row.}
 }
 \value{
 A \code{star_schema} object.
 }
 \description{
-Define facts in a \code{star_schema} object.
+Facts are part of a \code{star_schema} object. They can be defined directly
+as a \code{fact_schema} object or giving the name and a set of measures
+that can be empty (does not have explicit measures).
+}
+\details{
+Associated with each measurement there is an aggregation function that can be
+SUM, MAX or MIN. AVG is not considered among the possible aggregation
+functions: The reason is that calculating AVG by considering subsets of
+data does not necessarily yield the AVG of the total data.
+
+An additional measurement corresponding to the COUNT of aggregated rows can
+be added which, together with SUM, allows us to obtain the mean if needed.
 }
 \examples{
+
+s <- star_schema() |>
+  define_facts(
+    name = "mrs_cause",
+    measures = c(
+      "Pneumonia and Influenza Deaths",
+      "Other Deaths"
+    )
+  )
 
 s <- star_schema()
 f <- fact_schema(
