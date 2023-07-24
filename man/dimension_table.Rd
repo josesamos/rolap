@@ -4,12 +4,12 @@
 \alias{dimension_table}
 \title{\code{dimension_table} S3 class}
 \usage{
-dimension_table(dimension_schema = NULL, flat_table = NULL)
+dimension_table(dimension_schema = NULL, instances = NULL)
 }
 \arguments{
 \item{dimension_schema}{A \code{dimension_schema} object.}
 
-\item{flat_table}{A flat table with the dimension instances.}
+\item{instances}{A flat table with the dimension instances.}
 }
 \value{
 A \code{dimension_table} object.
