@@ -64,13 +64,22 @@ star_database <- function(schema, instances) {
     stopifnot(measure_type %in% c("integer", "double", "integer64", "numeric"))
   }
 
+  # create the structure for instances
   db <-
     list(facts = vector("list", length = 1),
          dimensions =  vector("list", length = length(schema$dimensions)))
-  names(db$facts) <- sd$fact$name
-  names(db$dimensions) <- names(sd$dimension)
+  names(db$facts) <- schema$fact$name
+  names(db$dimensions) <- names(schema$dimensions)
 
+  # get a flat table ready to generate facts and dimensions
+  # (NA values are replaced by UNKNOWN)
+  ft <- prepare_instances_to_join(instances, c(attributes, measures))
 
-  structure(list(schema = schema, facts = NULL, dimensions = NULL), class = "star_database")
+  for (dimension in schema$dimensions) {
+    db$dimensions[dimension$name] <- list(dimension_table(dimension, ft))
+    ft <- add_surrogate_key(ft, db$dimensions[[dimension$name]]$dimension)
+  }
+
+  structure(list(schema = schema, facts = db$facts, dimensions = db$dimensions), class = "star_database")
 }
 

@@ -61,9 +61,8 @@ s <- star_schema() |>
   define_dimension(
     name = "when",
     attributes = c(
-      "Week Ending Date",
-      "WEEK",
-      "Year"
+      "Year",
+      "WEEK"
     )
   ) |>
   define_dimension(
