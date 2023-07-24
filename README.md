@@ -30,7 +30,7 @@ s <- star_schema() |>
     name = "mrs_cause",
     measures = c(
       "Pneumonia and Influenza Deaths",
-      "Other Deaths"
+      "All Deaths"
     )
   ) |>
   define_dimension(
@@ -49,4 +49,10 @@ s <- star_schema() |>
       "City"
     )
   )
+
+ft$`Pneumonia and Influenza Deaths` <-
+  as.integer(ft$`Pneumonia and Influenza Deaths`)
+ft$`All Deaths` <- as.integer(ft$`All Deaths`)
+
+db <- star_database(s, ft)
 ```

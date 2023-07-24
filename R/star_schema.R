@@ -181,7 +181,7 @@ get_measure_names.star_schema <- function(schema) {
 #' @keywords internal
 get_attribute_names.star_schema <- function(schema) {
   names <- NULL
-  for (dimension in s$dimensions) {
+  for (dimension in schema$dimensions) {
     names <- c(names, get_attribute_names(dimension))
   }
   unique(names)

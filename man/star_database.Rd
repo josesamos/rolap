@@ -24,14 +24,15 @@ the columns of the flat table.
 }
 \examples{
 
-dput(colnames(ft)) # ft is defined in the package.
+dput(colnames(ft_num)) # ft_num is defined in the package.
+# Measures must be numerical
 
 s <- star_schema() |>
   define_facts(fact_schema(
     name = "mrs_cause",
     measures = c(
       "Pneumonia and Influenza Deaths",
-      "Other Deaths"
+      "All Deaths"
     )
   )) |>
   define_dimension(dimension_schema(
@@ -51,7 +52,7 @@ s <- star_schema() |>
     )
   ))
 
-db <- star_database(s, ft)
+db <- star_database(s, ft_num)
 
 }
 \seealso{

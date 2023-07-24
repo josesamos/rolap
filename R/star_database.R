@@ -16,14 +16,15 @@
 #'
 #' @examples
 #'
-#' dput(colnames(ft)) # ft is defined in the package.
+#' dput(colnames(ft_num)) # ft_num is defined in the package.
+#' # Measures must be numerical
 #'
 #' s <- star_schema() |>
 #'   define_facts(fact_schema(
 #'     name = "mrs_cause",
 #'     measures = c(
 #'       "Pneumonia and Influenza Deaths",
-#'       "Other Deaths"
+#'       "All Deaths"
 #'     )
 #'   )) |>
 #'   define_dimension(dimension_schema(
@@ -43,14 +44,28 @@
 #'     )
 #'   ))
 #'
-#' db <- star_database(s, ft)
+#' db <- star_database(s, ft_num)
 #'
 #' @export
 star_database <- function(schema, instances) {
-  measures <- get_measure_names(schema)
-  print(measures)
+  stopifnot(tibble::is_tibble(instances))
+  instance_attributes <- names(instances)
   attributes <- get_attribute_names(schema)
-  print(attributes)
+  for (attribute in attributes) {
+    stopifnot(attribute %in% instance_attributes)
+  }
+  measures <- get_measure_names(schema)
+  for (measure in measures) {
+    stopifnot(measure %in% instance_attributes)
+  }
+  measure_types <- dplyr::summarise_all(instances[, measures], class)
+  for (measure_type in seq_along(measure_types)) {
+    measure_type <- measure_types[[measure_type]][1]
+    stopifnot(measure_type %in% c("integer", "double", "integer64", "numeric"))
+  }
+
+
+
   structure(list(schema = schema, facts = NULL, dimensions = NULL), class = "star_database")
 }
 
