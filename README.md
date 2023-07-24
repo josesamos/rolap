@@ -61,8 +61,7 @@ s <- star_schema() |>
   define_dimension(
     name = "when",
     attributes = c(
-      "Year",
-      "WEEK"
+      "Year"
     )
   ) |>
   define_dimension(
@@ -80,3 +79,33 @@ ft$`All Deaths` <- as.integer(ft$`All Deaths`)
 
 db <- star_database(s, ft)
 ```
+
+The tables of dimensions and facts of the obtained star schema are shown
+below.
+
+| when_key | Year |
+|:--------:|:----:|
+|    1     | 1962 |
+|    2     | 1963 |
+|    3     | 1964 |
+
+| where_key | REGION | State |    City    |
+|:---------:|:------:|:-----:|:----------:|
+|     1     |   1    |  CT   | Bridgeport |
+|     2     |   1    |  CT   |  Hartford  |
+|     3     |   1    |  MA   |   Boston   |
+|     4     |   1    |  MA   | Cambridge  |
+
+| when_key | where_key | Pneumonia and Influenza Deaths | All Deaths | nrow_agg |
+|:--------:|:---------:|:------------------------------:|:----------:|:--------:|
+|    1     |     1     |               9                |    131     |    3     |
+|    1     |     2     |               5                |    104     |    2     |
+|    1     |     3     |               23               |    555     |    2     |
+|    1     |     4     |               4                |     39     |    1     |
+|    2     |     1     |               2                |     46     |    1     |
+|    2     |     2     |               12               |    192     |    3     |
+|    2     |     3     |               10               |    276     |    1     |
+|    3     |     1     |               8                |     45     |    1     |
+|    3     |     2     |               3                |     53     |    1     |
+|    3     |     3     |               22               |    569     |    2     |
+|    3     |     4     |               13               |     84     |    3     |

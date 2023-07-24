@@ -57,8 +57,7 @@ s <- star_schema() |>
   define_dimension(
     name = "when",
     attributes = c(
-      "Year",
-      "WEEK"
+      "Year"
     )
   ) |>
   define_dimension(
@@ -75,5 +74,13 @@ ft$`Pneumonia and Influenza Deaths` <-
 ft$`All Deaths` <- as.integer(ft$`All Deaths`)
 
 db <- star_database(s, ft)
+```
+
+The tables of dimensions and facts of the obtained star schema are shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(db$dimensions$when$dimension, split.table = Inf)
+pander::pandoc.table(db$dimensions$where$dimension, split.table = Inf)
+pander::pandoc.table(db$facts$mrs_cause$facts, split.table = Inf)
 ```
 
