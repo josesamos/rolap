@@ -76,9 +76,15 @@ star_database <- function(schema, instances) {
   ft <- prepare_instances_to_join(instances, c(attributes, measures))
 
   for (dimension in schema$dimensions) {
-    db$dimensions[dimension$name] <- list(dimension_table(dimension, ft))
-    ft <- add_surrogate_key(ft, db$dimensions[[dimension$name]]$dimension)
+    db$dimensions[dimension$name] <-
+      list(dimension_table(dimension, ft))
+    ft <- add_surrogate_key(
+      ft,
+      db$dimensions[[dimension$name]]$dimension,
+      db$dimensions[[dimension$name]]$surrogate_key
+    )
   }
+  dput(ft)
 
   structure(list(schema = schema, facts = db$facts, dimensions = db$dimensions), class = "star_database")
 }

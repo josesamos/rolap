@@ -37,10 +37,12 @@ prepare_instances_to_join <- function(instances, attributes = NULL) {
 #'
 #' @param instances A `tibble`, the instances table.
 #' @param dimension A `tibble`, the dimension table.
+#' @param surrogate_key A string, the surrogate key name.
 #'
 #' @return A `tibble`.
 #' @keywords internal
-add_surrogate_key <- function(instances, dimension) {
-  dput(dimension)
-  instances
+add_surrogate_key <- function(instances, dimension, surrogate_key) {
+  attributes <- colnames(dimension)
+  attributes <- attributes[attributes != surrogate_key]
+  dplyr::inner_join(instances, dimension, by = attributes)
 }
