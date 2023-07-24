@@ -35,8 +35,6 @@ s <- star_schema() |>
   define_dimension(dimension_schema(
     name = "when",
     attributes = c(
-      "Week Ending Date",
-      "WEEK",
       "Year"
     )
   )) |>
@@ -49,6 +47,7 @@ s <- star_schema() |>
     )
   ))
 
+# ft_num contains instances
 db <- star_database(s, ft_num)
 
 }

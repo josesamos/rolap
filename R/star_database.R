@@ -27,8 +27,6 @@
 #'   define_dimension(dimension_schema(
 #'     name = "when",
 #'     attributes = c(
-#'       "Week Ending Date",
-#'       "WEEK",
 #'       "Year"
 #'     )
 #'   )) |>
@@ -41,6 +39,7 @@
 #'     )
 #'   ))
 #'
+#' # ft_num contains instances
 #' db <- star_database(s, ft_num)
 #'
 #' @export
@@ -94,8 +93,7 @@ star_database <- function(schema, instances) {
     schema$facts$agg_functions,
     schema$facts$nrow_agg
   )
-
-  # dput(instances)
+  db$facts[schema$fact$name] <- list(fact_table(schema$facts, instances, keys))
 
   structure(list(schema = schema, facts = db$facts, dimensions = db$dimensions), class = "star_database")
 }
