@@ -73,18 +73,32 @@ star_database <- function(schema, instances) {
 
   # get a flat table ready to generate facts and dimensions
   # (NA values are replaced by UNKNOWN)
-  ft <- prepare_instances_to_join(instances, c(attributes, measures))
+  instances[, attributes] <- prepare_instances_to_join(instances[, attributes])
 
+  keys <- c()
   for (dimension in schema$dimensions) {
+    # generate dimension table
     db$dimensions[dimension$name] <-
-      list(dimension_table(dimension, ft))
-    ft <- add_surrogate_key(
-      ft,
+      list(dimension_table(dimension, instances))
+    # include surrogate key in instances
+    instances <- add_surrogate_key(
+      instances,
       db$dimensions[[dimension$name]]$dimension,
       db$dimensions[[dimension$name]]$surrogate_key
     )
+    keys <- c(keys, db$dimensions[[dimension$name]]$surrogate_key)
   }
-  dput(ft)
+  # select only keys and measures in instances
+  instances <- instances[, c(keys, measures)]
+  instances <- group_by_keys(
+    instances,
+    keys,
+    schema$facts$measures,
+    schema$facts$agg_functions,
+    schema$facts$nrow_agg
+  )
+
+  dput(instances)
 
   structure(list(schema = schema, facts = db$facts, dimensions = db$dimensions), class = "star_database")
 }
