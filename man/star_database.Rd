@@ -24,9 +24,6 @@ the columns of the flat table.
 }
 \examples{
 
-dput(colnames(ft_num)) # ft_num is defined in the package.
-# Measures must be numerical
-
 s <- star_schema() |>
   define_facts(fact_schema(
     name = "mrs_cause",

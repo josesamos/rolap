@@ -55,6 +55,9 @@ add_surrogate_key <- function(instances, dimension, surrogate_key) {
 #'   aggregated.
 #'
 #' @return A `tibble`.
+#'
+#' @importFrom rlang :=
+#'
 #' @keywords internal
 group_by_keys <- function(instances, keys, measures, agg_functions, nrow_agg) {
   # add the new measure to count the number of rows aggregated
@@ -65,7 +68,7 @@ group_by_keys <- function(instances, keys, measures, agg_functions, nrow_agg) {
   measures <- c(measures, nrow_agg)
   agg_functions <- c(agg_functions, "SUM")
 
-  ft_group <- dplyr::group_by_at(as.data.frame(instances), dplyr::vars(one_of(keys)))
+  ft_group <- dplyr::group_by_at(as.data.frame(instances), dplyr::vars(tidyselect::all_of(keys)))
   agg <- list()
   for (i in seq_along(measures)) {
     if (agg_functions[i] == "MAX") {
@@ -77,5 +80,5 @@ group_by_keys <- function(instances, keys, measures, agg_functions, nrow_agg) {
     }
     agg <- c(agg, list(df))
   }
-  purrr::reduce(agg, dplyr::inner_join, by = keys)
+  dplyr::ungroup(purrr::reduce(agg, dplyr::inner_join, by = keys))
 }

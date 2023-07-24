@@ -16,9 +16,6 @@
 #'
 #' @examples
 #'
-#' dput(colnames(ft_num)) # ft_num is defined in the package.
-#' # Measures must be numerical
-#'
 #' s <- star_schema() |>
 #'   define_facts(fact_schema(
 #'     name = "mrs_cause",
@@ -98,7 +95,7 @@ star_database <- function(schema, instances) {
     schema$facts$nrow_agg
   )
 
-  dput(instances)
+  # dput(instances)
 
   structure(list(schema = schema, facts = db$facts, dimensions = db$dimensions), class = "star_database")
 }

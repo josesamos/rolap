@@ -14,8 +14,12 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     dplyr,
+    purrr,
+    rlang,
     snakecase,
-    tibble
+    tibble,
+    tidyr,
+    tidyselect
 Depends: 
     R (>= 2.10)
 LazyData: true
