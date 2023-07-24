@@ -64,6 +64,11 @@ star_database <- function(schema, instances) {
     stopifnot(measure_type %in% c("integer", "double", "integer64", "numeric"))
   }
 
+  db <-
+    list(facts = vector("list", length = 1),
+         dimensions =  vector("list", length = length(schema$dimensions)))
+  names(db$facts) <- sd$fact$name
+  names(db$dimensions) <- names(sd$dimension)
 
 
   structure(list(schema = schema, facts = NULL, dimensions = NULL), class = "star_database")

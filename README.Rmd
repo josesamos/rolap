@@ -31,6 +31,16 @@ devtools::install_github("josesamos/rolap")
 
 ## Example
 
+Original data as a starting point, stored in `ft`.
+
+```{r setup, echo = FALSE}
+library(rolap)
+```
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft, split.table = Inf)
+```
+
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
