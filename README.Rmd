@@ -54,27 +54,28 @@ where <- dimension_schema(name = "Where",
                                          "State",
                                          "City"))
 
-s <- star_schema() |>
+s1 <- star_schema() |>
   define_facts(name = "MRS Cause",
                measures = c("Pneumonia and Influenza Deaths",
                             "All Deaths")) |>
   define_dimension(when) |>
   define_dimension(where)
 
-ft_num <- ft |>
+ft1 <- ft |>
   dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
-  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`))
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::filter(Year > "1962")
 
-db <- star_database(s, ft_num) |>
+db1 <- star_database(s1, ft1) |>
   snake_case()
 ```
 
 The tables of dimensions and facts of the obtained star database are shown below.
 
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(db$instance$dimensions$when$dimension, split.table = Inf)
-pander::pandoc.table(db$instance$dimensions$where$dimension, split.table = Inf)
-pander::pandoc.table(db$instance$facts$mrs_cause$facts, split.table = Inf)
+pander::pandoc.table(db1$instance$dimensions$when$dimension, split.table = Inf)
+pander::pandoc.table(db1$instance$dimensions$where$dimension, split.table = Inf)
+pander::pandoc.table(db1$instance$facts$mrs_cause$facts, split.table = Inf)
 ```
 
 ```{r example2}
@@ -91,10 +92,18 @@ ft2 <- ft |>
   dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
   tidyr::gather("Age", "All Deaths", 7:11) |>
   dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
-  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))
+  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", "")) |>
+  dplyr::filter(Year < "1964") |>
+  dplyr::filter(City != "Boston" & City != "Bridgeport") |>
+  dplyr::filter(WEEK >= "8")
 
 db2 <- star_database(s2, ft2) |>
   snake_case()
+```
+
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft2, split.table = Inf)
 ```
 
 The tables of dimensions and facts of the obtained star database are shown below.
