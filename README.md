@@ -50,34 +50,26 @@ This is a basic example which shows you how to solve a common problem:
 ``` r
 library(rolap)
 
+when <- dimension_schema(name = "When",
+                         attributes = c("Year"))
+
+where <- dimension_schema(name = "Where",
+                          attributes = c("REGION",
+                                         "State",
+                                         "City"))
+
 s <- star_schema() |>
-  define_facts(
-    name = "MRS Cause",
-    measures = c(
-      "Pneumonia and Influenza Deaths",
-      "All Deaths"
-    )
-  ) |>
-  define_dimension(
-    name = "When",
-    attributes = c(
-      "Year"
-    )
-  ) |>
-  define_dimension(
-    name = "Where",
-    attributes = c(
-      "REGION",
-      "State",
-      "City"
-    )
-  )
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where)
 
-ft$`Pneumonia and Influenza Deaths` <-
-  as.integer(ft$`Pneumonia and Influenza Deaths`)
-ft$`All Deaths` <- as.integer(ft$`All Deaths`)
+ft_num <- ft |>
+  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`))
 
-db <- star_database(s, ft)|>
+db <- star_database(s, ft_num) |>
   snake_case()
 ```
 
@@ -110,3 +102,105 @@ shown below.
 |    3     |     2     |               3                |     53     |    1     |
 |    3     |     3     |               22               |    569     |    2     |
 |    3     |     4     |               13               |     84     |    3     |
+
+``` r
+
+s2 <- star_schema() |>
+  define_facts(name = "MRS Age",
+               measures = c("All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where) |>
+  define_dimension(name = "Who",
+                         attributes = c("Age"))
+
+ft2 <- ft |>
+  dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
+  tidyr::gather("Age", "All Deaths", 7:11) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))
+
+db2 <- star_database(s2, ft2) |>
+  snake_case()
+```
+
+The tables of dimensions and facts of the obtained star database are
+shown below.
+
+| when_key | year |
+|:--------:|:----:|
+|    1     | 1962 |
+|    2     | 1963 |
+|    3     | 1964 |
+
+| where_key | region | state |    city    |
+|:---------:|:------:|:-----:|:----------:|
+|     1     |   1    |  CT   | Bridgeport |
+|     2     |   1    |  CT   |  Hartford  |
+|     3     |   1    |  MA   |   Boston   |
+|     4     |   1    |  MA   | Cambridge  |
+
+| who_key |     age     |
+|:-------:|:-----------:|
+|    1    | 1-24 years  |
+|    2    | 25-44 years |
+|    3    | 45-64 years |
+|    4    |  65+ years  |
+|    5    |  \<1 year   |
+
+| when_key | where_key | who_key | all_deaths | nrow_agg |
+|:--------:|:---------:|:-------:|:----------:|:--------:|
+|    1     |     1     |    1    |     1      |    3     |
+|    1     |     1     |    2    |     8      |    3     |
+|    1     |     1     |    3    |     41     |    3     |
+|    1     |     1     |    4    |     68     |    3     |
+|    1     |     1     |    5    |     13     |    3     |
+|    1     |     2     |    1    |     2      |    2     |
+|    1     |     2     |    2    |     3      |    2     |
+|    1     |     2     |    3    |     35     |    2     |
+|    1     |     2     |    4    |     54     |    2     |
+|    1     |     2     |    5    |     10     |    2     |
+|    1     |     3     |    1    |     15     |    2     |
+|    1     |     3     |    2    |     19     |    2     |
+|    1     |     3     |    3    |    143     |    2     |
+|    1     |     3     |    4    |    342     |    2     |
+|    1     |     3     |    5    |     36     |    2     |
+|    1     |     4     |    1    |     0      |    1     |
+|    1     |     4     |    2    |     2      |    1     |
+|    1     |     4     |    3    |     7      |    1     |
+|    1     |     4     |    4    |     29     |    1     |
+|    1     |     4     |    5    |     1      |    1     |
+|    2     |     1     |    1    |     0      |    1     |
+|    2     |     1     |    2    |     3      |    1     |
+|    2     |     1     |    3    |     10     |    1     |
+|    2     |     1     |    4    |     29     |    1     |
+|    2     |     1     |    5    |     4      |    1     |
+|    2     |     2     |    1    |     5      |    3     |
+|    2     |     2     |    2    |     13     |    3     |
+|    2     |     2     |    3    |     51     |    3     |
+|    2     |     2     |    4    |    107     |    3     |
+|    2     |     2     |    5    |     16     |    3     |
+|    2     |     3     |    1    |     14     |    1     |
+|    2     |     3     |    2    |     17     |    1     |
+|    2     |     3     |    3    |     67     |    1     |
+|    2     |     3     |    4    |    167     |    1     |
+|    2     |     3     |    5    |     11     |    1     |
+|    3     |     1     |    1    |     1      |    1     |
+|    3     |     1     |    2    |     2      |    1     |
+|    3     |     1     |    3    |     11     |    1     |
+|    3     |     1     |    4    |     28     |    1     |
+|    3     |     1     |    5    |     3      |    1     |
+|    3     |     2     |    1    |     0      |    1     |
+|    3     |     2     |    2    |     2      |    1     |
+|    3     |     2     |    3    |     16     |    1     |
+|    3     |     2     |    4    |     28     |    1     |
+|    3     |     2     |    5    |     7      |    1     |
+|    3     |     3     |    1    |     16     |    2     |
+|    3     |     3     |    2    |     38     |    2     |
+|    3     |     3     |    3    |    151     |    2     |
+|    3     |     3     |    4    |    334     |    2     |
+|    3     |     3     |    5    |     30     |    2     |
+|    3     |     4     |    1    |     0      |    3     |
+|    3     |     4     |    2    |     4      |    3     |
+|    3     |     4     |    3    |     25     |    3     |
+|    3     |     4     |    4    |     52     |    3     |
+|    3     |     4     |    5    |     3      |    3     |

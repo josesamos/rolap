@@ -46,34 +46,26 @@ This is a basic example which shows you how to solve a common problem:
 ```{r example}
 library(rolap)
 
+when <- dimension_schema(name = "When",
+                         attributes = c("Year"))
+
+where <- dimension_schema(name = "Where",
+                          attributes = c("REGION",
+                                         "State",
+                                         "City"))
+
 s <- star_schema() |>
-  define_facts(
-    name = "MRS Cause",
-    measures = c(
-      "Pneumonia and Influenza Deaths",
-      "All Deaths"
-    )
-  ) |>
-  define_dimension(
-    name = "When",
-    attributes = c(
-      "Year"
-    )
-  ) |>
-  define_dimension(
-    name = "Where",
-    attributes = c(
-      "REGION",
-      "State",
-      "City"
-    )
-  )
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where)
 
-ft$`Pneumonia and Influenza Deaths` <-
-  as.integer(ft$`Pneumonia and Influenza Deaths`)
-ft$`All Deaths` <- as.integer(ft$`All Deaths`)
+ft_num <- ft |>
+  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`))
 
-db <- star_database(s, ft)|>
+db <- star_database(s, ft_num) |>
   snake_case()
 ```
 
@@ -85,3 +77,31 @@ pander::pandoc.table(db$instance$dimensions$where$dimension, split.table = Inf)
 pander::pandoc.table(db$instance$facts$mrs_cause$facts, split.table = Inf)
 ```
 
+```{r example2}
+
+s2 <- star_schema() |>
+  define_facts(name = "MRS Age",
+               measures = c("All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where) |>
+  define_dimension(name = "Who",
+                         attributes = c("Age"))
+
+ft2 <- ft |>
+  dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
+  tidyr::gather("Age", "All Deaths", 7:11) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))
+
+db2 <- star_database(s2, ft2) |>
+  snake_case()
+```
+
+The tables of dimensions and facts of the obtained star database are shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(db2$instance$dimensions$when$dimension, split.table = Inf)
+pander::pandoc.table(db2$instance$dimensions$where$dimension, split.table = Inf)
+pander::pandoc.table(db2$instance$dimensions$who$dimension, split.table = Inf)
+pander::pandoc.table(db2$instance$facts$mrs_age$facts, split.table = Inf)
+```
