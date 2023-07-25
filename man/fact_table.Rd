@@ -4,14 +4,21 @@
 \alias{fact_table}
 \title{\code{fact_table} S3 class}
 \usage{
-fact_table(fact_schema = NULL, instances = NULL, surrogate_keys)
+fact_table(
+  name = NULL,
+  surrogate_keys = NULL,
+  dim_int_names = NULL,
+  instances = NULL
+)
 }
 \arguments{
-\item{fact_schema}{A \code{dimension_schema} object.}
-
-\item{instances}{A flat table with the fact instances.}
+\item{name}{A string, fact name.}
 
 \item{surrogate_keys}{A vector of strings, surrogate key names.}
+
+\item{dim_int_names}{A vector of strings, internal names of dimensions.}
+
+\item{instances}{A flat table with the fact instances.}
 }
 \value{
 A \code{fact_table} object.

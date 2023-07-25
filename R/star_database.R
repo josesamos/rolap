@@ -62,39 +62,51 @@ star_database <- function(schema, instances) {
 
   # create the structure for instances
   db <-
-    list(facts = vector("list", length = 1),
-         dimensions =  vector("list", length = length(schema$dimensions)))
-  names(db$facts) <- schema$fact$name
+    list(
+      facts = vector("list", length = length(schema$facts)),
+      dimensions =  vector("list", length = length(schema$dimensions))
+    )
+  names(db$facts) <- names(schema$facts)
   names(db$dimensions) <- names(schema$dimensions)
 
   # get a flat table ready to generate facts and dimensions
   # (NA values are replaced by UNKNOWN)
   instances[, attributes] <- prepare_instances_to_join(instances[, attributes])
 
+  # generate dimension tables
   keys <- c()
-  for (dimension in schema$dimensions) {
+  for (d in names(schema$dimensions)) {
     # generate dimension table
-    db$dimensions[dimension$name] <-
-      list(dimension_table(dimension, instances))
+    db$dimensions[d] <-
+      list(dimension_table(
+        get_dimension_name(schema$dimensions[[d]]),
+        get_attribute_names(schema$dimensions[[d]]),
+        instances
+      ))
     # include surrogate key in instances
-    instances <- add_surrogate_key(
-      instances,
-      db$dimensions[[dimension$name]]$dimension,
-      db$dimensions[[dimension$name]]$surrogate_key
-    )
-    keys <- c(keys, db$dimensions[[dimension$name]]$surrogate_key)
+    instances <- add_surrogate_key_to_instances(db$dimensions[[d]], instances)
+    keys <- c(keys, get_surrogate_key(db$dimensions[[d]]))
   }
+
   # select only keys and measures in instances
   instances <- instances[, c(keys, measures)]
+
+  # group instances in facts
   instances <- group_by_keys(
     instances,
     keys,
-    schema$facts$measures,
-    schema$facts$agg_functions,
-    schema$facts$nrow_agg
+    measures,
+    get_agg_functions(schema$facts[[1]]),
+    get_nrow_agg(schema$facts[[1]])
   )
-  db$facts[schema$fact$name] <- list(fact_table(schema$facts, instances, keys))
+  db$facts[names(schema$facts)] <-
+    list(fact_table(
+      get_fact_name(schema$fact[[1]]),
+      keys,
+      names(schema$dimensions),
+      instances
+    ))
 
-  structure(list(schema = schema, facts = db$facts, dimensions = db$dimensions), class = "star_database")
+  structure(list(schema = schema, instance = db), class = "star_database")
 }
 

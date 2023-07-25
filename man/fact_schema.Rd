@@ -29,17 +29,17 @@ A \code{fact_schema} object.
 \description{
 A \code{fact_schema} object is created, the essential data is a name and
 a set of measurements that can be empty (does not have explicit
-measurements). It is part of a \code{star_schema} object, defines the facts
+measures). It is part of a \code{star_schema} object, defines the facts
 of the star schema.
 }
 \details{
-Associated with each measurement there is an aggregation function that can be
+Associated with each measure there is an aggregation function that can be
 SUM, MAX or MIN. AVG is not considered among the possible aggregation
 functions: The reason is that calculating AVG by considering subsets of
 data does not necessarily yield the AVG of the total data.
 
-An additional measurement corresponding to the COUNT of aggregated rows can
-be added which, together with SUM, allows us to obtain the mean if needed.
+An additional measure corresponding to the COUNT of aggregated rows can
+be added which, together with SUM, allows us to obtain the AVG if needed.
 }
 \examples{
 

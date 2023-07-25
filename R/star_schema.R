@@ -93,7 +93,9 @@ define_facts <-
         nrow_agg = nrow_agg
       )
     }
-    structure(list(facts = facts, dimensions = schema$dimensions), class = "star_schema")
+    f <- list(facts)
+    names(f) <- snakecase::to_snake_case(facts$name)
+    structure(list(facts = f, dimensions = schema$dimensions), class = "star_schema")
   }
 
 #' Define dimension in a `star_schema` object.
@@ -166,7 +168,11 @@ define_dimension <- function(schema, dimension = NULL, name = NULL, attributes =
 #'
 #' @keywords internal
 get_measure_names.star_schema <- function(schema) {
-  get_measure_names(schema$facts)
+  names <- NULL
+  for (fact in schema$facts) {
+    names <- c(names, get_measure_names(fact))
+  }
+  unique(names)
 }
 
 
@@ -186,3 +192,5 @@ get_attribute_names.star_schema <- function(schema) {
   }
   unique(names)
 }
+
+

@@ -3,24 +3,25 @@
 #' A `dimension_table` object is created, we have to define its
 #' surrogate key.
 #'
-#' @param dimension_schema A `dimension_schema` object.
+#' @param name A string, dimension name.
+#' @param attributes A vector of strings, attributes names.
 #' @param instances A flat table with the dimension instances.
 #'
 #' @return A `dimension_table` object.
 #' @keywords internal
-dimension_table <- function(dimension_schema = NULL, instances = NULL) {
+dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
   # Check the type of the base object
   stopifnot(tibble::is_tibble(instances))
-  stopifnot(!is.null(dimension_schema$name))
+  stopifnot(!is.null(name))
+  stopifnot(!is.null(attributes))
 
-  ft <- instances[, dimension_schema$attributes]
+  ft <- instances[, attributes]
   # remove duplicates and sort
   ft <- dplyr::arrange_all(unique(ft))
   # add surrogate primary key
   # := variables for parameter names
   # !! expands the expression into a string
-  name <- dimension_schema$name
-  surrogate_key = sprintf("%s_key", name)
+  surrogate_key = sprintf("%s_key", snakecase::to_snake_case(name))
   ft <- tibble::add_column(ft,!!surrogate_key := 1:nrow(ft), .before = 1)
 
   structure(
@@ -31,4 +32,34 @@ dimension_table <- function(dimension_schema = NULL, instances = NULL) {
     ),
     class = "dimension_table"
   )
+}
+
+
+# add_surrogate_key_to_instances -----------------------------------------------
+
+#' Add the surrogate key from a dimension table to the instances table.
+#'
+#' @param dimension_table A `dimension_table` object.
+#' @param instances A `tibble`, the instances table.
+#'
+#' @return A `tibble`.
+#' @keywords internal
+add_surrogate_key_to_instances <- function(dimension_table, instances) {
+  attributes <- colnames(dimension_table$dimension)
+  attributes <- attributes[attributes != dimension_table$surrogate_key]
+  dplyr::inner_join(instances, dimension_table$dimension, by = attributes)
+}
+
+
+#' Get surrogate key names
+#'
+#' Get the names of the surrogate keys defined in the dimension table.
+#'
+#' @param dimension_table A `dimension_table` object.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+get_surrogate_key <- function(dimension_table) {
+  dimension_table$surrogate_key
 }

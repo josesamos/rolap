@@ -26,10 +26,7 @@ test_that("fact_schema() creates a fact schema", {
       list(
         name = "a",
         measures = c("b", "c"),
-        agg_functions = c(
-          "SUM",
-          "SUM"
-        ),
+        agg_functions = NULL,
         nrow_agg = NULL
       ),
       class = "fact_schema"

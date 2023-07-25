@@ -3,8 +3,8 @@
 #' A `dimension_schema` object is created, we have to define its
 #' name and the set of attributes that make it up.
 #'
-#'  A `dimension_schema` object is part of a `star_schema` object, defines
-#'  a dimension of the star schema.
+#' A `dimension_schema` object is part of a `star_schema` object, defines
+#' a dimension of the star schema.
 #'
 #' @param name A string, name of the dimension.
 #' @param attributes A vector of attribute names.
@@ -31,6 +31,20 @@ dimension_schema <- function(name = NULL, attributes = NULL) {
   stopifnot(length(attributes) > 0)
   stopifnot(length(attributes) == length(unique(attributes)))
   structure(list(name = name, attributes = attributes), class = "dimension_schema")
+}
+
+
+#' Get dimension name
+#'
+#' Get the dimension name.
+#'
+#' @param schema A `dimension_schema` object.
+#'
+#' @return A string.
+#'
+#' @keywords internal
+get_dimension_name <- function(schema) {
+  schema$name
 }
 
 

@@ -8,7 +8,7 @@ test_that("define_facts() define facts in a star schema", {
   expect_equal(
     define_facts(star_schema(), fact_schema(name = "a")),
     structure(list(
-      facts = structure(
+      facts = list(a = structure(
         list(
           name = "a",
           measures = NULL,
@@ -16,7 +16,7 @@ test_that("define_facts() define facts in a star schema", {
           nrow_agg = NULL
         ),
         class = "fact_schema"
-      ),
+      )),
       dimensions = NULL
     ), class = "star_schema")
   )
@@ -26,7 +26,7 @@ test_that("define_facts() define facts in a star schema", {
   expect_equal(
     define_facts(star_schema(), name = "a"),
     structure(list(
-      facts = structure(
+      facts = list(a = structure(
         list(
           name = "a",
           measures = NULL,
@@ -34,7 +34,7 @@ test_that("define_facts() define facts in a star schema", {
           nrow_agg = NULL
         ),
         class = "fact_schema"
-      ),
+      )),
       dimensions = NULL
     ), class = "star_schema")
   )
@@ -44,15 +44,15 @@ test_that("define_facts() define facts in a star schema", {
   expect_equal(
     define_facts(star_schema(), name = "a", measures = "b"),
     structure(list(
-      facts = structure(
+      facts = list(a = structure(
         list(
           name = "a",
           measures = "b",
-          agg_functions = "SUM",
+          agg_functions = NULL,
           nrow_agg = NULL
         ),
         class = "fact_schema"
-      ),
+      )),
       dimensions = NULL
     ), class = "star_schema")
   )
@@ -63,28 +63,22 @@ test_that("define_facts() define facts in a star schema", {
     define_facts(
       star_schema(),
       name = "a",
-      measures = c(
-        "b",
-        "c"
-      ),
-      agg_functions = c(
-        "MIN",
-        "MAX"
-      )
+      measures = c("b",
+                   "c"),
+      agg_functions = c("MIN",
+                        "MAX")
     ),
     structure(list(
-      facts = structure(
+      facts = list(a = structure(
         list(
           name = "a",
-          measures = c(
-            "b",
-            "c"
-          ),
+          measures = c("b",
+                       "c"),
           agg_functions = c("MIN", "MAX"),
           nrow_agg = NULL
         ),
         class = "fact_schema"
-      ),
+      )),
       dimensions = NULL
     ), class = "star_schema")
   )
@@ -94,7 +88,7 @@ test_that("define_facts() define facts in a star schema", {
   expect_equal(
     define_facts(star_schema(), name = "a", nrow_agg = "nrow"),
     structure(list(
-      facts = structure(
+      facts = list(a = structure(
         list(
           name = "a",
           measures = NULL,
@@ -102,7 +96,7 @@ test_that("define_facts() define facts in a star schema", {
           nrow_agg = "nrow"
         ),
         class = "fact_schema"
-      ),
+      )),
       dimensions = NULL
     ), class = "star_schema")
   )

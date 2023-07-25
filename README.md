@@ -52,20 +52,20 @@ library(rolap)
 
 s <- star_schema() |>
   define_facts(
-    name = "mrs_cause",
+    name = "MRS Cause",
     measures = c(
       "Pneumonia and Influenza Deaths",
       "All Deaths"
     )
   ) |>
   define_dimension(
-    name = "when",
+    name = "When",
     attributes = c(
       "Year"
     )
   ) |>
   define_dimension(
-    name = "where",
+    name = "Where",
     attributes = c(
       "REGION",
       "State",
@@ -80,8 +80,8 @@ ft$`All Deaths` <- as.integer(ft$`All Deaths`)
 db <- star_database(s, ft)
 ```
 
-The tables of dimensions and facts of the obtained star schema are shown
-below.
+The tables of dimensions and facts of the obtained star database are
+shown below.
 
 | when_key | Year |
 |:--------:|:----:|

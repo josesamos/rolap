@@ -26,22 +26,6 @@ prepare_instances_to_join <- function(instances) {
   }
 }
 
-# add_surrogate_key ------------------------------------------------------------
-
-#' Add the surrogate key from a dimension table to the instances table.
-#'
-#' @param instances A `tibble`, the instances table.
-#' @param dimension A `tibble`, the dimension table.
-#' @param surrogate_key A string, the surrogate key name.
-#'
-#' @return A `tibble`.
-#' @keywords internal
-add_surrogate_key <- function(instances, dimension, surrogate_key) {
-  attributes <- colnames(dimension)
-  attributes <- attributes[attributes != surrogate_key]
-  dplyr::inner_join(instances, dimension, by = attributes)
-}
-
 # group_by_keys ----------------------------------------------------------------
 
 #' Group instances by keys aggregating the measures using the corresponding
@@ -60,6 +44,9 @@ add_surrogate_key <- function(instances, dimension, surrogate_key) {
 #'
 #' @keywords internal
 group_by_keys <- function(instances, keys, measures, agg_functions, nrow_agg) {
+  if (is.null(agg_functions)) {
+    agg_functions <-  rep("SUM", length(measures))
+  }
   # add the new measure to count the number of rows aggregated
   if (is.null(nrow_agg)) {
     nrow_agg <- 'nrow_agg'
