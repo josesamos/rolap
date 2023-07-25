@@ -77,26 +77,27 @@ ft$`Pneumonia and Influenza Deaths` <-
   as.integer(ft$`Pneumonia and Influenza Deaths`)
 ft$`All Deaths` <- as.integer(ft$`All Deaths`)
 
-db <- star_database(s, ft)
+db <- star_database(s, ft)|>
+  snake_case()
 ```
 
 The tables of dimensions and facts of the obtained star database are
 shown below.
 
-| when_key | Year |
+| when_key | year |
 |:--------:|:----:|
 |    1     | 1962 |
 |    2     | 1963 |
 |    3     | 1964 |
 
-| where_key | REGION | State |    City    |
+| where_key | region | state |    city    |
 |:---------:|:------:|:-----:|:----------:|
 |     1     |   1    |  CT   | Bridgeport |
 |     2     |   1    |  CT   |  Hartford  |
 |     3     |   1    |  MA   |   Boston   |
 |     4     |   1    |  MA   | Cambridge  |
 
-| when_key | where_key | Pneumonia and Influenza Deaths | All Deaths | nrow_agg |
+| when_key | where_key | pneumonia_and_influenza_deaths | all_deaths | nrow_agg |
 |:--------:|:---------:|:------------------------------:|:----------:|:--------:|
 |    1     |     1     |               9                |    131     |    3     |
 |    1     |     2     |               5                |    104     |    2     |

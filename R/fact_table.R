@@ -27,3 +27,17 @@ fact_table <- function(name = NULL, surrogate_keys = NULL, dim_int_names = NULL,
     class = "fact_table"
   )
 }
+
+#' Transform names according to the snake case style
+#'
+#' @param table A `fact_table` object.
+#'
+#' @return A `fact_table` object.
+#'
+#' @keywords internal
+snake_case_table.fact_table <- function(table) {
+  table$name <- snakecase::to_snake_case(table$name)
+  names(table$facts) <- snakecase::to_snake_case(names(table$facts))
+  table
+}
+

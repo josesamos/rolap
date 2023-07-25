@@ -63,3 +63,18 @@ add_surrogate_key_to_instances <- function(dimension_table, instances) {
 get_surrogate_key <- function(dimension_table) {
   dimension_table$surrogate_key
 }
+
+
+
+#' Transform names according to the snake case style
+#'
+#' @param table A `dimension_table` object.
+#'
+#' @return A `dimension_table` object.
+#'
+#' @keywords internal
+snake_case_table.dimension_table <- function(table) {
+  table$name <- snakecase::to_snake_case(table$name)
+  names(table$dimension) <- snakecase::to_snake_case(names(table$dimension))
+  table
+}

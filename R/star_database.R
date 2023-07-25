@@ -99,7 +99,7 @@ star_database <- function(schema, instances) {
     get_agg_functions(schema$facts[[1]]),
     get_nrow_agg(schema$facts[[1]])
   )
-  db$facts[names(schema$facts)] <-
+  db$facts[1] <-
     list(fact_table(
       get_fact_name(schema$fact[[1]]),
       keys,
@@ -108,5 +108,59 @@ star_database <- function(schema, instances) {
     ))
 
   structure(list(schema = schema, instance = db), class = "star_database")
+}
+
+
+#' Transform names according to the snake case style
+#'
+#' Transform fact, dimension, measures, and attribute names according to the
+#' snake case style.
+#'
+#' This style is suitable if we are going to work with databases.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star schema and constellation definition functions
+#'
+#' @examples
+#'
+#' s <- star_schema() |>
+#'   define_facts(fact_schema(
+#'     name = "mrs_cause",
+#'     measures = c(
+#'       "Pneumonia and Influenza Deaths",
+#'       "All Deaths"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "when",
+#'     attributes = c(
+#'       "Year"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "where",
+#'     attributes = c(
+#'       "REGION",
+#'       "State",
+#'       "City"
+#'     )
+#'   ))
+#'
+#' # ft_num contains instances
+#' db <- star_database(s, ft_num) |>
+#'   snake_case()
+#'
+#' @export
+snake_case <- function(db) {
+  for (f in names(db$instance$facts)) {
+    db$instance$facts[[f]] <- snake_case_table(db$instance$facts[[f]])
+  }
+  for (d in names(db$instance$dimensions)) {
+    db$instance$dimensions[[d]] <- snake_case_table(db$instance$dimensions[[d]])
+  }
+  db
 }
 
