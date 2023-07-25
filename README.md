@@ -100,15 +100,6 @@ shown below.
 |    2     |     4     |               13               |     84     |    3     |
 
 ``` r
-
-s2 <- star_schema() |>
-  define_facts(name = "MRS Age",
-               measures = c("All Deaths")) |>
-  define_dimension(when) |>
-  define_dimension(where) |>
-  define_dimension(name = "Who",
-                         attributes = c("Age"))
-
 ft2 <- ft |>
   dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
   tidyr::gather("Age", "All Deaths", 7:11) |>
@@ -117,9 +108,6 @@ ft2 <- ft |>
   dplyr::filter(Year < "1964") |>
   dplyr::filter(City != "Boston" & City != "Bridgeport") |>
   dplyr::filter(WEEK >= "8")
-
-db2 <- star_database(s2, ft2) |>
-  snake_case()
 ```
 
 | Year | WEEK | Week Ending Date | REGION | State |   City    |     Age     | All Deaths |
@@ -134,6 +122,19 @@ db2 <- star_database(s2, ft2) |>
 | 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  | 45-64 years |     14     |
 | 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge |  65+ years  |     29     |
 | 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  |  65+ years  |     27     |
+
+``` r
+s2 <- star_schema() |>
+  define_facts(name = "MRS Age",
+               measures = c("All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where) |>
+  define_dimension(name = "Who",
+                         attributes = c("Age"))
+
+db2 <- star_database(s2, ft2) |>
+  snake_case()
+```
 
 The tables of dimensions and facts of the obtained star database are
 shown below.

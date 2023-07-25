@@ -79,15 +79,6 @@ pander::pandoc.table(db1$instance$facts$mrs_cause$facts, split.table = Inf)
 ```
 
 ```{r example2}
-
-s2 <- star_schema() |>
-  define_facts(name = "MRS Age",
-               measures = c("All Deaths")) |>
-  define_dimension(when) |>
-  define_dimension(where) |>
-  define_dimension(name = "Who",
-                         attributes = c("Age"))
-
 ft2 <- ft |>
   dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
   tidyr::gather("Age", "All Deaths", 7:11) |>
@@ -96,14 +87,24 @@ ft2 <- ft |>
   dplyr::filter(Year < "1964") |>
   dplyr::filter(City != "Boston" & City != "Bridgeport") |>
   dplyr::filter(WEEK >= "8")
-
-db2 <- star_database(s2, ft2) |>
-  snake_case()
 ```
 
 
 ```{r, results = "asis", echo = FALSE}
 pander::pandoc.table(ft2, split.table = Inf)
+```
+
+```{r example3}
+s2 <- star_schema() |>
+  define_facts(name = "MRS Age",
+               measures = c("All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where) |>
+  define_dimension(name = "Who",
+                         attributes = c("Age"))
+
+db2 <- star_database(s2, ft2) |>
+  snake_case()
 ```
 
 The tables of dimensions and facts of the obtained star database are shown below.
