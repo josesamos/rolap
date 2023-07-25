@@ -22,7 +22,7 @@ fact_table <- function(name = NULL, surrogate_keys = NULL, dim_int_names = NULL,
       name = name,
       surrogate_keys = surrogate_keys,
       dim_int_names = dim_int_names,
-      facts = instances
+      table = instances
     ),
     class = "fact_table"
   )
@@ -37,7 +37,7 @@ fact_table <- function(name = NULL, surrogate_keys = NULL, dim_int_names = NULL,
 #' @keywords internal
 snake_case_table.fact_table <- function(table) {
   table$name <- snakecase::to_snake_case(table$name)
-  names(table$facts) <- snakecase::to_snake_case(names(table$facts))
+  names(table$table) <- snakecase::to_snake_case(names(table$table))
   table
 }
 

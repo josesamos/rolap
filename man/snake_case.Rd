@@ -49,4 +49,8 @@ db <- star_database(s, ft_num) |>
   snake_case()
 
 }
+\seealso{
+Other star schema and constellation definition functions: 
+\code{\link{constellation}()}
+}
 \concept{star schema and constellation definition functions}

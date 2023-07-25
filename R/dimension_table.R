@@ -28,7 +28,7 @@ dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
     list(
       name = name,
       surrogate_key = surrogate_key,
-      dimension = ft
+      table = ft
     ),
     class = "dimension_table"
   )
@@ -45,9 +45,9 @@ dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
 #' @return A `tibble`.
 #' @keywords internal
 add_surrogate_key_to_instances <- function(dimension_table, instances) {
-  attributes <- colnames(dimension_table$dimension)
+  attributes <- colnames(dimension_table$table)
   attributes <- attributes[attributes != dimension_table$surrogate_key]
-  dplyr::inner_join(instances, dimension_table$dimension, by = attributes)
+  dplyr::inner_join(instances, dimension_table$table, by = attributes)
 }
 
 
@@ -75,6 +75,6 @@ get_surrogate_key <- function(dimension_table) {
 #' @keywords internal
 snake_case_table.dimension_table <- function(table) {
   table$name <- snakecase::to_snake_case(table$name)
-  names(table$dimension) <- snakecase::to_snake_case(names(table$dimension))
+  names(table$table) <- snakecase::to_snake_case(names(table$table))
   table
 }

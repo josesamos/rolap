@@ -44,7 +44,7 @@ test_that("star_database() define a a star database", {
           surrogate_keys = c("when_key", "where_key"),
           dim_int_names = c("when",
                             "where"),
-          facts = structure(
+          table = structure(
             list(
               when_key = c(1L, 1L,
                            2L, 2L, 3L, 3L),
@@ -67,7 +67,7 @@ test_that("star_database() define a a star database", {
           list(
             name = "When",
             surrogate_key = "when_key",
-            dimension = structure(
+            table = structure(
               list(
                 when_key = 1:3,
                 Year = c("1962", "1963", "1964")
@@ -83,7 +83,7 @@ test_that("star_database() define a a star database", {
           list(
             name = "Where",
             surrogate_key = "where_key",
-            dimension = structure(
+            table = structure(
               list(
                 where_key = 1:2,
                 REGION = c("1",
@@ -147,7 +147,7 @@ test_that("snake_case() transform a a star database in snake case", {
           surrogate_keys = c("when_key", "where_key"),
           dim_int_names = c("when",
                             "where"),
-          facts = structure(
+          table = structure(
             list(
               when_key = c(1L, 1L,
                            2L, 2L, 3L, 3L),
@@ -170,7 +170,7 @@ test_that("snake_case() transform a a star database in snake case", {
           list(
             name = "when",
             surrogate_key = "when_key",
-            dimension = structure(
+            table = structure(
               list(
                 when_key = 1:3,
                 year = c("1962", "1963", "1964")
@@ -186,7 +186,7 @@ test_that("snake_case() transform a a star database in snake case", {
           list(
             name = "where",
             surrogate_key = "where_key",
-            dimension = structure(
+            table = structure(
               list(
                 where_key = 1:2,
                 region = c("1",
