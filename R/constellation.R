@@ -13,6 +13,37 @@
 #'
 #' @examples
 #'
+#' when <- dimension_schema(name = "When",
+#'                          attributes = c("Year"))
+#'
+#' where <- dimension_schema(name = "Where",
+#'                           attributes = c("REGION",
+#'                                          "State",
+#'                                          "City"))
+#'
+#' s1 <- star_schema() |>
+#'   define_facts(name = "MRS Cause",
+#'                measures = c("Pneumonia and Influenza Deaths",
+#'                             "All Deaths")) |>
+#'   define_dimension(when) |>
+#'   define_dimension(where)
+#'
+#' db1 <- star_database(s1, ft_num) |>
+#'   snake_case()
+#'
+#'
+#' s2 <- star_schema() |>
+#'   define_facts(name = "MRS Age",
+#'                measures = c("All Deaths")) |>
+#'   define_dimension(when) |>
+#'   define_dimension(where) |>
+#'   define_dimension(name = "Who",
+#'                    attributes = c("Age"))
+#'
+#' db2 <- star_database(s2, ft_age) |>
+#'   snake_case()
+#'
+#' ct <- constellation("MRS", list(db1, db2))
 #'
 #' @export
 constellation <- function(name = NULL, stars = NULL) {
@@ -64,15 +95,15 @@ constellation <- function(name = NULL, stars = NULL) {
             i <- i + 1
             if (is.null(surrogate_key)) {
               surrogate_key <- dim[[1]]$surrogate_key
-              attributes <- names(dim[[1]]$table)[names(dim[[1]]$table) != surrogate_key]
+              attributes <-
+                names(dim[[1]]$table)[names(dim[[1]]$table) != surrogate_key]
             }
             # join facts to original dimension
             facts[names(stars[[s]]$instance$facts)][[1]]$table <-
               dplyr::select(
                 dplyr::inner_join(facts[names(stars[[s]]$instance$facts)][[1]]$table,
                                   dim[[1]]$table,
-                                  by = surrogate_key),
-                -surrogate_key
+                                  by = surrogate_key),-surrogate_key
               )
             break
           }
@@ -82,20 +113,29 @@ constellation <- function(name = NULL, stars = NULL) {
         }
       }
       dimensions[[dn]] <- conform_dimensions(to_conform)
-      # join to facts
+      # join new dimension to facts
       for (s in seq_along(stars)) {
         if (dn %in% names(stars[[s]]$instance$dimensions)) {
           facts[names(stars[[s]]$instance$facts)][[1]]$table <-
             dplyr::select(
               dplyr::inner_join(facts[names(stars[[s]]$instance$facts)][[1]]$table,
                                 dimensions[dn][[1]]$table,
-                                by = attributes),
-              -all_of(attributes)
+                                by = attributes),-tidyselect::all_of(attributes)
             )
-          # reorder fact columns
         }
       }
     }
   }
-  structure(list(name = name, facts = facts, dimensions = dimensions), class = "constellation")
+  # reorder attributes in facts
+  for (f in seq_along(facts)) {
+    measures <-
+      setdiff(names(facts[[f]]$table), facts[[f]]$surrogate_keys)
+    facts[[f]]$table <-
+      dplyr::select(facts[[f]]$table, tidyselect::all_of(c(facts[[f]]$surrogate_keys, measures)))
+  }
+  structure(list(
+    name = name,
+    facts = facts,
+    dimensions = dimensions
+  ), class = "constellation")
 }
