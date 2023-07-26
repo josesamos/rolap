@@ -39,7 +39,7 @@
 #' The operations to obtain it from ft data set are:
 #'
 #' ft_age <- ft |>
-#'   dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
+#'   dplyr::select(-`Pneumonia and Influenza Deaths`, -tidyselect::all_of(`All Deaths`)) |>
 #'   tidyr::gather("Age", "All Deaths", 7:11) |>
 #'   dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
 #'   dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))

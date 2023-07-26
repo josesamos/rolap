@@ -103,7 +103,7 @@ constellation <- function(name = NULL, stars = NULL) {
               dplyr::select(
                 dplyr::inner_join(facts[names(stars[[s]]$instance$facts)][[1]]$table,
                                   dim[[1]]$table,
-                                  by = surrogate_key),-surrogate_key
+                                  by = surrogate_key),-tidyselect::all_of(surrogate_key)
               )
             break
           }

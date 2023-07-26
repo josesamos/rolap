@@ -97,7 +97,7 @@ conform_dimensions <- function(to_conform) {
   dim_attr_length <- length(dim_attr)
   same_schema_dimensions <- TRUE
 
-  dim$table <- dplyr::select(dim$table,-dim$surrogate_key)
+  dim$table <- dplyr::select(dim$table,-tidyselect::all_of(dim$surrogate_key))
   attributes <- names(dim$table)
   for (d in 2:length(to_conform)) {
     # check if dimensions have the same schema

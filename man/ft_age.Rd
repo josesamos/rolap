@@ -22,7 +22,7 @@ mortality figures by age group and cause, considered separately, are included.
 The operations to obtain it from ft data set are:
 
 ft_age <- ft |>
-dplyr::select(-\verb{Pneumonia and Influenza Deaths}, -\verb{All Deaths}) |>
+dplyr::select(-\verb{Pneumonia and Influenza Deaths}, -tidyselect::all_of(\verb{All Deaths})) |>
 tidyr::gather("Age", "All Deaths", 7:11) |>
 dplyr::mutate(\verb{All Deaths} = as.integer(\verb{All Deaths})) |>
 dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))
