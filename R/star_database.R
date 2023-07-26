@@ -164,3 +164,12 @@ snake_case <- function(db) {
   db
 }
 
+# as_tibble_list.star_database -------------------------------------------
+
+#' @rdname as_tibble_list
+#' @export
+as_tibble_list.star_database <- function(db) {
+  print("as_tibble_list.star_database")
+  db
+}
+

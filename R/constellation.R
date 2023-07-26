@@ -139,3 +139,13 @@ constellation <- function(name = NULL, stars = NULL) {
     dimensions = dimensions
   ), class = "constellation")
 }
+
+# as_tibble_list.constellation -------------------------------------------
+
+#' @rdname as_tibble_list
+#' @export
+as_tibble_list.constellation <- function(db) {
+  print("as_tibble_list.constellation")
+  db
+}
+

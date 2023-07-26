@@ -56,6 +56,7 @@ ct <- constellation("MRS", list(db1, db2))
 }
 \seealso{
 Other star schema and constellation definition functions: 
+\code{\link{as_tibble_list.constellation}()},
 \code{\link{snake_case}()}
 }
 \concept{star schema and constellation definition functions}
