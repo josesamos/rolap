@@ -73,9 +73,9 @@ db1 <- star_database(s1, ft1) |>
 The tables of dimensions and facts of the obtained star database are shown below.
 
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(db1$instance$dimensions$when$dimension, split.table = Inf)
-pander::pandoc.table(db1$instance$dimensions$where$dimension, split.table = Inf)
-pander::pandoc.table(db1$instance$facts$mrs_cause$facts, split.table = Inf)
+pander::pandoc.table(db1$instance$dimensions$when$table, split.table = Inf)
+pander::pandoc.table(db1$instance$dimensions$where$table, split.table = Inf)
+pander::pandoc.table(db1$instance$facts$mrs_cause$table, split.table = Inf)
 ```
 
 ```{r example2}
@@ -110,8 +110,20 @@ db2 <- star_database(s2, ft2) |>
 The tables of dimensions and facts of the obtained star database are shown below.
 
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(db2$instance$dimensions$when$dimension, split.table = Inf)
-pander::pandoc.table(db2$instance$dimensions$where$dimension, split.table = Inf)
-pander::pandoc.table(db2$instance$dimensions$who$dimension, split.table = Inf)
-pander::pandoc.table(db2$instance$facts$mrs_age$facts, split.table = Inf)
+pander::pandoc.table(db2$instance$dimensions$when$table, split.table = Inf)
+pander::pandoc.table(db2$instance$dimensions$where$table, split.table = Inf)
+pander::pandoc.table(db2$instance$dimensions$who$table, split.table = Inf)
+pander::pandoc.table(db2$instance$facts$mrs_age$table, split.table = Inf)
+```
+
+```{r example4}
+ct <- constellation("MRS", list(db1, db2))
+```
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ct$dimensions$when$table, split.table = Inf)
+pander::pandoc.table(ct$dimensions$where$table, split.table = Inf)
+pander::pandoc.table(ct$dimensions$who$table, split.table = Inf)
+pander::pandoc.table(ct$facts$mrs_cause$table, split.table = Inf)
+pander::pandoc.table(ct$facts$mrs_age$table, split.table = Inf)
 ```
