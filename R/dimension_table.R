@@ -78,3 +78,37 @@ snake_case_table.dimension_table <- function(table) {
   names(table$table) <- snakecase::to_snake_case(names(table$table))
   table
 }
+
+
+
+#' Conform dimensions
+#'
+#' Generate a dimension from a list of dimensions with the same schema.
+#'
+#' @param to_conform A `dimension_table` object list.
+#'
+#' @return A `dimension_table` object.
+#'
+#' @keywords internal
+conform_dimensions <- function(to_conform) {
+  dim <- to_conform[[1]]
+  # to check if dimensions have the same schema
+  dim_attr <- names(dim$table)
+  dim_attr_length <- length(dim_attr)
+  same_schema_dimensions <- TRUE
+
+  dim$table <- dplyr::select(dim$table, -dim$surrogate_key)
+  attributes <- names(dim$table)
+  for (d in 2:length(to_conform)) {
+    # check if dimensions have the same schema
+    dim_attr <- unique(c(dim_attr, names(to_conform[[d]]$table)))
+    same_schema_dimensions <- (dim_attr_length == length(dim_attr))
+    stopifnot(same_schema_dimensions)
+
+    dim$table <- dplyr::bind_rows(dim$table, dplyr::select(to_conform[[d]]$table, all_of(attributes)))
+  }
+  dim$table <- dplyr::arrange_all(unique(dim$table))
+  dim$table <- tibble::add_column(dim$table,!!dim$surrogate_key := 1:nrow(dim$table), .before = 1)
+  dim
+}
+
