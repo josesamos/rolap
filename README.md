@@ -5,8 +5,7 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.com/josesamos/rolap.svg?branch=master)](https://travis-ci.com/josesamos/rolap)
+[![R-CMD-check](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The *multidimensional data model* was defined in the 1990s with the aim
