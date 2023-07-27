@@ -5,7 +5,7 @@ get_attribute_names <- function(schema) UseMethod("get_attribute_names")
 
 snake_case_table <- function(table) UseMethod("snake_case_table")
 
-#' Generate a list of tibbles with the fact and dimension tables
+#' Generate a list of tibbles with fact and dimension tables
 #'
 #' To port databases to other work environments it is useful to be able to
 #' export them as a list of tibbles, as this function does.

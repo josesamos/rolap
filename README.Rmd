@@ -127,3 +127,11 @@ pander::pandoc.table(ct$dimensions$who$table, split.table = Inf)
 pander::pandoc.table(ct$facts$mrs_cause$table, split.table = Inf)
 pander::pandoc.table(ct$facts$mrs_age$table, split.table = Inf)
 ```
+
+```{r example5}
+ls <- db2 |>
+  as_tibble_list()
+
+lc <- ct |>
+  as_tibble_list()
+```

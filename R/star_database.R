@@ -168,8 +168,19 @@ snake_case <- function(db) {
 
 #' @rdname as_tibble_list
 #' @export
+#' @keywords internal
 as_tibble_list.star_database <- function(db) {
-  print("as_tibble_list.star_database")
-  db
+  l <- NULL
+  lnames <- NULL
+  for (f in names(db$instance$facts)) {
+    l <- c(l, list(db$instance$facts[[f]]$table))
+    lnames <- c(lnames, f)
+  }
+  for (d in names(db$instance$dimensions)) {
+    l <- c(l, list(db$instance$dimensions[[d]]$table))
+    lnames <- c(lnames, d)
+  }
+  names(l) <- lnames
+  l
 }
 

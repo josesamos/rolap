@@ -4,7 +4,7 @@
 \alias{as_tibble_list.constellation}
 \alias{as_tibble_list}
 \alias{as_tibble_list.star_database}
-\title{Generate a list of tibbles with the fact and dimension tables}
+\title{Generate a list of tibbles with fact and dimension tables}
 \usage{
 \method{as_tibble_list}{constellation}(db)
 
@@ -61,3 +61,4 @@ Other star schema and constellation definition functions:
 \code{\link{snake_case}()}
 }
 \concept{star schema and constellation definition functions}
+\keyword{internal}

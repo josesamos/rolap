@@ -217,3 +217,13 @@ ct <- constellation("MRS", list(db1, db2))
 |    2     |     2     |    3    |     14     |    1     |
 |    2     |     2     |    4    |     27     |    1     |
 |    2     |     2     |    5    |     3      |    1     |
+
+``` r
+ls <- db2 |>
+  as_tibble_list()
+#> [1] "as_tibble_list.star_database"
+
+lc <- ct |>
+  as_tibble_list()
+#> [1] "as_tibble_list.constellation"
+```
