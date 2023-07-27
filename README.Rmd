@@ -165,7 +165,7 @@ pander::pandoc.table(db1$instance$dimensions$where$table, split.table = Inf)
 pander::pandoc.table(db1$instance$facts$mrs_cause$table, split.table = Inf)
 ```
 
-Below are the tables of the star database with the age data.
+Below are the tables of the star database with the age data, the `db2` database.
 
 ```{r, results = "asis", echo = FALSE}
 pander::pandoc.table(db2$instance$dimensions$when$table, split.table = Inf)
@@ -174,7 +174,7 @@ pander::pandoc.table(db2$instance$dimensions$who$table, split.table = Inf)
 pander::pandoc.table(db2$instance$facts$mrs_age$table, split.table = Inf)
 ```
 
-As we have filtered the data, it can be seen that the dimension tables only contain the necessary data for each star database.
+As we have filtered the data, it can be seen that the dimension tables only contain the necessary data for each star database but, for common dimensions, they share the same structure.
 
 Next we define a constellation formed by the two star databases.
 

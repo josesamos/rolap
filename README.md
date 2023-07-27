@@ -244,7 +244,8 @@ focused on the causes are shown below.
 |    1     |     2     |               22               |    569     |    2     |
 |    1     |     3     |               13               |     84     |    3     |
 
-Below are the tables of the star database with the age data.
+Below are the tables of the star database with the age data, the `db2`
+database.
 
 | when_key | year |
 |:--------:|:----:|
@@ -278,7 +279,8 @@ Below are the tables of the star database with the age data.
 |    2     |     1     |    5    |     3      |    1     |
 
 As we have filtered the data, it can be seen that the dimension tables
-only contain the necessary data for each star database.
+only contain the necessary data for each star database but, for common
+dimensions, they share the same structure.
 
 Next we define a constellation formed by the two star databases.
 
