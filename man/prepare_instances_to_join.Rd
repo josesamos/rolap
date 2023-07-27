@@ -14,6 +14,6 @@ A \code{tibble}.
 }
 \description{
 Transform all fields in the instances table to character type and replace
-the \code{NA} values for a specific value.
+the \code{NA} values to facilitate the join operation.
 }
 \keyword{internal}

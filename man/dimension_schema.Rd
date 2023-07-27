@@ -15,8 +15,8 @@ dimension_schema(name = NULL, attributes = NULL)
 A \code{dimension_schema} object.
 }
 \description{
-A \code{dimension_schema} object is created, we have to define its
-name and the set of attributes that make it up.
+A \code{dimension_schema} object is created, we have to define its name and the
+set of attributes that make it up.
 }
 \details{
 A \code{dimension_schema} object is part of a \code{star_schema} object, defines

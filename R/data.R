@@ -47,3 +47,58 @@
 #' @format A `tibble`.
 #' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
 "ft_age"
+
+#' Star schema for Mortality Reporting System by Cause
+#'
+#' Definition of schemas for facts and dimensions for the Mortality Reporting System
+#' considering the cause classification.
+#'
+#' Dimension schemes can be defined using variables so that you do not have to repeat
+#' the definition in several multidimensional designs.
+#'
+#' @examples
+#' # Defined by:
+#'
+#' when <- dimension_schema(name = "When",
+#'                          attributes = c("Year"))
+#' where <- dimension_schema(name = "Where",
+#'                           attributes = c("REGION",
+#'                                          "State",
+#'                                          "City"))
+#' mrs_cause_schema <- star_schema() |>
+#'   define_facts(name = "MRS Cause",
+#'                measures = c("Pneumonia and Influenza Deaths",
+#'                             "All Deaths")) |>
+#'   define_dimension(when) |>
+#'   define_dimension(where)
+#'
+#' @format A `star_schema` object.
+"mrs_cause_schema"
+
+#' Star schema for Mortality Reporting System by Age
+#'
+#' Definition of schemas for facts and dimensions for the Mortality Reporting System
+#' considering the age classification.
+#'
+#' Dimension schemes can be defined using variables so that you do not have to repeat
+#' the definition in several multidimensional designs.
+#'
+#' @examples
+#' # Defined by:
+#'
+#' when <- dimension_schema(name = "When",
+#'                          attributes = c("Year"))
+#' where <- dimension_schema(name = "Where",
+#'                           attributes = c("REGION",
+#'                                          "State",
+#'                                          "City"))
+#' mrs_age_schema <- star_schema() |>
+#'   define_facts(name = "MRS Age",
+#'                measures = c("All Deaths")) |>
+#'   define_dimension(when) |>
+#'   define_dimension(where) |>
+#'   define_dimension(name = "Who",
+#'                    attributes = c("Age"))
+#'
+#' @format A `star_schema` object.
+"mrs_age_schema"

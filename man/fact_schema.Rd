@@ -28,8 +28,8 @@ A \code{fact_schema} object.
 }
 \description{
 A \code{fact_schema} object is created, the essential data is a name and
-a set of measurements that can be empty (does not have explicit
-measures). It is part of a \code{star_schema} object, defines the facts
+a set of measures that can be empty (does not have explicit measures).
+It is part of a \code{star_schema} object, defines the facts
 of the star schema.
 }
 \details{

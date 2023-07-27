@@ -44,6 +44,7 @@
 #'
 #' @export
 star_database <- function(schema, instances) {
+  stopifnot(check_schema_validity(schema) == TRUE)
   stopifnot(tibble::is_tibble(instances))
   instance_attributes <- names(instances)
   attributes <- get_attribute_names(schema)

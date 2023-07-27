@@ -53,7 +53,7 @@ constellation <- function(name = NULL, stars = NULL) {
   dim_names <- c()
   facts = vector("list", length = length(stars))
   for (s in seq_along(stars)) {
-    stopifnot(class(stars[[s]]) == "star_database")
+    stopifnot("star_database" %in% class(stars[[s]]))
     fct_names <- c(fct_names, names(stars[[s]]$instance$facts))
     dim_names <- c(dim_names, names(stars[[s]]$instance$dimensions))
     facts[s] <- stars[[s]]$instance$facts

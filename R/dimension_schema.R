@@ -1,7 +1,7 @@
 #' `dimension_schema` S3 class
 #'
-#' A `dimension_schema` object is created, we have to define its
-#' name and the set of attributes that make it up.
+#' A `dimension_schema` object is created, we have to define its name and the
+#' set of attributes that make it up.
 #'
 #' A `dimension_schema` object is part of a `star_schema` object, defines
 #' a dimension of the star schema.

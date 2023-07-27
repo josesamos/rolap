@@ -24,8 +24,6 @@ s <- star_schema()
 
 }
 \seealso{
-\code{\link{fact_schema}}
-
 Other star schema definition functions: 
 \code{\link{define_dimension}()},
 \code{\link{define_facts}()},

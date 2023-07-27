@@ -10,7 +10,6 @@
 #' @return A `star_schema` object.
 #'
 #' @family star schema definition functions
-#' @seealso \code{\link{fact_schema}}
 #'
 #' @examples
 #'
@@ -193,4 +192,20 @@ get_attribute_names.star_schema <- function(schema) {
   unique(names)
 }
 
+
+
+#' check if star schema is valid: has facts and dimensions
+#'
+#' @param schema A `star_schema` object.
+#'
+#' @return A boolean.
+#'
+#' @keywords internal
+check_schema_validity <- function(schema) {
+  stopifnot("fact_schema" %in% class(schema$facts[[1]]))
+  for (d in seq_along(class(schema$dimensions))) {
+    stopifnot("dimension_schema" %in% class(schema$dimensions[[d]]))
+  }
+  TRUE
+}
 

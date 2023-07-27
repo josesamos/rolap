@@ -3,7 +3,7 @@
 #' Transform the instances table implemented by a `tibble` to join
 #'
 #' Transform all fields in the instances table to character type and replace
-#' the `NA` values for a specific value.
+#' the `NA` values to facilitate the join operation.
 #'
 #' @param instances A `tibble`, the instances table.
 #'
