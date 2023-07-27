@@ -2,16 +2,15 @@
 #'
 #' A `fact_schema` object is created, the essential data is a name and
 #' a set of measures that can be empty (does not have explicit measures).
-#' It is part of a `star_schema` object, defines the facts
-#' of the star schema.
+#' It is part of a `star_schema` object, defines the facts of the star schema.
 #'
 #' Associated with each measure there is an aggregation function that can be
 #' SUM, MAX or MIN. AVG is not considered among the possible aggregation
 #' functions: The reason is that calculating AVG by considering subsets of
 #' data does not necessarily yield the AVG of the total data.
 #'
-#' An additional measure corresponding to the COUNT of aggregated rows can
-#' be added which, together with SUM, allows us to obtain the AVG if needed.
+#' An additional measure corresponding to the COUNT of aggregated rows is added
+#' which, together with SUM, allows us to obtain the AVG if needed.
 #'
 #' @param name A string, name of the fact.
 #' @param measures A vector of measure names.
@@ -34,6 +33,19 @@
 #'     "Pneumonia and Influenza Deaths",
 #'     "Other Deaths"
 #'   )
+#' )
+#'
+#' f <- fact_schema(
+#'   name = "mrs_cause",
+#'   measures = c(
+#'     "Pneumonia and Influenza Deaths",
+#'     "Other Deaths"
+#'   ),
+#'   agg_functions = c(
+#'     "MAX",
+#'     "SUM"
+#'   ),
+#'   nrow_agg = "Nrow"
 #' )
 #'
 #' @export

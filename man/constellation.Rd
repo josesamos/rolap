@@ -21,42 +21,19 @@ dimensions with the same name in the star schemas have to be conformable
 }
 \examples{
 
-when <- dimension_schema(name = "When",
-                         attributes = c("Year"))
-
-where <- dimension_schema(name = "Where",
-                          attributes = c("REGION",
-                                         "State",
-                                         "City"))
-
-s1 <- star_schema() |>
-  define_facts(name = "MRS Cause",
-               measures = c("Pneumonia and Influenza Deaths",
-                            "All Deaths")) |>
-  define_dimension(when) |>
-  define_dimension(where)
-
-db1 <- star_database(s1, ft_num) |>
+db1 <- star_database(mrs_cause_schema, ft_num) |>
   snake_case()
-
-
-s2 <- star_schema() |>
-  define_facts(name = "MRS Age",
-               measures = c("All Deaths")) |>
-  define_dimension(when) |>
-  define_dimension(where) |>
-  define_dimension(name = "Who",
-                   attributes = c("Age"))
-
-db2 <- star_database(s2, ft_age) |>
+db2 <- star_database(mrs_age_schema, ft_age) |>
   snake_case()
-
 ct <- constellation("MRS", list(db1, db2))
 
 }
 \seealso{
-Other star schema and constellation definition functions: 
-\code{\link{as_tibble_list.constellation}()},
-\code{\link{snake_case}()}
+\code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{mrs_age_schema}}, \code{\link{ft_num}}, \code{\link{ft_age}}
+
+Other star database definition functions: 
+\code{\link{as_tibble_list}()},
+\code{\link{snake_case}()},
+\code{\link{star_database}()}
 }
-\concept{star schema and constellation definition functions}
+\concept{star database definition functions}

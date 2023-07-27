@@ -15,38 +15,21 @@ snake_case_table <- function(table) UseMethod("snake_case_table")
 #'
 #' @return A list of `tibble`
 #'
-#' @family star schema and constellation definition functions
+#' @family star database definition functions
+#' @seealso \code{\link{mrs_cause_schema}}, \code{\link{mrs_age_schema}}, \code{\link{ft_num}}, \code{\link{ft_age}}
 #'
 #' @examples
 #'
-#' s <- star_schema() |>
-#'   define_facts(fact_schema(
-#'     name = "mrs_cause",
-#'     measures = c(
-#'       "Pneumonia and Influenza Deaths",
-#'       "All Deaths"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "when",
-#'     attributes = c(
-#'       "Year"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "where",
-#'     attributes = c(
-#'       "REGION",
-#'       "State",
-#'       "City"
-#'     )
-#'   ))
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' tl1 <- db1 |>
+#'   as_tibble_list()
 #'
-#' # ft_num contains instances
-#' db <- star_database(s, ft_num) |>
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
 #'   snake_case()
 #'
-#' tl <- db |>
+#' ct <- constellation("MRS", list(db1, db2))
+#' tl <- ct |>
 #'   as_tibble_list()
 #'
 #' @export

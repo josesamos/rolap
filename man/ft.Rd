@@ -22,4 +22,12 @@ mortality figures by age group and cause, considered separately, are included.
 In the cause, only a distinction is made between pneumonia or influenza and
 others.
 }
+\seealso{
+\code{\link{mrs_cause_schema}}
+
+Other mrs example data: 
+\code{\link{ft_age}},
+\code{\link{ft_num}}
+}
+\concept{mrs example data}
 \keyword{datasets}

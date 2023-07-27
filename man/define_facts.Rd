@@ -43,8 +43,8 @@ SUM, MAX or MIN. AVG is not considered among the possible aggregation
 functions: The reason is that calculating AVG by considering subsets of
 data does not necessarily yield the AVG of the total data.
 
-An additional measurement corresponding to the COUNT of aggregated rows can
-be added which, together with SUM, allows us to obtain the mean if needed.
+An additional measurement corresponding to the COUNT of aggregated rows is
+added which, together with SUM, allows us to obtain the mean if needed.
 }
 \examples{
 
@@ -69,13 +69,12 @@ s <- s |>
   define_facts(f)
 }
 \seealso{
-\code{\link{star_schema}}
+\code{\link{fact_schema}}
 
 Other star schema definition functions: 
 \code{\link{define_dimension}()},
 \code{\link{dimension_schema}()},
 \code{\link{fact_schema}()},
-\code{\link{star_database}()},
 \code{\link{star_schema}()}
 }
 \concept{star schema definition functions}

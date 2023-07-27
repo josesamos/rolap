@@ -9,40 +9,15 @@
 #'
 #' @return A `constellation` object.
 #'
-#' @family star schema and constellation definition functions
+#' @family star database definition functions
+#' @seealso \code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{mrs_age_schema}}, \code{\link{ft_num}}, \code{\link{ft_age}}
 #'
 #' @examples
 #'
-#' when <- dimension_schema(name = "When",
-#'                          attributes = c("Year"))
-#'
-#' where <- dimension_schema(name = "Where",
-#'                           attributes = c("REGION",
-#'                                          "State",
-#'                                          "City"))
-#'
-#' s1 <- star_schema() |>
-#'   define_facts(name = "MRS Cause",
-#'                measures = c("Pneumonia and Influenza Deaths",
-#'                             "All Deaths")) |>
-#'   define_dimension(when) |>
-#'   define_dimension(where)
-#'
-#' db1 <- star_database(s1, ft_num) |>
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
 #'   snake_case()
-#'
-#'
-#' s2 <- star_schema() |>
-#'   define_facts(name = "MRS Age",
-#'                measures = c("All Deaths")) |>
-#'   define_dimension(when) |>
-#'   define_dimension(where) |>
-#'   define_dimension(name = "Who",
-#'                    attributes = c("Age"))
-#'
-#' db2 <- star_database(s2, ft_age) |>
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
 #'   snake_case()
-#'
 #' ct <- constellation("MRS", list(db1, db2))
 #'
 #' @export
@@ -142,9 +117,27 @@ constellation <- function(name = NULL, stars = NULL) {
 
 # as_tibble_list.constellation -------------------------------------------
 
-#' @rdname as_tibble_list
+#' Generate a list of tibbles with fact and dimension tables
+#'
+#' To port databases to other work environments it is useful to be able to
+#' export them as a list of tibbles, as this function does.
+#'
+#'
+#' @param db A `constellation` object.
+#'
+#' @return A list of `tibble`
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#' ct <- constellation("MRS", list(db1, db2))
+#' tl <- ct |>
+#'   as_tibble_list()
+#'
 #' @export
-#' @keywords internal
 as_tibble_list.constellation <- function(db) {
   l <- NULL
   lnames <- NULL

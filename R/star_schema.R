@@ -10,6 +10,7 @@
 #' @return A `star_schema` object.
 #'
 #' @family star schema definition functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -32,8 +33,8 @@ star_schema <- function() {
 #' functions: The reason is that calculating AVG by considering subsets of
 #' data does not necessarily yield the AVG of the total data.
 #'
-#' An additional measurement corresponding to the COUNT of aggregated rows can
-#' be added which, together with SUM, allows us to obtain the mean if needed.
+#' An additional measurement corresponding to the COUNT of aggregated rows is
+#' added which, together with SUM, allows us to obtain the mean if needed.
 #'
 #' @param schema A `star_schema` object.
 #' @param facts A `fact_schema` object.
@@ -48,7 +49,7 @@ star_schema <- function() {
 #' @return A `star_schema` object.
 #'
 #' @family star schema definition functions
-#' @seealso \code{\link{star_schema}}
+#' @seealso \code{\link{fact_schema}}
 #'
 #' @examples
 #'
@@ -110,7 +111,7 @@ define_facts <-
 #' @return A `star_schema` object.
 #'
 #' @family star schema definition functions
-#' @seealso \code{\link{star_schema}}
+#' @seealso \code{\link{dimension_schema}}
 #'
 #' @examples
 #'
@@ -191,7 +192,6 @@ get_attribute_names.star_schema <- function(schema) {
   }
   unique(names)
 }
-
 
 
 #' check if star schema is valid: has facts and dimensions

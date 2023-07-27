@@ -1,6 +1,6 @@
 #' `star_database` S3 class
 #'
-#' An `star_database` object is created from a `star_schema` object and a flat
+#' A `star_database` object is created from a `star_schema` object and a flat
 #' table that contains the data from which database instances are derived.
 #'
 #' Measures and attributes of the `star_schema` must correspond to the names of
@@ -11,36 +11,12 @@
 #'
 #' @return A `star_database` object.
 #'
-#' @family star schema definition functions
-#' @seealso \code{\link{fact_schema}}
+#' @family star database definition functions
+#' @seealso \code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{ft_num}}
 #'
 #' @examples
 #'
-#' s <- star_schema() |>
-#'   define_facts(fact_schema(
-#'     name = "mrs_cause",
-#'     measures = c(
-#'       "Pneumonia and Influenza Deaths",
-#'       "All Deaths"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "when",
-#'     attributes = c(
-#'       "Year"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "where",
-#'     attributes = c(
-#'       "REGION",
-#'       "State",
-#'       "City"
-#'     )
-#'   ))
-#'
-#' # ft_num contains instances
-#' db <- star_database(s, ft_num)
+#' db <- star_database(mrs_cause_schema, ft_num)
 #'
 #' @export
 star_database <- function(schema, instances) {
@@ -123,7 +99,7 @@ star_database <- function(schema, instances) {
 #'
 #' @return A `star_database` object.
 #'
-#' @family star schema and constellation definition functions
+#' @family star database definition functions
 #'
 #' @examples
 #'
@@ -167,9 +143,24 @@ snake_case <- function(db) {
 
 # as_tibble_list.star_database -------------------------------------------
 
-#' @rdname as_tibble_list
+#' Generate a list of tibbles with fact and dimension tables
+#'
+#' To port databases to other work environments it is useful to be able to
+#' export them as a list of tibbles, as this function does.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A list of `tibble`
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#'
+#' tl <- db |>
+#'   as_tibble_list()
+#'
 #' @export
-#' @keywords internal
 as_tibble_list.star_database <- function(db) {
   l <- NULL
   lnames <- NULL

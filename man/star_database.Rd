@@ -15,7 +15,7 @@ star_database(schema, instances)
 A \code{star_database} object.
 }
 \description{
-An \code{star_database} object is created from a \code{star_schema} object and a flat
+A \code{star_database} object is created from a \code{star_schema} object and a flat
 table that contains the data from which database instances are derived.
 }
 \details{
@@ -24,41 +24,15 @@ the columns of the flat table.
 }
 \examples{
 
-s <- star_schema() |>
-  define_facts(fact_schema(
-    name = "mrs_cause",
-    measures = c(
-      "Pneumonia and Influenza Deaths",
-      "All Deaths"
-    )
-  )) |>
-  define_dimension(dimension_schema(
-    name = "when",
-    attributes = c(
-      "Year"
-    )
-  )) |>
-  define_dimension(dimension_schema(
-    name = "where",
-    attributes = c(
-      "REGION",
-      "State",
-      "City"
-    )
-  ))
-
-# ft_num contains instances
-db <- star_database(s, ft_num)
+db <- star_database(mrs_cause_schema, ft_num)
 
 }
 \seealso{
-\code{\link{fact_schema}}
+\code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{ft_num}}
 
-Other star schema definition functions: 
-\code{\link{define_dimension}()},
-\code{\link{define_facts}()},
-\code{\link{dimension_schema}()},
-\code{\link{fact_schema}()},
-\code{\link{star_schema}()}
+Other star database definition functions: 
+\code{\link{as_tibble_list}()},
+\code{\link{constellation}()},
+\code{\link{snake_case}()}
 }
-\concept{star schema definition functions}
+\concept{star database definition functions}

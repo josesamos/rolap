@@ -35,4 +35,11 @@ mrs_cause_schema <- star_schema() |>
   define_dimension(where)
 
 }
+\seealso{
+\code{\link{ft_num}}
+
+Other mrs example schema: 
+\code{\link{mrs_age_schema}}
+}
+\concept{mrs example schema}
 \keyword{datasets}

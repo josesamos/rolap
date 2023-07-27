@@ -50,8 +50,9 @@ db <- star_database(s, ft_num) |>
 
 }
 \seealso{
-Other star schema and constellation definition functions: 
-\code{\link{as_tibble_list.constellation}()},
-\code{\link{constellation}()}
+Other star database definition functions: 
+\code{\link{as_tibble_list}()},
+\code{\link{constellation}()},
+\code{\link{star_database}()}
 }
-\concept{star schema and constellation definition functions}
+\concept{star database definition functions}

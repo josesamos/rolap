@@ -16,13 +16,20 @@ knitr::opts_chunk$set(
 # rolap
 
 <!-- badges: start -->
+[![Travis build status](https://travis-ci.com/josesamos/rolap.svg?branch=master)](https://travis-ci.com/josesamos/rolap)
 <!-- badges: end -->
 
-The goal of rolap is to ...
+The *multidimensional data model* was defined in the 1990s with the aim of supporting data analysis. Data in multidimensional systems is obtained from operational systems and is transformed to adapt it to the new structure.
+
+Transformations can be carried out using professional ETL (extract, transform and load) tools. Recently, tools aimed at end users have emerged, which are also aimed at performing transformation operations. All these tools are very useful to carry out the transformation process, they provide a development environment to define the transformation operations in a general way.
+
+Frequently, the operations to be performed aim to transform a flat table (with data that comes from operational systems) into a star database, made up of fact and dimension tables, which implements a multidimensional system. With the tools mentioned above, this transformation can be carried out, but it requires a lot of work. We are not aware of any tools with operations designed to specifically support this transformation process. 
+
+The goal of `rolap` is to define transformations that allow you to easily obtain star databases (fact and dimension tables) from flat tables. 
 
 ## Installation
 
-You can install the development version of rolap from [GitHub](https://github.com/) with:
+You can install the development version of `rolap` from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("rolap")
@@ -31,21 +38,95 @@ devtools::install_github("josesamos/rolap")
 
 ## Example
 
-Original data as a starting point, stored in `ft`.
-
 ```{r setup, echo = FALSE}
 library(rolap)
 ```
 
+To illustrate how the package works we will use a small part of the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) data set in the form of a flat table, available in the package in the `ft_num` variable, shown below.
+
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(ft, split.table = Inf)
+pander::pandoc.table(ft_num, split.table = Inf)
 ```
 
-This is a basic example which shows you how to solve a common problem:
+### Star database definition
+
+The transformation to obtain a star database from the flat table using `rolap` package is as follows:
 
 ```{r example}
 library(rolap)
 
+where <- dimension_schema(name = "Where",
+                          attributes = c("REGION",
+                                         "State",
+                                         "City"))
+
+s <- star_schema() |>
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths")) |>
+  define_dimension(name = "When",
+                   attributes = c("Year")) |>
+  define_dimension(where)
+
+db <- star_database(s, ft_num) |>
+  snake_case()
+
+ls <- db |>
+  as_tibble_list()
+
+```
+
+The dimension and fact schemas can be defined as variables (`where`) to be reused or directly in the star schema definition. To make it easier to work in a database environment we transform the table field names to snake case. With this same goal they can be exported as a tibble list.
+
+The tables of dimensions and facts of the obtained star database are shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(db$instance$dimensions$when$table, split.table = Inf)
+pander::pandoc.table(db$instance$dimensions$where$table, split.table = Inf)
+pander::pandoc.table(db$instance$facts$mrs_cause$table, split.table = Inf)
+```
+
+
+### Constellation definition
+
+We can work with several star databases to form a constellation. To show an example of how data is integrated into dimensions, let's filter the initial data. 
+
+```{r example2}
+ft1 <- ft |>
+  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::filter(Year > "1963") |>
+  dplyr::filter(City != "Hartford")
+```
+
+The flat table obtained is shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft1, split.table = Inf)
+```
+
+Additionally, we transform the dataset to be tidy data and filter it.
+
+```{r example3}
+ft2 <- ft |>
+  dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
+  tidyr::gather("Age", "All Deaths", 7:11) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", "")) |>
+  dplyr::filter(Year < "1964") |>
+  dplyr::filter(City != "Boston" & City != "Bridgeport") |>
+  dplyr::filter(WEEK >= "8")
+```
+
+In this case, the data set is adequate to treat the data by age. The tidy flat table obtained is shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft2, split.table = Inf)
+```
+
+We define the star databases, one with the data relative to the causes and the other with the age data.
+
+```{r example4}
 when <- dimension_schema(name = "When",
                          attributes = c("Year"))
 
@@ -61,40 +142,9 @@ s1 <- star_schema() |>
   define_dimension(when) |>
   define_dimension(where)
 
-ft1 <- ft |>
-  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
-  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
-  dplyr::filter(Year > "1962")
-
 db1 <- star_database(s1, ft1) |>
   snake_case()
-```
 
-The tables of dimensions and facts of the obtained star database are shown below.
-
-```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(db1$instance$dimensions$when$table, split.table = Inf)
-pander::pandoc.table(db1$instance$dimensions$where$table, split.table = Inf)
-pander::pandoc.table(db1$instance$facts$mrs_cause$table, split.table = Inf)
-```
-
-```{r example2}
-ft2 <- ft |>
-  dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
-  tidyr::gather("Age", "All Deaths", 7:11) |>
-  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
-  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", "")) |>
-  dplyr::filter(Year < "1964") |>
-  dplyr::filter(City != "Boston" & City != "Bridgeport") |>
-  dplyr::filter(WEEK >= "8")
-```
-
-
-```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(ft2, split.table = Inf)
-```
-
-```{r example3}
 s2 <- star_schema() |>
   define_facts(name = "MRS Age",
                measures = c("All Deaths")) |>
@@ -107,7 +157,15 @@ db2 <- star_database(s2, ft2) |>
   snake_case()
 ```
 
-The tables of dimensions and facts of the obtained star database are shown below.
+The tables of dimensions and facts of the new `db1` star database focused on the causes are shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(db1$instance$dimensions$when$table, split.table = Inf)
+pander::pandoc.table(db1$instance$dimensions$where$table, split.table = Inf)
+pander::pandoc.table(db1$instance$facts$mrs_cause$table, split.table = Inf)
+```
+
+Below are the tables of the star database with the age data.
 
 ```{r, results = "asis", echo = FALSE}
 pander::pandoc.table(db2$instance$dimensions$when$table, split.table = Inf)
@@ -116,9 +174,15 @@ pander::pandoc.table(db2$instance$dimensions$who$table, split.table = Inf)
 pander::pandoc.table(db2$instance$facts$mrs_age$table, split.table = Inf)
 ```
 
-```{r example4}
+As we have filtered the data, it can be seen that the dimension tables only contain the necessary data for each star database.
+
+Next we define a constellation formed by the two star databases.
+
+```{r example5}
 ct <- constellation("MRS", list(db1, db2))
 ```
+
+Below are the tables of the constellation's star databases. The instances of the dimensions have been integrated so that the tables are common to both databases.
 
 ```{r, results = "asis", echo = FALSE}
 pander::pandoc.table(ct$dimensions$when$table, split.table = Inf)
@@ -128,10 +192,9 @@ pander::pandoc.table(ct$facts$mrs_cause$table, split.table = Inf)
 pander::pandoc.table(ct$facts$mrs_age$table, split.table = Inf)
 ```
 
-```{r example5}
-ls <- db2 |>
-  as_tibble_list()
+Constellation tables can also be exported as a tibble list.
 
+```{r example6}
 lc <- ct |>
   as_tibble_list()
 ```

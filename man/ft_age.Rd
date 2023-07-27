@@ -19,6 +19,7 @@ Selection data from the 122 Cities Mortality Reporting System by age group.
 \details{
 The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
 mortality figures by age group and cause, considered separately, are included.
+
 The operations to obtain it from ft data set are:
 
 ft_age <- ft |>
@@ -27,4 +28,12 @@ tidyr::gather("Age", "All Deaths", 7:11) |>
 dplyr::mutate(\verb{All Deaths} = as.integer(\verb{All Deaths})) |>
 dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))
 }
+\seealso{
+\code{\link{mrs_age_schema}}
+
+Other mrs example data: 
+\code{\link{ft_num}},
+\code{\link{ft}}
+}
+\concept{mrs example data}
 \keyword{datasets}

@@ -36,4 +36,11 @@ mrs_age_schema <- star_schema() |>
                    attributes = c("Age"))
 
 }
+\seealso{
+\code{\link{ft_age}}
+
+Other mrs example schema: 
+\code{\link{mrs_cause_schema}}
+}
+\concept{mrs example schema}
 \keyword{datasets}

@@ -4,13 +4,38 @@
 # rolap
 
 <!-- badges: start -->
+
+[![Travis build
+status](https://travis-ci.com/josesamos/rolap.svg?branch=master)](https://travis-ci.com/josesamos/rolap)
 <!-- badges: end -->
 
-The goal of rolap is to …
+The *multidimensional data model* was defined in the 1990s with the aim
+of supporting data analysis. Data in multidimensional systems is
+obtained from operational systems and is transformed to adapt it to the
+new structure.
+
+Transformations can be carried out using professional ETL (extract,
+transform and load) tools. Recently, tools aimed at end users have
+emerged, which are also aimed at performing transformation operations.
+All these tools are very useful to carry out the transformation process,
+they provide a development environment to define the transformation
+operations in a general way.
+
+Frequently, the operations to be performed aim to transform a flat table
+(with data that comes from operational systems) into a star database,
+made up of fact and dimension tables, which implements a
+multidimensional system. With the tools mentioned above, this
+transformation can be carried out, but it requires a lot of work. We are
+not aware of any tools with operations designed to specifically support
+this transformation process.
+
+The goal of `rolap` is to define transformations that allow you to
+easily obtain star databases (fact and dimension tables) from flat
+tables.
 
 ## Installation
 
-You can install the development version of rolap from
+You can install the development version of `rolap` from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -20,7 +45,11 @@ devtools::install_github("josesamos/rolap")
 
 ## Example
 
-Original data as a starting point, stored in `ft`.
+To illustrate how the package works we will use a small part of the
+[Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting
+System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system)
+data set in the form of a flat table, available in the package in the
+`ft_num` variable, shown below.
 
 | Year | WEEK | Week Ending Date | REGION | State |    City    | Pneumonia and Influenza Deaths | All Deaths | \<1 year (all cause deaths) | 1-24 years (all cause deaths) | 25-44 years | 45-64 years (all cause deaths) | 65+ years (all cause deaths) |
 |:----:|:----:|:----------------:|:------:|:-----:|:----------:|:------------------------------:|:----------:|:---------------------------:|:-----------------------------:|:-----------:|:------------------------------:|:----------------------------:|
@@ -45,11 +74,127 @@ Original data as a starting point, stored in `ft`.
 | 1963 |  8   |    02/23/1963    |   1    |  CT   |  Hartford  |               6                |     49     |              3              |               2               |      3      |               14               |              27              |
 | 1964 |  2   |    01/11/1964    |   1    |  CT   |  Hartford  |               3                |     53     |              7              |               0               |      2      |               16               |              28              |
 
-This is a basic example which shows you how to solve a common problem:
+### Star database definition
+
+The transformation to obtain a star database from the flat table using
+`rolap` package is as follows:
 
 ``` r
 library(rolap)
 
+where <- dimension_schema(name = "Where",
+                          attributes = c("REGION",
+                                         "State",
+                                         "City"))
+
+s <- star_schema() |>
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths")) |>
+  define_dimension(name = "When",
+                   attributes = c("Year")) |>
+  define_dimension(where)
+
+db <- star_database(s, ft_num) |>
+  snake_case()
+
+ls <- db |>
+  as_tibble_list()
+```
+
+The dimension and fact schemas can be defined as variables (`where`) to
+be reused or directly in the star schema definition. To make it easier
+to work in a database environment we transform the table field names to
+snake case. With this same goal they can be exported as a tibble list.
+
+The tables of dimensions and facts of the obtained star database are
+shown below.
+
+| when_key | year |
+|:--------:|:----:|
+|    1     | 1962 |
+|    2     | 1963 |
+|    3     | 1964 |
+
+| where_key | region | state |    city    |
+|:---------:|:------:|:-----:|:----------:|
+|     1     |   1    |  CT   | Bridgeport |
+|     2     |   1    |  CT   |  Hartford  |
+|     3     |   1    |  MA   |   Boston   |
+|     4     |   1    |  MA   | Cambridge  |
+
+| when_key | where_key | pneumonia_and_influenza_deaths | all_deaths | nrow_agg |
+|:--------:|:---------:|:------------------------------:|:----------:|:--------:|
+|    1     |     1     |               9                |    131     |    3     |
+|    1     |     2     |               5                |    104     |    2     |
+|    1     |     3     |               23               |    555     |    2     |
+|    1     |     4     |               4                |     39     |    1     |
+|    2     |     1     |               2                |     46     |    1     |
+|    2     |     2     |               12               |    192     |    3     |
+|    2     |     3     |               10               |    276     |    1     |
+|    3     |     1     |               8                |     45     |    1     |
+|    3     |     2     |               3                |     53     |    1     |
+|    3     |     3     |               22               |    569     |    2     |
+|    3     |     4     |               13               |     84     |    3     |
+
+### Constellation definition
+
+We can work with several star databases to form a constellation. To show
+an example of how data is integrated into dimensions, let’s filter the
+initial data.
+
+``` r
+ft1 <- ft |>
+  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::filter(Year > "1963") |>
+  dplyr::filter(City != "Hartford")
+```
+
+The flat table obtained is shown below.
+
+| Year | WEEK | Week Ending Date | REGION | State |    City    | Pneumonia and Influenza Deaths | All Deaths | \<1 year (all cause deaths) | 1-24 years (all cause deaths) | 25-44 years | 45-64 years (all cause deaths) | 65+ years (all cause deaths) |
+|:----:|:----:|:----------------:|:------:|:-----:|:----------:|:------------------------------:|:----------:|:---------------------------:|:-----------------------------:|:-----------:|:------------------------------:|:----------------------------:|
+| 1964 |  3   |    01/18/1964    |   1    |  MA   |   Boston   |               13               |    325     |             17              |               7               |     24      |               90               |             187              |
+| 1964 |  6   |    02/08/1964    |   1    |  MA   |   Boston   |               9                |    244     |             13              |               9               |     14      |               61               |             147              |
+| 1964 |  5   |    02/01/1964    |   1    |  CT   | Bridgeport |               8                |     45     |              3              |               1               |      2      |               11               |              28              |
+| 1964 |  2   |    01/11/1964    |   1    |  MA   | Cambridge  |               7                |     31     |              1              |               0               |      2      |               9                |              19              |
+| 1964 |  5   |    02/01/1964    |   1    |  MA   | Cambridge  |               6                |     27     |              2              |               0               |      0      |               8                |              17              |
+| 1964 |  9   |    02/29/1964    |   1    |  MA   | Cambridge  |               0                |     26     |              0              |               0               |      2      |               8                |              16              |
+
+Additionally, we transform the dataset to be tidy data and filter it.
+
+``` r
+ft2 <- ft |>
+  dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
+  tidyr::gather("Age", "All Deaths", 7:11) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", "")) |>
+  dplyr::filter(Year < "1964") |>
+  dplyr::filter(City != "Boston" & City != "Bridgeport") |>
+  dplyr::filter(WEEK >= "8")
+```
+
+In this case, the data set is adequate to treat the data by age. The
+tidy flat table obtained is shown below.
+
+| Year | WEEK | Week Ending Date | REGION | State |   City    |     Age     | All Deaths |
+|:----:|:----:|:----------------:|:------:|:-----:|:---------:|:-----------:|:----------:|
+| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge |  \<1 year   |     1      |
+| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  |  \<1 year   |     3      |
+| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge | 1-24 years  |     0      |
+| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  | 1-24 years  |     2      |
+| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge | 25-44 years |     2      |
+| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  | 25-44 years |     3      |
+| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge | 45-64 years |     7      |
+| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  | 45-64 years |     14     |
+| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge |  65+ years  |     29     |
+| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  |  65+ years  |     27     |
+
+We define the star databases, one with the data relative to the causes
+and the other with the age data.
+
+``` r
 when <- dimension_schema(name = "When",
                          attributes = c("Year"))
 
@@ -65,65 +210,9 @@ s1 <- star_schema() |>
   define_dimension(when) |>
   define_dimension(where)
 
-ft1 <- ft |>
-  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
-  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
-  dplyr::filter(Year > "1962")
-
 db1 <- star_database(s1, ft1) |>
   snake_case()
-```
 
-The tables of dimensions and facts of the obtained star database are
-shown below.
-
-| when_key | year |
-|:--------:|:----:|
-|    1     | 1963 |
-|    2     | 1964 |
-
-| where_key | region | state |    city    |
-|:---------:|:------:|:-----:|:----------:|
-|     1     |   1    |  CT   | Bridgeport |
-|     2     |   1    |  CT   |  Hartford  |
-|     3     |   1    |  MA   |   Boston   |
-|     4     |   1    |  MA   | Cambridge  |
-
-| when_key | where_key | pneumonia_and_influenza_deaths | all_deaths | nrow_agg |
-|:--------:|:---------:|:------------------------------:|:----------:|:--------:|
-|    1     |     1     |               2                |     46     |    1     |
-|    1     |     2     |               12               |    192     |    3     |
-|    1     |     3     |               10               |    276     |    1     |
-|    2     |     1     |               8                |     45     |    1     |
-|    2     |     2     |               3                |     53     |    1     |
-|    2     |     3     |               22               |    569     |    2     |
-|    2     |     4     |               13               |     84     |    3     |
-
-``` r
-ft2 <- ft |>
-  dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
-  tidyr::gather("Age", "All Deaths", 7:11) |>
-  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
-  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", "")) |>
-  dplyr::filter(Year < "1964") |>
-  dplyr::filter(City != "Boston" & City != "Bridgeport") |>
-  dplyr::filter(WEEK >= "8")
-```
-
-| Year | WEEK | Week Ending Date | REGION | State |   City    |     Age     | All Deaths |
-|:----:|:----:|:----------------:|:------:|:-----:|:---------:|:-----------:|:----------:|
-| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge |  \<1 year   |     1      |
-| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  |  \<1 year   |     3      |
-| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge | 1-24 years  |     0      |
-| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  | 1-24 years  |     2      |
-| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge | 25-44 years |     2      |
-| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  | 25-44 years |     3      |
-| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge | 45-64 years |     7      |
-| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  | 45-64 years |     14     |
-| 1962 |  9   |    03/03/1962    |   1    |  MA   | Cambridge |  65+ years  |     29     |
-| 1963 |  8   |    02/23/1963    |   1    |  CT   | Hartford  |  65+ years  |     27     |
-
-``` r
 s2 <- star_schema() |>
   define_facts(name = "MRS Age",
                measures = c("All Deaths")) |>
@@ -136,8 +225,26 @@ db2 <- star_database(s2, ft2) |>
   snake_case()
 ```
 
-The tables of dimensions and facts of the obtained star database are
-shown below.
+The tables of dimensions and facts of the new `db1` star database
+focused on the causes are shown below.
+
+| when_key | year |
+|:--------:|:----:|
+|    1     | 1964 |
+
+| where_key | region | state |    city    |
+|:---------:|:------:|:-----:|:----------:|
+|     1     |   1    |  CT   | Bridgeport |
+|     2     |   1    |  MA   |   Boston   |
+|     3     |   1    |  MA   | Cambridge  |
+
+| when_key | where_key | pneumonia_and_influenza_deaths | all_deaths | nrow_agg |
+|:--------:|:---------:|:------------------------------:|:----------:|:--------:|
+|    1     |     1     |               8                |     45     |    1     |
+|    1     |     2     |               22               |    569     |    2     |
+|    1     |     3     |               13               |     84     |    3     |
+
+Below are the tables of the star database with the age data.
 
 | when_key | year |
 |:--------:|:----:|
@@ -170,9 +277,18 @@ shown below.
 |    2     |     1     |    4    |     27     |    1     |
 |    2     |     1     |    5    |     3      |    1     |
 
+As we have filtered the data, it can be seen that the dimension tables
+only contain the necessary data for each star database.
+
+Next we define a constellation formed by the two star databases.
+
 ``` r
 ct <- constellation("MRS", list(db1, db2))
 ```
+
+Below are the tables of the constellation’s star databases. The
+instances of the dimensions have been integrated so that the tables are
+common to both databases.
 
 | when_key | year |
 |:--------:|:----:|
@@ -197,11 +313,7 @@ ct <- constellation("MRS", list(db1, db2))
 
 | when_key | where_key | pneumonia_and_influenza_deaths | all_deaths | nrow_agg |
 |:--------:|:---------:|:------------------------------:|:----------:|:--------:|
-|    2     |     1     |               2                |     46     |    1     |
-|    2     |     2     |               12               |    192     |    3     |
-|    2     |     3     |               10               |    276     |    1     |
 |    3     |     1     |               8                |     45     |    1     |
-|    3     |     2     |               3                |     53     |    1     |
 |    3     |     3     |               22               |    569     |    2     |
 |    3     |     4     |               13               |     84     |    3     |
 
@@ -218,12 +330,9 @@ ct <- constellation("MRS", list(db1, db2))
 |    2     |     2     |    4    |     27     |    1     |
 |    2     |     2     |    5    |     3      |    1     |
 
-``` r
-ls <- db2 |>
-  as_tibble_list()
-#> [1] "as_tibble_list.star_database"
+Constellation tables can also be exported as a tibble list.
 
+``` r
 lc <- ct |>
   as_tibble_list()
-#> [1] "as_tibble_list.constellation"
 ```
