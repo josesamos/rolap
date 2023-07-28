@@ -13,8 +13,8 @@ of supporting data analysis. Data in multidimensional systems is
 obtained from operational systems and is transformed to adapt it to the
 new structure.
 
-Transformations can be carried out using professional ETL (extract,
-transform and load) tools. Recently, tools aimed at end users have
+Transformations can be carried out using professional ETL (*Extract,
+Transform and Load*) tools. Recently, tools aimed at end users have
 emerged, which are also aimed at performing transformation operations.
 All these tools are very useful to carry out the transformation process,
 they provide a development environment to define the transformation
@@ -29,8 +29,8 @@ not aware of any tools with operations designed to specifically support
 this transformation process.
 
 The goal of `rolap` is to define transformations that allow you to
-easily obtain star databases (fact and dimension tables) from flat
-tables.
+easily obtain ROLAP (*Relational On-Line Analytical Processing*) star
+databases, composed by fact and dimension tables, from flat tables.
 
 ## Installation
 
@@ -143,9 +143,7 @@ an example of how data is integrated into dimensions, let’s filter the
 initial data.
 
 ``` r
-ft1 <- ft |>
-  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
-  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+ft1 <- ft_num |>
   dplyr::filter(Year > "1963") |>
   dplyr::filter(City != "Hartford")
 ```
@@ -164,7 +162,7 @@ The flat table obtained is shown below.
 Additionally, we transform the dataset to be tidy data and filter it.
 
 ``` r
-ft2 <- ft |>
+ft2 <- ft_num |>
   dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
   tidyr::gather("Age", "All Deaths", 7:11) |>
   dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
@@ -287,6 +285,13 @@ Next we define a constellation formed by the two star databases.
 ct <- constellation("MRS", list(db1, db2))
 ```
 
+Constellation tables can also be exported as a tibble list.
+
+``` r
+lc <- ct |>
+  as_tibble_list()
+```
+
 Below are the tables of the constellation’s star databases. The
 instances of the dimensions have been integrated so that the tables are
 common to both databases.
@@ -330,10 +335,3 @@ common to both databases.
 |    2     |     2     |    3    |     14     |    1     |
 |    2     |     2     |    4    |     27     |    1     |
 |    2     |     2     |    5    |     3      |    1     |
-
-Constellation tables can also be exported as a tibble list.
-
-``` r
-lc <- ct |>
-  as_tibble_list()
-```

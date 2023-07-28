@@ -23,7 +23,7 @@ mortality figures by age group and cause, considered separately, are included.
 In the cause, only a distinction is made between pneumonia or influenza and
 others.
 
-The operations to obtain it from ft data set are:
+The operations to obtain it from the \code{ft} data set are:
 
 ft_num <- ft |>
 dplyr::mutate(\verb{Pneumonia and Influenza Deaths} = as.integer(\verb{Pneumonia and Influenza Deaths})) |>

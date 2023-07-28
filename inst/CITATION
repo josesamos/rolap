@@ -1,0 +1,14 @@
+citHeader("To cite rolap in publications use:")
+
+citEntry(entry = "Manual",
+  title        = "{rolap}: Obtaining ROLAP Star Databases from Flat Tables",
+  author       = personList(as.person("Jose Samos"), as.person("Maria Bermudez-Edo")),
+  year         = "2023",
+  note         = "R package version 1.0.0",
+  url          = "https://github.com/josesamos/rolap",
+
+  textVersion  =
+  paste("Jose Samos, Maria Bermudez-Edo (2023).",
+        "rolap: Obtaining ROLAP Star Databases from Flat Tables.",
+        "https://github.com/josesamos/rolap.")
+)

@@ -20,7 +20,7 @@ Selection data from the 122 Cities Mortality Reporting System by age group.
 The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
 mortality figures by age group and cause, considered separately, are included.
 
-The operations to obtain it from ft data set are:
+The operations to obtain it from the \code{ft} data set are:
 
 ft_age <- ft |>
 dplyr::select(-\verb{Pneumonia and Influenza Deaths}, -tidyselect::all_of(\verb{All Deaths})) |>
