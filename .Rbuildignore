@@ -5,3 +5,7 @@
 ^ejemplos.R$
 ^datos$
 ^\.github$
+^codecov\.yml$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
