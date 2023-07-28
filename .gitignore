@@ -6,3 +6,4 @@
 .quarto
 ejemplos.R
 datos
+inst/doc

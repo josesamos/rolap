@@ -1,0 +1,131 @@
+---
+title: "rolap"
+author: "Jose Samos (jsamos@ugr.es)"
+date: "2023-07-28"
+output: rmarkdown::html_vignette
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{rolap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rolap)
+```
+
+# Introduction
+
+The *multidimensional data model* was defined in the 1990s with the aim of supporting data analysis. Data in multidimensional systems is obtained from operational systems and is transformed to adapt it to the new structure.
+
+Transformations can be carried out using professional ETL (*Extract, Transform and Load*) tools. Recently, tools aimed at end users have emerged, which are also aimed at performing transformation operations. All these tools are very useful to carry out the transformation process, they provide a development environment to define the transformation operations in a general way.
+
+Frequently, the operations to be performed aim to transform a flat table (with data that comes from operational systems) into a ROLAP (*Relational On-Line Analytical Processing*) star database, made up of fact and dimension tables, which implements a multidimensional system. With the tools mentioned above, this transformation can be carried out, but it requires a lot of work. 
+
+The goal of `rolap` is to define transformations that allow you to easily obtain ROLAP star databases, composed by fact and dimension tables, from flat tables.
+
+The rest of this document is structured as follows: First, basic concepts of dimensional modelling and star databases are summarized. The following is an illustrative example of how the package works, to show usage of features it offers. Finally, the document ends with conclusions and bibliography.
+
+# Dimensional modelling and star databases
+
+The content of this section is a summary based mainly on @adamson2010star and @kimball2013data. It is intended to present the fundamental concepts of the area that are relevant to understand the functionality, naming and use of the `rolap` package.
+
+## Dimensional modelling
+
+Dimensional modelling aims to obtain simple data models. Simplicity is sought for two reasons: so that decision-makers can easily understand the data, and also so that they can be easily queried.
+
+In dimensional modelling, the analysis of a business process is performed *modelling how it is measured*. The measures are called *facts*, and the descriptors of the context of the facts are *dimensions*. Facts are numerical data, contain *measures*, and decision makers want to see them at various levels of detail, defined by dimensions.
+
+Not all numerical data is a measure in facts (some tools consider it that way). In dimensional modelling the designer has to differentiate between facts and dimensions. Some criteria are considered to distinguish between them, for example:
+
+- If it can be defined at different levels of detail then it is a fact.
+- If it is quantitative and takes continuous values, then it is a fact.
+- If it provides context then it is a dimension.
+
+Sometimes there are no measures associated with the business process, it is simply recorded that the combination of dimensions has occurred. This situation is often called *factless facts*, @jensen2010multi prefer to call it *measureless facts*. In any case, including when no other measures are available, a measure can be considered that represents the number of times the combination of dimension values occurs.
+
+### Dimensions and dimension attributes
+
+Attributes considered by the designer as dimensions can be grouped taking into account the natural affinities between them. In particular, they can be grouped as they describe the "who, what, where, when, how and why" associated with the modelled business process. Two attributes share a natural affinity when they are only related in one context. When their relationships are determined by transactions or activities, they can occur in multiple contexts, if this occurs, they must be located in different dimensions.
+
+In this way, a *dimension* is made up of a set of naturally related *dimension attributes* that describe the context of facts. Dimensions are used for two purposes: fact *selection* and fact *grouping* with the desired level of detail.
+
+Additionally, in the dimensions *hierarchies* with *levels* and *descriptors* can be defined. More details can be found at @jensen2010multi. These concepts are not used in the current version of the package.
+
+### Facts and measures
+
+Facts have a *granularity*, which is determined by the attributes of the dimensions that are considered at each moment. Thus, a measure in a fact has two components, the *numerical property* and an *formula*, frequently the SUM aggregation function, that allows combining several values of this measure to obtain a new value of the same measure with a coarser granularity [@jensen2010multi]. 
+
+According to their behaviour to obtain a coarser granularity, three types of measures are distinguished: *additive*, *semi-additive* and *non-additive*. For *additive measures*, SUM is always a valid formula that maintains the meaning of the measure when the granularity changes. For *semi-additive measures*, there is no point in using SUM when changing the level of detail in any of the dimensions because the meaning of the measure changes, this frequently occurs in dimensions that represents time and measures representing inventory level. For *non-additive measures*, values cannot be combined across any dimension using SUM because the result obtained has a different meaning from the original measure (generally occurs with ratios, percentages or unit amounts such as unit cost or unit price). 
+
+The most useful measures are additive. If we have non-additive measures, they can generally be redefined from other additive measures.
+
+## Star databases
+
+Dimensional models implemented in RDBMS (*Relational Database Management Systems*) are known as ROLAP (*Relational On-Line Analytical Processing*), if they use a table for each dimension are called *ROLAP star databases* because of their resemblance to a star-like structure: A *fact table* in the centre and *dimension tables* around it. Thus, dimension attributes are columns of the respective dimension tables, and measures are columns of the fact table.
+
+Other possible implementations on RDBMS normalize dimensions and are known as *ROLAP snowflake databases*. More details can be found at @jensen2010multi. This is not considered in this package.
+
+### Dimension tables
+
+Dimension tables contain the context associated with business process measures. Although they can contain any type of data, numerical data is generally not used for dimension attributes because some end user query tools consider any numeric data as a measure.
+
+Dimension attributes with NULL value are a source of problems when querying since DBMS and query tools sometimes handle them inconsistently, the result depends on the product. It is recommended to avoid the use of NULL and replace them with a descriptive text. In the case of dates, it is recommended to replace the NULL values with an arbitrary date in the very far future.
+
+#### Surrogate keys
+
+A dimension table contains dimension attributes and also a *surrogate key* column. This column is a unique identifier that has no intrinsic meaning: It is generally an integer and is the primary key for the dimension table. In @adamson2010star surrogate keys are easily identifiable by the suffix "_key" in the column name (and this criterion has also been applied in `rolap` package).
+
+Dimension tables also contain *natural key* columns that uniquely identify associated entities in an operational system. The separation of surrogate keys and natural keys allows the star schema to store changes in dimensions. Therefore, the use of surrogate keys in dimensions is a solution to the SCD (*Slowly Changing Dimensions*) problem. 
+
+#### Special dimensions
+
+In some cases, for the sake of simplicity, it is helpful to create a table that contains dimension attributes that have no natural affinities to each other, generally these are low-cardinality flags and indicators. The result is what is known as a *junk dimension*. They do not require any special support, only the designer's will to define them.
+
+Sometimes some dimension attributes are left in the fact table, usually transaction identifiers. It is considered as the primary key of a dimension that does not have an associated table, for this reason it is known as a *degenerate dimension*. In this package, each dimension is represented by a table, for a degenerate dimension this table will have a single attribute (for example, the transaction identifier). If the dimension table is subsequently deleted, we will have a degenerate dimension.
+
+Associated with multiple star databases we have the *conformed dimensions* that are presented in section [Conformed dimensions].
+
+### Fact table
+
+At the centre of a star database is the fact table. In addition to containing measures, the fact table includes *foreign keys* that refer to each of the surrogate keys in the dimension tables.
+
+#### Primary key
+
+A subset of foreign keys (along with possibly keys of degenerate dimensions) is considered to form the *primary key* of the fact table. 
+
+#### Grain
+
+The subset of dimensions that forms the primary key defines the level of detail stored in the fact table, which is known as the fact table's *grain*. In the design process, it is very important for the designer to clearly define the grain of the fact table (it is usually defined by listing the dimensions whose surrogate keys form its primary key): It is a way to ensure that all the facts are stored at the same level of detail. 
+
+At the finest grain, a row in the fact table corresponds to the measures of an event and vice versa, it is not influenced by the possible reports that may be obtained. When two facts have different grains, they should be set on different fact tables.
+
+
+### Constellation
+
+It is frequent the need to have several fact tables for various reasons: 
+
+- We find measures with different grain. 
+
+- There are measures that do not occur simultaneously, for example, when one occurs, we have no value for others and vice versa. 
+
+In reality it is about different business processes, each one has to have its own fact table but they have dimensions in common. This is known as a [*constellation*](https://www.geeksforgeeks.org/fact-constellation-in-data-warehouse-modelling/) which corresponds to the Kimball *enterprise data warehouse bus architecture*.
+
+### Conformed dimensions
+
+When star databases share a set of common dimensions in a constellation, these dimensions are called *conformed dimensions*.
+
+There are several possibilities to have conformed dimensions, the most obvious form is that the dimension tables share *structure* and *content*, that is, they are identical dimensions. This is the one considered in this version of the `rolap` package.
+
+# An illustrative example
+
+In this section an illustrative example is developed to show how the package works.
+
+## Starting data sets

@@ -8,10 +8,10 @@
 [![R-CMD-check](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The *multidimensional data model* was defined in the 1990s with the aim
-of supporting data analysis. Data in multidimensional systems is
-obtained from operational systems and is transformed to adapt it to the
-new structure.
+The aim of the *multidimensional data model* is organize data for
+supporting data analysis. Data in multidimensional systems is obtained
+from operational systems and is transformed to adapt it to the new
+structure.
 
 Transformations can be carried out using professional ETL (*Extract,
 Transform and Load*) tools. Recently, tools aimed at end users have
@@ -21,16 +21,16 @@ they provide a development environment to define the transformation
 operations in a general way.
 
 Frequently, the operations to be performed aim to transform a flat table
-(with data that comes from operational systems) into a star database,
-made up of fact and dimension tables, which implements a
-multidimensional system. With the tools mentioned above, this
-transformation can be carried out, but it requires a lot of work. We are
-not aware of any tools with operations designed to specifically support
-this transformation process.
+(with data that comes from operational systems) into a ROLAP
+(*Relational On-Line Analytical Processing*) star database, made up of
+fact and dimension tables, which implements a multidimensional system.
+With the tools mentioned above, this transformation can be carried out,
+but it requires a lot of work. We are not aware of any tools with
+operations designed to specifically support this transformation process.
 
 The goal of `rolap` is to define transformations that allow you to
-easily obtain ROLAP (*Relational On-Line Analytical Processing*) star
-databases, composed by fact and dimension tables, from flat tables.
+easily obtain ROLAP star databases, composed by fact and dimension
+tables, from flat tables.
 
 ## Installation
 
