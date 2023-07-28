@@ -95,10 +95,12 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of <code>rolap</code> from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the released version of <code>rolap</code> from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("rolap")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"josesamos/rolap"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"rolap"</span><span class="op">)</span></span></code></pre></div>
+<p>And the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"josesamos/rolap"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -442,7 +444,7 @@
 <h3 id="star-database-definition">Star database definition<a class="anchor" aria-label="anchor" href="#star-database-definition"></a>
 </h3>
 <p>The transformation to obtain a star database from the flat table using <code>rolap</code> package is as follows:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://josesamos.github.io/rolap/">rolap</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">where</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dimension_schema.html">dimension_schema</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Where"</span>,</span>
@@ -462,7 +464,7 @@
 <span>  <span class="fu"><a href="reference/snake_case.html">snake_case</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The dimension and fact schemas can be defined as variables (<code>where</code>) to be reused or directly in the star schema definition. To make it easier to work in a database environment we transform the table field names to snake case.</p>
 <p>With this same goal they can be exported as a tibble list.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ls</span> <span class="op">&lt;-</span> <span class="va">db</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/as_tibble_list.html">as_tibble_list</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The tables of dimensions and facts of the obtained star database are shown below.</p>
@@ -620,7 +622,7 @@
 <h3 id="constellation-definition">Constellation definition<a class="anchor" aria-label="anchor" href="#constellation-definition"></a>
 </h3>
 <p>We can work with several star databases to form a constellation. To show an example of how data is integrated into dimensions, let’s filter the initial data.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ft1</span> <span class="op">&lt;-</span> <span class="va">ft_num</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Year</span> <span class="op">&gt;</span> <span class="st">"1962"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">City</span> <span class="op">==</span> <span class="st">"Boston"</span> <span class="op">|</span> <span class="va">City</span> <span class="op">==</span> <span class="st">"Bridgeport"</span><span class="op">)</span></span></code></pre></div>
@@ -735,7 +737,7 @@
 </tbody>
 </table>
 <p>Additionally, we transform the dataset to be tidy data and filter it.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ft2</span> <span class="op">&lt;-</span> <span class="va">ft_num</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">`Pneumonia and Influenza Deaths`</span>, <span class="op">-</span><span class="va">`All Deaths`</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"All Deaths"</span>, <span class="fl">7</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -870,7 +872,7 @@
 </tbody>
 </table>
 <p>We define the star databases, one with the data relative to the causes and the other with the age data.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">when</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dimension_schema.html">dimension_schema</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"When"</span>,</span>
 <span>                         attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Year"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -1134,10 +1136,10 @@
 </table>
 <p>As we have filtered the data, it can be seen that the dimension tables only contain the necessary data for each star database but, for common dimensions, they share the same structure.</p>
 <p>Next we define a constellation formed by the two star databases.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ct</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/constellation.html">constellation</a></span><span class="op">(</span><span class="st">"MRS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">db1</span>, <span class="va">db2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Constellation tables can also be exported as a tibble list.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lc</span> <span class="op">&lt;-</span> <span class="va">ct</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/as_tibble_list.html">as_tibble_list</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Below are the tables of the constellation’s star databases. The instances of the dimensions have been integrated so that the tables are common to both databases.</p>
