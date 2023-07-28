@@ -19,14 +19,18 @@ Selection data from the 122 Cities Mortality Reporting System by age group.
 \details{
 The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
 mortality figures by age group and cause, considered separately, are included.
+}
+\examples{
+# The operations to obtain it from the `ft` data set are:
 
-The operations to obtain it from the \code{ft} data set are:
+if (rlang::is_installed("stringr")) {
+  ft_age <- ft |>
+    dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
+    tidyr::gather("Age", "All Deaths", 7:11) |>
+    dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+    dplyr::mutate(Age = stringr::str_replace(Age, " \\\\(all cause deaths\\\\)", ""))
+}
 
-ft_age <- ft |>
-dplyr::select(-\verb{Pneumonia and Influenza Deaths}, -tidyselect::all_of(\verb{All Deaths})) |>
-tidyr::gather("Age", "All Deaths", 7:11) |>
-dplyr::mutate(\verb{All Deaths} = as.integer(\verb{All Deaths})) |>
-dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))
 }
 \seealso{
 \code{\link{mrs_age_schema}}

@@ -96,15 +96,19 @@ s <- star_schema() |>
 
 db <- star_database(s, ft_num) |>
   snake_case()
-
-ls <- db |>
-  as_tibble_list()
 ```
 
 The dimension and fact schemas can be defined as variables (`where`) to
 be reused or directly in the star schema definition. To make it easier
 to work in a database environment we transform the table field names to
-snake case. With this same goal they can be exported as a tibble list.
+snake case.
+
+With this same goal they can be exported as a tibble list.
+
+``` r
+ls <- db |>
+  as_tibble_list()
+```
 
 The tables of dimensions and facts of the obtained star database are
 shown below.

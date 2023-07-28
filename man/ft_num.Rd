@@ -22,12 +22,14 @@ The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
 mortality figures by age group and cause, considered separately, are included.
 In the cause, only a distinction is made between pneumonia or influenza and
 others.
-
-The operations to obtain it from the \code{ft} data set are:
+}
+\examples{
+# The operations to obtain it from the `ft` data set are:
 
 ft_num <- ft |>
-dplyr::mutate(\verb{Pneumonia and Influenza Deaths} = as.integer(\verb{Pneumonia and Influenza Deaths})) |>
-dplyr::mutate(\verb{All Deaths} = as.integer(\verb{All Deaths}))
+  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`))
+
 }
 \seealso{
 \code{\link{mrs_cause_schema}}
