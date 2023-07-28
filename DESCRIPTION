@@ -4,22 +4,17 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Jose", "Samos", , "jsamos@ugr.es", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4457-3439"))
-Description: Data in multidimensional systems is obtained from 
-    operational systems and is transformed to adapt it to the new 
-    structure. Frequently, the operations to be performed aim to 
-    transform a flat table into a ROLAP (Relational On-Line Analytical 
-    Processing) star database. The main objective of the package is 
-    to allow the definition of these transformations easily.
+Description: Data in multidimensional systems is obtained from operational
+    systems and is transformed to adapt it to the new structure.
+    Frequently, the operations to be performed aim to transform a flat
+    table into a ROLAP (Relational On-Line Analytical Processing) star
+    database. The main objective of the package is to allow the definition
+    of these transformations easily.
+License: MIT + file LICENSE
 URL: http://rolap.es, https://github.com/josesamos/rolap
 BugReports: https://github.com/josesamos/rolap/issues
-License: MIT + file LICENSE
-Encoding: UTF-8
-Language: en-GB
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
 Imports: 
     dplyr,
     purrr,
@@ -28,6 +23,11 @@ Imports:
     tibble,
     tidyr,
     tidyselect
-Depends: 
-    R (>= 2.10)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-GB
 LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3

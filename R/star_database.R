@@ -48,7 +48,7 @@ star_database <- function(schema, instances) {
 
   # get a flat table ready to generate facts and dimensions
   # (NA values are replaced by UNKNOWN)
-  instances[, attributes] <- prepare_instances_to_join(instances[, attributes])
+  instances[, attributes] <- prepare_to_join(instances[, attributes])
 
   # generate dimension tables
   keys <- c()
@@ -61,7 +61,7 @@ star_database <- function(schema, instances) {
         instances
       ))
     # include surrogate key in instances
-    instances <- add_surrogate_key_to_instances(db$dimensions[[d]], instances)
+    instances <- add_surrogate_key(db$dimensions[[d]], instances)
     keys <- c(keys, get_surrogate_key(db$dimensions[[d]]))
   }
 

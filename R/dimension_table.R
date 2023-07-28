@@ -35,7 +35,7 @@ dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
 }
 
 
-# add_surrogate_key_to_instances -----------------------------------------------
+# add_surrogate_key ------------------------------------------------------------
 
 #' Add the surrogate key from a dimension table to the instances table.
 #'
@@ -44,7 +44,7 @@ dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
 #'
 #' @return A `tibble`.
 #' @keywords internal
-add_surrogate_key_to_instances <- function(dimension_table, instances) {
+add_surrogate_key <- function(dimension_table, instances) {
   attributes <- colnames(dimension_table$table)
   attributes <- attributes[attributes != dimension_table$surrogate_key]
   dplyr::inner_join(instances, dimension_table$table, by = attributes)

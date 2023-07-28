@@ -1,4 +1,4 @@
-# prepare_instances_to_join ----------------------------------------------------
+# prepare_to_join ----------------------------------------------------
 
 #' Transform the instances table implemented by a `tibble` to join
 #'
@@ -9,7 +9,7 @@
 #'
 #' @return A `tibble`.
 #' @keywords internal
-prepare_instances_to_join <- function(instances) {
+prepare_to_join <- function(instances) {
   n_row <- nrow(instances)
   # all attributes of type character
   attributes <- colnames(instances)
