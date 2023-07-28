@@ -11,8 +11,8 @@ Description: Data in multidimensional systems is obtained from operational
     database. The main objective of the package is to allow the definition
     of these transformations easily.
 License: MIT + file LICENSE
-URL: https://github.com/josesamos/rolap,
-    https://josesamos.github.io/rolap/
+URL: https://josesamos.github.io/rolap/,
+    https://github.com/josesamos/rolap
 BugReports: https://github.com/josesamos/rolap/issues
 Depends: 
     R (>= 2.10)
