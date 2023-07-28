@@ -1,12 +1,20 @@
 Package: rolap
-Title: What the Package Does (One Line, Title Case)
+Title: Obtaining Star Databases from Flat Tables
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Jose", "Samos", , "jsamos@ugr.es", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-4457-3439"))
+Description: Data in multidimensional systems is obtained from 
+    operational systems and is transformed to adapt it to the new 
+    structure. Frequently, the operations to be performed aim to 
+    transform a flat table into a ROLAP (Relational On-Line Analytical 
+    Processing) star database. The main objective of the package is 
+    to allow the definition of these transformations easily.
+URL: http://rolap.es, https://github.com/josesamos/rolap
+BugReports: https://github.com/josesamos/rolap/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en-GB
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
