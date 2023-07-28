@@ -61,7 +61,7 @@ Additionally, in the dimensions *hierarchies* with *levels* and *descriptors* ca
 
 ### Facts and measures
 
-Facts have a *granularity*, which is determined by the attributes of the dimensions that are considered at each moment. Thus, a measure in a fact has two components, the *numerical property* and an *formula*, frequently the SUM aggregation function, that allows combining several values of this measure to obtain a new value of the same measure with a coarser granularity [@jensen2010multi]. 
+Facts have a *granularity*, which is determined by the attributes of the dimensions that are considered at each moment. Thus, a measure in a fact has two components, the *numerical property* and an *formula*, frequently the *SUM* aggregation function, that allows combining several values of this measure to obtain a new value of the same measure with a coarser granularity [@jensen2010multi]. 
 
 According to their behaviour to obtain a coarser granularity, three types of measures are distinguished: *additive*, *semi-additive* and *non-additive*. For *additive measures*, SUM is always a valid formula that maintains the meaning of the measure when the granularity changes. For *semi-additive measures*, there is no point in using SUM when changing the level of detail in any of the dimensions because the meaning of the measure changes, this frequently occurs in dimensions that represents time and measures representing inventory level. For *non-additive measures*, values cannot be combined across any dimension using SUM because the result obtained has a different meaning from the original measure (generally occurs with ratios, percentages or unit amounts such as unit cost or unit price). 
 
@@ -128,4 +128,238 @@ There are several possibilities to have conformed dimensions, the most obvious f
 
 In this section an illustrative example is developed to show how the package works.
 
-## Starting data sets
+## Data sets
+
+To illustrate how the package works we will use a small part of the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) data set. 
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft, split.table = Inf)
+```
+
+In the table above, all the rows of the `ft` data set are shown. For each week and city, mortality figures by **age** group and **cause**, considered separately, are included (i.e., the combination of age group and cause is not included). In the cause, only a distinction is made between pneumonia or influenza and others. Regarding the data types, all the columns are of type character, they have been imported directly as a `tibble`, without indicating a specific type.
+
+From this initial data set, two additional datasets, `ft_num` and `ft_age`, have been defined with the transformations shown below.
+
+```{r}
+ft_num <- ft |>
+  dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`))
+
+ft_age <- ft |>
+  dplyr::select(-`Pneumonia and Influenza Deaths`,-`All Deaths`) |>
+  tidyr::gather("Age", "All Deaths", 7:11) |>
+  dplyr::mutate(`All Deaths` = as.integer(`All Deaths`)) |>
+  dplyr::mutate(Age = stringr::str_replace(Age, " \\(all cause deaths\\)", ""))
+```
+
+`ft_num` has the same structure and data as `ft`, only the data types of the two cause measures change. For `ft_age`, the columns with cause measures are removed and it is transformed into a tidy table (through `tidyr::gather`), with the only measure of numeric type and removing redundant descriptions. Below are the first 15 rows of `ft_age`.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(head(ft_age, 15), split.table = Inf)
+```
+
+`ft_num` and `ft_age` are the flat tables that will be considered as a starting point to obtain star databases from them in this example.
+
+## Dimensional modelling
+
+For each flat table, the goal is to define the attributes that correspond to measures in facts and those that are in dimensions. For facts, measures and their aggregation functions have to be defined. For dimensions, attributes with natural affinity must be grouped. Each attribute should only appear once in the definition.
+
+To avoid having to write the name of the attributes of the table, with the following function we can have them in the form of a string. Thus, we can copy and paste each name as needed.
+
+```{r}
+dput(colnames(ft_num))
+
+dput(colnames(ft_age))
+```
+
+### Star Schema
+
+We create an `star_schema` object using the `star_schema()` function, as shown below.
+
+```{r}
+s <- star_schema()
+```
+
+We already have an empty schema, we can add facts and dimensions to it, as shown in the sections that follow.
+
+### Dimensions
+
+We can define the dimensions through variables, using the `dimension_schema()` function and then the `define_dimension()` function in a `star_schema` object, or directly in a `star_schema` object , using the `define_dimension()` function. In the example below, the result in both cases is the same. The advantage is that by using variables we save defining them several times if the same dimension appears in several star schemes.
+
+```{r}
+# definition 1
+when <- dimension_schema(name = "When",
+                         attributes = c("Year",
+                                        "WEEK"))
+s_age <- star_schema() |>
+  define_dimension(when)
+
+# definition 2
+s_age <- star_schema() |>
+  define_dimension(name = "When",
+                         attributes = c("Year",
+                                        "WEEK"))
+```
+
+### Facts
+
+For completeness, facts can also be defined as variables or directly associated with the star_schema object. As for the dimensions, in the example below, the result in both cases is the same.
+
+```{r}
+# definition 1
+mrs_cause <- fact_schema(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths"))
+s_cause <- star_schema() |>
+  define_facts(mrs_cause)
+
+# definition 2
+s_cause <- star_schema() |>
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths"))
+```
+
+Each measure has an aggregation function associated with it, by default it is *SUM*. Alternatively, the *MAX* or *MIN* functions can be used. *AVG* cannot be used because the average of averages is not the total average. Instead, a field called `nrow_agg` (an alternative name can be specified) is always added where the number of records added in the result row is stored. With that value and the result of *SUM*, the value of the *AVG* function can be obtained.
+
+The aggregation functions are needed to get the data at the granularity defined in the star schema, which can be equal to or coarser than the granularity defined in the flat table.
+
+```{r}
+s_cause <- star_schema() |>
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths"),
+               agg_functions = c("MAX", "SUM"),
+               nrow_agg = "Num" 
+               )
+```
+
+In the above example, aggregation functions have been explicitly defined for the measures and the default name of the measure corresponding to the number of records added has been changed.
+
+### Star databases
+
+From a `star_schema` object and a flat table (`tibble`) that contains all the fields that appear in it, using the `star_database()` function, we obtain a `star_database` object. As an example we will consider data on causes.
+
+The definition of the star schema for the data considered for the cause case is shown below.
+
+```{r}
+s_cause <- star_schema() |>
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths"),
+               nrow_agg = "Num") |>
+  define_dimension(name = "When",
+                         attributes = c("Year",
+                                        "WEEK",
+                                        "Week Ending Date")) |>
+  define_dimension(name = "Where",
+                          attributes = c("REGION",
+                                         "State",
+                                         "City"))
+```
+
+Next we get the star database.
+
+```{r}
+db_cause <- star_database(s_cause, ft_num)
+```
+
+For now the objective of this database is to export its tables to be used in OLAP query tools. Two functions are offered for this purpose, firstly `snake_case()` to transform the column names to snake case and secondly `as_tibble_list()` to generate a `tibble` list with the database tables, as shown in the following example.
+
+```{r}
+l_cause <- db_cause |>
+  snake_case() |>
+  as_tibble_list()
+```
+
+The tables of dimensions and facts of the obtained star database are shown below.
+
+```{r, results = "asis", echo = FALSE}
+for (i in length(l_cause):1) {
+pander::pandoc.table(l_cause[[i]], split.table = Inf)
+}
+```
+
+It can be seen that the data in the fact table has the same granularity as the data in the original flat table (they have the same number of records). 
+
+```{r}
+nrow(ft_num)
+
+nrow(l_cause[[1]])
+```
+
+The same can be seen in the `num` field in the fact table which shows the number of records added to get each record, in this case it is always 1. Dimensions contain only the distinct value combinations for the attribute sets they contain.
+
+### Constellations
+
+From two or more star schemas we can define a constellation.
+
+
+
+
+```{r}
+when <- dimension_schema(name = "When",
+                         attributes = c("Year",
+                                        "WEEK"))
+
+where <- dimension_schema(name = "Where",
+                          attributes = c("REGION",
+                                         "State",
+                                         "City"))
+s_age <- star_schema() |>
+  define_facts(name = "MRS Age",
+               measures = c("All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where) |>
+  define_dimension(name = "Who",
+                         attributes = c("Age"))
+```
+
+Next we get the star database.
+
+```{r}
+db_age <- star_database(s_age, ft_age)
+```
+
+For now the objective of this database is to export its tables to be used in OLAP query tools. Two functions are offered for this purpose, firstly `snake_case()` to transform the column names to snake case and secondly `as_tibble_list()` to generate a `tibble` list with the database tables, as shown in the following example.
+
+```{r}
+l_age <- db_age |>
+  snake_case() |>
+  as_tibble_list()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+s_cause <- star_schema() |>
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where)
+```
+
+
+
+
+```{r}
+ft_age2 <- ft_age |>
+  dplyr::filter(Year < "1964") |>
+  dplyr::filter(City != "Boston" & City != "Bridgeport") |>
+  dplyr::filter(WEEK >= "8")
+
+db_age <- star_database(s_age, ft_age2) |>
+  snake_case()
+```
