@@ -36,11 +36,16 @@ tables, from flat tables.
 
 ## Installation
 
-You can install the development version of `rolap` from
-[GitHub](https://github.com/) with:
+You can install the released version of `rolap` from
+[CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-# install.packages("rolap")
+install.packages("rolap")
+```
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
 devtools::install_github("josesamos/rolap")
 ```
 
