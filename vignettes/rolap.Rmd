@@ -275,8 +275,8 @@ l_cause <- db_cause |>
 The tables of dimensions and facts of the obtained star database are shown below.
 
 ```{r, results = "asis", echo = FALSE}
-for (i in length(l_cause):1) {
-pander::pandoc.table(l_cause[[i]], split.table = Inf)
+for (i in 1:length(l_cause)) {
+  pander::pandoc.table(l_cause[[i]], split.table = Inf)
 }
 ```
 
@@ -292,20 +292,50 @@ The same can be seen in the `num` field in the fact table which shows the number
 
 ### Constellations
 
-From two or more star schemas we can define a constellation.
+From two or more star databases we can define a constellation.
 
+#### Definition of star databases
 
+To more effectively demonstrate the functionality, we are going to define the star databases with a coarser granularity than the original flat tables; additionally we are going to select only some of the rows from the flat tables.
 
+For the cause case is shown below.
 
 ```{r}
 when <- dimension_schema(name = "When",
-                         attributes = c("Year",
-                                        "WEEK"))
+                         attributes = c("Year"))
 
 where <- dimension_schema(name = "Where",
-                          attributes = c("REGION",
-                                         "State",
+                          attributes = c("State",
                                          "City"))
+s_cause <- star_schema() |>
+  define_facts(name = "MRS Cause",
+               measures = c("Pneumonia and Influenza Deaths",
+                            "All Deaths")) |>
+  define_dimension(when) |>
+  define_dimension(where)
+
+ft_num2 <- ft_num |>
+  dplyr::filter(Year > "1962") |>
+  dplyr::filter(City == "Boston" | City == "Bridgeport")
+
+db_cause <- star_database(s_cause, ft_num2) |>
+  snake_case()
+
+l_cause <- db_cause |>
+  as_tibble_list()
+```
+
+The tables obtained as a result are shown below.
+
+```{r, results = "asis", echo = FALSE}
+for (i in 1:length(l_cause)) {
+  pander::pandoc.table(l_cause[[i]], split.table = Inf)
+}
+```
+
+Next, we define the star database and the rest of the operations in the case of age groups.
+
+```{r}
 s_age <- star_schema() |>
   define_facts(name = "MRS Age",
                measures = c("All Deaths")) |>
@@ -313,53 +343,57 @@ s_age <- star_schema() |>
   define_dimension(where) |>
   define_dimension(name = "Who",
                          attributes = c("Age"))
-```
 
-Next we get the star database.
-
-```{r}
-db_age <- star_database(s_age, ft_age)
-```
-
-For now the objective of this database is to export its tables to be used in OLAP query tools. Two functions are offered for this purpose, firstly `snake_case()` to transform the column names to snake case and secondly `as_tibble_list()` to generate a `tibble` list with the database tables, as shown in the following example.
-
-```{r}
-l_age <- db_age |>
-  snake_case() |>
-  as_tibble_list()
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-s_cause <- star_schema() |>
-  define_facts(name = "MRS Cause",
-               measures = c("Pneumonia and Influenza Deaths",
-                            "All Deaths")) |>
-  define_dimension(when) |>
-  define_dimension(where)
-```
-
-
-
-
-```{r}
 ft_age2 <- ft_age |>
   dplyr::filter(Year < "1964") |>
-  dplyr::filter(City != "Boston" & City != "Bridgeport") |>
-  dplyr::filter(WEEK >= "8")
+  dplyr::filter(City != "Boston" & City != "Bridgeport")
 
 db_age <- star_database(s_age, ft_age2) |>
   snake_case()
+
+l_age <- db_age |>
+  as_tibble_list()
 ```
+
+The tables obtained as a result are also shown below.
+
+```{r, results = "asis", echo = FALSE}
+for (i in 1:length(l_age)) {
+  pander::pandoc.table(l_age[[i]], split.table = Inf)
+}
+```
+
+As we have filtered the data, it can be seen that the dimension tables only contain the necessary data for each star database but, for common dimensions, they share the same structure.
+
+#### Constellation definition
+
+Next we define a constellation formed by the two star databases.
+
+```{r example5}
+ct <- constellation("MRS", list(db_cause, db_age))
+```
+
+Constellation tables can also be exported as a tibble list.
+
+```{r example6}
+lc <- ct |>
+  as_tibble_list()
+```
+
+Below are the tables of the constellation's star databases. The instances of the dimensions have been integrated so that the tables are common to both databases.
+
+```{r, results = "asis", echo = FALSE}
+for (i in 1:length(lc)) {
+  pander::pandoc.table(lc[[i]], split.table = Inf)
+}
+```
+
+These tables can be directly exported in the format required by the OLAP query tool that we are going to use.
+
+# Conclusions
+
+`rolap` package offers a set of operations that allow us to transform flat tables into star databases.  From several star databases you can define a constellation with conformed dimensions.
+
+Operations have been designed to be intuitive and easy to use. The result greatly facilitates the data transformation process for the exposed situation.
+
+

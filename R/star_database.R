@@ -164,13 +164,13 @@ snake_case <- function(db) {
 as_tibble_list.star_database <- function(db) {
   l <- NULL
   lnames <- NULL
-  for (f in names(db$instance$facts)) {
-    l <- c(l, list(db$instance$facts[[f]]$table))
-    lnames <- c(lnames, f)
-  }
   for (d in names(db$instance$dimensions)) {
     l <- c(l, list(db$instance$dimensions[[d]]$table))
     lnames <- c(lnames, d)
+  }
+  for (f in names(db$instance$facts)) {
+    l <- c(l, list(db$instance$facts[[f]]$table))
+    lnames <- c(lnames, f)
   }
   names(l) <- lnames
   l

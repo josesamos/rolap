@@ -313,21 +313,6 @@ test_that("as_tibble_list() export star_database as a list of tibbles", {
       as_tibble_list()
   }, {
     list(
-      mrs_cause = structure(
-        list(
-          when_key = c(1L, 1L, 1L, 2L,
-                       2L, 2L),
-          where_key = c(1L, 2L, 3L, 1L, 2L, 3L),
-          pneumonia_and_influenza_deaths = c(9L,
-                                             5L, 23L, 2L, 12L, 10L),
-          all_deaths = c(131L, 104L, 555L, 46L,
-                         192L, 276L),
-          nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
-        ),
-        class = c("tbl_df",
-                  "tbl", "data.frame"),
-        row.names = c(NA,-6L)
-      ),
       when = structure(
         list(when_key = 1:2, year = c("1962", "1963")),
         row.names = c(NA,-2L),
@@ -343,6 +328,21 @@ test_that("as_tibble_list() export star_database as a list of tibbles", {
         ),
         row.names = c(NA,-3L),
         class = c("tbl_df", "tbl", "data.frame")
+      ),
+      mrs_cause = structure(
+        list(
+          when_key = c(1L, 1L, 1L, 2L,
+                       2L, 2L),
+          where_key = c(1L, 2L, 3L, 1L, 2L, 3L),
+          pneumonia_and_influenza_deaths = c(9L,
+                                             5L, 23L, 2L, 12L, 10L),
+          all_deaths = c(131L, 104L, 555L, 46L,
+                         192L, 276L),
+          nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
+        ),
+        class = c("tbl_df",
+                  "tbl", "data.frame"),
+        row.names = c(NA,-6L)
       )
     )
   })

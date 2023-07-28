@@ -25,6 +25,7 @@ Imports:
     tidyselect
 Suggests: 
     knitr,
+    pander,
     rmarkdown,
     stringr,
     testthat (>= 3.0.0)

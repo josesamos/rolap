@@ -318,21 +318,58 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
       as_tibble_list()
   }, {
     list(
-      mrs_cause = structure(
+      when = structure(
         list(
-          when_key = c(1L, 1L, 1L, 2L,
-                       2L, 2L),
-          where_key = c(1L, 2L, 3L, 1L, 2L, 3L),
-          pneumonia_and_influenza_deaths = c(9L,
-                                             5L, 23L, 2L, 12L, 10L),
+          when_key = 1:3,
+          year = c("1962", "1963",
+                   "1964")
+        ),
+        row.names = c(NA,-3L),
+        class = c("tbl_df", "tbl",
+                  "data.frame")
+      ),
+      where = structure(
+        list(
+          where_key = 1:4,
+          region = c("1",
+                     "1", "1", "1"),
+          state = c("CT", "CT", "MA", "MA"),
+          city = c("Bridgeport",
+                   "Hartford", "Boston", "Cambridge")
+        ),
+        row.names = c(NA,-4L),
+        class = c("tbl_df",
+                  "tbl", "data.frame")
+      ),
+      who = structure(
+        list(
+          who_key = 1:5,
+          age = c(
+            "1-24 years",
+            "25-44 years",
+            "45-64 years",
+            "65+ years",
+            "<1 year"
+          )
+        ),
+        row.names = c(NA,-5L),
+        class = c("tbl_df", "tbl", "data.frame")
+      ),
+      structure(
+        list(
+          when_key = c(1L, 1L, 1L, 2L, 2L, 2L),
+          where_key = c(1L, 2L,
+                        3L, 1L, 2L, 3L),
+          pneumonia_and_influenza_deaths = c(9L, 5L,
+                                             23L, 2L, 12L, 10L),
           all_deaths = c(131L, 104L, 555L, 46L,
                          192L, 276L),
           nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
         ),
-        row.names = c(NA, -6L),
+        row.names = c(NA,-6L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
-      mrs_age = structure(
+      structure(
         list(
           when_key = c(2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 3L, 3L,
                        3L, 3L, 3L, 3L),
@@ -346,43 +383,9 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
           nrow_agg = c(3L, 3L, 3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L,
                        3L, 3L, 3L, 3L, 3L)
         ),
-        row.names = c(NA, -15L),
+        row.names = c(NA,-15L),
         class = c("tbl_df",
                   "tbl", "data.frame")
-      ),
-      when = structure(
-        list(
-          when_key = 1:3,
-          year = c("1962", "1963", "1964")
-        ),
-        row.names = c(NA, -3L),
-        class = c("tbl_df",
-                  "tbl", "data.frame")
-      ),
-      where = structure(
-        list(
-          where_key = 1:4,
-          region = c("1", "1", "1", "1"),
-          state = c("CT", "CT", "MA",
-                    "MA"),
-          city = c("Bridgeport", "Hartford", "Boston", "Cambridge")
-        ),
-        row.names = c(NA, -4L),
-        class = c("tbl_df", "tbl", "data.frame")
-      ),
-      who = structure(
-        list(
-          who_key = 1:5,
-          age = c(
-            "1-24 years",
-            "25-44 years",
-            "45-64 years",
-            "65+ years",
-            "<1 year"
-          )
-        ),
-        row.names = c(NA, -5L),
-        class = c("tbl_df", "tbl", "data.frame")
       )
     )
   })

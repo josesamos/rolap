@@ -148,20 +148,19 @@ initial data.
 
 ``` r
 ft1 <- ft_num |>
-  dplyr::filter(Year > "1963") |>
-  dplyr::filter(City != "Hartford")
+  dplyr::filter(Year > "1962") |>
+  dplyr::filter(City == "Boston" | City == "Bridgeport")
 ```
 
 The flat table obtained is shown below.
 
 | Year | WEEK | Week Ending Date | REGION | State |    City    | Pneumonia and Influenza Deaths | All Deaths | \<1 year (all cause deaths) | 1-24 years (all cause deaths) | 25-44 years | 45-64 years (all cause deaths) | 65+ years (all cause deaths) |
 |:----:|:----:|:----------------:|:------:|:-----:|:----------:|:------------------------------:|:----------:|:---------------------------:|:-----------------------------:|:-----------:|:------------------------------:|:----------------------------:|
+| 1963 |  4   |    01/26/1963    |   1    |  MA   |   Boston   |               10               |    276     |             11              |              14               |     17      |               67               |             167              |
 | 1964 |  3   |    01/18/1964    |   1    |  MA   |   Boston   |               13               |    325     |             17              |               7               |     24      |               90               |             187              |
 | 1964 |  6   |    02/08/1964    |   1    |  MA   |   Boston   |               9                |    244     |             13              |               9               |     14      |               61               |             147              |
+| 1963 |  4   |    01/26/1963    |   1    |  CT   | Bridgeport |               2                |     46     |              4              |               0               |      3      |               10               |              29              |
 | 1964 |  5   |    02/01/1964    |   1    |  CT   | Bridgeport |               8                |     45     |              3              |               1               |      2      |               11               |              28              |
-| 1964 |  2   |    01/11/1964    |   1    |  MA   | Cambridge  |               7                |     31     |              1              |               0               |      2      |               9                |              19              |
-| 1964 |  5   |    02/01/1964    |   1    |  MA   | Cambridge  |               6                |     27     |              2              |               0               |      0      |               8                |              17              |
-| 1964 |  9   |    02/29/1964    |   1    |  MA   | Cambridge  |               0                |     26     |              0              |               0               |      2      |               8                |              16              |
 
 Additionally, we transform the dataset to be tidy data and filter it.
 
@@ -231,19 +230,20 @@ focused on the causes are shown below.
 
 | when_key | year |
 |:--------:|:----:|
-|    1     | 1964 |
+|    1     | 1963 |
+|    2     | 1964 |
 
 | where_key | region | state |    city    |
 |:---------:|:------:|:-----:|:----------:|
 |     1     |   1    |  CT   | Bridgeport |
 |     2     |   1    |  MA   |   Boston   |
-|     3     |   1    |  MA   | Cambridge  |
 
 | when_key | where_key | pneumonia_and_influenza_deaths | all_deaths | nrow_agg |
 |:--------:|:---------:|:------------------------------:|:----------:|:--------:|
-|    1     |     1     |               8                |     45     |    1     |
-|    1     |     2     |               22               |    569     |    2     |
-|    1     |     3     |               13               |     84     |    3     |
+|    1     |     1     |               2                |     46     |    1     |
+|    1     |     2     |               10               |    276     |    1     |
+|    2     |     1     |               8                |     45     |    1     |
+|    2     |     2     |               22               |    569     |    2     |
 
 Below are the tables of the star database with the age data, the `db2`
 database.
@@ -323,9 +323,10 @@ common to both databases.
 
 | when_key | where_key | pneumonia_and_influenza_deaths | all_deaths | nrow_agg |
 |:--------:|:---------:|:------------------------------:|:----------:|:--------:|
+|    2     |     1     |               2                |     46     |    1     |
+|    2     |     3     |               10               |    276     |    1     |
 |    3     |     1     |               8                |     45     |    1     |
 |    3     |     3     |               22               |    569     |    2     |
-|    3     |     4     |               13               |     84     |    3     |
 
 | when_key | where_key | who_key | all_deaths | nrow_agg |
 |:--------:|:---------:|:-------:|:----------:|:--------:|
@@ -339,3 +340,6 @@ common to both databases.
 |    2     |     2     |    3    |     14     |    1     |
 |    2     |     2     |    4    |     27     |    1     |
 |    2     |     2     |    5    |     3      |    1     |
+
+These tables can be directly exported in the format required by the OLAP
+query tool that we are going to use.

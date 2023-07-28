@@ -141,15 +141,15 @@ constellation <- function(name = NULL, stars = NULL) {
 as_tibble_list.constellation <- function(db) {
   l <- NULL
   lnames <- NULL
-  for (f in names(db$facts)) {
-    l <- c(l, list(db$facts[[f]]$table))
-    lnames <- c(lnames, f)
-  }
   for (d in names(db$dimensions)) {
     l <- c(l, list(db$dimensions[[d]]$table))
     lnames <- c(lnames, d)
   }
   names(l) <- lnames
+  for (f in names(db$facts)) {
+    l <- c(l, list(db$facts[[f]]$table))
+    lnames <- c(lnames, f)
+  }
   l
 }
 

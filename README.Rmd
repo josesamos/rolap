@@ -52,7 +52,7 @@ pander::pandoc.table(ft_num, split.table = Inf)
 
 The transformation to obtain a star database from the flat table using `rolap` package is as follows:
 
-```{r example}
+```{r}
 library(rolap)
 
 where <- dimension_schema(name = "Where",
@@ -76,7 +76,7 @@ The dimension and fact schemas can be defined as variables (`where`) to be reuse
 
 With this same goal they can be exported as a tibble list.
 
-```{r example1}
+```{r}
 ls <- db |>
   as_tibble_list()
 ```
@@ -84,9 +84,9 @@ ls <- db |>
 The tables of dimensions and facts of the obtained star database are shown below.
 
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(db$instance$dimensions$when$table, split.table = Inf)
-pander::pandoc.table(db$instance$dimensions$where$table, split.table = Inf)
-pander::pandoc.table(db$instance$facts$mrs_cause$table, split.table = Inf)
+for (i in 1:length(ls)) {
+  pander::pandoc.table(ls[[i]], split.table = Inf)
+}
 ```
 
 
@@ -94,10 +94,10 @@ pander::pandoc.table(db$instance$facts$mrs_cause$table, split.table = Inf)
 
 We can work with several star databases to form a constellation. To show an example of how data is integrated into dimensions, let's filter the initial data. 
 
-```{r example2}
+```{r}
 ft1 <- ft_num |>
-  dplyr::filter(Year > "1963") |>
-  dplyr::filter(City != "Hartford")
+  dplyr::filter(Year > "1962") |>
+  dplyr::filter(City == "Boston" | City == "Bridgeport")
 ```
 
 The flat table obtained is shown below.
@@ -108,7 +108,7 @@ pander::pandoc.table(ft1, split.table = Inf)
 
 Additionally, we transform the dataset to be tidy data and filter it.
 
-```{r example3}
+```{r}
 ft2 <- ft_num |>
   dplyr::select(-`Pneumonia and Influenza Deaths`, -`All Deaths`) |>
   tidyr::gather("Age", "All Deaths", 7:11) |>
@@ -127,7 +127,7 @@ pander::pandoc.table(ft2, split.table = Inf)
 
 We define the star databases, one with the data relative to the causes and the other with the age data.
 
-```{r example4}
+```{r}
 when <- dimension_schema(name = "When",
                          attributes = c("Year"))
 
@@ -161,31 +161,34 @@ db2 <- star_database(s2, ft2) |>
 The tables of dimensions and facts of the new `db1` star database focused on the causes are shown below.
 
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(db1$instance$dimensions$when$table, split.table = Inf)
-pander::pandoc.table(db1$instance$dimensions$where$table, split.table = Inf)
-pander::pandoc.table(db1$instance$facts$mrs_cause$table, split.table = Inf)
+ls <- db1 |>
+  as_tibble_list()
+for (i in 1:length(ls)) {
+  pander::pandoc.table(ls[[i]], split.table = Inf)
+}
 ```
 
 Below are the tables of the star database with the age data, the `db2` database.
 
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(db2$instance$dimensions$when$table, split.table = Inf)
-pander::pandoc.table(db2$instance$dimensions$where$table, split.table = Inf)
-pander::pandoc.table(db2$instance$dimensions$who$table, split.table = Inf)
-pander::pandoc.table(db2$instance$facts$mrs_age$table, split.table = Inf)
+ls <- db2 |>
+  as_tibble_list()
+for (i in 1:length(ls)) {
+  pander::pandoc.table(ls[[i]], split.table = Inf)
+}
 ```
 
 As we have filtered the data, it can be seen that the dimension tables only contain the necessary data for each star database but, for common dimensions, they share the same structure.
 
 Next we define a constellation formed by the two star databases.
 
-```{r example5}
+```{r}
 ct <- constellation("MRS", list(db1, db2))
 ```
 
 Constellation tables can also be exported as a tibble list.
 
-```{r example6}
+```{r}
 lc <- ct |>
   as_tibble_list()
 ```
@@ -193,10 +196,9 @@ lc <- ct |>
 Below are the tables of the constellation's star databases. The instances of the dimensions have been integrated so that the tables are common to both databases.
 
 ```{r, results = "asis", echo = FALSE}
-pander::pandoc.table(ct$dimensions$when$table, split.table = Inf)
-pander::pandoc.table(ct$dimensions$where$table, split.table = Inf)
-pander::pandoc.table(ct$dimensions$who$table, split.table = Inf)
-pander::pandoc.table(ct$facts$mrs_cause$table, split.table = Inf)
-pander::pandoc.table(ct$facts$mrs_age$table, split.table = Inf)
+for (i in 1:length(lc)) {
+  pander::pandoc.table(lc[[i]], split.table = Inf)
+}
 ```
 
+These tables can be directly exported in the format required by the OLAP query tool that we are going to use.
