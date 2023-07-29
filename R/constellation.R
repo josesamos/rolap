@@ -145,11 +145,11 @@ as_tibble_list.constellation <- function(db) {
     l <- c(l, list(db$dimensions[[d]]$table))
     lnames <- c(lnames, d)
   }
-  names(l) <- lnames
   for (f in names(db$facts)) {
     l <- c(l, list(db$facts[[f]]$table))
     lnames <- c(lnames, f)
   }
+  names(l) <- lnames
   l
 }
 

@@ -355,7 +355,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
         row.names = c(NA,-5L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
-      structure(
+      mrs_cause = structure(
         list(
           when_key = c(1L, 1L, 1L, 2L, 2L, 2L),
           where_key = c(1L, 2L,
@@ -369,7 +369,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
         row.names = c(NA,-6L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
-      structure(
+      mrs_age = structure(
         list(
           when_key = c(2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 3L, 3L,
                        3L, 3L, 3L, 3L),
