@@ -6,8 +6,13 @@
 #' Measures and attributes of the `star_schema` must correspond to the names of
 #' the columns of the flat table.
 #'
+#' Since NA values cause problems when doing Join operations between tables,
+#' you can indicate the value that will be used to replace them before doing
+#' these operations. If none is indicated, a default value is taken.
+#'
 #' @param schema A `star_schema` object.
 #' @param instances A flat table to define the database instances according to the schema.
+#' @param unknown_value A string, value used to replace NA values in dimensions.
 #'
 #' @return A `star_database` object.
 #'
@@ -19,8 +24,11 @@
 #' db <- star_database(mrs_cause_schema, ft_num)
 #'
 #' @export
-star_database <- function(schema, instances) {
-  stopifnot(check_schema_validity(schema) == TRUE)
+star_database <- function(schema, instances, unknown_value = NULL) {
+  stopifnot("fact_schema" %in% class(schema$facts[[1]]))
+  for (d in seq_along(schema$dimensions)) {
+    stopifnot("dimension_schema" %in% class(schema$dimensions[[d]]))
+  }
   stopifnot(tibble::is_tibble(instances))
   instance_attributes <- names(instances)
   attributes <- get_attribute_names(schema)
@@ -47,8 +55,8 @@ star_database <- function(schema, instances) {
   names(db$dimensions) <- names(schema$dimensions)
 
   # get a flat table ready to generate facts and dimensions
-  # (NA values are replaced by UNKNOWN)
-  instances[, attributes] <- prepare_to_join(instances[, attributes])
+  # (NA values are replaced by unknown_value)
+  instances[, attributes] <- prepare_to_join(instances[, attributes], unknown_value)
 
   # generate dimension tables
   keys <- c()

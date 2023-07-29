@@ -4,12 +4,14 @@
 \alias{star_database}
 \title{\code{star_database} S3 class}
 \usage{
-star_database(schema, instances)
+star_database(schema, instances, unknown_value = NULL)
 }
 \arguments{
 \item{schema}{A \code{star_schema} object.}
 
 \item{instances}{A flat table to define the database instances according to the schema.}
+
+\item{unknown_value}{A string, value used to replace NA values in dimensions.}
 }
 \value{
 A \code{star_database} object.
@@ -21,6 +23,10 @@ table that contains the data from which database instances are derived.
 \details{
 Measures and attributes of the \code{star_schema} must correspond to the names of
 the columns of the flat table.
+
+Since NA values cause problems when doing Join operations between tables,
+you can indicate the value that will be used to replace them before doing
+these operations. If none is indicated, a default value is taken.
 }
 \examples{
 

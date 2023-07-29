@@ -6,19 +6,23 @@
 #' the `NA` values to facilitate the join operation.
 #'
 #' @param instances A `tibble`, the instances table.
+#' @param unknown_value A string, value used to replace NA values in dimensions.
 #'
 #' @return A `tibble`.
 #' @keywords internal
-prepare_to_join <- function(instances) {
+prepare_to_join <- function(instances, unknown_value) {
+  if (is.null(unknown_value)) {
+    unknown_value <- "___UNKNOWN___"
+  }
   n_row <- nrow(instances)
   # all attributes of type character
   attributes <- colnames(instances)
   instances <- data.frame(lapply(instances, as.character), stringsAsFactors = FALSE)
   colnames(instances) <- attributes
 
-  # replace NA with unknown (for join)
+  # replace NA with unknown_value (for join)
   instances <- apply(instances[, , drop = FALSE], 2, function(x)
-    tidyr::replace_na(x, "___UNKNOWN___"))
+    tidyr::replace_na(x, unknown_value))
   if (n_row == 1) {
     tibble::as_tibble_row(instances)
   } else {

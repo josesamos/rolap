@@ -4,10 +4,12 @@
 \alias{prepare_to_join}
 \title{Transform the instances table implemented by a \code{tibble} to join}
 \usage{
-prepare_to_join(instances)
+prepare_to_join(instances, unknown_value)
 }
 \arguments{
 \item{instances}{A \code{tibble}, the instances table.}
+
+\item{unknown_value}{A string, value used to replace NA values in dimensions.}
 }
 \value{
 A \code{tibble}.
