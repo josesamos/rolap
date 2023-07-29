@@ -57,7 +57,7 @@ table that contains the data from which database instances are derived.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">star_database</span><span class="op">(</span><span class="va">schema</span>, <span class="va">instances</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">star_database</span><span class="op">(</span><span class="va">schema</span>, <span class="va">instances</span>, unknown_value <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -68,6 +68,10 @@ table that contains the data from which database instances are derived.</p>
 
 <dt>instances</dt>
 <dd><p>A flat table to define the database instances according to the schema.</p></dd>
+
+
+<dt>unknown_value</dt>
+<dd><p>A string, value used to replace NA values in dimensions.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -80,6 +84,9 @@ table that contains the data from which database instances are derived.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Measures and attributes of the <code>star_schema</code> must correspond to the names of
 the columns of the flat table.</p>
+<p>Since NA values cause problems when doing Join operations between tables,
+you can indicate the value that will be used to replace them before doing
+these operations. If none is indicated, a default value is taken.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
