@@ -142,3 +142,32 @@ as_tibble_list.constellation <- function(db) {
   as_tibble_list_common(db$dimensions, db$facts)
 }
 
+# as_dm_class.constellation -------------------------------------------
+
+#' Generate a `dm` class with fact and dimension tables
+#'
+#' To port databases to other work environments it is useful to be able to
+#' export them as a `dm` class, as this function does, in this way it can be
+#' saved directly in a DBMS.
+#'
+#'
+#' @param db A `constellation` object.
+#'
+#' @return A `dm` object.
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#' ct <- constellation("MRS", list(db1, db2))
+#'
+#' dm <- ct |>
+#'   as_dm_class()
+#'
+#' @export
+as_dm_class.constellation <- function(db) {
+  as_dm_class_common(db$dimensions, db$facts)
+}
+

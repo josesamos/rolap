@@ -37,6 +37,7 @@ db <- star_database(mrs_cause_schema, ft_num)
 \code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{ft_num}}
 
 Other star database definition functions: 
+\code{\link{as_dm_class}()},
 \code{\link{as_tibble_list}()},
 \code{\link{constellation}()},
 \code{\link{snake_case}()}

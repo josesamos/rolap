@@ -173,6 +173,36 @@ as_tibble_list.star_database <- function(db) {
   as_tibble_list_common(db$instance$dimensions, db$instance$facts)
 }
 
+# as_dm_class.star_database -------------------------------------------
+
+#' Generate a `dm` class with fact and dimension tables
+#'
+#' To port databases to other work environments it is useful to be able to
+#' export them as a `dm` class, as this function does, in this way it can be
+#' saved directly in a DBMS.
+#'
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `dm` object.
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#' ct <- constellation("MRS", list(db1, db2))
+#'
+#' dm <- ct |>
+#'   as_dm_class()
+#'
+#' @export
+as_dm_class.star_database <- function(db) {
+  as_dm_class_common(db$instance$dimensions, db$instance$facts)
+}
+
+
 # as_tibble_list_common ----------------------------------------------------
 
 #' Generate a list of tibbles with fact and dimension tables
@@ -196,3 +226,41 @@ as_tibble_list_common <- function(dimensions, facts) {
   names(l) <- lnames
   l
 }
+
+
+# as_dm_class_common ----------------------------------------------------
+
+#' Generate a list of tibbles with fact and dimension tables
+#'
+#' @param dimensions A list of dimension tables.
+#' @param facts A list of fact tables.
+#'
+#' @return  A `dm` object.
+#'
+#' @importFrom rlang :=
+#'
+#' @keywords internal
+as_dm_class_common <- function(dimensions, facts) {
+  c <- dm::dm()
+  for (d in names(dimensions)) {
+    c <- c |>
+      dm::dm(!!d := dimensions[[d]]$table) |>
+      dm::dm_add_pk(!!d, !!dimensions[[d]]$surrogate_key) |>
+      dm::dm_set_colors(darkgreen = !!d)
+  }
+  for (f in names(facts)) {
+    c <- c |>
+      dm::dm(!!f := facts[[f]]$table) |>
+      dm::dm_add_pk(!!f, !!facts[[f]]$surrogate_keys) |>
+      dm::dm_set_colors(darkblue = !!f)
+    for (s in facts[[f]]$surrogate_keys) {
+      t <- gsub("_key", "", s)
+      c <- c |>
+        dm::dm_add_fk(!!f, !!s, !!t)
+    }
+  }
+  c
+}
+
+
+

@@ -51,6 +51,7 @@ db <- star_database(s, ft_num) |>
 }
 \seealso{
 Other star database definition functions: 
+\code{\link{as_dm_class}()},
 \code{\link{as_tibble_list}()},
 \code{\link{constellation}()},
 \code{\link{star_database}()}
