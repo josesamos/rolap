@@ -350,3 +350,22 @@ common to both databases.
 
 These tables can be directly exported in the format required by the OLAP
 query tool that we are going to use.
+
+### Exportation as a `dm` object
+
+Star databases and constellations can be directly exported as objects of
+class [dm](https://cran.r-project.org/package=dm), as shown below.
+
+``` r
+dc <- ct |>
+  as_dm_class()
+```
+
+In this example, the `dm` class object is used only to represent the
+tables, but it can also be used to store them in any DBMS.
+
+``` r
+dc |> dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+<img src="man/figures/README-unnamed-chunk-17.svg" />

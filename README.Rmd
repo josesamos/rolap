@@ -4,13 +4,28 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
+library(tidyverse)
+library(dm)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+knit_print.grViz <- function(x, ..., options) {
+  svg <- DiagrammeRsvg::export_svg(x)
+  svg <- sub('[<]polygon fill="#ffffff"[^/]+/[>]\n', "", svg)
+  path <- paste0(options$fig.path, options$label, ".svg")
+  writeLines(svg, path)
+
+  knitr::asis_output(paste0('<img src="', path, '" />'))
+}
+vctrs::s3_register("knitr::knit_print", "grViz")
+
+options(cli.num_colors = 256)
 ```
 
 # rolap <a href="https://josesamos.github.io/rolap/"><img src="man/figures/logo.png" align="right" height="139" alt="rolap website" /></a>
@@ -45,7 +60,7 @@ devtools::install_github("josesamos/rolap")
 
 ## Example
 
-```{r setup, echo = FALSE}
+```{r, echo = FALSE}
 library(rolap)
 ```
 
@@ -209,3 +224,20 @@ for (i in 1:length(lc)) {
 ```
 
 These tables can be directly exported in the format required by the OLAP query tool that we are going to use.
+
+### Exportation as a `dm` object
+
+Star databases and constellations can be directly exported as objects of class [dm](https://cran.r-project.org/package=dm), as shown below.
+
+```{r}
+dc <- ct |>
+  as_dm_class()
+```
+
+In this example, the `dm` class object is used only to represent the tables, but it can also be used to store them in any DBMS.
+
+```{r}
+dc |> dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+
