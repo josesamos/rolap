@@ -158,7 +158,7 @@ snake_case <- function(db) {
 #'
 #' @param db A `star_database` object.
 #'
-#' @return A list of `tibble`
+#' @return A list of `tibble` objects.
 #'
 #' @examples
 #'
@@ -170,17 +170,29 @@ snake_case <- function(db) {
 #'
 #' @export
 as_tibble_list.star_database <- function(db) {
+  as_tibble_list_common(db$instance$dimensions, db$instance$facts)
+}
+
+# as_tibble_list_common ----------------------------------------------------
+
+#' Generate a list of tibbles with fact and dimension tables
+#'
+#' @param dimensions A list of dimension tables.
+#' @param facts A list of fact tables.
+#'
+#' @return A list of `tibble` objects.
+#' @keywords internal
+as_tibble_list_common <- function(dimensions, facts) {
   l <- NULL
   lnames <- NULL
-  for (d in names(db$instance$dimensions)) {
-    l <- c(l, list(db$instance$dimensions[[d]]$table))
+  for (d in names(dimensions)) {
+    l <- c(l, list(dimensions[[d]]$table))
     lnames <- c(lnames, d)
   }
-  for (f in names(db$instance$facts)) {
-    l <- c(l, list(db$instance$facts[[f]]$table))
+  for (f in names(facts)) {
+    l <- c(l, list(facts[[f]]$table))
     lnames <- c(lnames, f)
   }
   names(l) <- lnames
   l
 }
-

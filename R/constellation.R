@@ -125,7 +125,7 @@ constellation <- function(name = NULL, stars = NULL) {
 #'
 #' @param db A `constellation` object.
 #'
-#' @return A list of `tibble`
+#' @return A list of `tibble` objects.
 #'
 #' @examples
 #'
@@ -139,17 +139,6 @@ constellation <- function(name = NULL, stars = NULL) {
 #'
 #' @export
 as_tibble_list.constellation <- function(db) {
-  l <- NULL
-  lnames <- NULL
-  for (d in names(db$dimensions)) {
-    l <- c(l, list(db$dimensions[[d]]$table))
-    lnames <- c(lnames, d)
-  }
-  for (f in names(db$facts)) {
-    l <- c(l, list(db$facts[[f]]$table))
-    lnames <- c(lnames, f)
-  }
-  names(l) <- lnames
-  l
+  as_tibble_list_common(db$dimensions, db$facts)
 }
 

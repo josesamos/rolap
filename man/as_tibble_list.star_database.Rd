@@ -10,7 +10,7 @@
 \item{db}{A \code{star_database} object.}
 }
 \value{
-A list of \code{tibble}
+A list of \code{tibble} objects.
 }
 \description{
 To port databases to other work environments it is useful to be able to
