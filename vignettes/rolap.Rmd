@@ -392,13 +392,13 @@ for (i in 1:length(lc)) {
 
 These tables can be directly exported in the format required by the OLAP query tool that we are going to use.
 
-### Export results
+## Export results
 
 To continue working with the result of the implementation of the multidimensional database (star database or constellation) it can be exported as a `tibble` list, suitable for example to pass the data to a spreadsheet, or as an object of the class `dm`, which allows passing the data to a RDBMS.
 
 Generic functions are used, applicable to objects of both classes, `star_database` and `constellation`.
 
-#### `tibble` list
+### `tibble` list
 
 The following shows the results that are obtained for a `star_database` object.
 
@@ -414,7 +414,7 @@ ct |>
   as_tibble_list()
 ```
 
-#### `md` object
+### `md` object
 
 The [dm](https://cran.r-project.org/package=dm) package allows you to link tables implemented using the `tibble` class in R with tables in RDBMS.
 
