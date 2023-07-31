@@ -390,11 +390,62 @@ for (i in 1:length(lc)) {
 
 These tables can be directly exported in the format required by the OLAP query tool that we are going to use.
 
+### Export results
+
+To continue working with the result of the implementation of the multidimensional database (star database or constellation) it can be exported as a `tibble` list, suitable for example to pass the data to a spreadsheet, or as an object of the class `dm`, which allows passing the data to a RDBMS.
+
+Generic functions are used, applicable to objects of both classes, `star_database` and `constellation`.
+
+#### `tibble` list
+
+The following shows the results that are obtained for a `star_database` object.
+
+```{r}
+db_cause |>
+  as_tibble_list()
+```
+
+Also for a `constellation` object.
+
+```{r}
+ct |>
+  as_tibble_list()
+```
+
+#### `md` object
+
+The [dm](https://cran.r-project.org/package=dm) package allows you to link tables implemented using the `tibble` class in R with tables in RDBMS.
+
+The following example shows the transformation of a `star_database` object to an object of class `dm`.
+
+```{r}
+# star database
+db_cause_dm <- db_cause |>
+  as_dm_class()
+class(db_cause_dm)
+db_cause_dm
+```
+
+Also for a `constellation` object.
+
+```{r}
+# constellation
+ct_dm <- ct |>
+  as_dm_class()
+class(ct_dm)
+ct_dm
+```
+
+For example, the `dm` class object can be used to represent the tables or to store them in any RDBMS.
+
+
 # Conclusions
 
 `rolap` package offers a set of operations that allow us to transform flat tables into star databases.  From several star databases you can define a constellation with conformed dimensions.
 
 Operations have been designed to be intuitive and easy to use. The result greatly facilitates the data transformation process for the exposed situation.
+
+The implementation of the multidimensional database obtained can be exported to work with multidimensional analysis tools on spreadsheets or RDBMS.
 
 # References
 
