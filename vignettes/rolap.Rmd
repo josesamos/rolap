@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo = FALSE, message=FALSE}
 library(rolap)
-library(dm)
 ```
 
 # Introduction
@@ -142,6 +141,8 @@ In the table above, all the rows of the `ft` data set are shown. For each week a
 From this initial data set, two additional datasets, `ft_num` and `ft_age`, have been defined with the transformations shown below.
 
 ```{r}
+library(rolap)
+
 ft_num <- ft |>
   dplyr::mutate(`Pneumonia and Influenza Deaths` = as.integer(`Pneumonia and Influenza Deaths`)) |>
   dplyr::mutate(`All Deaths` = as.integer(`All Deaths`))

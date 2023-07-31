@@ -28,6 +28,8 @@ Imports:
     tidyr,
     tidyselect
 Suggests: 
+    DiagrammeR,
+    DiagrammeRsvg,
     knitr,
     pander,
     rmarkdown,
