@@ -385,17 +385,4 @@ ct_dm
 ```
 
 For example, the `dm` class object can be used to represent the tables
-or to store them in any RDBMS[^1].
-
-``` r
-# represent the tables
-ct_dm |> dm::dm_draw(rankdir = "LR", view_type = "all")
-
-# store the tables in a RDBMS
-ct_dbcon <- DBI::dbConnect(RSQLite::SQLite())
-deployed_dc <- copy_dm_to(ct_dbcon, ct_dm)
-DBI::dbDisconnect(ct_dbcon)
-```
-
-[^1]: The following code is configured not to run in this document to
-    avoid the requirements of the packages being used.
+or to store them in any RDBMS.
