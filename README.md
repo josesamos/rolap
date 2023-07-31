@@ -357,15 +357,45 @@ Star databases and constellations can be directly exported as objects of
 class [dm](https://cran.r-project.org/package=dm), as shown below.
 
 ``` r
-dc <- ct |>
+# star database
+db_dm <- db |>
   as_dm_class()
+class(db_dm)
+#> [1] "dm"
+db_dm
+#> ── Metadata ────────────────────────────────────────────────────────────────────
+#> Tables: `when`, `where`, `mrs_cause`
+#> Columns: 11
+#> Primary keys: 3
+#> Foreign keys: 2
 ```
-
-In this example, the `dm` class object is used only to represent the
-tables, but it can also be used to store them in any DBMS.
 
 ``` r
-dc |> dm::dm_draw(rankdir = "LR", view_type = "all")
+# constellation
+ct_dm <- ct |>
+  as_dm_class()
+class(ct_dm)
+#> [1] "dm"
+ct_dm
+#> ── Metadata ────────────────────────────────────────────────────────────────────
+#> Tables: `when`, `where`, `who`, `mrs_cause`, `mrs_age`
+#> Columns: 18
+#> Primary keys: 5
+#> Foreign keys: 5
 ```
 
-<img src="man/figures/README-unnamed-chunk-17.svg" />
+For example, the `dm` class object can be used to represent the tables
+or to store them in any RDBMS[^1].
+
+``` r
+# represent the tables
+ct_dm |> dm::dm_draw(rankdir = "LR", view_type = "all")
+
+# store the tables in a RDBMS
+ct_dbcon <- DBI::dbConnect(RSQLite::SQLite())
+deployed_dc <- copy_dm_to(ct_dbcon, ct_dm)
+DBI::dbDisconnect(ct_dbcon)
+```
+
+[^1]: The following code is configured not to run in this document to
+    avoid the requirements of the packages being used.
