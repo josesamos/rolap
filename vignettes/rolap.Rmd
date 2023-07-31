@@ -438,7 +438,12 @@ class(ct_dm)
 ct_dm
 ```
 
-For example, the `dm` class object can be used to represent the tables or to store them in any RDBMS.
+For example, the `dm` class object can be used to represent the `constellation` tables, as it's shown in the following (it can also be used to store them in a DBMS).
+
+```{r}
+ct_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
 
 
 # Conclusions
