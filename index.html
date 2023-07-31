@@ -1355,6 +1355,36 @@
 </table>
 <p>These tables can be directly exported in the format required by the OLAP query tool that we are going to use.</p>
 </div>
+<div class="section level3">
+<h3 id="exportation-as-a-dm-object">Exportation as a <code>dm</code> object<a class="anchor" aria-label="anchor" href="#exportation-as-a-dm-object"></a>
+</h3>
+<p>Star databases and constellations can be directly exported as objects of class <a href="https://cran.r-project.org/package=dm" class="external-link">dm</a>, as shown below.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># star database</span></span>
+<span><span class="va">db_dm</span> <span class="op">&lt;-</span> <span class="va">db</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/as_dm_class.html">as_dm_class</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">db_dm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "dm"</span></span>
+<span><span class="va">db_dm</span></span>
+<span><span class="co">#&gt; ── Metadata ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Tables: `when`, `where`, `mrs_cause`</span></span>
+<span><span class="co">#&gt; Columns: 11</span></span>
+<span><span class="co">#&gt; Primary keys: 3</span></span>
+<span><span class="co">#&gt; Foreign keys: 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># constellation</span></span>
+<span><span class="va">ct_dm</span> <span class="op">&lt;-</span> <span class="va">ct</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/as_dm_class.html">as_dm_class</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">ct_dm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "dm"</span></span>
+<span><span class="va">ct_dm</span></span>
+<span><span class="co">#&gt; ── Metadata ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Tables: `when`, `where`, `who`, `mrs_cause`, `mrs_age`</span></span>
+<span><span class="co">#&gt; Columns: 18</span></span>
+<span><span class="co">#&gt; Primary keys: 5</span></span>
+<span><span class="co">#&gt; Foreign keys: 5</span></span></code></pre></div>
+<p>For example, the <code>dm</code> class object can be used to represent the tables or to store them in any RDBMS.</p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
