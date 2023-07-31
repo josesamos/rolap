@@ -1,5 +1,5 @@
 ---
-title: "Basics and getting started with `rolap`"
+title: "Basics and getting started with rolap package"
 author: "Jose Samos (jsamos@ugr.es)"
 date: "2023-07-28"
 output: rmarkdown::html_vignette
