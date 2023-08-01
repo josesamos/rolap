@@ -433,7 +433,7 @@ Also for a `constellation` object.
 ```{r}
 # constellation
 ct_dm <- ct |>
-  as_dm_class()
+  as_dm_class(pk_facts = TRUE)
 class(ct_dm)
 ct_dm
 ```
@@ -443,6 +443,15 @@ For example, the `dm` class object can be used to represent the `constellation` 
 ```{r}
 ct_dm |> 
   dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+In the example below, a local *SQLite* database is used to demonstrate how to store the model in a database. `dm` works with any RDBMS supported by `DBI`.
+
+```{r}
+db <- DBI::dbConnect(RSQLite::SQLite())
+ct_dm_db <- dm::copy_dm_to(db, ct_dm)
+ct_dm_db
+DBI::dbDisconnect(db)
 ```
 
 

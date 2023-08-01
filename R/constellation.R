@@ -154,6 +154,7 @@ as_tibble_list.constellation <- function(db) {
 #' @param db A `constellation` object.
 #'
 #' @return A `dm` object.
+#' @param pk_facts A boolean, include primary key in fact tables.
 #'
 #' @examples
 #'
@@ -167,7 +168,7 @@ as_tibble_list.constellation <- function(db) {
 #'   as_dm_class()
 #'
 #' @export
-as_dm_class.constellation <- function(db) {
-  as_dm_class_common(db$dimensions, db$facts)
+as_dm_class.constellation <- function(db, pk_facts = TRUE) {
+  as_dm_class_common(db$dimensions, db$facts, pk_facts)
 }
 

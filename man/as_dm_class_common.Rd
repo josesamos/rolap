@@ -4,12 +4,14 @@
 \alias{as_dm_class_common}
 \title{Generate a list of tibbles with fact and dimension tables}
 \usage{
-as_dm_class_common(dimensions, facts)
+as_dm_class_common(dimensions, facts, pk_facts)
 }
 \arguments{
 \item{dimensions}{A list of dimension tables.}
 
 \item{facts}{A list of fact tables.}
+
+\item{pk_facts}{A boolean, include primary key in fact tables.}
 }
 \value{
 A \code{dm} object.

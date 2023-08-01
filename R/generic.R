@@ -44,6 +44,7 @@ as_tibble_list <- function(db) UseMethod("as_tibble_list")
 #'
 #'
 #' @param db A `star_database` or `constellation` object.
+#' @param pk_facts A boolean, include primary key in fact tables.
 #'
 #' @return A `dm` object.
 #'
@@ -65,4 +66,4 @@ as_tibble_list <- function(db) UseMethod("as_tibble_list")
 #'   as_dm_class()
 #'
 #' @export
-as_dm_class <- function(db) UseMethod("as_dm_class")
+as_dm_class <- function(db, pk_facts) UseMethod("as_dm_class")

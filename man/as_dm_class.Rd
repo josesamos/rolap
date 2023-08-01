@@ -4,10 +4,12 @@
 \alias{as_dm_class}
 \title{Generate a \code{dm} class with fact and dimension tables}
 \usage{
-as_dm_class(db)
+as_dm_class(db, pk_facts)
 }
 \arguments{
 \item{db}{A \code{star_database} or \code{constellation} object.}
+
+\item{pk_facts}{A boolean, include primary key in fact tables.}
 }
 \value{
 A \code{dm} object.

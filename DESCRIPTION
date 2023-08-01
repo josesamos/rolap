@@ -28,11 +28,14 @@ Imports:
     tidyr,
     tidyselect
 Suggests: 
+    DBI,
+    dbplyr,
     DiagrammeR,
     DiagrammeRsvg,
     knitr,
     pander,
     rmarkdown,
+    RSQLite,
     stringr,
     testthat (>= 3.0.0)
 VignetteBuilder: 

@@ -185,6 +185,7 @@ as_tibble_list.star_database <- function(db) {
 #' @param db A `star_database` object.
 #'
 #' @return A `dm` object.
+#' @param pk_facts A boolean, include primary key in fact tables.
 #'
 #' @examples
 #'
@@ -198,8 +199,8 @@ as_tibble_list.star_database <- function(db) {
 #'   as_dm_class()
 #'
 #' @export
-as_dm_class.star_database <- function(db) {
-  as_dm_class_common(db$instance$dimensions, db$instance$facts)
+as_dm_class.star_database <- function(db, pk_facts = TRUE) {
+  as_dm_class_common(db$instance$dimensions, db$instance$facts, pk_facts)
 }
 
 
@@ -236,11 +237,12 @@ as_tibble_list_common <- function(dimensions, facts) {
 #' @param facts A list of fact tables.
 #'
 #' @return  A `dm` object.
+#' @param pk_facts A boolean, include primary key in fact tables.
 #'
 #' @importFrom rlang :=
 #'
 #' @keywords internal
-as_dm_class_common <- function(dimensions, facts) {
+as_dm_class_common <- function(dimensions, facts, pk_facts) {
   c <- dm::dm()
   for (d in names(dimensions)) {
     c <- c |>
@@ -251,12 +253,15 @@ as_dm_class_common <- function(dimensions, facts) {
   for (f in names(facts)) {
     c <- c |>
       dm::dm(!!f := facts[[f]]$table) |>
-      dm::dm_add_pk(!!f, !!facts[[f]]$surrogate_keys) |>
       dm::dm_set_colors(darkblue = !!f)
     for (s in facts[[f]]$surrogate_keys) {
       t <- gsub("_key", "", s)
       c <- c |>
         dm::dm_add_fk(!!f, !!s, !!t)
+    }
+    if (pk_facts) {
+      c <- c |>
+        dm::dm_add_pk(!!f, !!facts[[f]]$surrogate_keys)
     }
   }
   c
