@@ -2,9 +2,12 @@
 % Please edit documentation in R/star_database.R
 \name{snake_case}
 \alias{snake_case}
+\alias{snake_case.star_database}
 \title{Transform names according to the snake case style}
 \usage{
 snake_case(db)
+
+\method{snake_case}{star_database}(db)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}

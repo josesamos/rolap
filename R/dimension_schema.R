@@ -33,6 +33,9 @@ dimension_schema <- function(name = NULL, attributes = NULL) {
   structure(list(name = name, attributes = attributes), class = "dimension_schema")
 }
 
+# generic
+get_dimension_name <- function(schema) UseMethod("get_dimension_name")
+
 
 #' Get dimension name
 #'
@@ -43,7 +46,7 @@ dimension_schema <- function(name = NULL, attributes = NULL) {
 #' @return A string.
 #'
 #' @keywords internal
-get_dimension_name <- function(schema) {
+get_dimension_name.dimension_schema <- function(schema) {
   schema$name
 }
 

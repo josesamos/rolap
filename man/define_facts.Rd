@@ -2,9 +2,12 @@
 % Please edit documentation in R/star_schema.R
 \name{define_facts}
 \alias{define_facts}
+\alias{define_facts.star_schema}
 \title{Define facts in a \code{star_schema} object.}
 \usage{
-define_facts(
+define_facts(schema, facts, name, measures, agg_functions, nrow_agg)
+
+\method{define_facts}{star_schema}(
   schema,
   facts = NULL,
   name = NULL,

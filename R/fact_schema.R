@@ -72,6 +72,13 @@ fact_schema <- function(name = NULL,
   )
 }
 
+# generic
+get_fact_name <- function(schema) UseMethod("get_fact_name")
+get_agg_functions <- function(schema) UseMethod("get_agg_functions")
+get_nrow_agg <- function(schema) UseMethod("get_nrow_agg")
+
+
+
 #' Get fact name
 #'
 #' @param schema A `fact_schema` object.
@@ -79,7 +86,7 @@ fact_schema <- function(name = NULL,
 #' @return A string.
 #'
 #' @keywords internal
-get_fact_name <- function(schema) {
+get_fact_name.fact_schema <- function(schema) {
   schema$name
 }
 
@@ -104,7 +111,7 @@ get_measure_names.fact_schema <- function(schema) {
 #' @return A vector of strings.
 #'
 #' @keywords internal
-get_agg_functions <- function(schema) {
+get_agg_functions.fact_schema <- function(schema) {
   schema$agg_functions
 }
 
@@ -116,6 +123,6 @@ get_agg_functions <- function(schema) {
 #' @return A string.
 #'
 #' @keywords internal
-get_nrow_agg <- function(schema) {
+get_nrow_agg.fact_schema <- function(schema) {
   schema$nrow_agg
 }

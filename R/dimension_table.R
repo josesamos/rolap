@@ -34,8 +34,11 @@ dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
   )
 }
 
+# generic
+add_surrogate_key <- function(dimension_table, instances) UseMethod("add_surrogate_key")
+get_surrogate_key <- function(dimension_table) UseMethod("get_surrogate_key")
 
-# add_surrogate_key ------------------------------------------------------------
+
 
 #' Add the surrogate key from a dimension table to the instances table.
 #'
@@ -44,7 +47,7 @@ dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
 #'
 #' @return A `tibble`.
 #' @keywords internal
-add_surrogate_key <- function(dimension_table, instances) {
+add_surrogate_key.dimension_table <- function(dimension_table, instances) {
   attributes <- colnames(dimension_table$table)
   attributes <- attributes[attributes != dimension_table$surrogate_key]
   dplyr::inner_join(instances, dimension_table$table, by = attributes)
@@ -60,10 +63,9 @@ add_surrogate_key <- function(dimension_table, instances) {
 #' @return A vector of strings.
 #'
 #' @keywords internal
-get_surrogate_key <- function(dimension_table) {
+get_surrogate_key.dimension_table <- function(dimension_table) {
   dimension_table$surrogate_key
 }
-
 
 
 #' Transform names according to the snake case style
@@ -78,7 +80,6 @@ snake_case_table.dimension_table <- function(table) {
   names(table$table) <- snakecase::to_snake_case(names(table$table))
   table
 }
-
 
 
 #' Conform dimensions

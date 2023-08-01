@@ -73,7 +73,12 @@ star_schema <- function() {
 #' s <- s |>
 #'   define_facts(f)
 #' @export
-define_facts <-
+define_facts <- function(schema, facts, name, measures, agg_functions, nrow_agg) UseMethod("define_facts")
+
+#' @rdname define_facts
+#'
+#' @export
+define_facts.star_schema <-
   function(schema,
            facts = NULL,
            name = NULL,
@@ -137,7 +142,12 @@ define_facts <-
 #' s <- s |>
 #'   define_dimension(d)
 #' @export
-define_dimension <- function(schema, dimension = NULL, name = NULL, attributes = NULL) {
+define_dimension <- function(schema, dimension, name, attributes) UseMethod("define_dimension")
+
+#' @rdname define_dimension
+#'
+#' @export
+define_dimension.star_schema <- function(schema, dimension = NULL, name = NULL, attributes = NULL) {
   if (!is.null(dimension)) {
     stopifnot(("dimension_schema" %in% class(dimension)))
     stopifnot(is.null(name) & is.null(attributes))

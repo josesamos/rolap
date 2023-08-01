@@ -2,9 +2,12 @@
 % Please edit documentation in R/star_schema.R
 \name{define_dimension}
 \alias{define_dimension}
+\alias{define_dimension.star_schema}
 \title{Define dimension in a \code{star_schema} object.}
 \usage{
-define_dimension(schema, dimension = NULL, name = NULL, attributes = NULL)
+define_dimension(schema, dimension, name, attributes)
+
+\method{define_dimension}{star_schema}(schema, dimension = NULL, name = NULL, attributes = NULL)
 }
 \arguments{
 \item{schema}{A \code{star_schema} object.}

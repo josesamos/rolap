@@ -9,9 +9,10 @@ Description: Data in multidimensional systems is obtained from operational
     Frequently, the operations to be performed aim to transform a flat
     table into a ROLAP (Relational On-Line Analytical Processing) star
     database. The main objective of the package is to allow the definition
-    of these transformations easily. The implementation of the multidimensional 
-    database obtained can be exported to work with multidimensional analysis 
-    tools on spreadsheets or relational databases.
+    of these transformations easily. The implementation of the
+    multidimensional database obtained can be exported to work with
+    multidimensional analysis tools on spreadsheets or relational
+    databases.
 License: MIT + file LICENSE
 URL: https://josesamos.github.io/rolap/,
     https://github.com/josesamos/rolap
