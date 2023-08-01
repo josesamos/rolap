@@ -32,7 +32,8 @@ operations designed to specifically support this transformation process.
 
 The goal of `rolap` is to define transformations that allow you to
 easily obtain ROLAP star databases, composed by fact and dimension
-tables, from flat tables.
+tables, from flat tables and to be able to export them in various
+formats to be used by OLAP query tools.
 
 ## Installation
 

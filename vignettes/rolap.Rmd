@@ -29,7 +29,7 @@ Transformations can be carried out using professional ETL (*Extract, Transform a
 
 Frequently, the operations to be performed aim to transform a flat table (with data that comes from operational systems) into a ROLAP (*Relational On-Line Analytical Processing*) star database, made up of fact and dimension tables, which implements a multidimensional system. With the tools mentioned above, this transformation can be carried out, but it requires a lot of work. 
 
-The goal of `rolap` is to define transformations that allow you to easily obtain ROLAP star databases, composed by fact and dimension tables, from flat tables.
+The goal of `rolap` is to define transformations that allow you to easily obtain ROLAP star databases, composed by fact and dimension tables, from flat tables and to be able to export them in various formats to be used by OLAP query tools.
 
 The rest of this document is structured as follows: First, basic concepts of dimensional modelling and star databases are summarized. The following is an illustrative example of how the package works, to show usage of features it offers. Finally, the document ends with conclusions and bibliography.
 
