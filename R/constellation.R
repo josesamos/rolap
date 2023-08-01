@@ -9,8 +9,8 @@
 #'
 #' @return A `constellation` object.
 #'
-#' @family star database definition functions
-#' @seealso \code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{mrs_age_schema}}, \code{\link{ft_num}}, \code{\link{ft_age}}
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 #'
 #' @examples
 #'
@@ -115,57 +115,14 @@ constellation <- function(name = NULL, stars = NULL) {
   ), class = "constellation")
 }
 
-# as_tibble_list.constellation -------------------------------------------
-
-#' Generate a list of tibbles with fact and dimension tables
-#'
-#' To port databases to other work environments it is useful to be able to
-#' export them as a list of tibbles, as this function does.
-#'
-#'
-#' @param db A `constellation` object.
-#'
-#' @return A list of `tibble` objects.
-#'
-#' @examples
-#'
-#' db1 <- star_database(mrs_cause_schema, ft_num) |>
-#'   snake_case()
-#' db2 <- star_database(mrs_age_schema, ft_age) |>
-#'   snake_case()
-#' ct <- constellation("MRS", list(db1, db2))
-#' tl <- ct |>
-#'   as_tibble_list()
+#' @rdname as_tibble_list
 #'
 #' @export
 as_tibble_list.constellation <- function(db) {
   as_tibble_list_common(db$dimensions, db$facts)
 }
 
-# as_dm_class.constellation -------------------------------------------
-
-#' Generate a `dm` class with fact and dimension tables
-#'
-#' To port databases to other work environments it is useful to be able to
-#' export them as a `dm` class, as this function does, in this way it can be
-#' saved directly in a DBMS.
-#'
-#'
-#' @param db A `constellation` object.
-#'
-#' @return A `dm` object.
-#' @param pk_facts A boolean, include primary key in fact tables.
-#'
-#' @examples
-#'
-#' db1 <- star_database(mrs_cause_schema, ft_num) |>
-#'   snake_case()
-#' db2 <- star_database(mrs_age_schema, ft_age) |>
-#'   snake_case()
-#' ct <- constellation("MRS", list(db1, db2))
-#'
-#' dm <- ct |>
-#'   as_dm_class()
+#' @rdname as_dm_class
 #'
 #' @export
 as_dm_class.constellation <- function(db, pk_facts = TRUE) {

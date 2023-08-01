@@ -23,7 +23,7 @@
 #' @return A `fact_schema` object.
 #'
 #' @family star schema definition functions
-#' @seealso \code{\link{star_schema}}
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'

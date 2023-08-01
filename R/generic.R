@@ -15,8 +15,8 @@ snake_case_table <- function(table) UseMethod("snake_case_table")
 #'
 #' @return A list of `tibble`
 #'
-#' @family star database definition functions
-#' @seealso \code{\link{mrs_cause_schema}}, \code{\link{mrs_age_schema}}, \code{\link{ft_num}}, \code{\link{ft_age}}
+#' @family star database and constellation exportation functions
+#' @seealso \code{\link{star_database}}, \code{\link{constellation}}
 #'
 #' @examples
 #'
@@ -48,8 +48,8 @@ as_tibble_list <- function(db) UseMethod("as_tibble_list")
 #'
 #' @return A `dm` object.
 #'
-#' @family star database definition functions
-#' @seealso \code{\link{mrs_cause_schema}}, \code{\link{mrs_age_schema}}, \code{\link{ft_num}}, \code{\link{ft_age}}
+#' @family star database and constellation exportation functions
+#' @seealso \code{\link{star_database}}, \code{\link{constellation}}
 #'
 #' @examples
 #'

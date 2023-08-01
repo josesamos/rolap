@@ -29,12 +29,10 @@ ct <- constellation("MRS", list(db1, db2))
 
 }
 \seealso{
-\code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{mrs_age_schema}}, \code{\link{ft_num}}, \code{\link{ft_age}}
+\code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 
-Other star database definition functions: 
-\code{\link{as_dm_class}()},
-\code{\link{as_tibble_list}()},
+Other star database and constellation definition functions: 
 \code{\link{snake_case}()},
 \code{\link{star_database}()}
 }
-\concept{star database definition functions}
+\concept{star database and constellation definition functions}

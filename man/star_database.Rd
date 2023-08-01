@@ -34,12 +34,10 @@ db <- star_database(mrs_cause_schema, ft_num)
 
 }
 \seealso{
-\code{\link{star_schema}}, \code{\link{mrs_cause_schema}}, \code{\link{ft_num}}
+\code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}
 
-Other star database definition functions: 
-\code{\link{as_dm_class}()},
-\code{\link{as_tibble_list}()},
+Other star database and constellation definition functions: 
 \code{\link{constellation}()},
 \code{\link{snake_case}()}
 }
-\concept{star database definition functions}
+\concept{star database and constellation definition functions}
