@@ -1,6 +1,6 @@
 citHeader("To cite rolap in publications use:")
 
-citEntry(entry = "Manual",
+bibentry(entry = "Manual",
   title        = "{rolap}: Obtaining ROLAP Star Databases from Flat Tables",
   author       = c(as.person("Jose Samos"), as.person("Maria Bermudez-Edo"), as.person("David Sides")),
   year         = "2023",
