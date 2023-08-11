@@ -25,9 +25,9 @@
 #'
 #' @export
 star_database <- function(schema, instances, unknown_value = NULL) {
-  stopifnot("fact_schema" %in% class(schema$facts[[1]]))
+  stopifnot(methods::is(schema$facts[[1]], "fact_schema"))
   for (d in seq_along(schema$dimensions)) {
-    stopifnot("dimension_schema" %in% class(schema$dimensions[[d]]))
+    stopifnot(methods::is(schema$dimensions[[d]], "dimension_schema"))
   }
   stopifnot(tibble::is_tibble(instances))
   instance_attributes <- names(instances)
