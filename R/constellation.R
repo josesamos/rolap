@@ -26,12 +26,15 @@ constellation <- function(name = NULL, stars = NULL) {
   stopifnot(length(stars) > 1)
   fct_names <- c()
   dim_names <- c()
-  facts = vector("list", length = length(stars))
+  facts <- vector("list", length = length(stars))
+  rpd <- list()
   for (s in seq_along(stars)) {
     stopifnot(methods::is(stars[[s]], "star_database"))
     fct_names <- c(fct_names, names(stars[[s]]$instance$facts))
     dim_names <- c(dim_names, names(stars[[s]]$instance$dimensions))
     facts[s] <- stars[[s]]$instance$facts
+    # get all rpd from star databases (possibly with repeated rpd)
+    rpd <- c(rpd, stars[[s]]$instance$rpd)
   }
   fct_names <- unique(fct_names)
   stopifnot(length(stars) == length(fct_names))
@@ -111,7 +114,8 @@ constellation <- function(name = NULL, stars = NULL) {
   structure(list(
     name = name,
     facts = facts,
-    dimensions = dimensions
+    dimensions = dimensions,
+    rpd = rpd
   ), class = "constellation")
 }
 

@@ -126,7 +126,7 @@ test_that("constellation() define constellation", {
           ),
           class = "dimension_table"
         )
-      )
+      ), rpd = list()
     ), class = "constellation")
   })
 })
@@ -293,7 +293,7 @@ test_that("constellation() define constellation", {
           ),
           class = "dimension_table"
         )
-      )
+      ), rpd = list()
     ), class = "constellation")
   })
 })
