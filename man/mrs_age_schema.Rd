@@ -40,6 +40,7 @@ mrs_age_schema <- star_schema() |>
 \code{\link{ft_age}}
 
 Other mrs example schema: 
+\code{\link{mrs_age_schema_rpd}},
 \code{\link{mrs_cause_schema_rpd}},
 \code{\link{mrs_cause_schema}}
 }

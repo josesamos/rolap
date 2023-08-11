@@ -33,9 +33,9 @@ constellation <- function(name = NULL, stars = NULL) {
     fct_names <- c(fct_names, names(stars[[s]]$instance$facts))
     dim_names <- c(dim_names, names(stars[[s]]$instance$dimensions))
     facts[s] <- stars[[s]]$instance$facts
-    # get all rpd from star databases (possibly with repeated rpd)
     rpd <- c(rpd, stars[[s]]$instance$rpd)
   }
+
   fct_names <- unique(fct_names)
   stopifnot(length(stars) == length(fct_names))
   names(facts) <- fct_names
@@ -111,14 +111,43 @@ constellation <- function(name = NULL, stars = NULL) {
     facts[[f]]$table <-
       dplyr::select(facts[[f]]$table, tidyselect::all_of(c(facts[[f]]$surrogate_keys, measures)))
   }
+  rpd <- unify_rpd(rpd)
   c <- structure(list(
     name = name,
     facts = facts,
     dimensions = dimensions,
     rpd = rpd
   ), class = "constellation")
-  rpd_in_constellation(c)
+  # rpd_in_constellation(c)
 }
+
+#' Unify lists of dimension names if there are any in common
+#'
+#' @param rpd A list of strings (dimension names).
+#'
+#' @keywords internal
+unify_rpd <- function(rpd) {
+  dims <- unlist(rpd, use.names=FALSE)
+  if (length(dims) != length(unique(dims))) {
+    rpd_res <- c(rpd[1])
+    for (i in 2:length(rpd)) {
+      included <- FALSE
+      for (j in 1:length(rpd_res)) {
+        if (length(intersect(rpd[[i]], rpd_res[[j]])) > 0) {
+          rpd_res[[j]] <- unique(c(rpd_res[[j]], rpd[[i]]))
+          included <- TRUE
+        }
+      }
+      if (!included) {
+        rpd_res <- c(rpd_res, rpd[i])
+      }
+    }
+    unify_rpd(rpd_res)
+  } else {
+    rpd
+  }
+}
+
 
 #' @rdname as_tibble_list
 #'
@@ -146,6 +175,43 @@ rpd_in_constellation <- function(db) UseMethod("rpd_in_constellation")
 #'
 #' @keywords internal
 rpd_in_constellation.constellation <- function(db) {
+  # frequency of dimensions and shared dimensions
+  dim_names <- c()
+  for (i in seq_along(db$facts)) {
+    dim_names <- c(dim_names, db$facts[[i]]$dim_int_names)
+  }
+  dim_freq <- table(dim_names)
+  shared_dim <- names(dim_freq)[dim_freq > 1]
+
+  #rpd dimensions
+  dim_names <- c()
+  for (i in seq_along(db$rpd)) {
+    dim_names <- c(dim_names, db$rpd[[i]])
+  }
+  rpd_shared_dim <- intersect(shared_dim, unique(dim_names))
+
+  if (length(rpd_shared_dim) > 0) {
+    # some rpd is a shared dimension
+    rpd <- list()
+    dim_in_rpd <- c()
+    for (i in seq_along(db$rpd)) {
+      if (length(intersect(rpd_shared_dim, db$rpd[[i]])) > 0) {
+        # dim is rpd
+        if (length(intersect(dim_in_rpd, db$rpd[[i]])) == 0) {
+          # dim not included yet
+          rpd <- c(rpd, db$rpd[i])
+        } else {
+          for (j in seq_along(rpd)) {
+            if (length(intersect(db$rpd[[i]], rpd[[j]])) > 0) {
+              rpd[[j]] <- unique(c(rpd[[j]], db$rpd[[i]]))
+            }
+          }
+        }
+        dim_in_rpd <- unique(c(dim_in_rpd, db$rpd[[i]]))
+      }
+    }
+  }
+
   db
 }
 
