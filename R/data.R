@@ -159,3 +159,59 @@
 #' @format A `tibble`.
 #' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
 "ft_cause_rpd"
+
+#' Star schema for Mortality Reporting System by Cause with additional dates
+#'
+#' Definition of schemas for facts and dimensions for the Mortality Reporting System
+#' considering the cause classification with additional dates to be used as role
+#' playing dimensions..
+#'
+#' @family mrs example schema
+#' @seealso \code{\link{ft_cause_rpd}}
+#' @examples
+#' # Defined by:
+#'
+#' mrs_cause_schema_rpd <- star_schema() |>
+#'   define_facts(fact_schema(
+#'     name = "mrs_cause",
+#'     measures = c(
+#'       "Pneumonia and Influenza Deaths",
+#'       "All Deaths"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When",
+#'     attributes = c(
+#'       "Year",
+#'       "WEEK",
+#'       "Week Ending Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When Available",
+#'     attributes = c(
+#'       "Data Availability Year",
+#'       "Data Availability Week",
+#'       "Data Availability Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When Received",
+#'     attributes = c(
+#'       "Reception Year",
+#'       "Reception Week",
+#'       "Reception Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "where",
+#'     attributes = c(
+#'       "REGION",
+#'       "State",
+#'       "City"
+#'     )
+#'   ))
+#'
+#' @format A `star_schema` object.
+"mrs_cause_schema_rpd"
+

@@ -347,3 +347,119 @@ test_that("as_tibble_list() export star_database as a list of tibbles", {
     )
   })
 })
+
+test_that("role_playing_dimension() define a rpd", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(rpd = "When",
+                             roles = c("When Available", "When Received"))
+    c(
+      db$instance$rpd,
+      nrow(db$instance$dimensions$when$table),
+      nrow(db$instance$dimensions$when_available$table),
+      nrow(db$instance$dimensions$when_received$table),
+      names(db$instance$dimensions$when$table),
+      names(db$instance$dimensions$when_available$table),
+      names(db$instance$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      when = c("when", "when_available", "when_received"),
+      44L,
+      44L,
+      44L,
+      "when_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_available_key",
+      "Data Availability Year",
+      "Data Availability Week",
+      "Data Availability Date",
+      "when_received_key",
+      "Reception Year",
+      "Reception Week",
+      "Reception Date"
+    )
+  })
+})
+
+test_that("role_playing_dimension() define a rpd", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(
+        rpd = "When",
+        roles = c("When Available", "When Received"),
+        rpd_att_names = TRUE
+      )
+
+    c(
+      db$instance$rpd,
+      nrow(db$instance$dimensions$when$table),
+      nrow(db$instance$dimensions$when_available$table),
+      nrow(db$instance$dimensions$when_received$table),
+      names(db$instance$dimensions$when$table),
+      names(db$instance$dimensions$when_available$table),
+      names(db$instance$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      when = c("when", "when_available", "when_received"),
+      44L,
+      44L,
+      44L,
+      "when_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_available_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_received_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date"
+    )
+  })
+})
+
+test_that("role_playing_dimension() define a rpd", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(
+        rpd = "When",
+        roles = c("When Available", "When Received"),
+        att_names = c("Year", "Week", "Date")
+      )
+
+    c(
+      db$instance$rpd,
+      nrow(db$instance$dimensions$when$table),
+      nrow(db$instance$dimensions$when_available$table),
+      nrow(db$instance$dimensions$when_received$table),
+      names(db$instance$dimensions$when$table),
+      names(db$instance$dimensions$when_available$table),
+      names(db$instance$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      when = c("when", "when_available", "when_received"),
+      44L,
+      44L,
+      44L,
+      "when_key",
+      "Year",
+      "Week",
+      "Date",
+      "when_available_key",
+      "Year",
+      "Week",
+      "Date",
+      "when_received_key",
+      "Year",
+      "Week",
+      "Date"
+    )
+  })
+})

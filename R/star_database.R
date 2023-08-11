@@ -255,8 +255,9 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
   rpd <- unique(snakecase::to_snake_case(rpd))
   stopifnot(length(rpd) == 1)
   roles <- unique(snakecase::to_snake_case(roles))
-  att_names <- unique(att_names)
+  stopifnot(length(roles) >= 1)
   stopifnot(!(rpd %in% roles))
+  att_names <- unique(att_names)
   dims <- c(rpd, roles)
   # have to be dimensions
   dim_names <- names(db$instance$dimensions)
