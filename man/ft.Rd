@@ -26,7 +26,9 @@ others.
 \code{\link{mrs_cause_schema}}
 
 Other mrs example data: 
+\code{\link{ft_age_rpd}},
 \code{\link{ft_age}},
+\code{\link{ft_cause_rpd}},
 \code{\link{ft_num}}
 }
 \concept{mrs example data}

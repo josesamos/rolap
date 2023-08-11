@@ -119,3 +119,43 @@
 #'
 #' @format A `star_schema` object.
 "mrs_age_schema"
+
+#' Mortality Reporting System by Age
+#'
+#' Selection of data from the 122 Cities Mortality Reporting System by age
+#' group, for the first 9 weeks of 1962 and 4 cities.
+#'
+#' The original dataset begins in 1962. For each week, in 122 US cities,
+#' mortality figures by age group and cause, considered separately, are included
+#' (i.e., the combination of age group and cause is not included). In the cause,
+#' only a distinction is made between pneumonia or influenza and others.
+#'
+#' Two additional dates have been generated, which were not present in the
+#' original dataset.
+#'
+#' @family mrs example data
+#' @seealso \code{\link{mrs_age_schema}}
+#'
+#' @format A `tibble`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"ft_age_rpd"
+
+#' Mortality Reporting System by Cause
+#'
+#' Selection of data from the 122 Cities Mortality Reporting System by cause,
+#' for the first 9 weeks of 1962 and 4 cities.
+#'
+#' The original dataset begins in 1962. For each week, in 122 US cities,
+#' mortality figures by age group and cause, considered separately, are included
+#' (i.e., the combination of age group and cause is not included). In the cause,
+#' only a distinction is made between pneumonia or influenza and others.
+#'
+#' Two additional dates have been generated, which were not present in the
+#' original dataset.
+#'
+#' @family mrs example data
+#' @seealso \code{\link{mrs_cause_schema}}
+#'
+#' @format A `tibble`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"ft_cause_rpd"

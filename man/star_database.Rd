@@ -38,6 +38,7 @@ db <- star_database(mrs_cause_schema, ft_num)
 
 Other star database and constellation definition functions: 
 \code{\link{constellation}()},
+\code{\link{role_playing_dimension}()},
 \code{\link{snake_case}()}
 }
 \concept{star database and constellation definition functions}

@@ -57,6 +57,7 @@ db <- star_database(s, ft_num) |>
 
 Other star database and constellation definition functions: 
 \code{\link{constellation}()},
+\code{\link{role_playing_dimension}()},
 \code{\link{star_database}()}
 }
 \concept{star database and constellation definition functions}
