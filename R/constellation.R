@@ -111,12 +111,13 @@ constellation <- function(name = NULL, stars = NULL) {
     facts[[f]]$table <-
       dplyr::select(facts[[f]]$table, tidyselect::all_of(c(facts[[f]]$surrogate_keys, measures)))
   }
-  structure(list(
+  c <- structure(list(
     name = name,
     facts = facts,
     dimensions = dimensions,
     rpd = rpd
   ), class = "constellation")
+  rpd_in_constellation(c)
 }
 
 #' @rdname as_tibble_list
@@ -131,5 +132,20 @@ as_tibble_list.constellation <- function(db) {
 #' @export
 as_dm_class.constellation <- function(db, pk_facts = TRUE) {
   as_dm_class_common(db$dimensions, db$facts, pk_facts)
+}
+
+
+#' Transform role playing dimensions in constellation
+#'
+#' @param db A `constellation` object.
+#'
+#' @return A `constellation` object.
+#'
+rpd_in_constellation <- function(db) UseMethod("rpd_in_constellation")
+#' @rdname rpd_in_constellation
+#'
+#' @keywords internal
+rpd_in_constellation.constellation <- function(db) {
+  db
 }
 
