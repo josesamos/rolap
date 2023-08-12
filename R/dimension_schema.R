@@ -27,9 +27,9 @@
 #'
 #' @export
 dimension_schema <- function(name = NULL, attributes = NULL) {
-  stopifnot(!is.null(name))
-  stopifnot(length(attributes) > 0)
-  stopifnot(length(attributes) == length(unique(attributes)))
+  stopifnot("Missing dimension name." = !is.null(name))
+  stopifnot("Missing dimension attributes" = length(attributes) > 0)
+  stopifnot("There are repeated attributes in the dimension." = length(attributes) == length(unique(attributes)))
   structure(list(name = name, attributes = attributes), class = "dimension_schema")
 }
 

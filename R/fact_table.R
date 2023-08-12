@@ -12,10 +12,10 @@
 #' @keywords internal
 fact_table <- function(name = NULL, surrogate_keys = NULL, dim_int_names = NULL, instances = NULL) {
   # Check the type of the base object
-  stopifnot(tibble::is_tibble(instances))
-  stopifnot(!is.null(name))
-  stopifnot(!is.null(surrogate_keys))
-  stopifnot(!is.null(dim_int_names))
+  stopifnot("A tibble with the instances was expected." = tibble::is_tibble(instances))
+  stopifnot("Missing table name." = !is.null(name))
+  stopifnot("Missing surrogate keys." = !is.null(surrogate_keys))
+  stopifnot("Missing dimension names." = !is.null(dim_int_names))
 
   structure(
     list(

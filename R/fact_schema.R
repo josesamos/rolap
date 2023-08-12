@@ -53,14 +53,14 @@ fact_schema <- function(name = NULL,
                         measures = NULL,
                         agg_functions = NULL,
                         nrow_agg = NULL) {
-  stopifnot(!is.null(name))
+  stopifnot("Missing fact name." = !is.null(name))
   if (!is.null(agg_functions)) {
-    stopifnot(length(measures) == length(agg_functions))
+    stopifnot("Each measure must have an aggregation function." = length(measures) == length(agg_functions))
     for (agg_function in agg_functions) {
-      stopifnot(agg_function %in% c("SUM", "MAX", "MIN"))
+      stopifnot("The allowed aggregation functions are SUM, MAX and MIN." = agg_function %in% c("SUM", "MAX", "MIN"))
     }
   }
-  stopifnot(length(c(measures, nrow_agg)) == length(unique(c(measures, nrow_agg))))
+  stopifnot("There are repeated measures in the facts." = length(c(measures, nrow_agg)) == length(unique(c(measures, nrow_agg))))
   structure(
     list(
       name = name,
