@@ -200,3 +200,48 @@ as_dm_class.constellation <- function(db, pk_facts = TRUE) {
   as_dm_class_common(db$dimensions, db$facts, pk_facts)
 }
 
+
+#' Get the names of the role playing dimensions
+#'
+#' Role playing dimensions are defined in star_databases. When integrating
+#' several star_databases to form a constellation, role playing dimensions are
+#' also integrated. This function allows you to see the result.
+#'
+#' @param db A `constellation` object.
+#'
+#' @return A list of vector of strings with dimension names.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+#'   role_playing_dimension(
+#'     rpd = "When",
+#'     roles = c("When Available", "When Received")
+#'   )
+#'
+#' db2 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
+#'   role_playing_dimension(
+#'     rpd = "When Arrived",
+#'     roles = c("When Available")
+#'   )
+#' rpd <- constellation("MRS", list(db1, db2)) |>
+#'   get_role_playing_dimension_names()
+#'
+#' @export
+get_role_playing_dimension_names <- function(db) UseMethod("get_role_playing_dimension_names")
+
+#' @rdname get_role_playing_dimension_names
+#'
+#' @export
+get_role_playing_dimension_names.constellation <- function(db) {
+  r <- db$rpd
+  names(r) <- sprintf("rpd_%d", 1:length(r))
+  for (i in seq_along(r)) {
+    r[[i]] <- sort(r[[i]])
+  }
+  r
+}
+
