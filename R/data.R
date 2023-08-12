@@ -251,11 +251,11 @@
 #'     )
 #'   )) |>
 #'   define_dimension(dimension_schema(
-#'     name = "When Received",
+#'     name = "When Arrived",
 #'     attributes = c(
-#'       "Reception Year",
-#'       "Reception Week",
-#'       "Reception Date"
+#'       "Arrival Year",
+#'       "Arrival Week",
+#'       "Arrival Date"
 #'     )
 #'   )) |>
 #'   define_dimension(dimension_schema(
