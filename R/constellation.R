@@ -70,9 +70,9 @@ constellation <- function(name = NULL, stars = NULL) {
             names(dim[[1]]$table)[names(dim[[1]]$table) != surrogate_key]
         }
         # join facts to original dimension
-        facts[names(stars[[s]]$instance$facts)][[1]]$table <-
+        facts[[names(stars[[s]]$instance$facts)]]$table <-
           dplyr::select(
-            dplyr::inner_join(facts[names(stars[[s]]$instance$facts)][[1]]$table,
+            dplyr::inner_join(facts[[names(stars[[s]]$instance$facts)]]$table,
                               dim[[1]]$table,
                               by = surrogate_key),-tidyselect::all_of(surrogate_key)
           )
@@ -85,14 +85,14 @@ constellation <- function(name = NULL, stars = NULL) {
     dimensions[[dn]] <- conform_dimensions(to_conform)
 
     # join new dimension to facts
-    for (s in seq_along(stars)) {
+    for (f in seq_along(facts)) {
       i <- 1
-      if (dn %in% names(stars[[s]]$instance$dimensions)) {
-        facts[names(stars[[s]]$instance$facts)][[1]]$table <-
+      if (dn %in% facts[[f]]$dim_int_names) {
+        facts[[f]]$table <-
           dplyr::select(
-            dplyr::inner_join(facts[names(stars[[s]]$instance$facts)][[1]]$table,
-                              dimensions[dn][[1]]$table,
-                              by = attributes),-tidyselect::all_of(attributes)
+            dplyr::inner_join(facts[[f]]$table,
+                              dimensions[[dn]]$table,
+                              by = attributes), -tidyselect::all_of(attributes)
           )
         i <- i + 1
       }
