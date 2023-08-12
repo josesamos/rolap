@@ -25,24 +25,24 @@
 #'
 #' @export
 star_database <- function(schema, instances, unknown_value = NULL) {
-  stopifnot(methods::is(schema$facts[[1]], "fact_schema"))
+  stopifnot("Schema does not include fact_schema object." = methods::is(schema$facts[[1]], "fact_schema"))
   for (d in seq_along(schema$dimensions)) {
-    stopifnot(methods::is(schema$dimensions[[d]], "dimension_schema"))
+    stopifnot("Schema does not include dimension_schema object." = methods::is(schema$dimensions[[d]], "dimension_schema"))
   }
-  stopifnot(tibble::is_tibble(instances))
+  stopifnot("A tibble with the instances was expected." = tibble::is_tibble(instances))
   instance_attributes <- names(instances)
   attributes <- get_attribute_names(schema)
   for (attribute in attributes) {
-    stopifnot(attribute %in% instance_attributes)
+    stopifnot("Schema attribute not defined on instances." = attribute %in% instance_attributes)
   }
   measures <- get_measure_names(schema)
   for (measure in measures) {
-    stopifnot(measure %in% instance_attributes)
+    stopifnot("Fact measure not defined on instances." = measure %in% instance_attributes)
   }
   measure_types <- dplyr::summarise_all(instances[, measures], class)
   for (measure_type in seq_along(measure_types)) {
     measure_type <- measure_types[[measure_type]][1]
-    stopifnot(measure_type %in% c("integer", "double", "integer64", "numeric"))
+    stopifnot("Measures must be of one of the numeric types." = measure_type %in% c("integer", "double", "integer64", "numeric"))
   }
 
   # create the structure for instances
@@ -253,10 +253,10 @@ role_playing_dimension <- function(db, rpd, roles, rpd_att_names, att_names) Use
 #' @export
 role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names = FALSE, att_names = NULL) {
   rpd <- unique(snakecase::to_snake_case(rpd))
-  stopifnot(length(rpd) == 1)
+  stopifnot("Only one value can be indicated in rpd." = length(rpd) == 1)
   roles <- unique(snakecase::to_snake_case(roles))
-  stopifnot(length(roles) >= 1)
-  stopifnot(!(rpd %in% roles))
+  stopifnot("At least one role must be indicated." = length(roles) >= 1)
+  stopifnot("rpd should not be included in roles." = !(rpd %in% roles))
   att_names <- unique(att_names)
   dims <- c(rpd, roles)
   # have to be dimensions
@@ -269,16 +269,16 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
   # they must have the same structure (number of attributes)
   n_att <- 0
   for (d in dims) {
-    stopifnot((d %in% dim_names))
-    stopifnot(!(d %in% prev_rpd))
+    stopifnot("rpd and roles have to be dimension names." = d %in% dim_names)
+    stopifnot("rpd or roles previously included in other rpd definitions." = !(d %in% prev_rpd))
     if (n_att == 0) {
       n_att <- ncol(db$instance$dimensions[[d]]$table)
     } else {
-      stopifnot((n_att == ncol(db$instance$dimensions[[d]]$table)))
+      stopifnot("rpd and roles must have the same number of attributes." = n_att == ncol(db$instance$dimensions[[d]]$table))
     }
   }
   if (!is.null(att_names)) {
-    stopifnot(n_att == length(att_names) + 1)
+    stopifnot("The number of attributes does not match those of att_names." = n_att == length(att_names) + 1)
   }
   # they meet all the requirements
 
@@ -366,3 +366,74 @@ share_dimensions <- function(db, dims) {
 }
 
 
+#' Rename the attributes of a dimension
+#'
+#' The dimension attribute names match those of the flat table from which they
+#' are defined. This function allows you to change their names.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#' @param attributes A vector of strings, attribute names.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   set_dimension_attribute_names(
+#'     name = "where",
+#'     attributes = c(
+#'       "Region",
+#'       "State",
+#'       "City"
+#'     )
+#'   )
+#'
+#' @export
+set_dimension_attribute_names <- function(db, name, attributes) UseMethod("set_dimension_attribute_names")
+
+#' @rdname set_dimension_attribute_names
+#'
+#' @export
+set_dimension_attribute_names.star_database <- function(db, name, attributes) {
+  attributes <- unique(attributes)
+  stopifnot("Missing dimension name." = !is.null(name))
+  stopifnot("It is not a dimension name." = name %in% names(db$instance$dimensions))
+  att_names <- names(db$instance$dimensions[[name]]$table)
+  stopifnot("The dimension has a different number of attributes." = length(attributes) == length(att_names) - 1)
+  names(db$instance$dimensions[[name]]$table) <- c(att_names[1], attributes)
+  db
+}
+
+#' Get the names of the attributes of a dimension
+#'
+#' Obtain the names of the attributes of a dimension.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#'
+#' @return A vector of strings, attribute names.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_dimension_attribute_names(name = "where")
+#'
+#' @export
+get_dimension_attribute_names <- function(db, name) UseMethod("get_dimension_attribute_names")
+
+#' @rdname get_dimension_attribute_names
+#'
+#' @export
+get_dimension_attribute_names.star_database <- function(db, name) {
+  stopifnot("Missing dimension name." = !is.null(name))
+  stopifnot("It is not a dimension name." = name %in% names(db$instance$dimensions))
+  att_names <- names(db$instance$dimensions[[name]]$table)
+  att_names[-1]
+}

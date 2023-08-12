@@ -32,7 +32,9 @@ ct <- constellation("MRS", list(db1, db2))
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 
 Other star database and constellation definition functions: 
+\code{\link{get_dimension_attribute_names}()},
 \code{\link{role_playing_dimension}()},
+\code{\link{set_dimension_attribute_names}()},
 \code{\link{snake_case}()},
 \code{\link{star_database}()}
 }
