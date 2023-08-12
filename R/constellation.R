@@ -22,14 +22,14 @@
 #'
 #' @export
 constellation <- function(name = NULL, stars = NULL) {
-  stopifnot(!is.null(name))
-  stopifnot(length(stars) > 1)
+  stopifnot("Missing constellation name." = !is.null(name))
+  stopifnot("A constellation must be made up of more than one star." = length(stars) > 1)
   fct_names <- c()
   dim_names <- c()
   facts <- vector("list", length = length(stars))
   rpd <- list()
   for (s in seq_along(stars)) {
-    stopifnot(methods::is(stars[[s]], "star_database"))
+    stopifnot("A constellation must be made up of stars." = methods::is(stars[[s]], "star_database"))
     fct_names <- c(fct_names, names(stars[[s]]$instance$facts))
     dim_names <- c(dim_names, names(stars[[s]]$instance$dimensions))
     facts[s] <- stars[[s]]$instance$facts
@@ -37,7 +37,7 @@ constellation <- function(name = NULL, stars = NULL) {
   }
 
   fct_names <- unique(fct_names)
-  stopifnot(length(stars) == length(fct_names))
+  stopifnot("The stars of a constellation must have different names." = length(stars) == length(fct_names))
   names(facts) <- fct_names
 
   # frequency of dimensions
@@ -48,10 +48,12 @@ constellation <- function(name = NULL, stars = NULL) {
   # generate dimensions
   for (dn in names(dim_freq)) {
     if (dim_freq[dn] == 1) {
+      # finding the dimension in the component stars
       for (s in seq_along(stars)) {
         for (d in seq_along(stars[[s]]$instance$dimensions)) {
           dim <- stars[[s]]$instance$dimensions[d]
           if (names(dim) == dn) {
+            # found
             dimensions[dn] <- dim
             break
           }
@@ -149,21 +151,6 @@ unify_rpd <- function(rpd) {
 }
 
 
-#' @rdname as_tibble_list
-#'
-#' @export
-as_tibble_list.constellation <- function(db) {
-  as_tibble_list_common(db$dimensions, db$facts)
-}
-
-#' @rdname as_dm_class
-#'
-#' @export
-as_dm_class.constellation <- function(db, pk_facts = TRUE) {
-  as_dm_class_common(db$dimensions, db$facts, pk_facts)
-}
-
-
 #' Transform role playing dimensions in constellation
 #'
 #' @param db A `constellation` object.
@@ -184,34 +171,34 @@ rpd_in_constellation.constellation <- function(db) {
   shared_dim <- names(dim_freq)[dim_freq > 1]
 
   #rpd dimensions
-  dim_names <- c()
-  for (i in seq_along(db$rpd)) {
-    dim_names <- c(dim_names, db$rpd[[i]])
-  }
-  rpd_shared_dim <- intersect(shared_dim, unique(dim_names))
+  rpd_dim <- unlist(db$rpd, use.names=FALSE)
 
+  rpd_shared_dim <- intersect(shared_dim, rpd_dim)
   if (length(rpd_shared_dim) > 0) {
     # some rpd is a shared dimension
-    rpd <- list()
-    dim_in_rpd <- c()
     for (i in seq_along(db$rpd)) {
-      if (length(intersect(rpd_shared_dim, db$rpd[[i]])) > 0) {
-        # dim is rpd
-        if (length(intersect(dim_in_rpd, db$rpd[[i]])) == 0) {
-          # dim not included yet
-          rpd <- c(rpd, db$rpd[i])
-        } else {
-          for (j in seq_along(rpd)) {
-            if (length(intersect(db$rpd[[i]], rpd[[j]])) > 0) {
-              rpd[[j]] <- unique(c(rpd[[j]], db$rpd[[i]]))
-            }
-          }
-        }
-        dim_in_rpd <- unique(c(dim_in_rpd, db$rpd[[i]]))
+      dims <- db$rpd[[i]]
+      if (length(intersect(rpd_shared_dim, dims)) > 0) {
+        db <- share_dimensions(db, dims)
       }
     }
   }
-
   db
+}
+
+
+
+#' @rdname as_tibble_list
+#'
+#' @export
+as_tibble_list.constellation <- function(db) {
+  as_tibble_list_common(db$dimensions, db$facts)
+}
+
+#' @rdname as_dm_class
+#'
+#' @export
+as_dm_class.constellation <- function(db, pk_facts = TRUE) {
+  as_dm_class_common(db$dimensions, db$facts, pk_facts)
 }
 

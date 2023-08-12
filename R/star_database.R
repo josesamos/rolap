@@ -296,10 +296,24 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
     }
   }
 
+  db$instance <- share_dimensions(db$instance, dims)
+
+  db
+}
+
+
+#' Share the given dimensions in the database
+#'
+#' @param db `star_database` or `constellation` object.
+#' @param dims Vector of dimension names.
+#'
+#' @return A `star_database` or `constellation` object.
+#' @keywords internal
+share_dimensions <- function(db, dims) {
   # merge dimensions
   to_conform <- vector("list", length = length(dims))
   for (i in seq_along(dims)) {
-    to_conform[i] <- db$instance$dimensions[dims[i]]
+    to_conform[i] <- db$dimensions[dims[i]]
     if (i > 1) {
       # to be able to conform they must have the same columns.
       names(to_conform[[i]]$table) <- names(to_conform[[1]]$table)
@@ -308,39 +322,47 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
   cd <- conform_dimensions(to_conform)
 
   for (i in seq_along(dims)) {
-    surrogate_key <- db$instance$dimensions[[dims[i]]]$surrogate_key
-    all_att <- names(db$instance$dimensions[[dims[i]]]$table)
+    surrogate_key <- db$dimensions[[dims[i]]]$surrogate_key
+    all_att <- names(db$dimensions[[dims[i]]]$table)
     attributes <- all_att[all_att != surrogate_key]
 
     # join facts to original dimension
-    db$instance$facts[[1]]$table <-
-      dplyr::select(
-        dplyr::inner_join(db$instance$facts[[1]]$table,
-                          db$instance$dimensions[[dims[i]]]$table,
-                          by = surrogate_key),-tidyselect::all_of(surrogate_key)
-      )
+    for (f in seq_along(db$facts)) {
+      if (dims[i] %in% db$facts[[f]]$dim_int_names) {
+        db$facts[[f]]$table <-
+          dplyr::select(
+            dplyr::inner_join(db$facts[[f]]$table,
+                              db$dimensions[[dims[i]]]$table,
+                              by = surrogate_key),-tidyselect::all_of(surrogate_key)
+          )
+      }
+    }
 
     # change dimension table keeping attribute names
-    db$instance$dimensions[[dims[i]]]$table <- cd$table
-    names(db$instance$dimensions[[dims[i]]]$table) <- all_att
+    db$dimensions[[dims[i]]]$table <- cd$table
+    names(db$dimensions[[dims[i]]]$table) <- all_att
 
     # join new dimension to facts
-    db$instance$facts[[1]]$table <-
-      dplyr::select(
-        dplyr::inner_join(db$instance$facts[[1]]$table,
-                          db$instance$dimensions[[dims[i]]]$table,
-                          by = attributes),-tidyselect::all_of(attributes)
-      )
+    for (f in seq_along(db$facts)) {
+      if (dims[i] %in% db$facts[[f]]$dim_int_names) {
+        db$facts[[f]]$table <-
+          dplyr::select(
+            dplyr::inner_join(db$facts[[f]]$table,
+                              db$dimensions[[dims[i]]]$table,
+                              by = attributes),-tidyselect::all_of(attributes)
+          )
+      }
+    }
   }
   # reorder attributes in facts
-  measures <-
-    setdiff(names(db$instance$facts[[1]]$table),
-            db$instance$facts[[1]]$surrogate_keys)
-  db$instance$facts[[1]]$table <-
-    dplyr::select(db$instance$facts[[1]]$table, tidyselect::all_of(c(
-      db$instance$facts[[1]]$surrogate_keys, measures
-    )))
-
+  for (f in seq_along(db$facts)) {
+    measures <-
+      setdiff(names(db$facts[[f]]$table),
+              db$facts[[f]]$surrogate_keys)
+    db$facts[[f]]$table <-
+      dplyr::select(db$facts[[f]]$table, tidyselect::all_of(c(db$facts[[f]]$surrogate_keys, measures)))
+  }
   db
 }
+
 
