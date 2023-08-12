@@ -37,6 +37,17 @@ easily obtain ROLAP star databases, composed by fact and dimension
 tables, from flat tables and to be able to export them in various
 formats to be used by OLAP query tools.
 
+The `rolap` package builds on experience with the
+[`starschemar`](https://CRAN.R-project.org/package=starschemar) package
+on which it is based. It currently incorporates the main functionalities
+for which it was initially intended. In particular, the data model and
+the way of treating role-playing and role dimensions have been changed,
+so that it is easier to add future extensions: For example, the
+possibility of exporting star databases and constellations to a database
+has already been added to `rolap`. Also, the `rolap` package has been
+designed in such a way that migration from `starschemar` is practically
+immediate.
+
 ## Installation
 
 You can install the released version of `rolap` from
