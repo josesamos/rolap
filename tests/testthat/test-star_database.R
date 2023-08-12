@@ -463,3 +463,20 @@ test_that("role_playing_dimension() define a rpd", {
     )
   })
 })
+
+test_that("set_dimension_attribute_names() and get_dimension_attribute_names()", {
+  expect_equal({
+    star_database(mrs_cause_schema, ft_num) |>
+      set_dimension_attribute_names(
+        name = "where",
+        attributes = c(
+          "Region",
+          "State",
+          "City"
+        )
+      ) |>
+      get_dimension_attribute_names(name = "where")
+  }, {
+    c("Region", "State", "City")
+  })
+})
