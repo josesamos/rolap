@@ -1,0 +1,285 @@
+---
+title: "Definition of Role-Playing and Role Dimensions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Definition of Role-Playing and Role Dimensions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, message=FALSE}
+library(rolap)
+```
+
+# Role-playing and role dimensions
+
+A single dimension can be referenced multiple times in a fact table, with each reference linked to a different conceptual role. These separate dimension views are called *role dimensions* and the common dimension is called a *role-playing dimension*.
+
+Depending on the OLAP (*On-Line Analytical Processing*) query system that we use, we may be interested in having a single physical table and defining views on it (one view for each role) or a different physical table for each role. The `rolap` package tries to facilitate the operations to achieve the alternative that we decide to implement.
+
+This document shows by means of an example the possibilities offered by the package in this context. First, through a star database, then by implementing a constellation.
+
+# A star database
+
+First of all, we are going to present the starting data, then we will define the star schema to obtain the star database. Next, we will see the different possibilities with the role-playing dimension and the roles.
+
+## Flat table with the initial data
+
+We use a dataset based on the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) dataset. Two additional dates have been generated, which were not present in the original dataset.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft_cause_rpd, split.table = Inf)
+```
+
+We have selected a small dataset so that the result can be more easily appreciated. Several columns with time information have been added so that it is justified to define a time dimension that can play several roles.
+
+## Star schema
+
+To define the schema, we get the table columns as shown below.
+
+```{r}
+dput(colnames(ft_cause_rpd))
+```
+
+The definition of the star schema is shown below.
+
+```{r}
+when <- dimension_schema(name = "When",
+                         attributes = c("Year",
+                                        "WEEK",
+                                        "Week Ending Date"))
+when_available <- dimension_schema(
+  name = "When Available",
+  attributes = c(
+    "Data Availability Year",
+    "Data Availability Week",
+    "Data Availability Date"
+  )
+)
+where <- dimension_schema(name = "where",
+                          attributes = c("REGION",
+                                         "State",
+                                         "City"))
+s <- star_schema() |>
+  define_facts(fact_schema(
+    name = "MRS Cause",
+    measures = c("Pneumonia and Influenza Deaths",
+                 "All Deaths")
+  )) |>
+  define_dimension(when) |>
+  define_dimension(when_available) |>
+  define_dimension(dimension_schema(
+    name = "When Received",
+    attributes = c("Reception Year",
+                   "Reception Week",
+                   "Reception Date")
+  )) |>
+  define_dimension(where)
+```
+
+As we will define more star schemas with dimensions in common, some of the dimensions have been defined as variables, to avoid repeating their definition later.
+
+## Star database
+
+From the star schema and the flat table, we define the star database, as can be seen below.
+
+```{r}
+db <- star_database(s, ft_cause_rpd) |>
+  snake_case()
+```
+
+It has been transformed to snake case because it is usually more appropriate if we work in RDBMS (*Relational Database Management Systems*).
+
+```{r, echo = FALSE}
+db_dm <- db |>
+  as_dm_class(pk_facts = FALSE)
+db_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+It can be seen that the tables associated with the dimension *when* (*when*, *when_available*, *when_received*) have the same structure, although the names of their attributes are different because they come from the same flat table and the field names cannot be repeated in the same table.
+
+The instances of the tables of dimensions and facts of the star database are shown below.
+
+```{r, results = "asis", echo = FALSE}
+l_db <- db |>
+  as_tibble_list()
+for (i in 1:length(l_db)) {
+  pander::pandoc.table(l_db[[i]], split.table = Inf)
+}
+```
+
+We observe that each of the *when* dimensions (*when*, *when_available*, *when_received*) has its own set of instances, exclusively those necessary for the concept they represent.
+
+## Star database with a role-playing dimension and role dimensions
+
+In the star database, we can define that any one of the dimensions is the role-playing dimension and the other dimensions are various roles of that dimension. The only requirement is that all dimensions must have the same number of attributes. This definition is shown below.
+
+```{r}
+db_1 <- db |>
+  role_playing_dimension(
+    rpd = "when",
+    roles = c("when_available", "when_received")
+  )
+```
+
+The result can be seen in the instances of the star database tables, below.
+
+```{r, results = "asis", echo = FALSE}
+l_db <- db_1 |>
+  as_tibble_list()
+for (i in 1:length(l_db)) {
+  pander::pandoc.table(l_db[[i]], split.table = Inf)
+}
+```
+
+We can see that the tables associated with the *when* dimension contain the same instances and the fact table has been updated appropriately.
+
+In this example, the field names have been preserved, but surely we may want all tables to have the same field names, except for the surrogate key. This can be easily achieved by indicating that we want the names of the fields of the role-playing dimension or by indicating new names in the function. The first alternative is shown below, using the `rpd_att_names` parameter.
+
+```{r}
+db_2 <- db |>
+  role_playing_dimension(
+    rpd = "when",
+    roles = c("when_available", "when_received"),
+    rpd_att_names = TRUE
+  )
+```
+
+In this case, the schema is displayed as the result since the content of the tables is the same.
+
+```{r, echo = FALSE}
+db_dm <- db_2 |>
+  as_dm_class(pk_facts = FALSE)
+db_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+The physical tables are kept in the star database but we work with a RDBMS and we want to work with only one physical table for the dimension, the rest of the tables can be easily defined by views.
+
+# A constellation
+
+With several star databases we can define a constellation where stars can share dimensions. Common dimensions must have the same name and structure. In the case of having role-playing dimensions and role dimensions, this must be taken into account since the shared dimensions must be transformed into conformed dimensions, but the package takes care of this automatically, as we will see below.
+
+## Second star database
+
+We start with a similar dataset, with dates added to the original dataset, as shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft_age_rpd, split.table = Inf)
+```
+
+```{r}
+dput(colnames(ft_age_rpd))
+```
+
+
+The definition of the star schema is shown below.
+
+```{r}
+s_2 <- star_schema() |>
+  define_facts(fact_schema(
+    name = "MRS Age",
+    measures = c(
+      "Deaths"
+    )
+  )) |>
+  define_dimension(when) |>
+  define_dimension(when_available) |>
+  define_dimension(dimension_schema(
+    name = "When Arrived",
+    attributes = c(
+      "Arrival Year",
+      "Arrival Week",
+      "Arrival Date"
+    )
+  )) |>
+  define_dimension(dimension_schema(
+    name = "Who",
+    attributes = c(
+      "Age Range"
+    )
+  )) |>
+  define_dimension(where)
+```
+
+We have reused the definitions of the *When* and *When Available* dimensions from the previous schema. A new dimension *When Arrived* has been added with different names in order to show how the definition works.
+
+The definition of the star database is shown below.
+
+```{r}
+db_3 <- star_database(s_2, ft_age_rpd) |>
+  role_playing_dimension(
+    rpd = "When Arrived",
+    roles = c("When Available"),
+    att_names = c("Year", "Week", "Week Ending Date")
+  ) |>
+  snake_case()
+```
+
+In this case, a role-playing dimension and a role dimension have been defined. The *When* dimension has not been included in this definition also to show how the system works. 
+
+The tables of the new star database are shown below.
+
+```{r, results = "asis", echo = FALSE}
+l_db <- db_3 |>
+  as_tibble_list()
+for (i in 1:length(l_db)) {
+  pander::pandoc.table(l_db[[i]], split.table = Inf)
+}
+```
+
+It can be seen that the When dimension is independent, it does not have the same instances as the other dimensions.
+
+## Constellation
+
+The definition of the constellation is shown below.
+
+```{r}
+ct <- constellation("MRS", list(db_2, db_3))
+```
+
+Below we can see the graphic representation of the tables that compose it.
+
+```{r, echo = FALSE}
+db_dm <- ct |>
+  as_dm_class(pk_facts = FALSE)
+db_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+The situation is that the *When* dimension in this second star database is independent of the other dimensions, but it is a common dimension with the first star database: it has to be a conformed dimension.
+
+Below are the instances of the tables to better appreciate the result.
+
+```{r, results = "asis", echo = FALSE}
+l_db <- ct |>
+  as_tibble_list()
+for (i in 1:length(l_db)) {
+  pander::pandoc.table(l_db[[i]], split.table = Inf)
+}
+```
+
+We can see that all the tables with information related to *When* dimension have the same instances, including all the instances of both star databases. In this example, the dimension attributes have been renamed.
+
+The definition of the role-playing dimension and the role dimensions have been updated when integrating the two star databases. It can be queried using the following function.
+
+```{r}
+ct  |>
+  get_role_playing_dimension_names()
+```
+
+The role-playing and role dimensions that share instances are displayed.
+
+# Conclusions
+
+The `rolap` package supports the definition of role-playing and role dimensions in star databases. In this way, the result can be exported to a RDBMS where we can define the dimensions as independent tables or as views of a single physical table, as we need or prefer.
+
+The definition of role-playing and role dimensions is propagated from star databases to constellations, allowing to integrate various definitions into a common one.
