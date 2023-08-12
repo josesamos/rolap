@@ -365,9 +365,9 @@ test_that("role_playing_dimension() define a rpd", {
   }, {
     list(
       when = c("when", "when_available", "when_received"),
-      20L,
-      20L,
-      20L,
+      15L,
+      15L,
+      15L,
       "when_key",
       "Year",
       "WEEK",
@@ -405,9 +405,9 @@ test_that("role_playing_dimension() define a rpd", {
   }, {
     list(
       when = c("when", "when_available", "when_received"),
-      20L,
-      20L,
-      20L,
+      15L,
+      15L,
+      15L,
       "when_key",
       "Year",
       "WEEK",
@@ -445,9 +445,9 @@ test_that("role_playing_dimension() define a rpd", {
   }, {
     list(
       when = c("when", "when_available", "when_received"),
-      20L,
-      20L,
-      20L,
+      15L,
+      15L,
+      15L,
       "when_key",
       "Year",
       "Week",
