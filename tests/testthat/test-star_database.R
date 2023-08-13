@@ -96,7 +96,7 @@ test_that("star_database() define a a star database", {
           ),
           class = "dimension_table"
         )
-      )
+      ), rpd = list()
     )
   ), class = "star_database"))
 })
@@ -190,7 +190,7 @@ test_that("star_database() define a a star database", {
           ),
           class = "dimension_table"
         )
-      )
+      ), rpd = list()
     )
   ), class = "star_database"))
 })
@@ -295,7 +295,7 @@ test_that("snake_case() transform a a star database in snake case", {
           ),
           class = "dimension_table"
         )
-      )
+      ), rpd = list()
     )
   ), class = "star_database"))
 })
@@ -345,5 +345,154 @@ test_that("as_tibble_list() export star_database as a list of tibbles", {
         row.names = c(NA,-6L)
       )
     )
+  })
+})
+
+test_that("role_playing_dimension() define a rpd", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(rpd = "When",
+                             roles = c("When Available", "When Received"))
+    c(
+      db$instance$rpd,
+      nrow(db$instance$dimensions$when$table),
+      nrow(db$instance$dimensions$when_available$table),
+      nrow(db$instance$dimensions$when_received$table),
+      names(db$instance$dimensions$when$table),
+      names(db$instance$dimensions$when_available$table),
+      names(db$instance$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      when = c("when", "when_available", "when_received"),
+      15L,
+      15L,
+      15L,
+      "when_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_available_key",
+      "Data Availability Year",
+      "Data Availability Week",
+      "Data Availability Date",
+      "when_received_key",
+      "Reception Year",
+      "Reception Week",
+      "Reception Date"
+    )
+  })
+})
+
+test_that("role_playing_dimension() define a rpd", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(
+        rpd = "When",
+        roles = c("When Available", "When Received"),
+        rpd_att_names = TRUE
+      )
+
+    c(
+      db$instance$rpd,
+      nrow(db$instance$dimensions$when$table),
+      nrow(db$instance$dimensions$when_available$table),
+      nrow(db$instance$dimensions$when_received$table),
+      names(db$instance$dimensions$when$table),
+      names(db$instance$dimensions$when_available$table),
+      names(db$instance$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      when = c("when", "when_available", "when_received"),
+      15L,
+      15L,
+      15L,
+      "when_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_available_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_received_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date"
+    )
+  })
+})
+
+test_that("role_playing_dimension() define a rpd", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(
+        rpd = "When",
+        roles = c("When Available", "When Received"),
+        att_names = c("Year", "Week", "Date")
+      )
+
+    c(
+      db$instance$rpd,
+      nrow(db$instance$dimensions$when$table),
+      nrow(db$instance$dimensions$when_available$table),
+      nrow(db$instance$dimensions$when_received$table),
+      names(db$instance$dimensions$when$table),
+      names(db$instance$dimensions$when_available$table),
+      names(db$instance$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      when = c("when", "when_available", "when_received"),
+      15L,
+      15L,
+      15L,
+      "when_key",
+      "Year",
+      "Week",
+      "Date",
+      "when_available_key",
+      "Year",
+      "Week",
+      "Date",
+      "when_received_key",
+      "Year",
+      "Week",
+      "Date"
+    )
+  })
+})
+
+test_that("set_dimension_attribute_names() and get_dimension_attribute_names()", {
+  expect_equal({
+    star_database(mrs_cause_schema, ft_num) |>
+      set_dimension_attribute_names(
+        name = "where",
+        attributes = c(
+          "Region",
+          "State",
+          "City"
+        )
+      ) |>
+      get_dimension_attribute_names(name = "where")
+  }, {
+    c("Region", "State", "City")
+  })
+})
+
+test_that("set_measure_names() and get_measure_names()", {
+  expect_equal({
+    star_database(mrs_cause_schema, ft_num) |>
+      set_measure_names(
+        measures = c(
+          "Pneumonia and Influenza",
+          "All",
+          "Rows Aggregated"
+        )
+      ) |>
+      get_measure_names()
+  }, {
+    c("Pneumonia and Influenza", "All", "Rows Aggregated")
   })
 })

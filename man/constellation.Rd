@@ -25,13 +25,33 @@ db1 <- star_database(mrs_cause_schema, ft_num) |>
   snake_case()
 db2 <- star_database(mrs_age_schema, ft_age) |>
   snake_case()
-ct <- constellation("MRS", list(db1, db2))
+ct1 <- constellation("MRS", list(db1, db2))
+
+
+db3 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+  role_playing_dimension(
+    rpd = "When",
+    roles = c("When Available", "When Received")
+  )
+
+db4 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
+  role_playing_dimension(
+    rpd = "When Arrived",
+    roles = c("When Available")
+  )
+ct2 <- constellation("MRS", list(db3, db4))
 
 }
 \seealso{
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 
 Other star database and constellation definition functions: 
+\code{\link{get_dimension_attribute_names}()},
+\code{\link{get_measure_names}()},
+\code{\link{get_role_playing_dimension_names}()},
+\code{\link{role_playing_dimension}()},
+\code{\link{set_dimension_attribute_names}()},
+\code{\link{set_measure_names}()},
 \code{\link{snake_case}()},
 \code{\link{star_database}()}
 }

@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/rolap)](https://CRAN.R-project.org/package=rolap)
 [![R-CMD-check](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
@@ -34,6 +36,15 @@ The goal of `rolap` is to define transformations that allow you to
 easily obtain ROLAP star databases, composed by fact and dimension
 tables, from flat tables and to be able to export them in various
 formats to be used by OLAP query tools.
+
+The `rolap` package builds on experience with the
+[`starschemar`](https://CRAN.R-project.org/package=starschemar) package
+on which it is based. It currently incorporates the main functionalities
+for which `starschemar` was initially intended. In particular, the data
+model and the way of treating role-playing and role dimensions have been
+changed, so that it is easier to add future extensions. It has been
+designed in such a way that migration from `starschemar` is practically
+immediate.
 
 ## Installation
 
@@ -355,7 +366,8 @@ query tool that we are going to use.
 ### Exportation as a `dm` object
 
 Star databases and constellations can be directly exported as objects of
-class [dm](https://cran.r-project.org/package=dm), as shown below.
+class `dm` from the [`dm`](https://cran.r-project.org/package=dm)
+package, as shown below.
 
 ``` r
 # star database

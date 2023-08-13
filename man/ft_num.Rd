@@ -35,7 +35,9 @@ ft_num <- ft |>
 \code{\link{mrs_cause_schema}}
 
 Other mrs example data: 
+\code{\link{ft_age_rpd}},
 \code{\link{ft_age}},
+\code{\link{ft_cause_rpd}},
 \code{\link{ft}}
 }
 \concept{mrs example data}

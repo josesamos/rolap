@@ -11,9 +11,9 @@
 #' @keywords internal
 dimension_table <- function(name = NULL, attributes = NULL, instances = NULL) {
   # Check the type of the base object
-  stopifnot(tibble::is_tibble(instances))
-  stopifnot(!is.null(name))
-  stopifnot(!is.null(attributes))
+  stopifnot("A tibble with the instances was expected." = tibble::is_tibble(instances))
+  stopifnot("Missing table name." = !is.null(name))
+  stopifnot("Missing table attributes." = !is.null(attributes))
 
   ft <- instances[, attributes]
   # remove duplicates and sort
@@ -96,15 +96,13 @@ conform_dimensions <- function(to_conform) {
   # to check if dimensions have the same schema
   dim_attr <- names(dim$table)
   dim_attr_length <- length(dim_attr)
-  same_schema_dimensions <- TRUE
 
   dim$table <- dplyr::select(dim$table,-tidyselect::all_of(dim$surrogate_key))
   attributes <- names(dim$table)
   for (d in 2:length(to_conform)) {
     # check if dimensions have the same schema
     dim_attr <- unique(c(dim_attr, names(to_conform[[d]]$table)))
-    same_schema_dimensions <- (dim_attr_length == length(dim_attr))
-    stopifnot(same_schema_dimensions)
+    stopifnot("Dimensions to conform do not have the same attributes." = dim_attr_length == length(dim_attr))
 
     dim$table <-
       dplyr::bind_rows(dim$table,

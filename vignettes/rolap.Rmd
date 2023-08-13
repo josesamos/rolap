@@ -5,7 +5,7 @@ date: "2023-07-28"
 output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 vignette: >
-  %\VignetteIndexEntry{rolap}
+  %\VignetteIndexEntry{Basics and getting started with the rolap package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -130,15 +130,15 @@ In this section an illustrative example is developed to show how the package wor
 
 ## Data sets
 
-To illustrate how the package works we will use a small part of the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) data set. 
+To illustrate how the package works we will use a small part of the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) dataset. 
 
 ```{r, results = "asis", echo = FALSE}
 pander::pandoc.table(ft, split.table = Inf)
 ```
 
-In the table above, all the rows of the `ft` data set are shown. For each week and city, mortality figures by **age** group and **cause**, considered separately, are included (i.e., the combination of age group and cause is not included). In the cause, only a distinction is made between pneumonia or influenza and others. Regarding the data types, all the columns are of type character, they have been imported directly as a `tibble`, without indicating a specific type.
+In the table above, all the rows of the `ft` dataset are shown. For each week and city, mortality figures by **age** group and **cause**, considered separately, are included (i.e., the combination of age group and cause is not included). In the cause, only a distinction is made between pneumonia or influenza and others. Regarding the data types, all the columns are of type character, they have been imported directly as a `tibble`, without indicating a specific type.
 
-From this initial data set, two additional datasets, `ft_num` and `ft_age`, have been defined with the transformations shown below.
+From this initial dataset, two additional datasets, `ft_num` and `ft_age`, have been defined with the transformations shown below.
 
 ```{r}
 library(rolap)
@@ -287,10 +287,16 @@ It can be seen that the data in the fact table has the same granularity as the d
 ```{r}
 nrow(ft_num)
 
-nrow(l_cause[[1]])
+nrow(l_cause[[3]])
 ```
 
 The same can be seen in the `num` field in the fact table which shows the number of records added to get each record, in this case it is always 1. Dimensions contain only the distinct value combinations for the attribute sets they contain.
+
+#### Rename fact measures and dimension attributes
+
+In this case it has not been considered necessary, but if desired, it is possible to rename both the dimension attributes and the fact measures.
+
+To do this, the functions `get_dimension_attribute_names()` and `get_measure_names()` are available to consult the current names, and `set_dimension_attribute_names()` and `set_measure_names()` to change them if necessary.
 
 ### Constellations
 

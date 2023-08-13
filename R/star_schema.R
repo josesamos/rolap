@@ -86,8 +86,8 @@ define_facts.star_schema <-
            agg_functions = NULL,
            nrow_agg = NULL) {
     if (!is.null(facts)) {
-      stopifnot(("fact_schema" %in% class(facts)))
-      stopifnot(is.null(name) &
+      stopifnot("Schema does not include fact_schema object." = methods::is(facts, "fact_schema"))
+      stopifnot("If a fact_schema has been defined, the rest of the fields cannot be defined." = is.null(name) &
                   is.null(measures) &
                   is.null(agg_functions) & is.null(nrow_agg))
     } else {
@@ -149,8 +149,8 @@ define_dimension <- function(schema, dimension, name, attributes) UseMethod("def
 #' @export
 define_dimension.star_schema <- function(schema, dimension = NULL, name = NULL, attributes = NULL) {
   if (!is.null(dimension)) {
-    stopifnot(("dimension_schema" %in% class(dimension)))
-    stopifnot(is.null(name) & is.null(attributes))
+    stopifnot("Schema does not include dimension_schema object." = methods::is(dimension, "dimension_schema"))
+    stopifnot("If a dimension_schema has been defined, the rest of the fields cannot be defined." = is.null(name) & is.null(attributes))
   } else {
     dimension <- dimension_schema(name = name, attributes = attributes)
   }
@@ -158,7 +158,7 @@ define_dimension.star_schema <- function(schema, dimension = NULL, name = NULL, 
     d <- list(dimension)
     names(d) <- snakecase::to_snake_case(dimension$name)
   } else {
-    stopifnot(!(snakecase::to_snake_case(dimension$name) %in% names(schema$dimensions)))
+    stopifnot("The schema already contains a dimension of the same name." = !(snakecase::to_snake_case(dimension$name) %in% names(schema$dimensions)))
     d <- schema$dimensions
     n <- names(d)
     d[[length(d) + 1]] <- dimension

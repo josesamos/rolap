@@ -39,7 +39,9 @@ mrs_cause_schema <- star_schema() |>
 \code{\link{ft_num}}
 
 Other mrs example schema: 
-\code{\link{mrs_age_schema}}
+\code{\link{mrs_age_schema_rpd}},
+\code{\link{mrs_age_schema}},
+\code{\link{mrs_cause_schema_rpd}}
 }
 \concept{mrs example schema}
 \keyword{datasets}

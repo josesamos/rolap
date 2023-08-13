@@ -36,6 +36,8 @@ if (rlang::is_installed("stringr")) {
 \code{\link{mrs_age_schema}}
 
 Other mrs example data: 
+\code{\link{ft_age_rpd}},
+\code{\link{ft_cause_rpd}},
 \code{\link{ft_num}},
 \code{\link{ft}}
 }

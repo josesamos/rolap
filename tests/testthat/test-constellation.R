@@ -126,7 +126,7 @@ test_that("constellation() define constellation", {
           ),
           class = "dimension_table"
         )
-      )
+      ), rpd = list()
     ), class = "constellation")
   })
 })
@@ -293,7 +293,7 @@ test_that("constellation() define constellation", {
           ),
           class = "dimension_table"
         )
-      )
+      ), rpd = list()
     ), class = "constellation")
   })
 })
@@ -388,5 +388,69 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
                   "tbl", "data.frame")
       )
     )
+  })
+})
+
+test_that("constellation() define constellation with rpd", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(rpd = "When",
+                             roles = c("When Available", "When Received"))
+
+    db2 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
+      role_playing_dimension(rpd = "When Arrived",
+                             roles = c("When Available"))
+    db <- constellation("MRS", list(db1, db2))
+    c(
+      db$rpd,
+      nrow(db$dimensions$when$table),
+      nrow(db$dimensions$when_available$table),
+      nrow(db$dimensions$when_arrived$table),
+      nrow(db$dimensions$when_received$table),
+      names(db$dimensions$when$table),
+      names(db$dimensions$when_available$table),
+      names(db$dimensions$when_arrived$table),
+      names(db$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      when = c("when", "when_available", "when_received", "when_arrived"),
+      25L,
+      25L,
+      25L,
+      25L,
+      "when_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_available_key",
+      "Data Availability Year",
+      "Data Availability Week",
+      "Data Availability Date",
+      "when_arrived_key",
+      "Arrival Year",
+      "Arrival Week",
+      "Arrival Date",
+      "when_received_key",
+      "Reception Year",
+      "Reception Week",
+      "Reception Date"
+    )
+  })
+})
+
+test_that("constellation() get_role_playing_dimension_names()", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(rpd = "When",
+                             roles = c("When Available", "When Received"))
+
+    db2 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
+      role_playing_dimension(rpd = "When Arrived",
+                             roles = c("When Available"))
+    constellation("MRS", list(db1, db2)) |>
+      get_role_playing_dimension_names()
+  }, {
+    list(rpd_1 = c("when", "when_arrived", "when_available", "when_received"))
   })
 })

@@ -22,6 +22,7 @@ Depends:
 Imports: 
     dm,
     dplyr,
+    methods,
     purrr,
     rlang,
     snakecase,

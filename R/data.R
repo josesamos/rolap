@@ -119,3 +119,159 @@
 #'
 #' @format A `star_schema` object.
 "mrs_age_schema"
+
+#' Mortality Reporting System by Age
+#'
+#' Selection of data from the 122 Cities Mortality Reporting System by age
+#' group, for the first 9 weeks of 1962 and 4 cities.
+#'
+#' The original dataset begins in 1962. For each week, in 122 US cities,
+#' mortality figures by age group and cause, considered separately, are included
+#' (i.e., the combination of age group and cause is not included). In the cause,
+#' only a distinction is made between pneumonia or influenza and others.
+#'
+#' Two additional dates have been generated, which were not present in the
+#' original dataset.
+#'
+#' @family mrs example data
+#' @seealso \code{\link{mrs_age_schema}}
+#'
+#' @format A `tibble`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"ft_age_rpd"
+
+#' Mortality Reporting System by Cause
+#'
+#' Selection of data from the 122 Cities Mortality Reporting System by cause,
+#' for the first 9 weeks of 1962 and 4 cities.
+#'
+#' The original dataset begins in 1962. For each week, in 122 US cities,
+#' mortality figures by age group and cause, considered separately, are included
+#' (i.e., the combination of age group and cause is not included). In the cause,
+#' only a distinction is made between pneumonia or influenza and others.
+#'
+#' Two additional dates have been generated, which were not present in the
+#' original dataset.
+#'
+#' @family mrs example data
+#' @seealso \code{\link{mrs_cause_schema}}
+#'
+#' @format A `tibble`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"ft_cause_rpd"
+
+#' Star schema for Mortality Reporting System by Cause with additional dates
+#'
+#' Definition of schemas for facts and dimensions for the Mortality Reporting System
+#' considering the cause classification with additional dates to be used as role
+#' playing dimensions..
+#'
+#' @family mrs example schema
+#' @seealso \code{\link{ft_cause_rpd}}
+#' @examples
+#' # Defined by:
+#'
+#' mrs_cause_schema_rpd <- star_schema() |>
+#'   define_facts(fact_schema(
+#'     name = "mrs_cause",
+#'     measures = c(
+#'       "Pneumonia and Influenza Deaths",
+#'       "All Deaths"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When",
+#'     attributes = c(
+#'       "Year",
+#'       "WEEK",
+#'       "Week Ending Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When Available",
+#'     attributes = c(
+#'       "Data Availability Year",
+#'       "Data Availability Week",
+#'       "Data Availability Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When Received",
+#'     attributes = c(
+#'       "Reception Year",
+#'       "Reception Week",
+#'       "Reception Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "where",
+#'     attributes = c(
+#'       "REGION",
+#'       "State",
+#'       "City"
+#'     )
+#'   ))
+#'
+#' @format A `star_schema` object.
+"mrs_cause_schema_rpd"
+
+
+#' Star schema for Mortality Reporting System by Age with additional dates
+#'
+#' Definition of schemas for facts and dimensions for the Mortality Reporting System
+#' considering the cause classification with additional dates to be used as role
+#' playing dimensions..
+#'
+#' @family mrs example schema
+#' @seealso \code{\link{ft_age_rpd}}
+#' @examples
+#' # Defined by:
+#'
+#' mrs_age_schema_rpd <- star_schema() |>
+#'   define_facts(fact_schema(
+#'     name = "mrs_age",
+#'     measures = c(
+#'       "Deaths"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When",
+#'     attributes = c(
+#'       "Year",
+#'       "WEEK",
+#'       "Week Ending Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When Available",
+#'     attributes = c(
+#'       "Data Availability Year",
+#'       "Data Availability Week",
+#'       "Data Availability Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "When Arrived",
+#'     attributes = c(
+#'       "Arrival Year",
+#'       "Arrival Week",
+#'       "Arrival Date"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "Who",
+#'     attributes = c(
+#'       "Age Range"
+#'     )
+#'   )) |>
+#'   define_dimension(dimension_schema(
+#'     name = "where",
+#'     attributes = c(
+#'       "REGION",
+#'       "State",
+#'       "City"
+#'     )
+#'   ))
+#'
+#' @format A `star_schema` object.
+"mrs_age_schema_rpd"
