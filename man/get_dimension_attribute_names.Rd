@@ -31,11 +31,11 @@ names <- star_database(mrs_cause_schema, ft_num) |>
 
 Other star database and constellation definition functions: 
 \code{\link{constellation}()},
-\code{\link{get_measure_names}()},
+\code{\link{get_fact_measure_names}()},
 \code{\link{get_role_playing_dimension_names}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{set_dimension_attribute_names}()},
-\code{\link{set_measure_names}()},
+\code{\link{set_fact_measure_names}()},
 \code{\link{snake_case}()},
 \code{\link{star_database}()}
 }

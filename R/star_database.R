@@ -455,7 +455,7 @@ get_dimension_attribute_names.star_database <- function(db, name) {
 #' @examples
 #'
 #' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   set_measure_names(
+#'   set_fact_measure_names(
 #'     measures = c(
 #'       "Pneumonia and Influenza",
 #'       "All",
@@ -464,12 +464,12 @@ get_dimension_attribute_names.star_database <- function(db, name) {
 #'   )
 #'
 #' @export
-set_measure_names <- function(db, measures) UseMethod("set_measure_names")
+set_fact_measure_names <- function(db, measures) UseMethod("set_fact_measure_names")
 
-#' @rdname set_measure_names
+#' @rdname set_fact_measure_names
 #'
 #' @export
-set_measure_names.star_database <- function(db, measures) {
+set_fact_measure_names.star_database <- function(db, measures) {
   measures <- unique(measures)
   measure_names <- setdiff(names(db$instance$facts[[1]]$table), db$instance$facts[[1]]$surrogate_keys)
   stopifnot("Facts have a different number of measures." = length(measures) == length(measure_names))
@@ -491,15 +491,15 @@ set_measure_names.star_database <- function(db, measures) {
 #' @examples
 #'
 #' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_measure_names()
+#'   get_fact_measure_names()
 #'
 #' @export
-get_measure_names <- function(db) UseMethod("get_measure_names")
+get_fact_measure_names <- function(db) UseMethod("get_fact_measure_names")
 
-#' @rdname get_measure_names
+#' @rdname get_fact_measure_names
 #'
 #' @export
-get_measure_names.star_database <- function(db) {
+get_fact_measure_names.star_database <- function(db) {
   setdiff(names(db$instance$facts[[1]]$table), db$instance$facts[[1]]$surrogate_keys)
 }
 
