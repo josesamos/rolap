@@ -21,7 +21,7 @@ A \code{star_database} object is created from a \code{star_schema} object and a 
 table that contains the data from which database instances are derived.
 }
 \details{
-Measures and attributes of the \code{star_schema} must correspond to the names of
+Measures and measures of the \code{star_schema} must correspond to the names of
 the columns of the flat table.
 
 Since NA values cause problems when doing Join operations between tables,
@@ -39,9 +39,11 @@ db <- star_database(mrs_cause_schema, ft_num)
 Other star database and constellation definition functions: 
 \code{\link{constellation}()},
 \code{\link{get_dimension_attribute_names}()},
+\code{\link{get_measure_names}()},
 \code{\link{get_role_playing_dimension_names}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{set_dimension_attribute_names}()},
+\code{\link{set_measure_names}()},
 \code{\link{snake_case}()}
 }
 \concept{star database and constellation definition functions}

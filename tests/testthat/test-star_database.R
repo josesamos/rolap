@@ -480,3 +480,19 @@ test_that("set_dimension_attribute_names() and get_dimension_attribute_names()",
     c("Region", "State", "City")
   })
 })
+
+test_that("set_measure_names() and get_measure_names()", {
+  expect_equal({
+    star_database(mrs_cause_schema, ft_num) |>
+      set_measure_names(
+        measures = c(
+          "Pneumonia and Influenza",
+          "All",
+          "Rows Aggregated"
+        )
+      ) |>
+      get_measure_names()
+  }, {
+    c("Pneumonia and Influenza", "All", "Rows Aggregated")
+  })
+})

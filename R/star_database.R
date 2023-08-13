@@ -3,7 +3,7 @@
 #' A `star_database` object is created from a `star_schema` object and a flat
 #' table that contains the data from which database instances are derived.
 #'
-#' Measures and attributes of the `star_schema` must correspond to the names of
+#' Measures and measures of the `star_schema` must correspond to the names of
 #' the columns of the flat table.
 #'
 #' Since NA values cause problems when doing Join operations between tables,
@@ -437,3 +437,69 @@ get_dimension_attribute_names.star_database <- function(db, name) {
   att_names <- names(db$instance$dimensions[[name]]$table)
   att_names[-1]
 }
+
+
+#' Rename the measures of a star database
+#'
+#' The measure names match those of the flat table from which they
+#' are defined. This function allows you to change their names.
+#'
+#' @param db A `star_database` object.
+#' @param measures A vector of strings, measure names.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   set_measure_names(
+#'     measures = c(
+#'       "Pneumonia and Influenza",
+#'       "All",
+#'       "Rows Aggregated"
+#'     )
+#'   )
+#'
+#' @export
+set_measure_names <- function(db, measures) UseMethod("set_measure_names")
+
+#' @rdname set_measure_names
+#'
+#' @export
+set_measure_names.star_database <- function(db, measures) {
+  measures <- unique(measures)
+  measure_names <- setdiff(names(db$instance$facts[[1]]$table), db$instance$facts[[1]]$surrogate_keys)
+  stopifnot("Facts have a different number of measures." = length(measures) == length(measure_names))
+  names(db$instance$facts[[1]]$table) <- c(db$instance$facts[[1]]$surrogate_keys, measures)
+  db
+}
+
+#' Get the names of the measures of a star database
+#'
+#' Obtain the names of the measures of a star database.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A vector of strings, measure names.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_measure_names()
+#'
+#' @export
+get_measure_names <- function(db) UseMethod("get_measure_names")
+
+#' @rdname get_measure_names
+#'
+#' @export
+get_measure_names.star_database <- function(db) {
+  setdiff(names(db$instance$facts[[1]]$table), db$instance$facts[[1]]$surrogate_keys)
+}
+

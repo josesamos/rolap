@@ -40,11 +40,9 @@ formats to be used by OLAP query tools.
 The `rolap` package builds on experience with the
 [`starschemar`](https://CRAN.R-project.org/package=starschemar) package
 on which it is based. It currently incorporates the main functionalities
-for which it was initially intended. In particular, the data model and
-the way of treating role-playing and role dimensions have been changed,
-so that it is easier to add future extensions: For example, the
-possibility of exporting star databases and constellations to a database
-has already been added to `rolap`. Also, the `rolap` package has been
+for which `starschemar` was initially intended. In particular, the data
+model and the way of treating role-playing and role dimensions have been
+changed, so that it is easier to add future extensions. It has been
 designed in such a way that migration from `starschemar` is practically
 immediate.
 
@@ -368,7 +366,8 @@ query tool that we are going to use.
 ### Exportation as a `dm` object
 
 Star databases and constellations can be directly exported as objects of
-class [dm](https://cran.r-project.org/package=dm), as shown below.
+class `dm` from the [`dm`](https://cran.r-project.org/package=dm)
+package, as shown below.
 
 ``` r
 # star database
