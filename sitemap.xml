@@ -16,6 +16,9 @@
     <loc>https://josesamos.github.io/rolap/articles/rolap.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/articles/rpd.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/authors.html</loc>
   </url>
   <url>
@@ -70,6 +73,12 @@
     <loc>https://josesamos.github.io/rolap/reference/ft_age.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/ft_age_rpd.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/ft_cause_rpd.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/ft_num.html</loc>
   </url>
   <url>
@@ -82,6 +91,9 @@
     <loc>https://josesamos.github.io/rolap/reference/get_attribute_names.star_schema.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_dimension_attribute_names.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_dimension_name.dimension_schema.html</loc>
   </url>
   <url>
@@ -91,10 +103,16 @@
     <loc>https://josesamos.github.io/rolap/reference/get_measure_names.fact_schema.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_measure_names.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_measure_names.star_schema.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_nrow_agg.fact_schema.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_role_playing_dimension_names.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_surrogate_key.dimension_table.html</loc>
@@ -109,10 +127,31 @@
     <loc>https://josesamos.github.io/rolap/reference/mrs_age_schema.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/mrs_age_schema_rpd.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/mrs_cause_schema.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/mrs_cause_schema_rpd.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/prepare_to_join.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/role_playing_dimension.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/rpd_in_constellation.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/set_dimension_attribute_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/set_measure_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/share_dimensions.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/snake_case.html</loc>
@@ -128,5 +167,8 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/star_schema.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/unify_rpd.html</loc>
   </url>
 </urlset>

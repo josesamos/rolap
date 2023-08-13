@@ -48,6 +48,12 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/rpd.html">Definition of Role-Playing and Role Dimensions</a>
+  </div>
+</li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
@@ -335,7 +341,7 @@ package works.</p>
 <p>To illustrate how the package works we will use a small part of the
 <a href="https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system" class="external-link">Deaths
 in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting
-System</a> data set.</p>
+System</a> dataset.</p>
 <table class="table">
 <colgroup>
 <col width="2%">
@@ -670,7 +676,7 @@ System</a> data set.</p>
 </tr>
 </tbody>
 </table>
-<p>In the table above, all the rows of the <code>ft</code> data set are
+<p>In the table above, all the rows of the <code>ft</code> dataset are
 shown. For each week and city, mortality figures by <strong>age</strong>
 group and <strong>cause</strong>, considered separately, are included
 (i.e., the combination of age group and cause is not included). In the
@@ -678,7 +684,7 @@ cause, only a distinction is made between pneumonia or influenza and
 others. Regarding the data types, all the columns are of type character,
 they have been imported directly as a <code>tibble</code>, without
 indicating a specific type.</p>
-<p>From this initial data set, two additional datasets,
+<p>From this initial dataset, two additional datasets,
 <code>ft_num</code> and <code>ft_age</code>, have been defined with the
 transformations shown below.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -1332,12 +1338,24 @@ number of records).</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ft_num</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 20</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">l_cause</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 16</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">l_cause</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 20</span></span></code></pre></div>
 <p>The same can be seen in the <code>num</code> field in the fact table
 which shows the number of records added to get each record, in this case
 it is always 1. Dimensions contain only the distinct value combinations
 for the attribute sets they contain.</p>
+<div class="section level5">
+<h5 id="rename-fact-measures-and-dimension-attributes">Rename fact measures and dimension attributes<a class="anchor" aria-label="anchor" href="#rename-fact-measures-and-dimension-attributes"></a>
+</h5>
+<p>In this case it has not been considered necessary, but if desired, it
+is possible to rename both the dimension attributes and the fact
+measures.</p>
+<p>To do this, the functions
+<code><a href="../reference/get_dimension_attribute_names.html">get_dimension_attribute_names()</a></code> and
+<code><a href="../reference/get_measure_names.html">get_measure_names()</a></code> are available to consult the current
+names, and <code><a href="../reference/set_dimension_attribute_names.html">set_dimension_attribute_names()</a></code> and
+<code><a href="../reference/set_measure_names.html">set_measure_names()</a></code> to change them if necessary.</p>
+</div>
 </div>
 <div class="section level4">
 <h4 id="constellations">Constellations<a class="anchor" aria-label="anchor" href="#constellations"></a>
@@ -2108,8 +2126,8 @@ following (it can also be used to store them in a DBMS).</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ct_dm</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dm</span><span class="fu">::</span><span class="fu"><a href="https://dm.cynkra.com/reference/dm_draw.html" class="external-link">dm_draw</a></span><span class="op">(</span>rankdir <span class="op">=</span> <span class="st">"LR"</span>, view_type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
-<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-cf06202a64494d2a7528" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-cf06202a64494d2a7528">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_age\" [id = \"mrs_age\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_age<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"who_key\">who_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key, where_key, who_key\"><U>when_key, where_key, who_key<\/U><\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"mrs_cause\" [id = \"mrs_cause\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_cause<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">pneumonia_and_influenza_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key, where_key\"><U>when_key, where_key<\/U><\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"who\" [id = \"who\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">who<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"who_key\"><U>who_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">age<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_cause\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_cause_1\"]\n\"mrs_age\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_age_1\"]\n\"mrs_cause\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_cause_2\"]\n\"mrs_age\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_age_2\"]\n\"mrs_age\":\"who_key\"->\"who\":\"who_key\" [id=\"mrs_age_3\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script><p>In the example below, a local <em>SQLite</em> database is used to
+<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-39583387da0483bd6d4f" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-39583387da0483bd6d4f">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_age\" [id = \"mrs_age\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_age<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"who_key\">who_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key, where_key, who_key\"><U>when_key, where_key, who_key<\/U><\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"mrs_cause\" [id = \"mrs_cause\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_cause<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">pneumonia_and_influenza_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key, where_key\"><U>when_key, where_key<\/U><\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"who\" [id = \"who\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">who<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"who_key\"><U>who_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">age<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_cause\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_cause_1\"]\n\"mrs_age\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_age_1\"]\n\"mrs_cause\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_cause_2\"]\n\"mrs_age\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_age_2\"]\n\"mrs_age\":\"who_key\"->\"who\":\"who_key\" [id=\"mrs_age_3\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script><p>In the example below, a local <em>SQLite</em> database is used to
 demonstrate how to store the model in a database. <code>dm</code> works
 with any RDBMS supported by <code>DBI</code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
