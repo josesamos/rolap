@@ -1,8 +1,8 @@
 ---
-title: "Accessing relational databases through the dm package"
+title: "Star databases and RDBMS through the dm and rolap packages"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Accessing relational databases through the dm package}
+  %\VignetteIndexEntry{Star databases and RDBMS through the dm and rolap packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,21 +17,23 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The main objective of this document is to show how to access transactional data in RDBMS (*Relational Database Management Systems*) and store the star database generated from it in another relational database. Access to the databases is done through the [`dm`](https://cran.r-project.org/package=dm) package, transformations using the `rolap` package. Additionally, a case of multidimensional design from real data is shown.
+The main objective of this document is to show how to access transactional data in RDBMS (*Relational Database Management Systems*) and store the star database generated from it in another relational database. Access to the databases is done through the [`dm`](https://cran.r-project.org/package=dm) package. The transformations are carried out using the `rolap` package.
 
+Additionally, a multidimensional design case is solved using star databases with two granularities.
 
+First, the initial transactional data is presented. The following shows the implementation of the star databases. Finally, it ends with the conclusions.
 
 # Transactional data
 
-We will build on a dataset with transactional data from Czech debit card company specialising on payments at petrol pumps called [CCS](https://relational.fit.cvut.cz/dataset/CCS), publicly available in a RDBMS.
+We will build on a dataset with transactional data from Czech debit card company specialising on payments at gas stations called [CCS](https://relational.fit.cvut.cz/dataset/CCS), publicly available in a RDBMS.
 
-We make a connection by following the instructions they offer, as shown below.
+First, we make a connection by following the instructions they offer, as shown below^[In the R code that is included, although with the use of `library` it is not necessary, for each function it is indicated by the prefix the package where it is defined.].
 
 ```{r}
 library(RMariaDB)
 
-ccs_db <- dbConnect(
-  MariaDB(),
+ccs_db <- RMariaDB::dbConnect(
+  RMariaDB::MariaDB(),
   username = "guest",
   password = "relational",
   dbname = "ccs",
@@ -39,19 +41,19 @@ ccs_db <- dbConnect(
 )
 ```
 
-From the connection, we can obtain a `dm` object, indicating in the creation function that it take the keys defined in the database.
+Next, from the connection, we can obtain a `dm` object, taking the definition of the keys from the database.
 
 ```{r, message=FALSE}
 library(dm)
 
-ccs_dm <- dm_from_con(ccs_db, learn_keys = TRUE)
+ccs_dm <- dm::dm_from_con(ccs_db, learn_keys = TRUE)
 ```
 
 Using the following function we can display the database tables with all their fields.
 
 ```{r}
 ccs_dm |>
-  dm_draw(view_type = "all")
+  dm::dm_draw(view_type = "all")
 ```
 
 We can access tables as if they were part of a list. If we access the *transactions* table we can see that it has no data, the data is in the *transactions_1k* table hat is not related to the other tables.
@@ -67,47 +69,48 @@ Therefore, what we do is generate a new `dm` object by selecting the tables that
 ```{r}
 ccs_sel_dm <-
   ccs_dm[c('transactions_1k', 'customers', 'gasstations', 'products')] |>
-  dm_add_fk(transactions_1k, CustomerID, customers) |>
-  dm_add_fk(transactions_1k, GasStationID, gasstations) |>
-  dm_add_fk(transactions_1k, ProductID, products)
+  dm::dm_add_fk(transactions_1k, CustomerID, customers) |>
+  dm::dm_add_fk(transactions_1k, GasStationID, gasstations) |>
+  dm::dm_add_fk(transactions_1k, ProductID, products)
 ```
 
 The resulting database schema is shown below.
 
 ```{r}
 ccs_sel_dm |>
-  dm_draw(view_type = "all")
+  dm::dm_draw(view_type = "all")
 ```
 
-To generate a flat table from the database tables we can use the function offered by the `dm` package, as shown below.
+The starting point of the `rolap` package to define the transformations to obtain a star database is a flat table. To generate a flat table in a `tibble` from the database tables we can use the functions offered by the `dm` package, as shown below.
 
 ```{r, message=FALSE}
 transactions_ft <- ccs_sel_dm |>
-  dm_flatten_to_tbl(transactions_1k, .recursive = TRUE) |>
-  collect()
+  dm::dm_flatten_to_tbl(transactions_1k, .recursive = TRUE) |>
+  dm::collect()
 
+class(transactions_ft)
 nrow(transactions_ft)
 dput(colnames(transactions_ft))
 ```
 
-With this we already have in the `transactions_ft` variable the flat table with the transactional data that we are going to use. In the list of fields of the result table, we can see that the fields with the same name that were in several tables are now prefixed with the name of the table they came from.
+With this we already have in the `transactions_ft` variable the flat table with the transactional data that we are going to use. In the list of fields of this table, we can see that the fields with the same name that were in several tables are now postfixed with the name of the table they came from (*Segment.customers* and *Segment.gasstations*).
 
-We can then disconnect from the database.
+Since we already have the result we need, we can disconnect from the database.
 
 ```{r}
 DBI::dbDisconnect(ccs_db)
 ```
 
 
-# Star database
+# Star databases
 
-From the data of the flat table of the variable `transactions_ft`, we are going to carry out a multidimensional design.
+From the data in the flat table (variable `transactions_ft`), we are going to carry out a multidimensional design.
 
 We will start by exploring part of the data to get to know it better.
 
 ## Data exploration
 
-The *transactions_1k* table has the *TransactionID* field as its primary key. We check that this field is a surrogate key, autonumber. We check that this field is a surrogate key, autonumber, as shown below.
+The *transactions_1k* table has the *TransactionID* field as its primary key. We check that this field is a surrogate key, autonumber, as shown below.
 
 ```{r}
 length(unique(transactions_ft$TransactionID))
@@ -115,7 +118,7 @@ min(transactions_ft$TransactionID)
 max(transactions_ft$TransactionID)
 ```
 
-As would be expected, in this case, a transaction would correspond to the payment of a customer, by means of a card, for one or several products at a gas station and a specific moment.
+As would be expected, a transaction would correspond to the payment of a customer, by means of a card, for one or several products at a gas station and at a specific moment.
 
 We can verify that this is true by obtaining the number of distinct instances for the combinations of attributes of interest.
 
@@ -125,66 +128,71 @@ nrow(unique(transactions_ft[, c("Date", "Time", "CardID")]))
 nrow(unique(transactions_ft[, c("Date", "Time", "CardID", "ProductID")]))
 ```
 
-We deduce that a customer has paid at the same time with more than one card; this has been possible because the time is given in minutes. By adding the product to the combination of attributes that includes card, it is observed that all the rows of the table are obtained.
+In view of these results, we deduce that a customer has paid at the same time with more than one card: This has been possible because the time is given in minutes. By adding the product to the combination of attributes that includes card, it is observed that all the rows of the table are obtained.
 
 In view of this, we consider that:
 
-  - A transaction is identified by a card and an instant in time. 
-  - A transaction can include several products, each row is a transaction line.
-
-Without loss of generality, let's assume that the card number is not needed to analyse the data (the customer is enough) and we are only interested in the hour in which the transaction occurs, not the specific minute. For the latter, we are going to add an *Hour* field obtained from the *Time* field.
-
-```{r}
-transactions_ft <- transactions_ft |> 
-  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))
-```
+  - A transaction is identified by a card and an instant of time in which a payment is made.
+  - A transaction can include several products, each row is a transaction line that is defined by a transaction and a product.
 
 There is nothing remarkable in the rest of the data.
 
-## Star schema
+## Design with the finest possible granularity
 
-We define the star schema by distributing the attributes into facts and dimensions.
+First, we are going to make a design with the finest granularity.
+
+### Star schema
+
+We define the star schema by distributing the flat table attributes into facts and dimensions.
 
 ```{r setup}
 library(rolap)
 
-s <- star_schema() |>
-  define_facts(name = "Transaction Line",
-    measures = c("Amount", "Price"),
-    nrow_agg = "Rows") |>
-  define_dimension(name = "Transaction",
+s_finest <- rolap::star_schema() |>
+  rolap::define_facts(name = "Transaction Line",
+    measures = c("Amount", "Price")) |>
+  rolap::define_dimension(name = "Transaction",
     attributes = c("Date", "Time", "CardID")) |>
-  define_dimension(name = "Who",
-    attributes = c("CustomerID", "Segment.customers",
+  rolap::define_dimension(name = "Who",
+    attributes = c("CardID", "CustomerID", "Segment.customers",
                    "Currency")) |>
-  define_dimension(name = "Where",
+  rolap::define_dimension(name = "Where",
     attributes = c("GasStationID", "ChainID", "Country",
                    "Segment.gasstations")) |>
-  define_dimension(name = "When",
-    attributes = c("Date", "Hour")) |>
-  define_dimension(name = "What",
+  rolap::define_dimension(name = "When",
+    attributes = c("Date", "Time")) |>
+  rolap::define_dimension(name = "What",
     attributes = c("Description"))
 
 ```
 
-The most remarkable thing about the definition is that the facts correspond to a transaction line, each line corresponding to a product in the transaction. On the other hand, each transaction is identified by the attributes *Date*, *Time* and *CardID*. Since these concepts are not needed for analysis or are already represented in other dimensions, the surrogate key (foreign key in the facts) would be enough to represent the transaction, so it would be a ***degenerate dimension*** (the dimension table is not needed, the foreign key in the facts is enough).
+The most remarkable thing about the definition is that the facts correspond to a transaction line, each line corresponding to a product in the transaction. On the other hand, each transaction is identified by the attributes *Date*, *Time* and *CardID*. Since these concepts are already represented in other dimensions, the surrogate key (foreign key in the facts) would be enough to represent the transaction, so *Transaction* would be a ***degenerate dimension*** (the dimension table is not needed, the foreign key in the facts is enough).
 
 Subsequently, the dimensions could be enriched with other attributes available in the transactional system. In this case, we are going to leave them as they are.
 
-## Star database 
+### Star database
+
+From the star schema and the flat table, we obtain a star database with the tables of the dimensions and facts.
 
 ```{r}
-db <- star_database(s, transactions_ft) |>
-  snake_case() |>
-  set_dimension_attribute_names(
+db_finest <- rolap::star_database(s_finest, transactions_ft)
+```
+
+We can transform the database by renaming the measures of the facts and/or the attributes of the dimensions and also, if we are going to work in a RDBMS, transforming them to snake case style.
+
+```{r}
+db_finest <- db_finest |>
+  rolap::snake_case() |>
+  rolap::set_dimension_attribute_names(
     name = "who",
     attributes = c(
+      "card",
       "customer",
       "segment",
       "currency"
     )
   ) |>
-  set_dimension_attribute_names(
+  rolap::set_dimension_attribute_names(
     name = "where",
     attributes = c(
       "gas_station",
@@ -193,7 +201,7 @@ db <- star_database(s, transactions_ft) |>
       "segment"
     )
   ) |>
-  set_dimension_attribute_names(
+  rolap::set_dimension_attribute_names(
     name = "what",
     attributes = c(
       "product"
@@ -202,46 +210,153 @@ db <- star_database(s, transactions_ft) |>
 ```
 
 
+### Presentation of the result
 
+For easier access to the result tables, we are going to transform them into a list of `tibble` objects and show their names and number of instances.
 
 ```{r}
-db_tl <- db |>
-  as_tibble_list()
+db_tl <- db_finest |>
+  rolap::as_tibble_list()
 
+names <- names(db_tl)
 for (i in seq_along(db_tl)){
-  cat(sprintf("name: %s, nrow: %d\n", names(db_tl)[i], nrow(db_tl[[i]])))
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
 }
-
 ```
 
-
+To represent the result graphically, we export the star database in the form of a `dm` object. In addition, we select the tables of the model: All except the table of the degenerate dimension.
 
 ```{r}
-db_dm <- db |>
-  as_dm_class(pk_facts = FALSE)
+db_dm <- db_finest |>
+  rolap::as_dm_class(pk_facts = FALSE)
 
-db_sel_dm <-
+db_finest_dm <-
   db_dm[c('transaction_line', 'who', 'where', 'when', 'what')]
 ```
 
+Below is the database schema.
+
 ```{r}
-db_sel_dm |> 
-  dm::dm_draw(rankdir = "LR", view_type = "all")
+db_finest_dm |> 
+  dm::dm_draw(view_type = "all")
+```
+
+It can be seen that a new measure has been added to the fact table (*nrow_agg*), this measure, for each row, indicates the number of rows in the original table from which it was obtained. In the definition of the facts you can indicate a specific name for it. In this case, each row corresponds to a row in the original table, therefore, all the values must be 1, as can be verified below.
+
+```{r}
+max(db_tl[['transaction_line']]$nrow_agg)
+sum(db_tl[['transaction_line']]$nrow_agg)
 ```
 
 
-## Store tables in a relational database
+### Store tables in a relational database
 
-In the example below, a local *SQLite* database is used to demonstrate how to store the model in a database. `dm` works with any RDBMS supported by `DBI`.
+Once we have the star database tables in a `dm` object, exporting them to any RDBMS is immediate. In the example below, a local *SQLite* database is used. `dm` works with any RDBMS supported by `DBI`.
 
 ```{r}
 my_db <- DBI::dbConnect(RSQLite::SQLite())
-my_db_dm <- dm::copy_dm_to(my_db, db_sel_dm)
-my_db_dm
+my_db_finest_dm <- dm::copy_dm_to(my_db, db_finest_dm)
+my_db_finest_dm
 DBI::dbDisconnect(my_db)
 ```
 
 
+## Design with a summary of the data
+
+Next we are going to perform a multidimensional design with a coarser granularity. Let's assume that we are only interested in the hour in which the transaction occurs, not the specific minute: We are going to add an *Hour* field obtained from the *Time* field.
+
+```{r}
+transactions_ft <- transactions_ft |> 
+  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))
+```
+
+
+### Star schema
+
+To design the star schema, for each dimension we exclusively select the attributes that we consider necessary.
+
+
+```{r}
+s_summary <- rolap::star_schema() |>
+  rolap::define_facts(name = "Transaction Summary",
+    measures = c("Amount", "Price"),
+    nrow_agg = "Transactions") |>
+  rolap::define_dimension(name = "Who",
+    attributes = c("Segment.customers",
+                   "Currency")) |>
+  rolap::define_dimension(name = "Where",
+    attributes = c("ChainID", "Country",
+                   "Segment.gasstations")) |>
+  rolap::define_dimension(name = "When",
+    attributes = c("Date", "Hour")) |>
+  rolap::define_dimension(name = "What",
+    attributes = c("Description"))
+```
+
+We have assumed that we are not interested in individual transactions but in a summary of them; neither the particular data of the clients, but only the associated segment and currency. Finally, we are not interested in gas stations either, but only the chain to which they belong and the rest of the dimension attributes.
+
+Each measure can be associated with a specific aggregation function, by default it is the sum which, in this case, can be considered adequate since adding to group the data the meaning of the measures is preserved (understanding *Price* as the total amount of the sale operation). Otherwise, it is advisable to define measures obtained from those available so that this principle is fulfilled.
+
+Finally, indicate that this time a specific name has been assigned to the measure of the number of rows added: *Transactions*.
+
+### Star database
+
+As before, from the star schema and the flat table, we obtain a star database with the tables of the dimensions and facts. We also transform the names of dimension attributes.
+
+```{r}
+db_summary <- rolap::star_database(s_summary, transactions_ft) |>
+  rolap::snake_case() |>
+  rolap::set_dimension_attribute_names(
+    name = "who",
+    attributes = c(
+      "segment",
+      "currency"
+    )
+  ) |>
+  rolap::set_dimension_attribute_names(
+    name = "where",
+    attributes = c(
+      "chain",
+      "country",
+      "segment"
+    )
+  ) |>
+  rolap::set_dimension_attribute_names(
+    name = "what",
+    attributes = c(
+      "product"
+    )
+  )
+```
+
+Finally, we present the result obtained showing the names and number of rows of the tables. We check that the number of rows added matches the total number of rows in the initial flat table.
+
+```{r}
+db_tl <- db_summary |>
+  rolap::as_tibble_list()
+
+names <- names(db_tl)
+for (i in seq_along(db_tl)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+}
+
+sum(db_tl[['transaction_summary']]$transactions)
+```
+
+We also show its graphic representation.
+
+```{r}
+db_summary_dm <- db_summary |>
+  rolap::as_dm_class(pk_facts = FALSE)
+
+db_summary_dm |> 
+  dm::dm_draw(view_type = "all")
+```
+
+Tables can be stored directly in any RDBMS, just as we have done before.
 
 # Conclusions
 
+In this document we have started from transactional data in a RDBMS and, through the `dm` and `rolap` packages, we have obtained two star databases also in RDBMS. The `dm` package facilitates access to the RDBMS, while the `rolap` package supports the definition of the necessary transformations in this context.
+
+The initial data schema is very close to a star schema although, as explained in the design section, it is conceptually different (particularly the concepts of transaction and transaction line). The simple structure of this schema has only facilitated the process of obtaining the starting flat table to work with the `rolap` package.
