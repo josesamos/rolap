@@ -1,0 +1,147 @@
+---
+title: "Accessing relational databases through the dm package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Accessing relational databases through the dm package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Introduction
+
+The main objective of this document is to show how to access transactional data in RDBMS (*Relational Database Management Systems*) and store the star database generated from it in another relational database. Access to the databases is done through the [`dm`](https://cran.r-project.org/package=dm) package, transformations using the `rolap` package. Additionally, a case of multidimensional design from real data is shown.
+
+
+
+# Transactional data
+
+We will build on a dataset with transactional data from Czech debit card company specialising on payments at petrol pumps called [CCS](https://relational.fit.cvut.cz/dataset/CCS), publicly available in a RDBMS.
+
+We make a connection by following the instructions they offer, as shown below.
+
+```{r}
+library(RMariaDB)
+
+ccs_db <- dbConnect(
+  MariaDB(),
+  username = "guest",
+  password = "relational",
+  dbname = "ccs",
+  host = "relational.fit.cvut.cz"
+)
+```
+
+From the connection, we can obtain a `dm` object, indicating in the creation function that it take the keys defined in the database.
+
+```{r, message=FALSE}
+library(dm)
+
+ccs_dm <- dm_from_con(ccs_db, learn_keys = TRUE)
+```
+
+Using the following function we can display the database tables with all their fields.
+
+```{r}
+ccs_dm |>
+  dm_draw(view_type = "all")
+```
+
+We can access tables as if they were part of a list. If we access the *transactions* table we can see that it has no data, the data is in the *transactions_1k* table hat is not related to the other tables.
+
+```{r}
+ccs_dm$transactions
+```
+
+On the other hand, the *yearmonth* table contains historical customer data, which we will not use in this example.
+
+Therefore, what we do is generate a new `dm` object by selecting the tables that we are going to use and relating table *transactions_1k* to the rest of the tables. These operations are performed below.
+
+```{r}
+ccs_sel_dm <-
+  ccs_dm[c('transactions_1k', 'customers', 'gasstations', 'products')] |>
+  dm_add_fk(transactions_1k, CustomerID, customers) |>
+  dm_add_fk(transactions_1k, GasStationID, gasstations) |>
+  dm_add_fk(transactions_1k, ProductID, products)
+```
+
+The resulting database schema is shown below.
+
+```{r}
+ccs_sel_dm |>
+  dm_draw(view_type = "all")
+```
+
+To generate a flat table from the database tables we can use the function offered by the `dm` package, as shown below.
+
+```{r, message=FALSE}
+transactions_ft <- ccs_sel_dm |>
+  dm_flatten_to_tbl(transactions_1k, .recursive = TRUE) |>
+  collect()
+
+nrow(transactions_ft)
+dput(colnames(transactions_ft))
+```
+
+With this we already have in the `transactions_ft` variable the flat table with the transactional data that we are going to use. In the list of fields of the result table, we can see that the fields with the same name that were in several tables are now prefixed with the name of the table they came from.
+
+We can then disconnect from the database.
+
+```{r}
+DBI::dbDisconnect(ccs_db)
+```
+
+
+# Multidimensional design
+
+From the data of the flat table of the variable `transactions_ft`, we are going to carry out a multidimensional design.
+
+We will start by exploring part of the data to get to know it better.
+
+## Data exploration
+
+The *transactions_1k* table has the *TransactionID* field as its primary key. We check that this field is a surrogate key, autonumber. We check that this field is a surrogate key, autonumber, as shown below.
+
+```{r}
+length(unique(transactions_ft$TransactionID))
+min(transactions_ft$TransactionID)
+max(transactions_ft$TransactionID)
+```
+
+As would be expected, in this case, a transaction would correspond to the payment of a customer, by means of a card, for one or several products at a gas station and a specific moment.
+
+We can verify that this is true by obtaining the number of distinct instances for the combinations of attributes of interest.
+
+```{r}
+nrow(unique(transactions_ft[, c("Date", "Time", "CustomerID")]))
+nrow(unique(transactions_ft[, c("Date", "Time", "CardID")]))
+nrow(unique(transactions_ft[, c("Date", "Time", "CardID", "ProductID")]))
+```
+
+We deduce that a customer has paid at the same time with more than one card; this has been possible because the time is given in minutes. By including the product in the combination of attributes that we are considering, it is observed that all the rows of the table are obtained.
+
+In view of this, we decide that the card is not relevant and consider that:
+
+  - A transaction is identified by a customer and an instant in time. 
+  - A transaction can include several products.
+
+
+```{r setup}
+library(rolap)
+```
+
+
+# Star database 
+
+# Export of results
+
+
+# Conclusions
+

@@ -420,9 +420,9 @@ ct |>
   as_tibble_list()
 ```
 
-### `md` object
+### `dm` object
 
-The [dm](https://cran.r-project.org/package=dm) package allows you to link tables implemented using the `tibble` class in R with tables in RDBMS.
+The [`dm`](https://cran.r-project.org/package=dm) package allows you to link tables implemented using the `tibble` class in R with tables in RDBMS.
 
 The following example shows the transformation of a `star_database` object to an object of class `dm`.
 
