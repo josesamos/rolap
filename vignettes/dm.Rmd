@@ -99,7 +99,7 @@ DBI::dbDisconnect(ccs_db)
 ```
 
 
-# Multidimensional design
+# Star database
 
 From the data of the flat table of the variable `transactions_ft`, we are going to carry out a multidimensional design.
 
@@ -125,22 +125,122 @@ nrow(unique(transactions_ft[, c("Date", "Time", "CardID")]))
 nrow(unique(transactions_ft[, c("Date", "Time", "CardID", "ProductID")]))
 ```
 
-We deduce that a customer has paid at the same time with more than one card; this has been possible because the time is given in minutes. By including the product in the combination of attributes that we are considering, it is observed that all the rows of the table are obtained.
+We deduce that a customer has paid at the same time with more than one card; this has been possible because the time is given in minutes. By adding the product to the combination of attributes that includes card, it is observed that all the rows of the table are obtained.
 
-In view of this, we decide that the card is not relevant and consider that:
+In view of this, we consider that:
 
-  - A transaction is identified by a customer and an instant in time. 
-  - A transaction can include several products.
+  - A transaction is identified by a card and an instant in time. 
+  - A transaction can include several products, each row is a transaction line.
 
+Without loss of generality, let's assume that the card number is not needed to analyse the data (the customer is enough) and we are only interested in the hour in which the transaction occurs, not the specific minute. For the latter, we are going to add an *Hour* field obtained from the *Time* field.
+
+```{r}
+transactions_ft <- transactions_ft |> 
+  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))
+```
+
+There is nothing remarkable in the rest of the data.
+
+## Star schema
+
+We define the star schema by distributing the attributes into facts and dimensions.
 
 ```{r setup}
 library(rolap)
+
+s <- star_schema() |>
+  define_facts(name = "Transaction Line",
+    measures = c("Amount", "Price"),
+    nrow_agg = "Rows") |>
+  define_dimension(name = "Transaction",
+    attributes = c("Date", "Time", "CardID")) |>
+  define_dimension(name = "Who",
+    attributes = c("CustomerID", "Segment.customers",
+                   "Currency")) |>
+  define_dimension(name = "Where",
+    attributes = c("GasStationID", "ChainID", "Country",
+                   "Segment.gasstations")) |>
+  define_dimension(name = "When",
+    attributes = c("Date", "Hour")) |>
+  define_dimension(name = "What",
+    attributes = c("Description"))
+
+```
+
+The most remarkable thing about the definition is that the facts correspond to a transaction line, each line corresponding to a product in the transaction. On the other hand, each transaction is identified by the attributes *Date*, *Time* and *CardID*. Since these concepts are not needed for analysis or are already represented in other dimensions, the surrogate key (foreign key in the facts) would be enough to represent the transaction, so it would be a ***degenerate dimension*** (the dimension table is not needed, the foreign key in the facts is enough).
+
+Subsequently, the dimensions could be enriched with other attributes available in the transactional system. In this case, we are going to leave them as they are.
+
+## Star database 
+
+```{r}
+db <- star_database(s, transactions_ft) |>
+  snake_case() |>
+  set_dimension_attribute_names(
+    name = "who",
+    attributes = c(
+      "customer",
+      "segment",
+      "currency"
+    )
+  ) |>
+  set_dimension_attribute_names(
+    name = "where",
+    attributes = c(
+      "gas_station",
+      "chain",
+      "country",
+      "segment"
+    )
+  ) |>
+  set_dimension_attribute_names(
+    name = "what",
+    attributes = c(
+      "product"
+    )
+  )
 ```
 
 
-# Star database 
 
-# Export of results
+
+```{r}
+db_tl <- db |>
+  as_tibble_list()
+
+for (i in seq_along(db_tl)){
+  cat(sprintf("name: %s, nrow: %d\n", names(db_tl)[i], nrow(db_tl[[i]])))
+}
+
+```
+
+
+
+```{r}
+db_dm <- db |>
+  as_dm_class(pk_facts = FALSE)
+
+db_sel_dm <-
+  db_dm[c('transaction_line', 'who', 'where', 'when', 'what')]
+```
+
+```{r}
+db_sel_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+
+## Store tables in a relational database
+
+In the example below, a local *SQLite* database is used to demonstrate how to store the model in a database. `dm` works with any RDBMS supported by `DBI`.
+
+```{r}
+my_db <- DBI::dbConnect(RSQLite::SQLite())
+my_db_dm <- dm::copy_dm_to(my_db, db_sel_dm)
+my_db_dm
+DBI::dbDisconnect(my_db)
+```
+
 
 
 # Conclusions
