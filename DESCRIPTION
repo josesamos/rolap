@@ -36,6 +36,7 @@ Suggests:
     DiagrammeRsvg,
     knitr,
     pander,
+    RMariaDB,
     rmarkdown,
     RSQLite,
     stringr,
