@@ -7,6 +7,7 @@
 fact_table(
   name = NULL,
   surrogate_keys = NULL,
+  agg = NULL,
   dim_int_names = NULL,
   instances = NULL
 )
@@ -15,6 +16,8 @@ fact_table(
 \item{name}{A string, fact name.}
 
 \item{surrogate_keys}{A vector of strings, surrogate key names.}
+
+\item{agg}{A vector of strings, aggregation functions.}
 
 \item{dim_int_names}{A vector of strings, internal names of dimensions.}
 

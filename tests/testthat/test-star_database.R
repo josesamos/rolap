@@ -44,6 +44,11 @@ test_that("star_database() define a a star database", {
           list(
             name = "MRS Cause",
             surrogate_keys = c("when_key", "where_key"),
+            agg = c(
+              `Pneumonia and Influenza Deaths` = "SUM",
+              `All Deaths` = "SUM",
+              nrow_agg = "SUM"
+            ),
             dim_int_names = c("when",
                               "where"),
             table = structure(
@@ -59,7 +64,7 @@ test_that("star_database() define a a star database", {
               ),
               class = c("tbl_df",
                         "tbl", "data.frame"),
-              row.names = c(NA, -6L)
+              row.names = c(NA,-6L)
             )
           ),
           class = "fact_table"
@@ -74,7 +79,7 @@ test_that("star_database() define a a star database", {
                   when_key = 1:3,
                   Year = c("1962", "1963", "1964")
                 ),
-                row.names = c(NA, -3L),
+                row.names = c(NA,-3L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -92,7 +97,7 @@ test_that("star_database() define a a star database", {
                              "1"),
                   State = c("CT", "MA")
                 ),
-                row.names = c(NA, -2L),
+                row.names = c(NA,-2L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -147,6 +152,7 @@ test_that("star_database() define a a star database", {
           list(
             name = "MRS Cause",
             surrogate_keys = c("when_key", "where_key"),
+            agg = c(nrow_agg = "SUM"),
             dim_int_names = c("when",
                               "where"),
             table = structure(
@@ -158,7 +164,7 @@ test_that("star_database() define a a star database", {
               ),
               class = c("tbl_df",
                         "tbl", "data.frame"),
-              row.names = c(NA, -6L)
+              row.names = c(NA,-6L)
             )
           ),
           class = "fact_table"
@@ -173,7 +179,7 @@ test_that("star_database() define a a star database", {
                   when_key = 1:3,
                   Year = c("1962", "1963", "1964")
                 ),
-                row.names = c(NA, -3L),
+                row.names = c(NA,-3L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -191,7 +197,7 @@ test_that("star_database() define a a star database", {
                              "1"),
                   State = c("CT", "MA")
                 ),
-                row.names = c(NA, -2L),
+                row.names = c(NA,-2L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -253,6 +259,11 @@ test_that("snake_case() transform a a star database in snake case", {
           list(
             name = "mrs_cause",
             surrogate_keys = c("when_key", "where_key"),
+            agg = c(
+              `Pneumonia and Influenza Deaths` = "SUM",
+              `All Deaths` = "SUM",
+              nrow_agg = "SUM"
+            ),
             dim_int_names = c("when",
                               "where"),
             table = structure(
@@ -268,7 +279,7 @@ test_that("snake_case() transform a a star database in snake case", {
               ),
               class = c("tbl_df",
                         "tbl", "data.frame"),
-              row.names = c(NA, -6L)
+              row.names = c(NA,-6L)
             )
           ),
           class = "fact_table"
@@ -283,7 +294,7 @@ test_that("snake_case() transform a a star database in snake case", {
                   when_key = 1:3,
                   year = c("1962", "1963", "1964")
                 ),
-                row.names = c(NA, -3L),
+                row.names = c(NA,-3L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -301,7 +312,7 @@ test_that("snake_case() transform a a star database in snake case", {
                              "1"),
                   state = c("CT", "MA")
                 ),
-                row.names = c(NA, -2L),
+                row.names = c(NA,-2L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -330,7 +341,7 @@ test_that("as_tibble_list() export star_database as a list of tibbles", {
     list(
       when = structure(
         list(when_key = 1:2, year = c("1962", "1963")),
-        row.names = c(NA, -2L),
+        row.names = c(NA,-2L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
       where = structure(
@@ -341,7 +352,7 @@ test_that("as_tibble_list() export star_database as a list of tibbles", {
                     "CT", "MA"),
           city = c("Bridgeport", "Hartford", "Boston")
         ),
-        row.names = c(NA, -3L),
+        row.names = c(NA,-3L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
       mrs_cause = structure(
@@ -357,7 +368,7 @@ test_that("as_tibble_list() export star_database as a list of tibbles", {
         ),
         class = c("tbl_df",
                   "tbl", "data.frame"),
-        row.names = c(NA, -6L)
+        row.names = c(NA,-6L)
       )
     )
   })

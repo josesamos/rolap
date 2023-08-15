@@ -5,22 +5,25 @@
 #'
 #' @param name A string, fact name.
 #' @param surrogate_keys A vector of strings, surrogate key names.
+#' @param agg A vector of strings, aggregation functions.
 #' @param dim_int_names A vector of strings, internal names of dimensions.
 #' @param instances A flat table with the fact instances.
 #'
 #' @return A `fact_table` object.
 #' @keywords internal
-fact_table <- function(name = NULL, surrogate_keys = NULL, dim_int_names = NULL, instances = NULL) {
+fact_table <- function(name = NULL, surrogate_keys = NULL, agg = NULL, dim_int_names = NULL, instances = NULL) {
   # Check the type of the base object
   stopifnot("A tibble with the instances was expected." = tibble::is_tibble(instances))
   stopifnot("Missing table name." = !is.null(name))
   stopifnot("Missing surrogate keys." = !is.null(surrogate_keys))
+  stopifnot("Missing aggregation functions." = !is.null(agg))
   stopifnot("Missing dimension names." = !is.null(dim_int_names))
 
   structure(
     list(
       name = name,
       surrogate_keys = surrogate_keys,
+      agg = agg,
       dim_int_names = dim_int_names,
       table = instances
     ),

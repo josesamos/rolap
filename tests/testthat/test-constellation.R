@@ -23,6 +23,11 @@ test_that("constellation() define constellation", {
           list(
             name = "mrs_cause",
             surrogate_keys = c("when_key", "where_key"),
+            agg = c(
+              `Pneumonia and Influenza Deaths` = "SUM",
+              `All Deaths` = "SUM",
+              nrow_agg = "SUM"
+            ),
             dim_int_names = c("when", "where"),
             table = structure(
               list(
@@ -35,7 +40,7 @@ test_that("constellation() define constellation", {
                                46L, 192L, 276L),
                 nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
               ),
-              row.names = c(NA,-6L),
+              row.names = c(NA, -6L),
               class = c("tbl_df", "tbl",
                         "data.frame")
             )
@@ -47,6 +52,7 @@ test_that("constellation() define constellation", {
             name = "mrs_age",
             surrogate_keys = c("when_key", "where_key",
                                "who_key"),
+            agg = c(`All Deaths` = "SUM", nrow_agg = "SUM"),
             dim_int_names = c("when", "where", "who"),
             table = structure(
               list(
@@ -61,7 +67,7 @@ test_that("constellation() define constellation", {
                 nrow_agg = c(3L, 3L,
                              3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L, 3L, 3L, 3L, 3L, 3L)
               ),
-              row.names = c(NA,-15L),
+              row.names = c(NA, -15L),
               class = c("tbl_df", "tbl", "data.frame")
             )
           ),
@@ -79,7 +85,7 @@ test_that("constellation() define constellation", {
                 year = c("1962",
                          "1963", "1964")
               ),
-              row.names = c(NA,-3L),
+              row.names = c(NA, -3L),
               class = c("tbl_df",
                         "tbl", "data.frame")
             )
@@ -98,7 +104,7 @@ test_that("constellation() define constellation", {
                 city = c("Bridgeport",
                          "Hartford", "Boston", "Cambridge")
               ),
-              row.names = c(NA,-4L),
+              row.names = c(NA, -4L),
               class = c("tbl_df", "tbl", "data.frame")
             )
           ),
@@ -119,15 +125,17 @@ test_that("constellation() define constellation", {
                   "<1 year"
                 )
               ),
-              row.names = c(NA,-5L),
+              row.names = c(NA, -5L),
               class = c("tbl_df", "tbl",
                         "data.frame")
             )
           ),
           class = "dimension_table"
         )
-      ), rpd = list()
-    ), class = "constellation")
+      ),
+      rpd = list()
+    ),
+    class = "constellation")
   })
 })
 
@@ -169,6 +177,11 @@ test_that("constellation() define constellation", {
           list(
             name = "mrs_cause",
             surrogate_keys = c("when_key", "where_key"),
+            agg = c(
+              `Pneumonia and Influenza Deaths` = "SUM",
+              `All Deaths` = "SUM",
+              nrow_agg = "SUM"
+            ),
             dim_int_names = c("when", "where"),
             table = structure(
               list(
@@ -181,7 +194,7 @@ test_that("constellation() define constellation", {
                                46L, 192L, 276L),
                 nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
               ),
-              row.names = c(NA,-6L),
+              row.names = c(NA, -6L),
               class = c("tbl_df", "tbl",
                         "data.frame")
             )
@@ -193,6 +206,7 @@ test_that("constellation() define constellation", {
             name = "mrs_age",
             surrogate_keys = c("when_key", "where_key",
                                "who_key"),
+            agg = c(`All Deaths` = "SUM", nrow_agg = "SUM"),
             dim_int_names = c("when", "where", "who"),
             table = structure(
               list(
@@ -207,7 +221,7 @@ test_that("constellation() define constellation", {
                 nrow_agg = c(3L, 3L,
                              3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L, 3L, 3L, 3L, 3L, 3L)
               ),
-              row.names = c(NA,-15L),
+              row.names = c(NA, -15L),
               class = c("tbl_df", "tbl", "data.frame")
             )
           ),
@@ -218,6 +232,7 @@ test_that("constellation() define constellation", {
             name = "mrs_cause_2",
             surrogate_keys = c("when_key",
                                "where_key"),
+            agg = c(nrow_agg = "SUM"),
             dim_int_names = c("when", "where"),
             table = structure(
               list(
@@ -228,7 +243,7 @@ test_that("constellation() define constellation", {
                 nrow_agg = c(2L, 3L, 1L, 2L, 1L, 1L, 3L, 2L,
                              1L, 3L, 1L)
               ),
-              row.names = c(NA,-11L),
+              row.names = c(NA, -11L),
               class = c("tbl_df",
                         "tbl", "data.frame")
             )
@@ -247,7 +262,7 @@ test_that("constellation() define constellation", {
                 year = c("1962",
                          "1963", "1964")
               ),
-              row.names = c(NA,-3L),
+              row.names = c(NA, -3L),
               class = c("tbl_df",
                         "tbl", "data.frame")
             )
@@ -266,7 +281,7 @@ test_that("constellation() define constellation", {
                 city = c("Bridgeport",
                          "Hartford", "Boston", "Cambridge")
               ),
-              row.names = c(NA,-4L),
+              row.names = c(NA, -4L),
               class = c("tbl_df", "tbl", "data.frame")
             )
           ),
@@ -287,14 +302,16 @@ test_that("constellation() define constellation", {
                   "<1 year"
                 )
               ),
-              row.names = c(NA,-5L),
+              row.names = c(NA, -5L),
               class = c("tbl_df", "tbl", "data.frame")
             )
           ),
           class = "dimension_table"
         )
-      ), rpd = list()
-    ), class = "constellation")
+      ),
+      rpd = list()
+    ),
+    class = "constellation")
   })
 })
 
@@ -324,7 +341,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
           year = c("1962", "1963",
                    "1964")
         ),
-        row.names = c(NA,-3L),
+        row.names = c(NA, -3L),
         class = c("tbl_df", "tbl",
                   "data.frame")
       ),
@@ -337,7 +354,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
           city = c("Bridgeport",
                    "Hartford", "Boston", "Cambridge")
         ),
-        row.names = c(NA,-4L),
+        row.names = c(NA, -4L),
         class = c("tbl_df",
                   "tbl", "data.frame")
       ),
@@ -352,7 +369,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
             "<1 year"
           )
         ),
-        row.names = c(NA,-5L),
+        row.names = c(NA, -5L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
       mrs_cause = structure(
@@ -366,7 +383,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
                          192L, 276L),
           nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
         ),
-        row.names = c(NA,-6L),
+        row.names = c(NA, -6L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
       mrs_age = structure(
@@ -383,7 +400,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
           nrow_agg = c(3L, 3L, 3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L,
                        3L, 3L, 3L, 3L, 3L)
         ),
-        row.names = c(NA,-15L),
+        row.names = c(NA, -15L),
         class = c("tbl_df",
                   "tbl", "data.frame")
       )

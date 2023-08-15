@@ -45,6 +45,17 @@ star_database <- function(schema, instances, unknown_value = NULL) {
     stopifnot("Measures must be of one of the numeric types." = measure_type %in% c("integer", "double", "integer64", "numeric"))
   }
 
+  # default agg function
+  agg_functions <- get_agg_functions(schema$facts[[1]])
+  if (is.null(agg_functions)) {
+    agg_functions <-  rep("SUM", length(measures))
+  }
+  # add the new measure to count the number of rows aggregated
+  nrow_agg <- get_nrow_agg(schema$facts[[1]])
+  if (is.null(nrow_agg)) {
+    nrow_agg <- 'nrow_agg'
+  }
+
   # create the structure for instances
   db <-
     structure(list(
@@ -85,13 +96,18 @@ star_database <- function(schema, instances, unknown_value = NULL) {
     instances,
     keys,
     measures,
-    get_agg_functions(schema$facts[[1]]),
-    get_nrow_agg(schema$facts[[1]])
+    agg_functions,
+    nrow_agg
   )
+
+  agg <- c(agg_functions, "SUM")
+  names(agg) <- c(measures, nrow_agg)
+
   db$facts[1] <-
     list(fact_table(
       get_fact_name(schema$fact[[1]]),
       keys,
+      agg,
       names(schema$dimensions),
       instances
     ))

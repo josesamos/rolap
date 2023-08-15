@@ -48,13 +48,6 @@ prepare_to_join <- function(instances, unknown_value) {
 #'
 #' @keywords internal
 group_by_keys <- function(instances, keys, measures, agg_functions, nrow_agg) {
-  if (is.null(agg_functions)) {
-    agg_functions <-  rep("SUM", length(measures))
-  }
-  # add the new measure to count the number of rows aggregated
-  if (is.null(nrow_agg)) {
-    nrow_agg <- 'nrow_agg'
-  }
   instances <- tibble::add_column(instances, !!(nrow_agg) := as.integer(1))
   measures <- c(measures, nrow_agg)
   agg_functions <- c(agg_functions, "SUM")
