@@ -33,7 +33,9 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   instance_attributes <- names(instances)
   attributes <- get_attribute_names(schema)
   for (attribute in attributes) {
-    stopifnot("Schema attribute not defined on instances." = attribute %in% instance_attributes)
+    if (!(attribute %in% instance_attributes)) {
+      stop(sprintf("The schema attribute '%s' is not defined on instances.", attribute))
+    }
   }
   measures <- get_measure_names(schema)
   for (measure in measures) {

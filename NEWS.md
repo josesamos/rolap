@@ -1,4 +1,6 @@
 # rolap (development version)
+* Aggregation functions in instances struct for future operations
+* Vignette about md and rolap
 
 # rolap 2.1.0
 * Definition of role-playing and role dimensions (with explanatory vignette): `role_playing_dimension()` and `get_role_playing_dimension_names()` functions.
