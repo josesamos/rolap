@@ -47,11 +47,14 @@ star_database <- function(schema, instances, unknown_value = NULL) {
 
   # create the structure for instances
   db <-
-    list(
+    structure(list(
+      name = "star_database",
       facts = vector("list", length = length(schema$facts)),
       dimensions =  vector("list", length = length(schema$dimensions)),
       rpd = list()
-    )
+    ),
+    class = "constellation")
+
   names(db$facts) <- names(schema$facts)
   names(db$dimensions) <- names(schema$dimensions)
 
