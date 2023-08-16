@@ -79,8 +79,6 @@ constellation <- function(name = NULL, stars = NULL) {
       }
     }
   }
-  browser()
-
   for (dn in names(dim_freq[dim_freq > 1])) {
     to_conform <- vector("list", length = dim_freq[dn])
     i <- 1
@@ -106,16 +104,12 @@ constellation <- function(name = NULL, stars = NULL) {
             )
         }
       }
-      if (i > dim_freq[dn]) {
-        break
-      }
     }
 
     dimensions[[dn]] <- conform_dimensions(to_conform)
 
     # join new dimension to facts
     for (f in seq_along(facts)) {
-      i <- 1
       if (dn %in% facts[[f]]$dim_int_names) {
         facts[[f]]$table <-
           dplyr::select(
@@ -123,10 +117,6 @@ constellation <- function(name = NULL, stars = NULL) {
                               dimensions[[dn]]$table,
                               by = attributes), -tidyselect::all_of(attributes)
           )
-        i <- i + 1
-      }
-      if (i > dim_freq[dn]) {
-        break
       }
     }
   }
