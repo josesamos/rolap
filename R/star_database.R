@@ -563,23 +563,26 @@ get_similar_instances.star_database <- function(db, name) {
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   table <- db$dimensions[[name]]$table
   table <- data.frame(table[, colnames(table)[-1]], stringsAsFactors = FALSE)
-  table <- lapply(table, function(x) base::iconv (x, to="ASCII//TRANSLIT"))
-  table <- lapply(table, tolower)
-  table <- lapply(table, snakecase::to_snake_case)
-  table <- lapply(table, function(x) base::gsub("_", "", x))
-  table <- data.frame(table)
-
+  # in one column
   df_args <- c(table, sep="")
   table <- do.call(paste, df_args)
+  # clean values
+  table <- iconv(table, to="ASCII//TRANSLIT")
+  table <- tolower(table)
+  table <- snakecase::to_snake_case(table)
+  table <- gsub("_", "", table)
+  # id and value
   t_id <- data.frame(id = as.vector(db$dimensions[[name]]$table[1]), value = table)
   names(t_id) <- c("id", "value")
+  # value frequency
   t_freq <- table(table)
   t_freq <- t_freq[t_freq > 1]
+  # repeated values
   n_freq <- names(t_freq)
   res <- list()
   for (i in seq_along(n_freq)) {
-    r <- t_id$id[t_id$value == n_freq[i]]
-    v <- db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r, ]
+    id <- t_id$id[t_id$value == n_freq[i]]
+    v <- db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == id, ]
     res <- c(res, list(v))
   }
   res

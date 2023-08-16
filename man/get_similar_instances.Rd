@@ -15,7 +15,7 @@ get_similar_instances(db, name)
 \item{name}{A string, dimension name.}
 }
 \value{
-A vector of strings, attribute names.
+A vector of 'tibble' objects with similar instances.
 }
 \description{
 Obtain the names of the attributes of a dimension.
