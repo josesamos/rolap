@@ -39,12 +39,16 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   }
   measures <- get_measure_names(schema)
   for (measure in measures) {
-    stopifnot("Fact measure not defined on instances." = measure %in% instance_attributes)
+    if (!(measure %in% instance_attributes)) {
+      stop(sprintf("The fact measure '%s' is not defined on instances.", measure))
+    }
   }
   measure_types <- dplyr::summarise_all(instances[, measures], class)
   for (measure_type in seq_along(measure_types)) {
     measure_type <- measure_types[[measure_type]][1]
-    stopifnot("Measures must be of one of the numeric types." = measure_type %in% c("integer", "double", "integer64", "numeric"))
+    if (!(measure_type %in% c("integer", "double", "integer64", "numeric"))) {
+      stop(sprintf("'%s' is not one of the numeric types that measures can have.", measure_type))
+    }
   }
 
   # default agg function
@@ -290,8 +294,12 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
   # they must have the same structure (number of attributes)
   n_att <- 0
   for (d in dims) {
-    stopifnot("rpd and roles have to be dimension names." = d %in% dim_names)
-    stopifnot("rpd or roles previously included in other rpd definitions." = !(d %in% prev_rpd))
+    if (!(d %in% dim_names)) {
+      stop(sprintf("'%s' is not a dimension name.", d))
+    }
+    if (d %in% prev_rpd) {
+      stop(sprintf("'%s' is included in a previous rpd definition.", d))
+    }
     if (n_att == 0) {
       n_att <- ncol(db$instance$dimensions[[d]]$table)
     } else {
