@@ -65,13 +65,15 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   # create the structure for instances
   db <-
     structure(list(
-      name = "star_database",
+      name = names(schema$facts)[1],
+      operations = vector("list", length = length(schema$facts)),
       facts = vector("list", length = length(schema$facts)),
       dimensions =  vector("list", length = length(schema$dimensions)),
       rpd = list()
     ),
-    class = "constellation")
+    class = "star_database")
 
+  names(db$operations) <- names(schema$facts)
   names(db$facts) <- names(schema$facts)
   names(db$dimensions) <- names(schema$dimensions)
 
@@ -81,17 +83,16 @@ star_database <- function(schema, instances, unknown_value = NULL) {
 
   # generate dimension tables
   keys <- c()
+  op <- NULL
   for (d in names(schema$dimensions)) {
     # generate dimension table
-    db$dimensions[d] <-
-      list(dimension_table(
-        get_dimension_name(schema$dimensions[[d]]),
-        get_attribute_names(schema$dimensions[[d]]),
-        instances
-      ))
+    dim_name <- get_dimension_name(schema$dimensions[[d]])
+    dim_attributes <- get_attribute_names(schema$dimensions[[d]])
+    db$dimensions[[d]] <- dimension_table(dim_name, dim_attributes, instances)
     # include surrogate key in instances
     instances <- add_surrogate_key(db$dimensions[[d]], instances)
     keys <- c(keys, get_surrogate_key(db$dimensions[[d]]))
+    op <- add_operation(op, "define_dimension", dim_name, dim_attributes)
   }
 
   # select only keys and measures in instances
@@ -109,16 +110,11 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   agg <- c(agg_functions, "SUM")
   names(agg) <- c(measures, nrow_agg)
 
-  db$facts[1] <-
-    list(fact_table(
-      get_fact_name(schema$fact[[1]]),
-      keys,
-      agg,
-      names(schema$dimensions),
-      instances
-    ))
+  fact_name <- get_fact_name(schema$fact[[1]])
+  db$facts[[1]] <- fact_table(fact_name, keys, agg, names(schema$dimensions), instances)
+  db$operations[[1]] <- add_operation(op, "define_facts", fact_name, names(agg), agg)
 
-  structure(list(schema = schema, instance = db), class = "star_database")
+  db
 }
 
 
@@ -172,12 +168,14 @@ snake_case <- function(db) UseMethod("snake_case")
 #'
 #' @export
 snake_case.star_database <- function(db) {
-  for (f in names(db$instance$facts)) {
-    db$instance$facts[[f]] <- snake_case_table(db$instance$facts[[f]])
+  for (f in names(db$facts)) {
+    db$facts[[f]] <- snake_case_table(db$facts[[f]])
   }
-  for (d in names(db$instance$dimensions)) {
-    db$instance$dimensions[[d]] <- snake_case_table(db$instance$dimensions[[d]])
+  for (d in names(db$dimensions)) {
+    db$dimensions[[d]] <- snake_case_table(db$dimensions[[d]])
   }
+  db$operations[[1]] <- add_operation(db$operations[[1]], "snake_case")
+
   db
 }
 
@@ -185,14 +183,14 @@ snake_case.star_database <- function(db) {
 #'
 #' @export
 as_tibble_list.star_database <- function(db) {
-  as_tibble_list_common(db$instance$dimensions, db$instance$facts)
+  as_tibble_list_common(db$dimensions, db$facts)
 }
 
 #' @rdname as_dm_class
 #'
 #' @export
 as_dm_class.star_database <- function(db, pk_facts = TRUE) {
-  as_dm_class_common(db$instance$dimensions, db$instance$facts, pk_facts)
+  as_dm_class_common(db$dimensions, db$facts, pk_facts)
 }
 
 
@@ -285,11 +283,11 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
   att_names <- unique(att_names)
   dims <- c(rpd, roles)
   # have to be dimensions
-  dim_names <- names(db$instance$dimensions)
+  dim_names <- names(db$dimensions)
   # they should not be previously defined rpd
   prev_rpd <- NULL
-  for (n in names(db$instance$rpd)) {
-    prev_rpd <-c(prev_rpd, db$instance$rpd[[n]])
+  for (n in names(db$rpd)) {
+    prev_rpd <-c(prev_rpd, db$rpd[[n]])
   }
   # they must have the same structure (number of attributes)
   n_att <- 0
@@ -301,9 +299,9 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
       stop(sprintf("'%s' is included in a previous rpd definition.", d))
     }
     if (n_att == 0) {
-      n_att <- ncol(db$instance$dimensions[[d]]$table)
+      n_att <- ncol(db$dimensions[[d]]$table)
     } else {
-      stopifnot("rpd and roles must have the same number of attributes." = n_att == ncol(db$instance$dimensions[[d]]$table))
+      stopifnot("rpd and roles must have the same number of attributes." = n_att == ncol(db$dimensions[[d]]$table))
     }
   }
   if (!is.null(att_names)) {
@@ -312,21 +310,23 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
   # they meet all the requirements
 
   # annotate rpd
-  db$instance$rpd[[rpd]] <- dims
+  db$rpd[[rpd]] <- dims
 
   # rename attributes
   if (rpd_att_names == TRUE) {
-    att_names <- names(db$instance$dimensions[[rpd]]$table)[-1]
+    att_names <- names(db$dimensions[[rpd]]$table)[-1]
   }
   if (!is.null(att_names)) {
     for (d in dims) {
-      names(db$instance$dimensions[[d]]$table) <-
-        c(names(db$instance$dimensions[[d]]$table)[1], att_names)
+      names(db$dimensions[[d]]$table) <-
+        c(names(db$dimensions[[d]]$table)[1], att_names)
     }
+  } else {
+    att_names <- ""
   }
 
-  db$instance <- share_dimensions(db$instance, dims)
-
+  db <- share_dimensions(db, dims)
+  db$operations[[1]] <- add_operation(db$operations[[1]], "role_playing_dimension", rpd, roles, att_names)
   db
 }
 
@@ -430,10 +430,11 @@ set_dimension_attribute_names <- function(db, name, attributes) UseMethod("set_d
 set_dimension_attribute_names.star_database <- function(db, name, attributes) {
   attributes <- unique(attributes)
   stopifnot("Missing dimension name." = !is.null(name))
-  stopifnot("It is not a dimension name." = name %in% names(db$instance$dimensions))
-  att_names <- names(db$instance$dimensions[[name]]$table)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  att_names <- names(db$dimensions[[name]]$table)
   stopifnot("The dimension has a different number of attributes." = length(attributes) == length(att_names) - 1)
-  names(db$instance$dimensions[[name]]$table) <- c(att_names[1], attributes)
+  names(db$dimensions[[name]]$table) <- c(att_names[1], attributes)
+  db$operations[[1]] <- add_operation(db$operations[[1]], "set_dimension_attribute_names", name, attributes)
   db
 }
 
@@ -462,8 +463,8 @@ get_dimension_attribute_names <- function(db, name) UseMethod("get_dimension_att
 #' @export
 get_dimension_attribute_names.star_database <- function(db, name) {
   stopifnot("Missing dimension name." = !is.null(name))
-  stopifnot("It is not a dimension name." = name %in% names(db$instance$dimensions))
-  att_names <- names(db$instance$dimensions[[name]]$table)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  att_names <- names(db$dimensions[[name]]$table)
   att_names[-1]
 }
 
@@ -500,9 +501,10 @@ set_fact_measure_names <- function(db, measures) UseMethod("set_fact_measure_nam
 #' @export
 set_fact_measure_names.star_database <- function(db, measures) {
   measures <- unique(measures)
-  measure_names <- setdiff(names(db$instance$facts[[1]]$table), db$instance$facts[[1]]$surrogate_keys)
+  measure_names <- setdiff(names(db$facts[[1]]$table), db$facts[[1]]$surrogate_keys)
   stopifnot("Facts have a different number of measures." = length(measures) == length(measure_names))
-  names(db$instance$facts[[1]]$table) <- c(db$instance$facts[[1]]$surrogate_keys, measures)
+  names(db$facts[[1]]$table) <- c(db$facts[[1]]$surrogate_keys, measures)
+  db$operations[[1]] <- add_operation(db$operations[[1]], "set_fact_measure_names", names(db$facts), measures)
   db
 }
 
@@ -529,6 +531,6 @@ get_fact_measure_names <- function(db) UseMethod("get_fact_measure_names")
 #'
 #' @export
 get_fact_measure_names.star_database <- function(db) {
-  setdiff(names(db$instance$facts[[1]]$table), db$instance$facts[[1]]$surrogate_keys)
+  setdiff(names(db$facts[[1]]$table), db$facts[[1]]$surrogate_keys)
 }
 

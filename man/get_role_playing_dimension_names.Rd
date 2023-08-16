@@ -2,12 +2,12 @@
 % Please edit documentation in R/constellation.R
 \name{get_role_playing_dimension_names}
 \alias{get_role_playing_dimension_names}
-\alias{get_role_playing_dimension_names.constellation}
+\alias{get_role_playing_dimension_names.star_database}
 \title{Get the names of the role playing dimensions}
 \usage{
 get_role_playing_dimension_names(db)
 
-\method{get_role_playing_dimension_names}{constellation}(db)
+\method{get_role_playing_dimension_names}{star_database}(db)
 }
 \arguments{
 \item{db}{A \code{constellation} object.}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/constellation.R
 \name{constellation}
 \alias{constellation}
-\title{\code{constellation} S3 class}
+\title{Create constellation}
 \usage{
 constellation(name = NULL, stars = NULL)
 }
@@ -12,10 +12,10 @@ constellation(name = NULL, stars = NULL)
 \item{stars}{A list of \code{star_database} objects.}
 }
 \value{
-A \code{constellation} object.
+A \code{star_database} object.
 }
 \description{
-Creates a \code{constellation} object from a list of \code{star_database} objects. All
+Creates a constellation from a list of \code{star_database} objects. All
 dimensions with the same name in the star schemas have to be conformable
 (share the same structure, even though they have different instances).
 }

@@ -15,100 +15,93 @@ test_that("star_database() define a a star database", {
       ))
     star_database(s, ft_num)
   },
-  structure(list(
-    schema = structure(list(
+  structure(
+    list(
+      name = "mrs_cause",
+      operations = list(mrs_cause = structure(
+        list(
+          operation = c("define_dimension", "define_dimension", "define_facts"),
+          name = c("When", "Where", "MRS Cause"),
+          details = c(
+            "Year",
+            "REGION<|>State",
+            "Pneumonia and Influenza Deaths<|>All Deaths<|>nrow_agg"
+          ),
+          details2 = c("", "", "SUM<|>SUM<|>SUM"),
+          order = c(1,
+                    2, 3)
+        ),
+        row.names = c(NA,-3L),
+        class = "data.frame"
+      )),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
-          measures = c("Pneumonia and Influenza Deaths",
-                       "All Deaths"),
-          agg_functions = NULL,
-          nrow_agg = NULL
-        ),
-        class = "fact_schema"
-      )),
-      dimensions = list(
-        when = structure(list(
-          name = "When", attributes = "Year"
-        ), class = "dimension_schema"),
-        where = structure(list(
-          name = "Where", attributes = c("REGION",
-                                         "State")
-        ), class = "dimension_schema")
-      )
-    ), class = "star_schema"),
-    instance = structure(
-      list(
-        name = "star_database",
-        facts = list(mrs_cause = structure(
-          list(
-            name = "MRS Cause",
-            surrogate_keys = c("when_key", "where_key"),
-            agg = c(
-              `Pneumonia and Influenza Deaths` = "SUM",
-              `All Deaths` = "SUM",
-              nrow_agg = "SUM"
-            ),
-            dim_int_names = c("when",
-                              "where"),
-            table = structure(
-              list(
-                when_key = c(1L, 1L,
-                             2L, 2L, 3L, 3L),
-                where_key = c(1L, 2L, 1L, 2L, 1L, 2L),
-                `Pneumonia and Influenza Deaths` = c(14L, 27L, 14L,
-                                                     10L, 11L, 35L),
-                `All Deaths` = c(235L, 594L, 238L, 276L,
-                                 98L, 653L),
-                nrow_agg = c(5L, 3L, 4L, 1L, 2L, 5L)
-              ),
-              class = c("tbl_df",
-                        "tbl", "data.frame"),
-              row.names = c(NA,-6L)
-            )
+          surrogate_keys = c("when_key", "where_key"),
+          agg = c(
+            `Pneumonia and Influenza Deaths` = "SUM",
+            `All Deaths` = "SUM",
+            nrow_agg = "SUM"
           ),
-          class = "fact_table"
-        )),
-        dimensions = list(
-          when = structure(
+          dim_int_names = c("when",
+                            "where"),
+          table = structure(
             list(
-              name = "When",
-              surrogate_key = "when_key",
-              table = structure(
-                list(
-                  when_key = 1:3,
-                  Year = c("1962", "1963", "1964")
-                ),
-                row.names = c(NA,-3L),
-                class = c("tbl_df",
-                          "tbl", "data.frame")
-              )
+              when_key = c(1L, 1L,
+                           2L, 2L, 3L, 3L),
+              where_key = c(1L, 2L, 1L, 2L, 1L, 2L),
+              `Pneumonia and Influenza Deaths` = c(14L, 27L, 14L,
+                                                   10L, 11L, 35L),
+              `All Deaths` = c(235L, 594L, 238L, 276L,
+                               98L, 653L),
+              nrow_agg = c(5L, 3L, 4L, 1L, 2L, 5L)
             ),
-            class = "dimension_table"
-          ),
-          where = structure(
-            list(
-              name = "Where",
-              surrogate_key = "where_key",
-              table = structure(
-                list(
-                  where_key = 1:2,
-                  REGION = c("1",
-                             "1"),
-                  State = c("CT", "MA")
-                ),
-                row.names = c(NA,-2L),
-                class = c("tbl_df", "tbl", "data.frame")
-              )
-            ),
-            class = "dimension_table"
+            class = c("tbl_df",
+                      "tbl", "data.frame"),
+            row.names = c(NA, -6L)
           )
         ),
-        rpd = list()
+        class = "fact_table"
+      )),
+      dimensions = list(
+        when = structure(
+          list(
+            name = "When",
+            surrogate_key = "when_key",
+            table = structure(
+              list(
+                when_key = 1:3,
+                Year = c("1962", "1963", "1964")
+              ),
+              row.names = c(NA, -3L),
+              class = c("tbl_df",
+                        "tbl", "data.frame")
+            )
+          ),
+          class = "dimension_table"
+        ),
+        where = structure(
+          list(
+            name = "Where",
+            surrogate_key = "where_key",
+            table = structure(
+              list(
+                where_key = 1:2,
+                REGION = c("1",
+                           "1"),
+                State = c("CT", "MA")
+              ),
+              row.names = c(NA, -2L),
+              class = c("tbl_df", "tbl", "data.frame")
+            )
+          ),
+          class = "dimension_table"
+        )
       ),
-      class = "constellation"
-    )
-  ), class = "star_database"))
+      rpd = list()
+    ),
+    class = "star_database"
+  ))
 })
 
 test_that("star_database() define a a star database", {
@@ -124,91 +117,81 @@ test_that("star_database() define a a star database", {
       ))
     star_database(s, ft_num)
   },
-  structure(list(
-    schema = structure(list(
+  structure(
+    list(
+      name = "mrs_cause",
+      operations = list(mrs_cause = structure(
+        list(
+          operation = c("define_dimension", "define_dimension", "define_facts"),
+          name = c("When", "Where", "MRS Cause"),
+          details = c("Year",
+                      "REGION<|>State", "nrow_agg"),
+          details2 = c("", "", "SUM"),
+          order = c(1, 2, 3)
+        ),
+        row.names = c(NA,-3L),
+        class = "data.frame"
+      )),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
-          measures = NULL,
-          agg_functions = NULL,
-          nrow_agg = NULL
-        ),
-        class = "fact_schema"
-      )),
-      dimensions = list(
-        when = structure(list(
-          name = "When", attributes = "Year"
-        ), class = "dimension_schema"),
-        where = structure(list(
-          name = "Where", attributes = c("REGION",
-                                         "State")
-        ), class = "dimension_schema")
-      )
-    ), class = "star_schema"),
-    instance = structure(
-      list(
-        name = "star_database",
-        facts = list(mrs_cause = structure(
-          list(
-            name = "MRS Cause",
-            surrogate_keys = c("when_key", "where_key"),
-            agg = c(nrow_agg = "SUM"),
-            dim_int_names = c("when",
-                              "where"),
-            table = structure(
-              list(
-                when_key = c(1L, 1L,
-                             2L, 2L, 3L, 3L),
-                where_key = c(1L, 2L, 1L, 2L, 1L, 2L),
-                nrow_agg = c(5L, 3L, 4L, 1L, 2L, 5L)
-              ),
-              class = c("tbl_df",
-                        "tbl", "data.frame"),
-              row.names = c(NA,-6L)
-            )
-          ),
-          class = "fact_table"
-        )),
-        dimensions = list(
-          when = structure(
+          surrogate_keys = c("when_key", "where_key"),
+          agg = c(nrow_agg = "SUM"),
+          dim_int_names = c("when",
+                            "where"),
+          table = structure(
             list(
-              name = "When",
-              surrogate_key = "when_key",
-              table = structure(
-                list(
-                  when_key = 1:3,
-                  Year = c("1962", "1963", "1964")
-                ),
-                row.names = c(NA,-3L),
-                class = c("tbl_df",
-                          "tbl", "data.frame")
-              )
+              when_key = c(1L, 1L,
+                           2L, 2L, 3L, 3L),
+              where_key = c(1L, 2L, 1L, 2L, 1L, 2L),
+              nrow_agg = c(5L, 3L, 4L, 1L, 2L, 5L)
             ),
-            class = "dimension_table"
-          ),
-          where = structure(
-            list(
-              name = "Where",
-              surrogate_key = "where_key",
-              table = structure(
-                list(
-                  where_key = 1:2,
-                  REGION = c("1",
-                             "1"),
-                  State = c("CT", "MA")
-                ),
-                row.names = c(NA,-2L),
-                class = c("tbl_df", "tbl", "data.frame")
-              )
-            ),
-            class = "dimension_table"
+            class = c("tbl_df",
+                      "tbl", "data.frame"),
+            row.names = c(NA, -6L)
           )
         ),
-        rpd = list()
+        class = "fact_table"
+      )),
+      dimensions = list(
+        when = structure(
+          list(
+            name = "When",
+            surrogate_key = "when_key",
+            table = structure(
+              list(
+                when_key = 1:3,
+                Year = c("1962", "1963", "1964")
+              ),
+              row.names = c(NA, -3L),
+              class = c("tbl_df",
+                        "tbl", "data.frame")
+            )
+          ),
+          class = "dimension_table"
+        ),
+        where = structure(
+          list(
+            name = "Where",
+            surrogate_key = "where_key",
+            table = structure(
+              list(
+                where_key = 1:2,
+                REGION = c("1",
+                           "1"),
+                State = c("CT", "MA")
+              ),
+              row.names = c(NA, -2L),
+              class = c("tbl_df", "tbl", "data.frame")
+            )
+          ),
+          class = "dimension_table"
+        )
       ),
-      class = "constellation"
-    )
-  ), class = "star_database"))
+      rpd = list()
+    ),
+    class = "star_database"
+  ))
 })
 
 
@@ -230,100 +213,99 @@ test_that("snake_case() transform a a star database in snake case", {
       ))
     snake_case(star_database(s, ft_num))
   },
-  structure(list(
-    schema = structure(list(
+  structure(
+    list(
+      name = "mrs_cause",
+      operations = list(mrs_cause = structure(
+        list(
+          operation = c(
+            "define_dimension",
+            "define_dimension",
+            "define_facts",
+            "snake_case"
+          ),
+          name = c("When", "Where", "MRS Cause", ""),
+          details = c(
+            "Year",
+            "REGION<|>State",
+            "Pneumonia and Influenza Deaths<|>All Deaths<|>nrow_agg",
+            ""
+          ),
+          details2 = c("", "", "SUM<|>SUM<|>SUM", ""),
+          order = c(1,
+                    2, 3, 4)
+        ),
+        row.names = c(NA,-4L),
+        class = "data.frame"
+      )),
       facts = list(mrs_cause = structure(
         list(
-          name = "MRS Cause",
-          measures = c("Pneumonia and Influenza Deaths",
-                       "All Deaths"),
-          agg_functions = NULL,
-          nrow_agg = NULL
-        ),
-        class = "fact_schema"
-      )),
-      dimensions = list(
-        when = structure(list(
-          name = "When", attributes = "Year"
-        ), class = "dimension_schema"),
-        where = structure(list(
-          name = "Where", attributes = c("REGION",
-                                         "State")
-        ), class = "dimension_schema")
-      )
-    ), class = "star_schema"),
-    instance = structure(
-      list(
-        name = "star_database",
-        facts = list(mrs_cause = structure(
-          list(
-            name = "mrs_cause",
-            surrogate_keys = c("when_key", "where_key"),
-            agg = c(
-              `Pneumonia and Influenza Deaths` = "SUM",
-              `All Deaths` = "SUM",
-              nrow_agg = "SUM"
-            ),
-            dim_int_names = c("when",
-                              "where"),
-            table = structure(
-              list(
-                when_key = c(1L, 1L,
-                             2L, 2L, 3L, 3L),
-                where_key = c(1L, 2L, 1L, 2L, 1L, 2L),
-                pneumonia_and_influenza_deaths = c(14L, 27L, 14L,
-                                                   10L, 11L, 35L),
-                all_deaths = c(235L, 594L, 238L, 276L,
-                               98L, 653L),
-                nrow_agg = c(5L, 3L, 4L, 1L, 2L, 5L)
-              ),
-              class = c("tbl_df",
-                        "tbl", "data.frame"),
-              row.names = c(NA,-6L)
-            )
+          name = "mrs_cause",
+          surrogate_keys = c("when_key", "where_key"),
+          agg = c(
+            `Pneumonia and Influenza Deaths` = "SUM",
+            `All Deaths` = "SUM",
+            nrow_agg = "SUM"
           ),
-          class = "fact_table"
-        )),
-        dimensions = list(
-          when = structure(
+          dim_int_names = c("when",
+                            "where"),
+          table = structure(
             list(
-              name = "when",
-              surrogate_key = "when_key",
-              table = structure(
-                list(
-                  when_key = 1:3,
-                  year = c("1962", "1963", "1964")
-                ),
-                row.names = c(NA,-3L),
-                class = c("tbl_df",
-                          "tbl", "data.frame")
-              )
+              when_key = c(1L, 1L,
+                           2L, 2L, 3L, 3L),
+              where_key = c(1L, 2L, 1L, 2L, 1L, 2L),
+              pneumonia_and_influenza_deaths = c(14L, 27L, 14L,
+                                                 10L, 11L, 35L),
+              all_deaths = c(235L, 594L, 238L, 276L,
+                             98L, 653L),
+              nrow_agg = c(5L, 3L, 4L, 1L, 2L, 5L)
             ),
-            class = "dimension_table"
-          ),
-          where = structure(
-            list(
-              name = "where",
-              surrogate_key = "where_key",
-              table = structure(
-                list(
-                  where_key = 1:2,
-                  region = c("1",
-                             "1"),
-                  state = c("CT", "MA")
-                ),
-                row.names = c(NA,-2L),
-                class = c("tbl_df", "tbl", "data.frame")
-              )
-            ),
-            class = "dimension_table"
+            class = c("tbl_df",
+                      "tbl", "data.frame"),
+            row.names = c(NA, -6L)
           )
         ),
-        rpd = list()
+        class = "fact_table"
+      )),
+      dimensions = list(
+        when = structure(
+          list(
+            name = "when",
+            surrogate_key = "when_key",
+            table = structure(
+              list(
+                when_key = 1:3,
+                year = c("1962", "1963", "1964")
+              ),
+              row.names = c(NA, -3L),
+              class = c("tbl_df",
+                        "tbl", "data.frame")
+            )
+          ),
+          class = "dimension_table"
+        ),
+        where = structure(
+          list(
+            name = "where",
+            surrogate_key = "where_key",
+            table = structure(
+              list(
+                where_key = 1:2,
+                region = c("1",
+                           "1"),
+                state = c("CT", "MA")
+              ),
+              row.names = c(NA, -2L),
+              class = c("tbl_df", "tbl", "data.frame")
+            )
+          ),
+          class = "dimension_table"
+        )
       ),
-      class = "constellation"
-    )
-  ), class = "star_database"))
+      rpd = list()
+    ),
+    class = "star_database"
+  ))
 })
 
 test_that("as_tibble_list() export star_database as a list of tibbles", {
@@ -380,16 +362,23 @@ test_that("role_playing_dimension() define a rpd", {
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     c(
-      db$instance$rpd,
-      nrow(db$instance$dimensions$when$table),
-      nrow(db$instance$dimensions$when_available$table),
-      nrow(db$instance$dimensions$when_received$table),
-      names(db$instance$dimensions$when$table),
-      names(db$instance$dimensions$when_available$table),
-      names(db$instance$dimensions$when_received$table)
+      db$operations$mrs_cause$operation,
+      db$rpd,
+      nrow(db$dimensions$when$table),
+      nrow(db$dimensions$when_available$table),
+      nrow(db$dimensions$when_received$table),
+      names(db$dimensions$when$table),
+      names(db$dimensions$when_available$table),
+      names(db$dimensions$when_received$table)
     )
   }, {
     list(
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_facts",
+      "role_playing_dimension",
       when = c("when", "when_available", "when_received"),
       15L,
       15L,
@@ -420,16 +409,23 @@ test_that("role_playing_dimension() define a rpd", {
       )
 
     c(
-      db$instance$rpd,
-      nrow(db$instance$dimensions$when$table),
-      nrow(db$instance$dimensions$when_available$table),
-      nrow(db$instance$dimensions$when_received$table),
-      names(db$instance$dimensions$when$table),
-      names(db$instance$dimensions$when_available$table),
-      names(db$instance$dimensions$when_received$table)
+      db$operations$mrs_cause$operation,
+      db$rpd,
+      nrow(db$dimensions$when$table),
+      nrow(db$dimensions$when_available$table),
+      nrow(db$dimensions$when_received$table),
+      names(db$dimensions$when$table),
+      names(db$dimensions$when_available$table),
+      names(db$dimensions$when_received$table)
     )
   }, {
     list(
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_facts",
+      "role_playing_dimension",
       when = c("when", "when_available", "when_received"),
       15L,
       15L,
@@ -460,16 +456,23 @@ test_that("role_playing_dimension() define a rpd", {
       )
 
     c(
-      db$instance$rpd,
-      nrow(db$instance$dimensions$when$table),
-      nrow(db$instance$dimensions$when_available$table),
-      nrow(db$instance$dimensions$when_received$table),
-      names(db$instance$dimensions$when$table),
-      names(db$instance$dimensions$when_available$table),
-      names(db$instance$dimensions$when_received$table)
+      db$operations$mrs_cause$operation,
+      db$rpd,
+      nrow(db$dimensions$when$table),
+      nrow(db$dimensions$when_available$table),
+      nrow(db$dimensions$when_received$table),
+      names(db$dimensions$when$table),
+      names(db$dimensions$when_available$table),
+      names(db$dimensions$when_received$table)
     )
   }, {
     list(
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_facts",
+      "role_playing_dimension",
       when = c("when", "when_available", "when_received"),
       15L,
       15L,
@@ -493,25 +496,47 @@ test_that("role_playing_dimension() define a rpd", {
 test_that("set_dimension_attribute_names() and get_dimension_attribute_names()",
           {
             expect_equal({
-              star_database(mrs_cause_schema, ft_num) |>
+              db <- star_database(mrs_cause_schema, ft_num) |>
                 set_dimension_attribute_names(name = "where",
                                               attributes = c("Region",
                                                              "State",
-                                                             "City")) |>
-                get_dimension_attribute_names(name = "where")
+                                                             "City"))
+              c(
+                db$operations$mrs_cause$operation,
+                db |>
+                  get_dimension_attribute_names(name = "where")
+              )
             }, {
-              c("Region", "State", "City")
+              c(
+                "define_dimension",
+                "define_dimension",
+                "define_facts",
+                "set_dimension_attribute_names",
+                "Region",
+                "State",
+                "City"
+              )
             })
           })
 
 test_that("set_fact_measure_names() and get_fact_measure_names()", {
   expect_equal({
-    star_database(mrs_cause_schema, ft_num) |>
+    db <- star_database(mrs_cause_schema, ft_num) |>
       set_fact_measure_names(measures = c("Pneumonia and Influenza",
                                           "All",
-                                          "Rows Aggregated")) |>
-      get_fact_measure_names()
+                                          "Rows Aggregated"))
+    c(db$operations$mrs_cause$operation,
+      db |>
+        get_fact_measure_names())
   }, {
-    c("Pneumonia and Influenza", "All", "Rows Aggregated")
+    c(
+      "define_dimension",
+      "define_dimension",
+      "define_facts",
+      "set_fact_measure_names",
+      "Pneumonia and Influenza",
+      "All",
+      "Rows Aggregated"
+    )
   })
 })
