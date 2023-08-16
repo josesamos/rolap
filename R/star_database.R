@@ -43,6 +43,7 @@ star_database <- function(schema, instances, unknown_value = NULL) {
       stop(sprintf("The fact measure '%s' is not defined on instances.", measure))
     }
   }
+  stopifnot("The intersection between measures and attributes is not empty." = length(intersect(attributes, measures)) == 0)
   measure_types <- dplyr::summarise_all(instances[, measures], class)
   for (measure_type in seq_along(measure_types)) {
     measure_type <- measure_types[[measure_type]][1]
@@ -534,3 +535,52 @@ get_fact_measure_names.star_database <- function(db) {
   setdiff(names(db$facts[[1]]$table), db$facts[[1]]$surrogate_keys)
 }
 
+#' Get similar instances of a dimension
+#'
+#' Obtain the names of the attributes of a dimension.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#'
+#' @return A vector of 'tibble' objects with similar instances.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' instances <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_similar_instances(name = "where")
+#'
+#' @export
+get_similar_instances <- function(db, name) UseMethod("get_similar_instances")
+
+#' @rdname get_similar_instances
+#'
+#' @export
+get_similar_instances.star_database <- function(db, name) {
+  stopifnot("Missing dimension name." = !is.null(name))
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  table <- db$dimensions[[name]]$table
+  table <- data.frame(table[, colnames(table)[-1]], stringsAsFactors = FALSE)
+  table <- lapply(table, function(x) base::iconv (x, to="ASCII//TRANSLIT"))
+  table <- lapply(table, tolower)
+  table <- lapply(table, snakecase::to_snake_case)
+  table <- lapply(table, function(x) base::gsub("_", "", x))
+  table <- data.frame(table)
+
+  df_args <- c(table, sep="")
+  table <- do.call(paste, df_args)
+  t_id <- data.frame(id = as.vector(db$dimensions[[name]]$table[1]), value = table)
+  names(t_id) <- c("id", "value")
+  t_freq <- table(table)
+  t_freq <- t_freq[t_freq > 1]
+  n_freq <- names(t_freq)
+  res <- list()
+  for (i in seq_along(n_freq)) {
+    r <- t_id$id[t_id$value == n_freq[i]]
+    v <- db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r, ]
+    res <- c(res, list(v))
+  }
+  res
+}
