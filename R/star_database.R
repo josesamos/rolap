@@ -652,17 +652,17 @@ add_dput_column <- function(v, column) {
 #' @examples
 #'
 #' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   replace_instance_values(name = "where",
+#'   replace_dimension_instance_values(name = "where",
 #'     old = c('1', 'CT', 'Bridgeport'),
 #'     new = c('1', 'CT', 'Hartford'))
 #'
 #' @export
-replace_instance_values <- function(db, name, old, new) UseMethod("replace_instance_values")
+replace_dimension_instance_values <- function(db, name, old, new) UseMethod("replace_dimension_instance_values")
 
-#' @rdname replace_instance_values
+#' @rdname replace_dimension_instance_values
 #'
 #' @export
-replace_instance_values.star_database <- function(db, name, old, new) {
+replace_dimension_instance_values.star_database <- function(db, name, old, new) {
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
@@ -686,7 +686,7 @@ replace_instance_values.star_database <- function(db, name, old, new) {
     for (f in seq_along(db$facts)) {
       if (name %in% db$facts[[f]]$dim_int_names) {
         n <- names(db$facts[f])
-        db$operations[[n]] <- add_operation(db$operations[[n]], "replace_instance_values", name, old, new)
+        db$operations[[n]] <- add_operation(db$operations[[n]], "replace_dimension_instance_values", name, old, new)
       }
     }
   }
@@ -709,4 +709,60 @@ get_rpd_dimensions <- function(db, name) {
     }
   }
   res
+}
+
+
+#' Group instances of a dimension
+#'
+#' After changes in values in the instances of a dimension, groups the instances
+#' and, if necessary, also the related facts.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   group_dimension_instances(name = "where")
+#'
+#' @export
+group_dimension_instances <- function(db, name) UseMethod("group_dimension_instances")
+
+#' @rdname group_dimension_instances
+#'
+#' @export
+group_dimension_instances.star_database <- function(db, name) {
+  stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  stopifnot("The number of old and new values must be equal." = length(old) == length(new))
+  rpd <- get_rpd_dimensions(db, name)
+  for (name in rpd) {
+    table <- db$dimensions[[name]]$table
+    n_att <- ncol(table) - 1
+    stopifnot("The number of values must be equal to the number of dimension attributes." = n_att == length(new))
+    for (j in 1:n_att) {
+      table <- table[ table[, j + 1] == old[j], ]
+    }
+    if (nrow(table) > 0) {
+      r <- as.vector(table[, 1])
+      for (i in 1:length(r)) {
+        for (j in 1:n_att) {
+          db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], j + 1] <- new[j]
+        }
+      }
+    }
+    for (f in seq_along(db$facts)) {
+      if (name %in% db$facts[[f]]$dim_int_names) {
+        n <- names(db$facts[f])
+        db$operations[[n]] <- add_operation(db$operations[[n]], "group_dimension_instances", name, old, new)
+      }
+    }
+  }
+  db
 }
