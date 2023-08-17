@@ -540,3 +540,23 @@ test_that("set_fact_measure_names() and get_fact_measure_names()", {
     )
   })
 })
+
+test_that("get_similar_instances()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db |> get_similar_instances("where")
+  }, {
+    list(structure(
+      list(
+        where_key = 1:2,
+        REGION = c("1", "1"),
+        State = c("CT",
+                  "CT"),
+        City = c("Bridgeport", " BrId  gEport ")
+      ),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    ))
+  })
+})
