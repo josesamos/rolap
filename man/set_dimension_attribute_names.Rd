@@ -45,6 +45,7 @@ Other star database and constellation definition functions:
 \code{\link{get_fact_measure_names}()},
 \code{\link{get_role_playing_dimension_names}()},
 \code{\link{get_similar_instances}()},
+\code{\link{replace_instance_values}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{set_fact_measure_names}()},
 \code{\link{snake_case}()},

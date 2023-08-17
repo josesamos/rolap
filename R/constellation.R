@@ -145,6 +145,8 @@ constellation <- function(name = NULL, stars = NULL) {
 #'
 #' @param rpd A list of strings (dimension names).
 #'
+#' @return A list of strings (dimension names).
+#'
 #' @keywords internal
 unify_rpd <- function(rpd) {
   dims <- unlist(rpd, use.names=FALSE)

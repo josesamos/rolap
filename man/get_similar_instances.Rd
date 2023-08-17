@@ -5,20 +5,23 @@
 \alias{get_similar_instances.star_database}
 \title{Get similar instances of a dimension}
 \usage{
-get_similar_instances(db, name)
+get_similar_instances(db, name, column)
 
-\method{get_similar_instances}{star_database}(db, name)
+\method{get_similar_instances}{star_database}(db, name, column = "dput_instance")
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
 
 \item{name}{A string, dimension name.}
+
+\item{column}{A string, name of the column to include a vector of values.}
 }
 \value{
 A vector of 'tibble' objects with similar instances.
 }
 \description{
-Obtain the names of the attributes of a dimension.
+Get sets of instances of a dimension whose combination of attribute values
+differ only by tildes, spaces, or punctuation marks.
 }
 \examples{
 
@@ -34,6 +37,7 @@ Other star database and constellation definition functions:
 \code{\link{get_dimension_attribute_names}()},
 \code{\link{get_fact_measure_names}()},
 \code{\link{get_role_playing_dimension_names}()},
+\code{\link{replace_instance_values}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{set_dimension_attribute_names}()},
 \code{\link{set_fact_measure_names}()},

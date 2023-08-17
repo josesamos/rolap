@@ -553,10 +553,81 @@ test_that("get_similar_instances()", {
         REGION = c("1", "1"),
         State = c("CT",
                   "CT"),
-        City = c("Bridgeport", " BrId  gEport ")
+        City = c("Bridgeport", " BrId  gEport "),
+        dput_instance = c("c('1', 'CT', 'Bridgeport')",
+                          "c('1', 'CT', ' BrId  gEport ')")
       ),
       row.names = c(NA,-2L),
-      class = c("tbl_df", "tbl", "data.frame")
+      class = c("tbl_df",
+                "tbl", "data.frame")
     ))
+  })
+})
+
+test_that("replace_instance_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db <- db |> replace_instance_values(
+      "where",
+      old = c('1', 'CT', 'Bridgeport'),
+      new = c('1', 'CT', 'Hartford')
+    )
+    db$dimensions$where$table
+  }, {
+    structure(
+      list(
+        where_key = 1:4,
+        REGION = c("1", "1", "1", "1"),
+        State = c("CT", "CT", "MA", "MA"),
+        City = c("Hartford", "Hartford",
+                 "Boston", "Cambridge")
+      ),
+      row.names = c(NA,-4L),
+      class = c("tbl_df",
+                "tbl", "data.frame")
+    )
+  })
+})
+
+test_that("replace_instance_values() with role_playing_dimension()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(rpd = "When",
+                             roles = c("When Available", "When Received"))
+    c(
+      db$operations$mrs_cause$operation,
+      db$rpd,
+      nrow(db$dimensions$when$table),
+      nrow(db$dimensions$when_available$table),
+      nrow(db$dimensions$when_received$table),
+      names(db$dimensions$when$table),
+      names(db$dimensions$when_available$table),
+      names(db$dimensions$when_received$table)
+    )
+  }, {
+    list(
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_facts",
+      "role_playing_dimension",
+      when = c("when", "when_available", "when_received"),
+      15L,
+      15L,
+      15L,
+      "when_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_available_key",
+      "Data Availability Year",
+      "Data Availability Week",
+      "Data Availability Date",
+      "when_received_key",
+      "Reception Year",
+      "Reception Week",
+      "Reception Date"
+    )
   })
 })

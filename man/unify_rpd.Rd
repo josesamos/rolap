@@ -9,6 +9,9 @@ unify_rpd(rpd)
 \arguments{
 \item{rpd}{A list of strings (dimension names).}
 }
+\value{
+A list of strings (dimension names).
+}
 \description{
 Unify lists of dimension names if there are any in common
 }

@@ -431,6 +431,7 @@ set_dimension_attribute_names <- function(db, name, attributes) UseMethod("set_d
 set_dimension_attribute_names.star_database <- function(db, name, attributes) {
   attributes <- unique(attributes)
   stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   att_names <- names(db$dimensions[[name]]$table)
   stopifnot("The dimension has a different number of attributes." = length(attributes) == length(att_names) - 1)
@@ -464,6 +465,7 @@ get_dimension_attribute_names <- function(db, name) UseMethod("get_dimension_att
 #' @export
 get_dimension_attribute_names.star_database <- function(db, name) {
   stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   att_names <- names(db$dimensions[[name]]$table)
   att_names[-1]
@@ -537,10 +539,12 @@ get_fact_measure_names.star_database <- function(db) {
 
 #' Get similar instances of a dimension
 #'
-#' Obtain the names of the attributes of a dimension.
+#' Get sets of instances of a dimension whose combination of attribute values
+#' differ only by tildes, spaces, or punctuation marks.
 #'
 #' @param db A `star_database` object.
 #' @param name A string, dimension name.
+#' @param column A string, name of the column to include a vector of values.
 #'
 #' @return A vector of 'tibble' objects with similar instances.
 #'
@@ -553,13 +557,14 @@ get_fact_measure_names.star_database <- function(db) {
 #'   get_similar_instances(name = "where")
 #'
 #' @export
-get_similar_instances <- function(db, name) UseMethod("get_similar_instances")
+get_similar_instances <- function(db, name, column) UseMethod("get_similar_instances")
 
 #' @rdname get_similar_instances
 #'
 #' @export
-get_similar_instances.star_database <- function(db, name) {
+get_similar_instances.star_database <- function(db, name, column='dput_instance') {
   stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   table <- db$dimensions[[name]]$table
   table <- data.frame(table[, colnames(table)[-1]], stringsAsFactors = FALSE)
@@ -583,7 +588,116 @@ get_similar_instances.star_database <- function(db, name) {
   for (i in seq_along(n_freq)) {
     id <- t_id$id[t_id$value == n_freq[i]]
     v <- db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == id, ]
+    v <- add_dput_column(v, column)
     res <- c(res, list(v))
+  }
+  res
+}
+
+#' For each row, add a vector of values
+#'
+#' @param v A `tibble`, rows of a dimension table.
+#' @param column A string, name of the column to include a vector of values.
+#'
+#' @return A `tibble`, rows of a dimension table.
+#'
+#' @keywords internal
+add_dput_column <- function(v, column) {
+  n_att <- ncol(v)
+  v[column] <- ""
+  for (i in 1:nrow(v)) {
+    dt <- "c("
+    for (j in 2:n_att) {
+      if (j == 2) {
+        sep = ""
+      } else {
+        sep = ", "
+      }
+      dt <- paste(dt, sprintf("'%s'", v[i, j]), sep = sep)
+    }
+    dt <- paste(dt, ")", sep = "")
+    v[i, column] <- dt
+  }
+  v
+}
+
+
+#' Replace instance values in a dimension
+#'
+#' Given the values of a possible instance of a dimension, for that combination,
+#' replace them with the new data values.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#' @param old A vector of values.
+#' @param new A vector of values.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   replace_instance_values(name = "where",
+#'     old = c('1', 'CT', 'Bridgeport'),
+#'     new = c('1', 'CT', 'Hartford'))
+#'
+#' @export
+replace_instance_values <- function(db, name, old, new) UseMethod("replace_instance_values")
+
+#' @rdname replace_instance_values
+#'
+#' @export
+replace_instance_values.star_database <- function(db, name, old, new) {
+
+  browser()
+
+  stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  stopifnot("The number of old and new values must be equal." = length(old) == length(new))
+  rpd <- get_rpd_dimensions(db, name)
+  for (name in rpd) {
+    table <- db$dimensions[[name]]$table
+    n_att <- ncol(table) - 1
+    stopifnot("The number of values must be equal to the number of dimension attributes." = n_att == length(new))
+    for (j in 1:n_att) {
+      table <- table[ table[, j + 1] == old[j], ]
+    }
+    if (nrow(table) > 0) {
+      r <- as.vector(table[, 1])
+      for (i in 1:length(r)) {
+        for (j in 1:n_att) {
+          db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], j + 1] <- new[j]
+        }
+      }
+    }
+    for (f in seq_along(db$facts)) {
+      if (name %in% db$facts[[f]]$dim_int_names) {
+        n <- names(db$facts[f])
+        db$operations[[n]] <- add_operation(db$operations[[n]], "replace_instance_values", name, old, new)
+      }
+    }
+  }
+  db
+}
+
+#' Get rpd dimensions of a dimension
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#'
+#' @return A vector of dimension names.
+#'
+#' @keywords internal
+get_rpd_dimensions <- function(db, name) {
+  res <- name
+  for (i in seq_along(db$rpd)) {
+    if (name %in% db$rpd[[i]]) {
+      res <- db$rpd[i]
+    }
   }
   res
 }
