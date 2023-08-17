@@ -568,7 +568,18 @@ get_measure_names.star_database <- function(db, name = NULL) {
 #' @examples
 #'
 #' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values(name = "where", attributes = c())
+#'   get_similar_attribute_values(name = "where")
+#'
+#' db <- star_database(mrs_cause_schema, ft_num)
+#' db$dimensions$where$table$City[2] <- " BrId  gEport "
+#' db |>
+#'   get_similar_attribute_values("where")
+#'
+#' db <- star_database(mrs_cause_schema, ft_num)
+#' db$dimensions$where$table$City[2] <- " BrId  gEport "
+#' db |>
+#'   get_similar_attribute_values("where",
+#'     attributes = c("City", "State"))
 #'
 #' @export
 get_similar_attribute_values <- function(db, name, attributes, column) UseMethod("get_similar_attribute_values")
@@ -677,6 +688,12 @@ add_dput_column <- function(v, column) {
 #'   replace_attribute_values(name = "where",
 #'     old = c('1', 'CT', 'Bridgeport'),
 #'     new = c('1', 'CT', 'Hartford'))
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   replace_attribute_values(name = "where",
+#'                            attributes = c('REGION', 'State'),
+#'                            old = c('1', 'CT'),
+#'                            new = c('2', 'CT'))
 #'
 #' @export
 replace_attribute_values <- function(db, name, attributes, old, new) UseMethod("replace_attribute_values")

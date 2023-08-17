@@ -192,7 +192,7 @@ db_finest <- db_finest |>
       "currency"
     )
   ) |>
-  rolap::set_dimension_attribute_names(
+  rolap::set_attribute_names(
     name = "where",
     attributes = c(
       "gas_station",
@@ -201,7 +201,7 @@ db_finest <- db_finest |>
       "segment"
     )
   ) |>
-  rolap::set_dimension_attribute_names(
+  rolap::set_attribute_names(
     name = "what",
     attributes = c(
       "product"
@@ -306,14 +306,14 @@ As before, from the star schema and the flat table, we obtain a star database wi
 ```{r}
 db_summary <- rolap::star_database(s_summary, transactions_ft) |>
   rolap::snake_case() |>
-  rolap::set_dimension_attribute_names(
+  rolap::set_attribute_names(
     name = "who",
     attributes = c(
       "segment",
       "currency"
     )
   ) |>
-  rolap::set_dimension_attribute_names(
+  rolap::set_attribute_names(
     name = "where",
     attributes = c(
       "chain",
@@ -321,7 +321,7 @@ db_summary <- rolap::star_database(s_summary, transactions_ft) |>
       "segment"
     )
   ) |>
-  rolap::set_dimension_attribute_names(
+  rolap::set_attribute_names(
     name = "what",
     attributes = c(
       "product"

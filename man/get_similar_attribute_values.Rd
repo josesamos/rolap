@@ -33,7 +33,18 @@ or punctuation marks.
 \examples{
 
 instances <- star_database(mrs_cause_schema, ft_num) |>
-  get_similar_attribute_values(name = "where", attributes = c())
+  get_similar_attribute_values(name = "where")
+
+db <- star_database(mrs_cause_schema, ft_num)
+db$dimensions$where$table$City[2] <- " BrId  gEport "
+db |>
+  get_similar_attribute_values("where")
+
+db <- star_database(mrs_cause_schema, ft_num)
+db$dimensions$where$table$City[2] <- " BrId  gEport "
+db |>
+  get_similar_attribute_values("where",
+    attributes = c("City", "State"))
 
 }
 \seealso{

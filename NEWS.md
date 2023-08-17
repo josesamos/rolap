@@ -1,6 +1,6 @@
 # rolap (development version)
-* Functions to debug instances in dimensions: `get_similar_attribute_values()`, `replace_attribute_values()`, `group_dimension_instances`.
-* Aggregation functions and transformation operations in instances data model for future operations.
+* Functions to update instances in dimensions: `get_similar_attribute_values()`, `replace_attribute_values()`, and `group_dimension_instances()`.
+* Common data model for star_databases and constellations for future operations.
 * Vignette about `md` and `rolap` packages.
 
 # rolap 2.1.0

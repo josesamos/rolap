@@ -34,6 +34,12 @@ db <- star_database(mrs_cause_schema, ft_num) |>
     old = c('1', 'CT', 'Bridgeport'),
     new = c('1', 'CT', 'Hartford'))
 
+db <- star_database(mrs_cause_schema, ft_num) |>
+  replace_attribute_values(name = "where",
+                           attributes = c('REGION', 'State'),
+                           old = c('1', 'CT'),
+                           new = c('2', 'CT'))
+
 }
 \seealso{
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
