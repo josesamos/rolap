@@ -478,6 +478,7 @@ get_dimension_attribute_names.star_database <- function(db, name) {
 #' are defined. This function allows you to change their names.
 #'
 #' @param db A `star_database` object.
+#' @param name A string, fact name.
 #' @param measures A vector of strings, measure names.
 #'
 #' @return A `star_database` object.
@@ -497,17 +498,22 @@ get_dimension_attribute_names.star_database <- function(db, name) {
 #'   )
 #'
 #' @export
-set_fact_measure_names <- function(db, measures) UseMethod("set_fact_measure_names")
+set_fact_measure_names <- function(db, name, measures) UseMethod("set_fact_measure_names")
 
 #' @rdname set_fact_measure_names
 #'
 #' @export
-set_fact_measure_names.star_database <- function(db, measures) {
+set_fact_measure_names.star_database <- function(db, name = NULL, measures) {
+  if (is.null(name)) {
+    name <- names(db$facts[1])
+  }
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a fact name." = name %in% names(db$facts))
   measures <- unique(measures)
-  measure_names <- setdiff(names(db$facts[[1]]$table), db$facts[[1]]$surrogate_keys)
+  measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
   stopifnot("Facts have a different number of measures." = length(measures) == length(measure_names))
-  names(db$facts[[1]]$table) <- c(db$facts[[1]]$surrogate_keys, measures)
-  db$operations[[1]] <- add_operation(db$operations[[1]], "set_fact_measure_names", names(db$facts), measures)
+  names(db$facts[[name]]$table) <- c(db$facts[[name]]$surrogate_keys, measures)
+  db$operations[[name]] <- add_operation(db$operations[[name]], "set_fact_measure_names", names(db$facts), measures)
   db
 }
 
@@ -516,6 +522,7 @@ set_fact_measure_names.star_database <- function(db, measures) {
 #' Obtain the names of the measures of a star database.
 #'
 #' @param db A `star_database` object.
+#' @param name A string, fact name.
 #'
 #' @return A vector of strings, measure names.
 #'
@@ -528,13 +535,18 @@ set_fact_measure_names.star_database <- function(db, measures) {
 #'   get_fact_measure_names()
 #'
 #' @export
-get_fact_measure_names <- function(db) UseMethod("get_fact_measure_names")
+get_fact_measure_names <- function(db, name) UseMethod("get_fact_measure_names")
 
 #' @rdname get_fact_measure_names
 #'
 #' @export
-get_fact_measure_names.star_database <- function(db) {
-  setdiff(names(db$facts[[1]]$table), db$facts[[1]]$surrogate_keys)
+get_fact_measure_names.star_database <- function(db, name = NULL) {
+  if (is.null(name)) {
+    name <- names(db$facts[1])
+  }
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a fact name." = name %in% names(db$facts))
+  setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
 }
 
 #' Get similar instances of a dimension
@@ -651,9 +663,6 @@ replace_instance_values <- function(db, name, old, new) UseMethod("replace_insta
 #'
 #' @export
 replace_instance_values.star_database <- function(db, name, old, new) {
-
-  browser()
-
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
@@ -696,7 +705,7 @@ get_rpd_dimensions <- function(db, name) {
   res <- name
   for (i in seq_along(db$rpd)) {
     if (name %in% db$rpd[[i]]) {
-      res <- db$rpd[i]
+      res <- db$rpd[[i]]
     }
   }
   res

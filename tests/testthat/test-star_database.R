@@ -594,6 +594,11 @@ test_that("replace_instance_values() with role_playing_dimension()", {
     db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
+    db <- db |> replace_instance_values(
+      name = "When Available",
+      old = c('1962', '11', '1962-03-14'),
+      new = c('1962', '3', '1962-01-15')
+    )
     c(
       db$operations$mrs_cause$operation,
       db$rpd,
@@ -602,7 +607,12 @@ test_that("replace_instance_values() with role_playing_dimension()", {
       nrow(db$dimensions$when_received$table),
       names(db$dimensions$when$table),
       names(db$dimensions$when_available$table),
-      names(db$dimensions$when_received$table)
+      names(db$dimensions$when_received$table),
+      as.vector(db$dimensions$when$table$WEEK),
+      as.vector(
+        db$dimensions$when_available$table$`Data Availability Week`
+      ),
+      as.vector(db$dimensions$when_received$table$`Reception Week`)
     )
   }, {
     list(
@@ -612,6 +622,9 @@ test_that("replace_instance_values() with role_playing_dimension()", {
       "define_dimension",
       "define_facts",
       "role_playing_dimension",
+      "replace_instance_values",
+      "replace_instance_values",
+      "replace_instance_values",
       when = c("when", "when_available", "when_received"),
       15L,
       15L,
@@ -627,7 +640,52 @@ test_that("replace_instance_values() with role_playing_dimension()", {
       "when_received_key",
       "Reception Year",
       "Reception Week",
-      "Reception Date"
+      "Reception Date",
+      "1",
+      "3",
+      "11",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "3",
+      "4",
+      "4",
+      "5",
+      "5",
+      "6",
+      "9",
+      "1",
+      "3",
+      "11",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "3",
+      "4",
+      "4",
+      "5",
+      "5",
+      "6",
+      "9",
+      "1",
+      "3",
+      "11",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "3",
+      "4",
+      "4",
+      "5",
+      "5",
+      "6",
+      "9"
     )
   })
 })

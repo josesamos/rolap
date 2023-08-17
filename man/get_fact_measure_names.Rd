@@ -5,12 +5,14 @@
 \alias{get_fact_measure_names.star_database}
 \title{Get the names of the measures of a star database}
 \usage{
-get_fact_measure_names(db)
+get_fact_measure_names(db, name)
 
-\method{get_fact_measure_names}{star_database}(db)
+\method{get_fact_measure_names}{star_database}(db, name = NULL)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
+
+\item{name}{A string, fact name.}
 }
 \value{
 A vector of strings, measure names.

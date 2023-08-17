@@ -5,12 +5,14 @@
 \alias{set_fact_measure_names.star_database}
 \title{Rename the measures of a star database}
 \usage{
-set_fact_measure_names(db, measures)
+set_fact_measure_names(db, name, measures)
 
-\method{set_fact_measure_names}{star_database}(db, measures)
+\method{set_fact_measure_names}{star_database}(db, name = NULL, measures)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
+
+\item{name}{A string, fact name.}
 
 \item{measures}{A vector of strings, measure names.}
 }
