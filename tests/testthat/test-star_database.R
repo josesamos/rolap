@@ -564,10 +564,10 @@ test_that("get_similar_instances()", {
   })
 })
 
-test_that("replace_instance_values()", {
+test_that("replace_dimension_instance_values()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num)
-    db <- db |> replace_instance_values(
+    db <- db |> replace_dimension_instance_values(
       "where",
       old = c('1', 'CT', 'Bridgeport'),
       new = c('1', 'CT', 'Hartford')
@@ -589,12 +589,12 @@ test_that("replace_instance_values()", {
   })
 })
 
-test_that("replace_instance_values() with role_playing_dimension()", {
+test_that("replace_dimension_instance_values() with role_playing_dimension()", {
   expect_equal({
     db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
-    db <- db |> replace_instance_values(
+    db <- db |> replace_dimension_instance_values(
       name = "When Available",
       old = c('1962', '11', '1962-03-14'),
       new = c('1962', '3', '1962-01-15')
@@ -622,9 +622,9 @@ test_that("replace_instance_values() with role_playing_dimension()", {
       "define_dimension",
       "define_facts",
       "role_playing_dimension",
-      "replace_instance_values",
-      "replace_instance_values",
-      "replace_instance_values",
+      "replace_dimension_instance_values",
+      "replace_dimension_instance_values",
+      "replace_dimension_instance_values",
       when = c("when", "when_available", "when_received"),
       15L,
       15L,
