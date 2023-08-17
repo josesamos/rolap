@@ -623,8 +623,6 @@ test_that("replace_dimension_instance_values() with role_playing_dimension()", {
       "define_facts",
       "role_playing_dimension",
       "replace_dimension_instance_values",
-      "replace_dimension_instance_values",
-      "replace_dimension_instance_values",
       when = c("when", "when_available", "when_received"),
       15L,
       15L,

@@ -177,11 +177,8 @@ unify_rpd <- function(rpd) {
 #'
 #' @return A `constellation` object.
 #'
-rpd_in_constellation <- function(db) UseMethod("rpd_in_constellation")
-#' @rdname rpd_in_constellation
-#'
 #' @keywords internal
-rpd_in_constellation.star_database <- function(db) {
+rpd_in_constellation <- function(db) {
   # frequency of dimensions and shared dimensions
   dim_names <- c()
   for (i in seq_along(db$facts)) {

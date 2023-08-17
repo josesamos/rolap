@@ -1,6 +1,7 @@
 # rolap (development version)
-* Aggregation functions in instances struct for future operations
-* Vignette about md and rolap
+* Functions to debug instances in dimensions: `get_similar_instances()`, `replace_dimension_instance_values()`, `group_dimension_instances`.
+* Aggregation functions and transformation operations in instances data model for future operations.
+* Vignette about `md` and `rolap` packages.
 
 # rolap 2.1.0
 * Definition of role-playing and role dimensions (with explanatory vignette): `role_playing_dimension()` and `get_role_playing_dimension_names()` functions.

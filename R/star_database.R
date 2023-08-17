@@ -667,8 +667,8 @@ replace_dimension_instance_values.star_database <- function(db, name, old, new) 
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   stopifnot("The number of old and new values must be equal." = length(old) == length(new))
-  rpd <- get_rpd_dimensions(db, name)
-  for (name in rpd) {
+  dims <- get_rpd_dimensions(db, name)
+  for (name in dims) {
     table <- db$dimensions[[name]]$table
     n_att <- ncol(table) - 1
     stopifnot("The number of values must be equal to the number of dimension attributes." = n_att == length(new))
@@ -683,10 +683,15 @@ replace_dimension_instance_values.star_database <- function(db, name, old, new) 
         }
       }
     }
-    for (f in seq_along(db$facts)) {
+  }
+  for (f in seq_along(db$facts)) {
+    for (name in dims) {
       if (name %in% db$facts[[f]]$dim_int_names) {
         n <- names(db$facts[f])
-        db$operations[[n]] <- add_operation(db$operations[[n]], "replace_dimension_instance_values", name, old, new)
+        db$operations[[n]] <-
+          add_operation(db$operations[[n]], "replace_dimension_instance_values",
+                        name, old, new)
+        break
       }
     }
   }
@@ -740,27 +745,17 @@ group_dimension_instances.star_database <- function(db, name) {
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-  stopifnot("The number of old and new values must be equal." = length(old) == length(new))
-  rpd <- get_rpd_dimensions(db, name)
-  for (name in rpd) {
-    table <- db$dimensions[[name]]$table
-    n_att <- ncol(table) - 1
-    stopifnot("The number of values must be equal to the number of dimension attributes." = n_att == length(new))
-    for (j in 1:n_att) {
-      table <- table[ table[, j + 1] == old[j], ]
-    }
-    if (nrow(table) > 0) {
-      r <- as.vector(table[, 1])
-      for (i in 1:length(r)) {
-        for (j in 1:n_att) {
-          db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], j + 1] <- new[j]
-        }
-      }
-    }
-    for (f in seq_along(db$facts)) {
+  dims <- get_rpd_dimensions(db, name)
+
+  db <- share_dimensions(db, dims)
+
+  for (f in seq_along(db$facts)) {
+    for (name in dims) {
       if (name %in% db$facts[[f]]$dim_int_names) {
         n <- names(db$facts[f])
-        db$operations[[n]] <- add_operation(db$operations[[n]], "group_dimension_instances", name, old, new)
+        db$operations[[n]] <-
+          add_operation(db$operations[[n]], "group_dimension_instances", name)
+        break
       }
     }
   }

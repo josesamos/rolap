@@ -99,14 +99,16 @@ conform_dimensions <- function(to_conform) {
 
   dim$table <- dplyr::select(dim$table,-tidyselect::all_of(dim$surrogate_key))
   attributes <- names(dim$table)
-  for (d in 2:length(to_conform)) {
-    # check if dimensions have the same schema
-    dim_attr <- unique(c(dim_attr, names(to_conform[[d]]$table)))
-    stopifnot("Dimensions to conform do not have the same attributes." = dim_attr_length == length(dim_attr))
+  if (length(to_conform) > 1) {
+    for (d in 2:length(to_conform)) {
+      # check if dimensions have the same schema
+      dim_attr <- unique(c(dim_attr, names(to_conform[[d]]$table)))
+      stopifnot("Dimensions to conform do not have the same attributes." = dim_attr_length == length(dim_attr))
 
-    dim$table <-
-      dplyr::bind_rows(dim$table,
-                       dplyr::select(to_conform[[d]]$table, tidyselect::all_of(attributes)))
+      dim$table <-
+        dplyr::bind_rows(dim$table,
+                         dplyr::select(to_conform[[d]]$table, tidyselect::all_of(attributes)))
+    }
   }
   dim$table <- dplyr::arrange_all(unique(dim$table))
   dim$table <-
