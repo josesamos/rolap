@@ -413,7 +413,7 @@ share_dimensions <- function(db, dims) {
 #' @examples
 #'
 #' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   set_dimension_attribute_names(
+#'   set_attribute_names(
 #'     name = "where",
 #'     attributes = c(
 #'       "Region",
@@ -423,12 +423,12 @@ share_dimensions <- function(db, dims) {
 #'   )
 #'
 #' @export
-set_dimension_attribute_names <- function(db, name, attributes) UseMethod("set_dimension_attribute_names")
+set_attribute_names <- function(db, name, attributes) UseMethod("set_attribute_names")
 
-#' @rdname set_dimension_attribute_names
+#' @rdname set_attribute_names
 #'
 #' @export
-set_dimension_attribute_names.star_database <- function(db, name, attributes) {
+set_attribute_names.star_database <- function(db, name, attributes) {
   attributes <- unique(attributes)
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
@@ -436,7 +436,7 @@ set_dimension_attribute_names.star_database <- function(db, name, attributes) {
   att_names <- names(db$dimensions[[name]]$table)
   stopifnot("The dimension has a different number of attributes." = length(attributes) == length(att_names) - 1)
   names(db$dimensions[[name]]$table) <- c(att_names[1], attributes)
-  db$operations[[1]] <- add_operation(db$operations[[1]], "set_dimension_attribute_names", name, attributes)
+  db$operations[[1]] <- add_operation(db$operations[[1]], "set_attribute_names", name, attributes)
   db
 }
 
@@ -455,15 +455,15 @@ set_dimension_attribute_names.star_database <- function(db, name, attributes) {
 #' @examples
 #'
 #' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_dimension_attribute_names(name = "where")
+#'   get_attribute_names(name = "where")
 #'
 #' @export
-get_dimension_attribute_names <- function(db, name) UseMethod("get_dimension_attribute_names")
+get_attribute_names <- function(db, name) UseMethod("get_attribute_names")
 
-#' @rdname get_dimension_attribute_names
+#' @rdname get_attribute_names
 #'
 #' @export
-get_dimension_attribute_names.star_database <- function(db, name) {
+get_attribute_names.star_database <- function(db, name) {
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
@@ -489,7 +489,7 @@ get_dimension_attribute_names.star_database <- function(db, name) {
 #' @examples
 #'
 #' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   set_fact_measure_names(
+#'   set_measure_names(
 #'     measures = c(
 #'       "Pneumonia and Influenza",
 #'       "All",
@@ -498,12 +498,12 @@ get_dimension_attribute_names.star_database <- function(db, name) {
 #'   )
 #'
 #' @export
-set_fact_measure_names <- function(db, name, measures) UseMethod("set_fact_measure_names")
+set_measure_names <- function(db, name, measures) UseMethod("set_measure_names")
 
-#' @rdname set_fact_measure_names
+#' @rdname set_measure_names
 #'
 #' @export
-set_fact_measure_names.star_database <- function(db, name = NULL, measures) {
+set_measure_names.star_database <- function(db, name = NULL, measures) {
   if (is.null(name)) {
     name <- names(db$facts[1])
   }
@@ -513,7 +513,7 @@ set_fact_measure_names.star_database <- function(db, name = NULL, measures) {
   measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
   stopifnot("Facts have a different number of measures." = length(measures) == length(measure_names))
   names(db$facts[[name]]$table) <- c(db$facts[[name]]$surrogate_keys, measures)
-  db$operations[[name]] <- add_operation(db$operations[[name]], "set_fact_measure_names", names(db$facts), measures)
+  db$operations[[name]] <- add_operation(db$operations[[name]], "set_measure_names", names(db$facts), measures)
   db
 }
 
@@ -532,15 +532,15 @@ set_fact_measure_names.star_database <- function(db, name = NULL, measures) {
 #' @examples
 #'
 #' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_fact_measure_names()
+#'   get_measure_names()
 #'
 #' @export
-get_fact_measure_names <- function(db, name) UseMethod("get_fact_measure_names")
+get_measure_names <- function(db, name) UseMethod("get_measure_names")
 
-#' @rdname get_fact_measure_names
+#' @rdname get_measure_names
 #'
 #' @export
-get_fact_measure_names.star_database <- function(db, name = NULL) {
+get_measure_names.star_database <- function(db, name = NULL) {
   if (is.null(name)) {
     name <- names(db$facts[1])
   }
@@ -549,13 +549,15 @@ get_fact_measure_names.star_database <- function(db, name = NULL) {
   setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
 }
 
-#' Get similar instances of a dimension
+
+#' Get similar attribute values in a dimension
 #'
-#' Get sets of instances of a dimension whose combination of attribute values
-#' differ only by tildes, spaces, or punctuation marks.
+#' Get sets of attribute values in a dimension that differ only by tildes, spaces,
+#' or punctuation marks.
 #'
 #' @param db A `star_database` object.
 #' @param name A string, dimension name.
+#' @param attributes A vector of strings, attribute names.
 #' @param column A string, name of the column to include a vector of values.
 #'
 #' @return A vector of 'tibble' objects with similar instances.
@@ -566,45 +568,64 @@ get_fact_measure_names.star_database <- function(db, name = NULL) {
 #' @examples
 #'
 #' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_instances(name = "where")
+#'   get_similar_attribute_values(name = "where", attributes = c())
 #'
 #' @export
-get_similar_instances <- function(db, name, column) UseMethod("get_similar_instances")
+get_similar_attribute_values <- function(db, name, attributes, column) UseMethod("get_similar_attribute_values")
 
-#' @rdname get_similar_instances
+#' @rdname get_similar_attribute_values
 #'
 #' @export
-get_similar_instances.star_database <- function(db, name, column='dput_instance') {
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-  table <- db$dimensions[[name]]$table
-  table <- data.frame(table[, colnames(table)[-1]], stringsAsFactors = FALSE)
-  # in one column
-  df_args <- c(table, sep="")
-  table <- do.call(paste, df_args)
-  # clean values
-  table <- iconv(table, to="ASCII//TRANSLIT")
-  table <- tolower(table)
-  table <- snakecase::to_snake_case(table)
-  table <- gsub("_", "", table)
-  # id and value
-  t_id <- data.frame(id = as.vector(db$dimensions[[name]]$table[1]), value = table)
-  names(t_id) <- c("id", "value")
-  # value frequency
-  t_freq <- table(table)
-  t_freq <- t_freq[t_freq > 1]
-  # repeated values
-  n_freq <- names(t_freq)
-  res <- list()
-  for (i in seq_along(n_freq)) {
-    id <- t_id$id[t_id$value == n_freq[i]]
-    v <- db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == id, ]
-    v <- add_dput_column(v, column)
-    res <- c(res, list(v))
+get_similar_attribute_values.star_database <-
+  function(db,
+           name,
+           attributes = NULL,
+           column = 'dput_instance') {
+    stopifnot("Missing dimension name." = !is.null(name))
+    name <- snakecase::to_snake_case(name)
+    stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+    table <- db$dimensions[[name]]$table
+    att <- colnames(table)[-1]
+    if (is.null(attributes)) {
+      attributes <- att
+    } else {
+      stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+      for (attribute in attributes) {
+        if (!(attribute %in% att)) {
+          stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
+        }
+      }
+    }
+    table <- data.frame(table[, attributes], stringsAsFactors = FALSE)
+    # in one column
+    df_args <- c(table, sep = "")
+    table <- do.call(paste, df_args)
+    # clean values
+    table <- iconv(table, to = "ASCII//TRANSLIT")
+    table <- tolower(table)
+    table <- snakecase::to_snake_case(table)
+    table <- gsub("_", "", table)
+    # id and value
+    t_id <-
+      data.frame(id = as.vector(db$dimensions[[name]]$table[1]), value = table)
+    names(t_id) <- c("id", "value")
+    # value frequency
+    t_freq <- table(table)
+    t_freq <- t_freq[t_freq > 1]
+    # repeated values
+    n_freq <- names(t_freq)
+    res <- list()
+    for (i in seq_along(n_freq)) {
+      id <- t_id$id[t_id$value == n_freq[i]]
+      v <-
+        db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == id, attributes]
+      v <- dplyr::arrange_all(unique(v))
+      v <- add_dput_column(v, column)
+      res <- c(res, list(v))
+    }
+    res
   }
-  res
-}
+
 
 #' For each row, add a vector of values
 #'
@@ -619,8 +640,8 @@ add_dput_column <- function(v, column) {
   v[column] <- ""
   for (i in 1:nrow(v)) {
     dt <- "c("
-    for (j in 2:n_att) {
-      if (j == 2) {
+    for (j in 1:n_att) {
+      if (j == 1) {
         sep = ""
       } else {
         sep = ", "
@@ -641,6 +662,7 @@ add_dput_column <- function(v, column) {
 #'
 #' @param db A `star_database` object.
 #' @param name A string, dimension name.
+#' @param attributes A vector of strings, attribute names.
 #' @param old A vector of values.
 #' @param new A vector of values.
 #'
@@ -652,34 +674,51 @@ add_dput_column <- function(v, column) {
 #' @examples
 #'
 #' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   replace_dimension_instance_values(name = "where",
+#'   replace_attribute_values(name = "where",
 #'     old = c('1', 'CT', 'Bridgeport'),
 #'     new = c('1', 'CT', 'Hartford'))
 #'
 #' @export
-replace_dimension_instance_values <- function(db, name, old, new) UseMethod("replace_dimension_instance_values")
+replace_attribute_values <- function(db, name, attributes, old, new) UseMethod("replace_attribute_values")
 
-#' @rdname replace_dimension_instance_values
+#' @rdname replace_attribute_values
 #'
 #' @export
-replace_dimension_instance_values.star_database <- function(db, name, old, new) {
+replace_attribute_values.star_database <- function(db, name, attributes = NULL, old, new) {
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   stopifnot("The number of old and new values must be equal." = length(old) == length(new))
+  table <- db$dimensions[[name]]$table
+  att <- colnames(table)[-1]
+  if (is.null(attributes)) {
+    attributes <- att
+    pos_att <- 2:(length(att) + 1)
+  } else {
+    stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+    pos_att <- c()
+    for (attribute in attributes) {
+      pos <- which(att %in% attribute)
+      if (length(pos) == 0) {
+        stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
+      } else {
+        pos_att <- c(pos_att, pos + 1)
+      }
+    }
+  }
   dims <- get_rpd_dimensions(db, name)
   for (name in dims) {
     table <- db$dimensions[[name]]$table
-    n_att <- ncol(table) - 1
+    n_att <- length(pos_att)
     stopifnot("The number of values must be equal to the number of dimension attributes." = n_att == length(new))
     for (j in 1:n_att) {
-      table <- table[ table[, j + 1] == old[j], ]
+      table <- table[ table[, pos_att[j]] == old[j], ]
     }
     if (nrow(table) > 0) {
       r <- as.vector(table[, 1])
       for (i in 1:length(r)) {
         for (j in 1:n_att) {
-          db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], j + 1] <- new[j]
+          db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], pos_att[j]] <- new[j]
         }
       }
     }
@@ -689,8 +728,8 @@ replace_dimension_instance_values.star_database <- function(db, name, old, new) 
       if (name %in% db$facts[[f]]$dim_int_names) {
         n <- names(db$facts[f])
         db$operations[[n]] <-
-          add_operation(db$operations[[n]], "replace_dimension_instance_values",
-                        name, old, new)
+          add_operation(db$operations[[n]], "replace_attribute_values",
+                        name, attributes, c(old, "-->>", new))
         break
       }
     }

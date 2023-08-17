@@ -1,11 +1,11 @@
 # rolap (development version)
-* Functions to debug instances in dimensions: `get_similar_instances()`, `replace_dimension_instance_values()`, `group_dimension_instances`.
+* Functions to debug instances in dimensions: `get_similar_attribute_values()`, `replace_attribute_values()`, `group_dimension_instances`.
 * Aggregation functions and transformation operations in instances data model for future operations.
 * Vignette about `md` and `rolap` packages.
 
 # rolap 2.1.0
 * Definition of role-playing and role dimensions (with explanatory vignette): `role_playing_dimension()` and `get_role_playing_dimension_names()` functions.
-* New functions to query and rename attributes in dimensions and measures in facts: `get_dimension_attribute_names()`, `set_dimension_attribute_names()`, `get_fact_measure_names()` and `set_fact_measure_names()`.
+* New functions to query and rename attributes in dimensions and measures in facts: `get_attribute_names()`, `set_attribute_names()`, `get_measure_names()` and `set_measure_names()`.
 * Include detailed validation error messages.
 
 # rolap 2.0.0

@@ -904,7 +904,7 @@ test_that("constellation() get_role_playing_dimension_names()", {
 })
 
 test_that(
-  "constellation() replace_dimension_instance_values() with role_playing_dimension()",
+  "constellation() replace_attribute_values() with role_playing_dimension()",
   {
     expect_equal({
       db1 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
@@ -916,7 +916,7 @@ test_that(
         role_playing_dimension(rpd = "When Arrived",
                                roles = c("When Available"))
       db <- constellation("MRS", list(db1, db2))
-      db <- db |> replace_dimension_instance_values(
+      db <- db |> replace_attribute_values(
         name = "When Available",
         old = c('1962', '11', '1962-03-14'),
         new = c('1962', '3', '1962-01-15')
@@ -944,7 +944,7 @@ test_that(
         "define_dimension",
         "define_facts",
         "role_playing_dimension",
-        "replace_dimension_instance_values",
+        "replace_attribute_values",
         when = c("when", "when_available", "when_received", "when_arrived"),
         25L,
         25L,
@@ -1042,7 +1042,7 @@ test_that(
 )
 
 test_that(
-  "constellation() replace_dimension_instance_values() with role_playing_dimension()",
+  "constellation() replace_attribute_values() with role_playing_dimension()",
   {
     expect_equal({
       db1 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
@@ -1054,7 +1054,7 @@ test_that(
                                roles = c("When Available"))
       db <- constellation("MRS", list(db1, db2))
 
-      db <- db |> replace_dimension_instance_values(
+      db <- db |> replace_attribute_values(
         name = "When Available",
         old = c('1962', '11', '1962-03-14'),
         new = c('1962', '3', '1962-01-15')
@@ -1086,7 +1086,7 @@ test_that(
         "define_dimension",
         "define_facts",
         "role_playing_dimension",
-        "replace_dimension_instance_values",
+        "replace_attribute_values",
         "group_dimension_instances",
         "define_dimension",
         "define_dimension",
@@ -1095,7 +1095,7 @@ test_that(
         "define_dimension",
         "define_facts",
         "role_playing_dimension",
-        "replace_dimension_instance_values",
+        "replace_attribute_values",
         "group_dimension_instances",
         "group_dimension_instances",
         when = c("when", "when_available",

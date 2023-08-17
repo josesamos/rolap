@@ -32,14 +32,14 @@ db <- star_database(mrs_cause_schema, ft_num) |>
 
 Other star database and constellation definition functions: 
 \code{\link{constellation}()},
-\code{\link{get_dimension_attribute_names}()},
-\code{\link{get_fact_measure_names}()},
+\code{\link{get_attribute_names}()},
+\code{\link{get_measure_names}()},
 \code{\link{get_role_playing_dimension_names}()},
-\code{\link{get_similar_instances}()},
-\code{\link{replace_dimension_instance_values}()},
+\code{\link{get_similar_attribute_values}()},
+\code{\link{replace_attribute_values}()},
 \code{\link{role_playing_dimension}()},
-\code{\link{set_dimension_attribute_names}()},
-\code{\link{set_fact_measure_names}()},
+\code{\link{set_attribute_names}()},
+\code{\link{set_measure_names}()},
 \code{\link{snake_case}()},
 \code{\link{star_database}()}
 }

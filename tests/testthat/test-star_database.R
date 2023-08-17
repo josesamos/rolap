@@ -493,25 +493,25 @@ test_that("role_playing_dimension() define a rpd", {
   })
 })
 
-test_that("set_dimension_attribute_names() and get_dimension_attribute_names()",
+test_that("set_attribute_names() and get_attribute_names()",
           {
             expect_equal({
               db <- star_database(mrs_cause_schema, ft_num) |>
-                set_dimension_attribute_names(name = "where",
+                set_attribute_names(name = "where",
                                               attributes = c("Region",
                                                              "State",
                                                              "City"))
               c(
                 db$operations$mrs_cause$operation,
                 db |>
-                  get_dimension_attribute_names(name = "where")
+                  get_attribute_names(name = "where")
               )
             }, {
               c(
                 "define_dimension",
                 "define_dimension",
                 "define_facts",
-                "set_dimension_attribute_names",
+                "set_attribute_names",
                 "Region",
                 "State",
                 "City"
@@ -519,21 +519,21 @@ test_that("set_dimension_attribute_names() and get_dimension_attribute_names()",
             })
           })
 
-test_that("set_fact_measure_names() and get_fact_measure_names()", {
+test_that("set_measure_names() and get_measure_names()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num) |>
-      set_fact_measure_names(measures = c("Pneumonia and Influenza",
+      set_measure_names(measures = c("Pneumonia and Influenza",
                                           "All",
                                           "Rows Aggregated"))
     c(db$operations$mrs_cause$operation,
       db |>
-        get_fact_measure_names())
+        get_measure_names())
   }, {
     c(
       "define_dimension",
       "define_dimension",
       "define_facts",
-      "set_fact_measure_names",
+      "set_measure_names",
       "Pneumonia and Influenza",
       "All",
       "Rows Aggregated"
@@ -541,21 +541,19 @@ test_that("set_fact_measure_names() and get_fact_measure_names()", {
   })
 })
 
-test_that("get_similar_instances()", {
+test_that("get_similar_attribute_values()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num)
     db$dimensions$where$table$City[2] <- " BrId  gEport "
-    db |> get_similar_instances("where")
+    db |> get_similar_attribute_values("where")
   }, {
     list(structure(
       list(
-        where_key = 1:2,
         REGION = c("1", "1"),
-        State = c("CT",
-                  "CT"),
-        City = c("Bridgeport", " BrId  gEport "),
-        dput_instance = c("c('1', 'CT', 'Bridgeport')",
-                          "c('1', 'CT', ' BrId  gEport ')")
+        State = c("CT", "CT"),
+        City = c(" BrId  gEport ", "Bridgeport"),
+        dput_instance = c("c('1', 'CT', ' BrId  gEport ')",
+                          "c('1', 'CT', 'Bridgeport')")
       ),
       row.names = c(NA,-2L),
       class = c("tbl_df",
@@ -564,10 +562,10 @@ test_that("get_similar_instances()", {
   })
 })
 
-test_that("replace_dimension_instance_values()", {
+test_that("replace_attribute_values()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num)
-    db <- db |> replace_dimension_instance_values(
+    db <- db |> replace_attribute_values(
       "where",
       old = c('1', 'CT', 'Bridgeport'),
       new = c('1', 'CT', 'Hartford')
@@ -589,12 +587,12 @@ test_that("replace_dimension_instance_values()", {
   })
 })
 
-test_that("replace_dimension_instance_values() with role_playing_dimension()", {
+test_that("replace_attribute_values() with role_playing_dimension()", {
   expect_equal({
     db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
-    db <- db |> replace_dimension_instance_values(
+    db <- db |> replace_attribute_values(
       name = "When Available",
       old = c('1962', '11', '1962-03-14'),
       new = c('1962', '3', '1962-01-15')
@@ -622,7 +620,7 @@ test_that("replace_dimension_instance_values() with role_playing_dimension()", {
       "define_dimension",
       "define_facts",
       "role_playing_dimension",
-      "replace_dimension_instance_values",
+      "replace_attribute_values",
       when = c("when", "when_available", "when_received"),
       15L,
       15L,

@@ -183,7 +183,7 @@ We can transform the database by renaming the measures of the facts and/or the a
 ```{r}
 db_finest <- db_finest |>
   rolap::snake_case() |>
-  rolap::set_dimension_attribute_names(
+  rolap::set_attribute_names(
     name = "who",
     attributes = c(
       "card",
