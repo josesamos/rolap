@@ -277,32 +277,15 @@
 "mrs_age_schema_rpd"
 
 
-#' Czech debit card company specialising on payments at gas stations (finest granularity)
-#'
-#' Multidimensional design with the finest granularity possible from the data
-#' available at the source.
-#'
-#' The development has been done in the vignette `vignette("dm")` of the `rolap`
-#' package.
-#'
-#' @family database example data
-#' @seealso \code{\link{mrs_cause_schema}}
-#'
-#' @format A `star_database`.
-#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
-"db_finest_dm"
-
-
 #' Czech debit card company specialising on payments at gas stations (summary)
 #'
 #' Multidimensional design with a summary from the data available at the source.
 #'
-#' The development has been done in the vignette `vignette("dm")` of the `rolap`
-#' package.
+#' The development has been done in the vignette `vignette("rdbms-dm")`.
 #'
 #' @family database example data
 #' @seealso \code{\link{mrs_cause_schema}}
 #'
 #' @format A `star_database`.
 #' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
-"db_summary_dm"
+"db_summary"

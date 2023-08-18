@@ -1,0 +1,58 @@
+---
+title: "Integration of dimension instances"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Integration of dimension instances}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+It is generally recommended to perform data cleansing as close as possible to the original data sources. Sometimes, the need to perform data cleaning operations is detected when the multidimensional system is already implemented, either because it hasn't been detected in the data sources or because it comes from multiple data sources. For example, we can integrate several stars with common dimensions in a constellation and, when conforming the dimensions, we observe that there are instances that are actually the same and should be merged (they only differ in the form of abbreviation or in a misspelling). For these cases, the functions described in this vignette have been developed.
+
+# Detection of repeated values in dimension instances
+
+To show by example the available operations, we are going to use one of the multidimensional designs developed in the vignette titled *Star databases and RDBMS through the dm and rolap packages*, `vignette("rdbms-dm")`, which is available as a `star_database` object (`db_summary`). As shown below, we can get the names of the available dimensions.
+
+```{r}
+library(rolap)
+
+class(db_summary)
+
+db_summary |>
+  get_dimension_names()
+```
+
+Let's focus on the *what* dimension. 
+
+```{r}
+db_summary |> 
+  get_attribute_names('what')
+```
+
+```{r}
+db_summary |>
+  get_similar_attribute_values('what')
+```
+
+```{r, results = "asis"}
+t <- db_summary |>
+  get_unique_attribute_values('what', col_as_vector = "As a vector")
+
+pander::pandoc.table(t[c(6:8, 12:17), ], split.table = Inf)
+```
+
+
+```{r}
+
+```
+
+

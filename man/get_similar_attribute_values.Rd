@@ -5,14 +5,9 @@
 \alias{get_similar_attribute_values.star_database}
 \title{Get similar attribute values in a dimension}
 \usage{
-get_similar_attribute_values(db, name, attributes, column)
+get_similar_attribute_values(db, name, attributes, col_as_vector)
 
-\method{get_similar_attribute_values}{star_database}(
-  db,
-  name,
-  attributes = NULL,
-  column = "dput_instance"
-)
+\method{get_similar_attribute_values}{star_database}(db, name, attributes = NULL, col_as_vector = NULL)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
@@ -21,14 +16,18 @@ get_similar_attribute_values(db, name, attributes, column)
 
 \item{attributes}{A vector of strings, attribute names.}
 
-\item{column}{A string, name of the column to include a vector of values.}
+\item{col_as_vector}{A string, name of the column to include a vector of values.}
 }
 \value{
-A vector of 'tibble' objects with similar instances.
+A vector of \code{tibble} objects with similar instances.
 }
 \description{
 Get sets of attribute values in a dimension that differ only by tildes, spaces,
 or punctuation marks.
+}
+\details{
+If a name is indicated in the \code{col_as_vector} parameter, it includes a column
+with the data in vector form to be used in other functions.
 }
 \examples{
 
@@ -44,7 +43,8 @@ db <- star_database(mrs_cause_schema, ft_num)
 db$dimensions$where$table$City[2] <- " BrId  gEport "
 db |>
   get_similar_attribute_values("where",
-    attributes = c("City", "State"))
+    attributes = c("City", "State"),
+    col_as_vector = "As a vector")
 
 }
 \seealso{
@@ -54,9 +54,9 @@ Other star database and constellation definition functions:
 \code{\link{constellation}()},
 \code{\link{get_attribute_names}()},
 \code{\link{get_dimension_names}()},
-\code{\link{get_dimension_table}()},
 \code{\link{get_measure_names}()},
 \code{\link{get_role_playing_dimension_names}()},
+\code{\link{get_unique_attribute_values}()},
 \code{\link{group_dimension_instances}()},
 \code{\link{replace_attribute_values}()},
 \code{\link{role_playing_dimension}()},
