@@ -27,9 +27,23 @@ library(rolap)
 
 class(db_summary)
 
+db_tl <- db_summary |>
+  rolap::as_tibble_list()
+
+names <- names(db_tl)
+for (i in seq_along(db_tl)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+}
+```
+
+
+
+```{r}
 db_summary |>
   get_dimension_names()
 ```
+
+
 
 Let's focus on the *what* dimension. 
 
@@ -47,12 +61,106 @@ db_summary |>
 t <- db_summary |>
   get_unique_attribute_values('what', col_as_vector = "As a vector")
 
-pander::pandoc.table(t[c(6:8, 12:17), ], split.table = Inf)
+pander::pandoc.table(t[c(6:8, 12:18), ], split.table = Inf)
+```
+
+
+
+
+```{r}
+db_2 <- db_summary |>
+  replace_attribute_values(
+    name = 'what',
+    attributes = 'product',
+    old = c('Nat.Super', 'Natural +', 'Natural Plus', 'Natural Spec'),
+    new = c('Natural')
+  ) |>
+  group_dimension_instances(name = 'what')
+```
+
+```{r, results = "asis"}
+t <- db_2 |>
+  get_unique_attribute_values('what', col_as_vector = "As a vector")
+
+pander::pandoc.table(t[c(6:8, 12:18), ], split.table = Inf)
 ```
 
 
 ```{r}
+db_tl <- db_2 |>
+  rolap::as_tibble_list()
 
+names <- names(db_tl)
+for (i in seq_along(db_tl)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+}
+
+sum(db_tl[['transaction_summary']]$transactions)
 ```
 
+
+```{r, results = "asis"}
+t <- db_2 |>
+  get_unique_attribute_values('when', attributes = c('date'))
+
+pander::pandoc.table(t, split.table = Inf)
+```
+
+
+```{r, results = "asis"}
+t <- db_2 |>
+  get_unique_attribute_values('when', attributes = c('hour'), col_as_vector = "As a vector")
+
+pander::pandoc.table(t, split.table = Inf)
+```
+
+
+```{r}
+db_3 <- db_2 |>
+  replace_attribute_values(
+    name = 'when',
+    attributes = 'hour',
+    old = c('05', '06', '07', '08', '09', '10', '11'),
+    new = c('Morning')
+  ) |>
+  replace_attribute_values(
+    name = 'when',
+    attributes = 'hour',
+    old = c('12', '13', '14', '15', '16'),
+    new = c('Afternoon')
+  ) |>
+  replace_attribute_values(
+    name = 'when',
+    attributes = 'hour',
+    old = c('17', '18', '19', '20'),
+    new = c('Evening')
+  ) |>
+  replace_attribute_values(
+    name = 'when',
+    attributes = 'hour',
+    old = c('21', '22', '23', '00', '01', '02', '03', '04'),
+    new = c('Night')
+  ) |>
+  group_dimension_instances(name = 'when')
+```
+
+```{r}
+db_tl <- db_3 |>
+  rolap::as_tibble_list()
+
+names <- names(db_tl)
+for (i in seq_along(db_tl)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+}
+
+sum(db_tl[['transaction_summary']]$transactions)
+```
+
+
+```{r, results = "asis"}
+t <- db_3 |>
+  get_unique_attribute_values('when')
+
+pander::pandoc.table(t, split.table = Inf)
+```
 

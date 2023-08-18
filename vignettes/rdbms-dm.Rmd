@@ -139,7 +139,14 @@ There is nothing remarkable in the rest of the data.
 
 ## Design with the finest possible granularity
 
-First, we are going to make a design with the finest granularity.
+First, we are going to make a design with the finest granularity. 
+
+We are going to add an *Hour* field obtained from the *Time* field.
+
+```{r}
+transactions_ft <- transactions_ft |> 
+  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))
+```
 
 ### Star schema
 
@@ -160,7 +167,9 @@ s_finest <- rolap::star_schema() |>
     attributes = c("GasStationID", "ChainID", "Country",
                    "Segment.gasstations")) |>
   rolap::define_dimension(name = "When",
-    attributes = c("Date", "Time")) |>
+    attributes = c("Date", "Hour")) |>
+  rolap::define_dimension(name = "When Moment",
+    attributes = c("Hour", "Time")) |>
   rolap::define_dimension(name = "What",
     attributes = c("Description"))
 
@@ -231,7 +240,7 @@ db_dm <- db_finest |>
   rolap::as_dm_class(pk_facts = FALSE)
 
 db_finest_dm <-
-  db_dm[c('transaction_line', 'who', 'where', 'when', 'what')]
+  db_dm[c('transaction_line', 'who', 'where', 'when', 'when_moment', 'what')]
 ```
 
 Below is the database schema.
@@ -263,13 +272,7 @@ DBI::dbDisconnect(my_db)
 
 ## Design with a summary of the data
 
-Next we are going to perform a multidimensional design with a coarser granularity. Let's assume that we are only interested in the hour in which the transaction occurs, not the specific minute: We are going to add an *Hour* field obtained from the *Time* field.
-
-```{r}
-transactions_ft <- transactions_ft |> 
-  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))
-```
-
+Next we are going to perform a multidimensional design with a coarser granularity. 
 
 ### Star schema
 
@@ -281,10 +284,10 @@ s_summary <- rolap::star_schema() |>
   rolap::define_facts(name = "Transaction Summary",
     measures = c("Amount", "Price"),
     nrow_agg = "Transactions") |>
-  rolap::define_dimension(name = "Who",
+  rolap::define_dimension(name = "Who Segment",
     attributes = c("Segment.customers",
                    "Currency")) |>
-  rolap::define_dimension(name = "Where",
+  rolap::define_dimension(name = "Where Chain",
     attributes = c("ChainID", "Country",
                    "Segment.gasstations")) |>
   rolap::define_dimension(name = "When",
@@ -307,14 +310,14 @@ As before, from the star schema and the flat table, we obtain a star database wi
 db_summary <- rolap::star_database(s_summary, transactions_ft) |>
   rolap::snake_case() |>
   rolap::set_attribute_names(
-    name = "who",
+    name = "who_segment",
     attributes = c(
       "segment",
       "currency"
     )
   ) |>
   rolap::set_attribute_names(
-    name = "where",
+    name = "where_chain",
     attributes = c(
       "chain",
       "country",
@@ -354,6 +357,25 @@ db_summary_dm |>
 ```
 
 Tables can be stored directly in any RDBMS, just as we have done before.
+
+
+## Constellation
+
+```{r}
+ct <- rolap::constellation("CSS", list(db_finest, db_summary))
+
+ct_dm_all <- ct |>
+  rolap::as_dm_class(pk_facts = FALSE)
+
+ct_dm <-
+  ct_dm_all[c('transaction_line', 'who', 'where', 'when', 'when_moment', 
+              'what', 'transaction_summary', 'who_segment', 'where_chain')]
+
+ct_dm |> 
+  dm::dm_draw(view_type = "all")
+```
+
+
 
 # Conclusions
 

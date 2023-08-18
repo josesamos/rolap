@@ -48,9 +48,11 @@ prepare_to_join <- function(instances, unknown_value) {
 #'
 #' @keywords internal
 group_by_keys <- function(instances, keys, measures, agg_functions, nrow_agg) {
-  instances <- tibble::add_column(instances, !!(nrow_agg) := as.integer(1))
-  measures <- c(measures, nrow_agg)
-  agg_functions <- c(agg_functions, "SUM")
+  if (!is.null(nrow_agg)) {
+    instances <- tibble::add_column(instances, !!(nrow_agg) := as.integer(1))
+    measures <- c(measures, nrow_agg)
+    agg_functions <- c(agg_functions, "SUM")
+  }
 
   ft_group <- dplyr::group_by_at(as.data.frame(instances), dplyr::vars(tidyselect::all_of(keys)))
   agg <- list()

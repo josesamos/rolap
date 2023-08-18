@@ -41,6 +41,7 @@ fact_table <- function(name = NULL, surrogate_keys = NULL, agg = NULL, dim_int_n
 snake_case_table.fact_table <- function(table) {
   table$name <- snakecase::to_snake_case(table$name)
   names(table$table) <- snakecase::to_snake_case(names(table$table))
+  names(table$agg) <- snakecase::to_snake_case(names(table$agg))
   table
 }
 

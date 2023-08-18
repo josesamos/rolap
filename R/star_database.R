@@ -793,7 +793,6 @@ replace_attribute_values.star_database <- function(db, name, attributes = NULL, 
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-  stopifnot("The number of old and new values must be equal." = length(old) == length(new))
   table <- db$dimensions[[name]]$table
   att <- colnames(table)[-1]
   if (is.null(attributes)) {
@@ -811,16 +810,34 @@ replace_attribute_values.star_database <- function(db, name, attributes = NULL, 
       }
     }
   }
+  n_att <- length(pos_att)
+  stopifnot("The number of new values must be equal to the number of dimension attributes." = n_att == length(new))
+  if (length(attributes) > 1) {
+    stopifnot("The number of old and new values must be equal." = length(old) == length(new))
+  }
+  # update various old values
+  if (length(attributes) == 1 & length(new) == 1 & length(old) > 1) {
+    various_old <- TRUE
+  } else {
+    various_old <- FALSE
+  }
   dims <- get_rpd_dimensions(db, name)
   for (name in dims) {
     table <- db$dimensions[[name]]$table
-    n_att <- length(pos_att)
-    stopifnot("The number of values must be equal to the number of dimension attributes." = n_att == length(new))
-    for (j in 1:n_att) {
-      table <- table[ table[, pos_att[j]] == old[j], ]
+    if (!various_old) {
+      for (j in 1:n_att) {
+        table <- table[table[, pos_att[j]] == old[j],]
+      }
+    } else {
+      # 1 attribute and n old values
+      or_res <- rep(FALSE, nrow(table))
+      for (j in 1:length(old)) {
+        or_res <- or_res | (table[, pos_att[1]] == old[j])
+      }
+      table <- table[or_res,]
     }
-    if (nrow(table) > 0) {
-      r <- as.vector(table[, 1])
+    r <- as.vector(table[, 1])[[1]]
+    if (length(r) > 0) {
       for (i in 1:length(r)) {
         for (j in 1:n_att) {
           db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], pos_att[j]] <- new[j]
@@ -896,9 +913,25 @@ group_dimension_instances.star_database <- function(db, name) {
   for (f in seq_along(db$facts)) {
     for (name in dims) {
       if (name %in% db$facts[[f]]$dim_int_names) {
+        # group instances in facts
+        agg_functions <- db$facts[[f]]$agg
+        measures <- names(agg_functions)
+        len <- length(measures)
+        db$facts[[f]]$table <-
+          group_by_keys(
+            instances = db$facts[[f]]$table,
+            keys = db$facts[[f]]$surrogate_keys,
+            measures = names(db$facts[[f]]$agg),
+            agg_functions = db$facts[[f]]$agg,
+            nrow_agg = NULL
+          )
+
+        # annotate operation
         n <- names(db$facts[f])
         db$operations[[n]] <-
           add_operation(db$operations[[n]], "group_dimension_instances", name)
+
+        # only once is necessary
         break
       }
     }
