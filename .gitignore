@@ -5,6 +5,7 @@
 .DS_Store
 .quarto
 ejemplos.R
+dm.R
 datos
 inst/doc
 docs

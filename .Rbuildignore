@@ -3,6 +3,7 @@
 ^README\.Rmd$
 ^LICENSE\.md$
 ^ejemplos.R$
+^dm.R$
 ^datos$
 ^\.github$
 ^codecov\.yml$

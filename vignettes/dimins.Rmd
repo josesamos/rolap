@@ -1,0 +1,28 @@
+---
+title: "Integration of dimension instances in the rolap package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Integration of dimension instances in the rolap package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rolap)
+```
+
+# Introduction
+
+It is generally recommended to perform data cleansing as close as possible to the original data sources.
+
+Sometimes, the need to perform data cleaning operations is detected when the multidimensional system is already implemented, either because it hasn't been detected in the data sources or because it comes from multiple data sources. For example, we can integrate several stars with common dimensions in a constellation and, when conforming the dimensions, we observe that there are instances that are actually the same and should be merged (they only differ in the form of abbreviation or in a misspelling). 
+
+For these cases, the functions described in this vignette have been developed.
+
