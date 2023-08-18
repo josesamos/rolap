@@ -14,10 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(rolap)
-```
-
 # Introduction
 
 It is generally recommended to perform data cleansing as close as possible to the original data sources.
@@ -26,3 +22,9 @@ Sometimes, the need to perform data cleaning operations is detected when the mul
 
 For these cases, the functions described in this vignette have been developed.
 
+# Detection of repeated values in dimension instances
+
+
+```{r}
+library(rolap)
+```

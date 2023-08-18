@@ -1,5 +1,5 @@
 # rolap (development version)
-* Functions to update instances in dimensions: `get_similar_attribute_values()`, `replace_attribute_values()`, and `group_dimension_instances()`.
+* Functions to update instances in dimensions: `get_dimension_names()`, `get_dimension_table()`, `get_similar_attribute_values()`, `replace_attribute_values()`, and `group_dimension_instances()`.
 * Common data model for star_databases and constellations for future operations.
 * Vignette about `md` and `rolap` packages.
 

@@ -550,6 +550,63 @@ get_measure_names.star_database <- function(db, name = NULL) {
 }
 
 
+#' Get the names of the dimensions of a star database
+#'
+#' Obtain the names of the dimensions of a star database.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A vector of strings, dimension names.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_dimension_names()
+#'
+#' @export
+get_dimension_names <- function(db) UseMethod("get_dimension_names")
+
+#' @rdname get_dimension_names
+#'
+#' @export
+get_dimension_names.star_database <- function(db) {
+  sort(names(db$dimensions))
+}
+
+#' Get the table of a dimension
+#'
+#' Obtain the table of a dimension.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#'
+#' @return A `tibble` dimension table.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' dt <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_dimension_table(name = "where")
+#'
+#' @export
+get_dimension_table <- function(db, name) UseMethod("get_dimension_table")
+
+#' @rdname get_dimension_table
+#'
+#' @export
+get_dimension_table.star_database <- function(db, name) {
+  stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  db$dimensions[[name]]$table[, -1]
+}
+
+
 #' Get similar attribute values in a dimension
 #'
 #' Get sets of attribute values in a dimension that differ only by tildes, spaces,
