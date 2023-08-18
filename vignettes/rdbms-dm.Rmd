@@ -141,11 +141,13 @@ There is nothing remarkable in the rest of the data.
 
 First, we are going to make a design with the finest granularity. 
 
-We are going to add an *Hour* field obtained from the *Time* field.
+We are going to add an *Hour* field obtained from the *Time* field. We also add a processing date, assuming we know that transactions are processed 48 hours after they occur.
 
 ```{r}
-transactions_ft <- transactions_ft |> 
-  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))
+transactions_ft <- transactions_ft |>
+  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))  |>
+  dplyr::mutate(`Processing Date` = format(as.POSIXct(Date) + 
+    lubridate::days(2), format = "%Y-%m-%d"))
 ```
 
 ### Star schema
@@ -169,7 +171,9 @@ s_finest <- rolap::star_schema() |>
   rolap::define_dimension(name = "When",
     attributes = c("Date", "Hour")) |>
   rolap::define_dimension(name = "When Moment",
-    attributes = c("Hour", "Time")) |>
+    attributes = c("Time", "Hour")) |>
+  rolap::define_dimension(name = "When Processed",
+    attributes = c("Processing Date", "Hour")) |>
   rolap::define_dimension(name = "What",
     attributes = c("Description"))
 
@@ -239,8 +243,13 @@ To represent the result graphically, we export the star database in the form of 
 db_dm <- db_finest |>
   rolap::as_dm_class(pk_facts = FALSE)
 
-db_finest_dm <-
-  db_dm[c('transaction_line', 'who', 'where', 'when', 'when_moment', 'what')]
+tables <- db_finest |>
+  rolap::get_table_names()
+
+# Degenerate dimension
+tables <- setdiff(tables, 'transaction')
+
+db_finest_dm <- db_dm[tables]
 ```
 
 Below is the database schema.
@@ -292,11 +301,13 @@ s_summary <- rolap::star_schema() |>
                    "Segment.gasstations")) |>
   rolap::define_dimension(name = "When",
     attributes = c("Date", "Hour")) |>
+  rolap::define_dimension(name = "When Paid",
+    attributes = c("Processing Date", "Hour")) |>
   rolap::define_dimension(name = "What",
     attributes = c("Description"))
 ```
 
-We have assumed that we are not interested in individual transactions but in a summary of them; neither the particular data of the clients, but only the associated segment and currency. Finally, we are not interested in gas stations either, but only the chain to which they belong and the rest of the dimension attributes.
+We have assumed that we are not interested in individual transactions but in a summary of them; neither the particular data of the clients, but only the associated segment and currency. We are not interested in gas stations either, but only the chain to which they belong and the rest of the dimension attributes. Finally, in this case, the dimension with the data of the processing date has been interpreted as payment date.
 
 Each measure can be associated with a specific aggregation function, by default it is the sum which, in this case, can be considered adequate since adding to group the data the meaning of the measures is preserved (understanding *Price* as the total amount of the sale operation). Otherwise, it is advisable to define measures obtained from those available so that this principle is fulfilled.
 
@@ -322,6 +333,13 @@ db_summary <- rolap::star_database(s_summary, transactions_ft) |>
       "chain",
       "country",
       "segment"
+    )
+  ) |>
+  rolap::set_attribute_names(
+    name = "when_paid",
+    attributes = c(
+      "payment_date",
+      "hour"
     )
   ) |>
   rolap::set_attribute_names(
@@ -357,24 +375,6 @@ db_summary_dm |>
 ```
 
 Tables can be stored directly in any RDBMS, just as we have done before.
-
-
-## Constellation
-
-```{r}
-ct <- rolap::constellation("CSS", list(db_finest, db_summary))
-
-ct_dm_all <- ct |>
-  rolap::as_dm_class(pk_facts = FALSE)
-
-ct_dm <-
-  ct_dm_all[c('transaction_line', 'who', 'where', 'when', 'when_moment', 
-              'what', 'transaction_summary', 'who_segment', 'where_chain')]
-
-ct_dm |> 
-  dm::dm_draw(view_type = "all")
-```
-
 
 
 # Conclusions

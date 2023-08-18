@@ -577,6 +577,33 @@ get_dimension_names.star_database <- function(db) {
 }
 
 
+#' Get the names of the tables of a star database
+#'
+#' Obtain the names of the tables of a star database.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A vector of strings, table names.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_table_names()
+#'
+#' @export
+get_table_names <- function(db) UseMethod("get_table_names")
+
+#' @rdname get_table_names
+#'
+#' @export
+get_table_names.star_database <- function(db) {
+  sort(c(names(db$dimensions), names(db$facts)))
+}
+
+
 #' Get similar attribute values in a dimension
 #'
 #' Get sets of attribute values in a dimension that differ only by tildes, spaces,

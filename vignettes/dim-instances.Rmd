@@ -28,7 +28,7 @@ library(rolap)
 class(db_summary)
 
 db_tl <- db_summary |>
-  rolap::as_tibble_list()
+  as_tibble_list()
 
 names <- names(db_tl)
 for (i in seq_along(db_tl)){
@@ -88,7 +88,7 @@ pander::pandoc.table(t[c(6:8, 12:18), ], split.table = Inf)
 
 ```{r}
 db_tl <- db_2 |>
-  rolap::as_tibble_list()
+  as_tibble_list()
 
 names <- names(db_tl)
 for (i in seq_along(db_tl)){
@@ -146,7 +146,7 @@ db_3 <- db_2 |>
 
 ```{r}
 db_tl <- db_3 |>
-  rolap::as_tibble_list()
+  as_tibble_list()
 
 names <- names(db_tl)
 for (i in seq_along(db_tl)){
@@ -163,4 +163,27 @@ t <- db_3 |>
 
 pander::pandoc.table(t, split.table = Inf)
 ```
+
+
+## Constellation
+
+```{r}
+ct <- constellation("CSS", list(db_finest, db_summary))
+
+ct_dm_all <- ct |>
+  as_dm_class(pk_facts = FALSE)
+
+tables <- ct |>
+  get_table_names()
+
+# Degenerate dimension
+tables <- setdiff(tables, 'transaction')
+
+ct_dm <-
+  ct_dm_all[tables]
+
+ct_dm |> 
+  dm::dm_draw(view_type = "all")
+```
+
 
