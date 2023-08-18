@@ -73,8 +73,8 @@ test_that("constellation() define constellation", {
               name = "mrs_cause",
               surrogate_keys = c("when_key", "where_key"),
               agg = c(
-                `Pneumonia and Influenza Deaths` = "SUM",
-                `All Deaths` = "SUM",
+                pneumonia_and_influenza_deaths = "SUM",
+                all_deaths = "SUM",
                 nrow_agg = "SUM"
               ),
               dim_int_names = c("when", "where"),
@@ -101,7 +101,7 @@ test_that("constellation() define constellation", {
               name = "mrs_age",
               surrogate_keys = c("when_key", "where_key",
                                  "who_key"),
-              agg = c(`All Deaths` = "SUM", nrow_agg = "SUM"),
+              agg = c(all_deaths = "SUM", nrow_agg = "SUM"),
               dim_int_names = c("when", "where", "who"),
               table = structure(
                 list(
@@ -296,8 +296,8 @@ test_that("constellation() define constellation", {
               name = "mrs_cause",
               surrogate_keys = c("when_key", "where_key"),
               agg = c(
-                `Pneumonia and Influenza Deaths` = "SUM",
-                `All Deaths` = "SUM",
+                pneumonia_and_influenza_deaths = "SUM",
+                all_deaths = "SUM",
                 nrow_agg = "SUM"
               ),
               dim_int_names = c("when", "where"),
@@ -324,7 +324,7 @@ test_that("constellation() define constellation", {
               name = "mrs_age",
               surrogate_keys = c("when_key", "where_key",
                                  "who_key"),
-              agg = c(`All Deaths` = "SUM", nrow_agg = "SUM"),
+              agg = c(all_deaths = "SUM", nrow_agg = "SUM"),
               dim_int_names = c("when", "where", "who"),
               table = structure(
                 list(
@@ -544,7 +544,7 @@ test_that("constellation() define constellation", {
               name = "mrs_age",
               surrogate_keys = c("when_key",
                                  "where_key", "who_key"),
-              agg = c(`All Deaths` = "SUM", nrow_agg = "SUM"),
+              agg = c(all_deaths = "SUM", nrow_agg = "SUM"),
               dim_int_names = c("when", "where", "who"),
               table = structure(
                 list(
@@ -571,8 +571,8 @@ test_that("constellation() define constellation", {
               surrogate_keys = c("when_key",
                                  "where_key"),
               agg = c(
-                `Pneumonia and Influenza Deaths` = "SUM",
-                `All Deaths` = "SUM",
+                pneumonia_and_influenza_deaths = "SUM",
+                all_deaths = "SUM",
                 nrow_agg = "SUM"
               ),
               dim_int_names = c("when",

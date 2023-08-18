@@ -243,8 +243,8 @@ test_that("snake_case() transform a a star database in snake case", {
           name = "mrs_cause",
           surrogate_keys = c("when_key", "where_key"),
           agg = c(
-            `Pneumonia and Influenza Deaths` = "SUM",
-            `All Deaths` = "SUM",
+            pneumonia_and_influenza_deaths = "SUM",
+            all_deaths = "SUM",
             nrow_agg = "SUM"
           ),
           dim_int_names = c("when",
@@ -545,7 +545,7 @@ test_that("get_similar_attribute_values()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num)
     db$dimensions$where$table$City[2] <- " BrId  gEport "
-    db |> get_similar_attribute_values("where")
+    db |> get_similar_attribute_values("where", col_as_vector = 'dput_instance')
   }, {
     list(structure(
       list(
