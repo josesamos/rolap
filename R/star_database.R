@@ -84,7 +84,7 @@ star_database <- function(schema, instances, unknown_value = NULL) {
 
   # generate dimension tables
   keys <- c()
-  op <- NULL
+  op <- star_operation()
   for (d in names(schema$dimensions)) {
     # generate dimension table
     dim_name <- get_dimension_name(schema$dimensions[[d]])

@@ -20,7 +20,7 @@ It is generally recommended to perform data cleansing as close as possible to th
 
 # Detection of repeated values in dimension instances
 
-To show by example the available operations, we are going to use one of the multidimensional designs developed in the vignette titled *Star databases and RDBMS through the dm and rolap packages*, `vignette("rdbms-dm")`, which is available as a `star_database` object (`db_summary`). As shown below, we can get the names of the available dimensions.
+To show by example the available operations, we are going to use one of the multidimensional designs developed in the vignette titled *Star databases and RDBMS through the `dm` and `rolap` packages*, `vignette("rdbms-dm")`, which is available as a `star_database` object (`db_summary`). As shown below, we can get the names of the available dimensions.
 
 ```{r}
 library(rolap)

@@ -377,6 +377,29 @@ db_summary_dm |>
 Tables can be stored directly in any RDBMS, just as we have done before.
 
 
+## Constellation
+
+```{r}
+ct <- constellation("CSS", list(db_finest, db_summary))
+
+ct_dm_all <- ct |>
+  as_dm_class(pk_facts = FALSE)
+
+tables <- ct |>
+  get_table_names()
+
+# Degenerate dimension
+tables <- setdiff(tables, 'transaction')
+
+ct_dm <-
+  ct_dm_all[tables]
+
+ct_dm |> 
+  dm::dm_draw(view_type = "all")
+```
+
+
+
 # Conclusions
 
 In this document we have started from transactional data in a RDBMS and, through the `dm` and `rolap` packages, we have obtained two star databases also in RDBMS. The `dm` package facilitates access to the RDBMS, while the `rolap` package supports the definition of the necessary transformations in this context.
