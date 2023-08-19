@@ -169,7 +169,6 @@ snake_case <- function(db) UseMethod("snake_case")
 #'
 #' @export
 snake_case.star_database <- function(db) {
-  browser()
   for (f in names(db$facts)) {
     db$facts[[f]] <- snake_case_table(db$facts[[f]])
   }

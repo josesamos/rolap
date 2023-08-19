@@ -49,7 +49,9 @@ add_operation.star_operation <- function(op, op_name, name = NULL, details = NUL
     }
     details <- vector_to_string(details)
     details2 <- vector_to_string(details2)
-
+    if (is.null(name)) {
+      name <- ""
+    }
     op$operations <-
       rbind(
         op$operations,
