@@ -61,7 +61,7 @@ db_summary |>
 t <- db_summary |>
   get_unique_attribute_values('what', col_as_vector = "As a vector")
 
-pander::pandoc.table(t[c(6:8, 12:18), ], split.table = Inf)
+pander::pandoc.table(t, split.table = Inf)
 ```
 
 
@@ -72,8 +72,34 @@ db_2 <- db_summary |>
   replace_attribute_values(
     name = 'what',
     attributes = 'product',
-    old = c('Nat.Super', 'Natural +', 'Natural Plus', 'Natural Spec'),
-    new = c('Natural')
+    old = c('Autokosmet.'),
+    new = c('Autokozmetik')
+  ) |>
+  replace_attribute_values(
+    name = 'what',
+    attributes = 'product',
+    old = c('Diesel aditiv'),
+    new = c('Diesel +')
+  ) |>
+  replace_attribute_values(
+    name = 'what',
+    attributes = 'product',
+    old = c('Nafta Plus'),
+    new = c('Nafta +')
+  ) |>
+  replace_attribute_values(
+    name = 'what',
+    attributes = 'product',
+    old = c('Nat.Super', 'Natural Plus', 'Natural Spec'),
+    new = c('Natural +')
+  ) |>
+  replace_attribute_values(
+    name = 'what',
+    attributes = 'product',
+    old = c('Autoprísluš.', 'Dalnic.popl.', 'Knihy,nov.', 'LPG', 'Mytí vozidel',
+            'Nemrz.kapal.', 'Obcerstvení', 'Oleje,tuky', 'Potraviny', 'Prev.náplne',
+            'Provoz.nápl.', 'Umývanie voz', 'Zboží nesp.', 'Zpr.nakupu'),
+    new = c('Ostatní')
   ) |>
   group_dimension_instances(name = 'what')
 ```
@@ -82,7 +108,7 @@ db_2 <- db_summary |>
 t <- db_2 |>
   get_unique_attribute_values('what', col_as_vector = "As a vector")
 
-pander::pandoc.table(t[c(6:8, 12:18), ], split.table = Inf)
+pander::pandoc.table(t, split.table = Inf)
 ```
 
 
@@ -104,6 +130,16 @@ t <- db_2 |>
   get_unique_attribute_values('when', attributes = c('date'))
 
 pander::pandoc.table(t, split.table = Inf)
+
+
+t <- db_2 |>
+  get_unique_attribute_values('when_paid', attributes = c('payment_date'))
+
+pander::pandoc.table(t, split.table = Inf)
+
+
+db_2 |>
+  get_role_playing_dimension_names()
 ```
 
 
