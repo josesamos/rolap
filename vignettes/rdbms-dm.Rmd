@@ -176,7 +176,6 @@ s_finest <- rolap::star_schema() |>
     attributes = c("Processing Date", "Hour")) |>
   rolap::define_dimension(name = "What",
     attributes = c("Description"))
-
 ```
 
 The most remarkable thing about the definition is that the facts correspond to a transaction line, each line corresponding to a product in the transaction. On the other hand, each transaction is identified by the attributes *Date*, *Time* and *CardID*. Since these concepts are already represented in other dimensions, the surrogate key (foreign key in the facts) would be enough to represent the transaction, so *Transaction* would be a ***degenerate dimension*** (the dimension table is not needed, the foreign key in the facts is enough).
@@ -247,7 +246,7 @@ tables <- db_finest |>
   rolap::get_table_names()
 
 # Degenerate dimension
-tables <- setdiff(tables, 'transaction')
+tables <- base::setdiff(tables, 'transaction')
 
 db_finest_dm <- db_dm[tables]
 ```
@@ -259,12 +258,40 @@ db_finest_dm |>
   dm::dm_draw(view_type = "all")
 ```
 
-It can be seen that a new measure has been added to the fact table (*nrow_agg*), this measure, for each row, indicates the number of rows in the original table from which it was obtained. In the definition of the facts you can indicate a specific name for it. In this case, each row corresponds to a row in the original table, therefore, all the values must be 1, as can be verified below.
+It can be seen that a new measure has been added to the fact table (*nrow_agg*), this measure indicates for each row the number of rows in the original table from which it was obtained. In the definition of the facts you can indicate a specific name for it. In this case, each row corresponds to a row in the original table, therefore, all the values must be 1, as can be verified below.
 
 ```{r}
 max(db_tl[['transaction_line']]$nrow_agg)
 sum(db_tl[['transaction_line']]$nrow_agg)
 ```
+
+### Definition of role-playing and role dimensions
+
+In the star database, we can define that any one of the dimensions is the role-playing dimension and the other dimensions are various roles of that dimension, the only requirement is that all dimensions must have the same number of attributes. More details can be found in the vignette titled *Definition of Role-Playing and Role Dimensions*, `vignette("rpd")`.
+
+For the case we are solving, the definition is shown below.
+
+```{r}
+db_finest <- db_finest |>
+  rolap::role_playing_dimension(
+    rpd = "when",
+    roles = c("when_processed")
+  )
+```
+
+The result can be seen in the instances of the star database tables, below.
+
+```{r}
+db_tl <- db_finest |>
+  rolap::as_tibble_list()
+
+names <- names(db_tl)
+for (i in seq_along(db_tl)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+}
+```
+
+We can see that the tables associated with the *when* dimension (with date and hour) contain the same number of instances, but a larger number than before since they include all the different instances of the two tables.
 
 
 ### Store tables in a relational database
@@ -281,7 +308,14 @@ DBI::dbDisconnect(my_db)
 
 ## Design with a summary of the data
 
-Next we are going to perform a multidimensional design with a coarser granularity. 
+Next we are going to perform a multidimensional design with a coarser granularity. To have somewhat different dates from the previous example, we are going to define a new date, assuming we know that transactions are paid 24 hours after they occur.
+
+```{r}
+transactions_ft <- transactions_ft |>
+  dplyr::mutate(`Payment Date` = format(as.POSIXct(Date) + 
+    lubridate::days(1), format = "%Y-%m-%d"))
+```
+
 
 ### Star schema
 
@@ -302,7 +336,7 @@ s_summary <- rolap::star_schema() |>
   rolap::define_dimension(name = "When",
     attributes = c("Date", "Hour")) |>
   rolap::define_dimension(name = "When Paid",
-    attributes = c("Processing Date", "Hour")) |>
+    attributes = c("Payment Date", "Hour")) |>
   rolap::define_dimension(name = "What",
     attributes = c("Description"))
 ```
@@ -315,7 +349,7 @@ Finally, indicate that this time a specific name has been assigned to the measur
 
 ### Star database
 
-As before, from the star schema and the flat table, we obtain a star database with the tables of the dimensions and facts. We also transform the names of dimension attributes.
+As before, from the star schema and the flat table, we obtain a star database with the tables of the dimensions and facts. We also transform the names of dimension attributes and define the role-playing and role dimensions.
 
 ```{r}
 db_summary <- rolap::star_database(s_summary, transactions_ft) |>
@@ -336,17 +370,14 @@ db_summary <- rolap::star_database(s_summary, transactions_ft) |>
     )
   ) |>
   rolap::set_attribute_names(
-    name = "when_paid",
-    attributes = c(
-      "payment_date",
-      "hour"
-    )
-  ) |>
-  rolap::set_attribute_names(
     name = "what",
     attributes = c(
       "product"
     )
+  ) |>
+  rolap::role_playing_dimension(
+    rpd = "when",
+    roles = c("when_paid")
   )
 ```
 
@@ -364,6 +395,8 @@ for (i in seq_along(db_tl)){
 sum(db_tl[['transaction_summary']]$transactions)
 ```
 
+If we compare it with the previous example, we verify that there are fewer instances in the *when* dimension tables because in this case the difference between dates was 24 hours (before it was 48 hours).
+
 We also show its graphic representation.
 
 ```{r}
@@ -379,29 +412,50 @@ Tables can be stored directly in any RDBMS, just as we have done before.
 
 ## Constellation
 
+We can work with the star databases separately or in an integrated way by defining a constellation from them. On the constellation we can carry out the same operations that we perform on a star database.
+
 ```{r}
-ct <- constellation("CSS", list(db_finest, db_summary))
+ct <- rolap::constellation("CSS", list(db_finest, db_summary))
+
+db_tl <- ct |>
+  rolap::as_tibble_list()
+
+names <- names(db_tl)
+for (i in seq_along(db_tl)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+}
 
 ct_dm_all <- ct |>
-  as_dm_class(pk_facts = FALSE)
+  rolap::as_dm_class(pk_facts = FALSE)
 
 tables <- ct |>
-  get_table_names()
+  rolap::get_table_names()
 
 # Degenerate dimension
-tables <- setdiff(tables, 'transaction')
+tables <- base::setdiff(tables, 'transaction')
 
 ct_dm <-
   ct_dm_all[tables]
+
+my_db <- DBI::dbConnect(RSQLite::SQLite())
+my_ct_dm <- dm::copy_dm_to(my_db, ct_dm)
+my_ct_dm
+DBI::dbDisconnect(my_db)
 
 ct_dm |> 
   dm::dm_draw(view_type = "all")
 ```
 
+If we look at the *when* dimension tables (with date and hour), it can be seen that they all have the same number of instances: as there was a table in common between both star databases, a conformed table has been generated from them and the information about role-playing and role dimensions has been automatically updated with the new situation for the joint schema, as shown below .
+
+```{r}
+ct |>
+  rolap::get_role_playing_dimension_names()
+```
 
 
 # Conclusions
 
-In this document we have started from transactional data in a RDBMS and, through the `dm` and `rolap` packages, we have obtained two star databases also in RDBMS. The `dm` package facilitates access to the RDBMS, while the `rolap` package supports the definition of the necessary transformations in this context.
+In this document we have started from transactional data in a RDBMS and, through the `dm` and `rolap` packages, we have obtained two star databases and/or a constellation also in RDBMS. The `dm` package facilitates access to the RDBMS, while the `rolap` package supports the definition of the necessary transformations in this context.
 
 The initial data schema is very close to a star schema although, as explained in the design section, it is conceptually different (particularly the concepts of transaction and transaction line). The simple structure of this schema has only facilitated the process of obtaining the starting flat table to work with the `rolap` package.
