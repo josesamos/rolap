@@ -166,6 +166,8 @@ share_dimension_instance_operations <- function(stars, dim_freq) {
               details <- next_op$details
               details2 <- next_op$details2
               if (is_new_operation(stars[[s]]$operations[[f]], op_name, dn, details, details2)) {
+                details <- string_to_vector(details)
+                details2 <- string_to_vector(details2)
                 pos_att <- as.integer(details)
                 attributes <- colnames(stars[[s]]$dimensions[[dn]]$table)[pos_att]
                 # c(old, "-->>", new)

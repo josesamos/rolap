@@ -204,7 +204,7 @@ pander::pandoc.table(t, split.table = Inf)
 ## Constellation
 
 ```{r}
-ct <- constellation("CSS", list(db_finest, db_summary))
+ct <- constellation("CSS", list(db_finest, db_3))
 
 ct_dm_all <- ct |>
   as_dm_class(pk_facts = FALSE)

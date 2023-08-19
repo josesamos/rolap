@@ -108,8 +108,6 @@ get_next_operation.star_operation <- function(op, op_name, name = NULL, actual =
   if (nrow(res) > 0) {
     order <- min(res$order)
     res <- res[res$order == order, ]
-    res$details <- string_to_vector(res$details)
-    res$details2 <- string_to_vector(res$details2)
   } else {
     res <- NULL
   }
