@@ -604,10 +604,10 @@ get_table_names.star_database <- function(db) {
 }
 
 
-#' Get similar attribute values in a dimension
+#' Get similar attribute values combination in a dimension
 #'
 #' Get sets of attribute values in a dimension that differ only by tildes, spaces,
-#' or punctuation marks.
+#' or punctuation marks, for the combination of the given set of attributes.
 #'
 #' If a name is indicated in the `col_as_vector` parameter, it includes a column
 #' with the data in vector form to be used in other functions.
@@ -688,12 +688,100 @@ get_similar_attribute_values.star_database <-
       if (!is.null(col_as_vector)) {
         v <- add_dput_column(v, col_as_vector)
       }
-      res <- c(res, list(v))
+      if (nrow(v) > 1) {
+        res <- c(res, list(v))
+      }
+    }
+    res
+  }
+
+#################################
+
+
+#' Get similar attribute values for individual attributes in dimensions
+#'
+#' Get sets of attribute values for individual attributes in the set of dimensions
+#' that differ only by tildes, spaces, or punctuation marks. If no dimension name
+#' is indicated, all dimensions are considered.
+#'
+#' If a name is indicated in the `col_as_vector` parameter, it includes a column
+#' with the data in vector form to be used in other functions.
+#'
+#' @param db A `star_database` object.
+#' @param name A vector of strings, dimension names.
+#' @param col_as_vector A string, name of the column to include a vector of values.
+#'
+#' @return A vector of `tibble` objects with similar instances.
+#'
+#' @family star database and constellation definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' instances <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_similar_attribute_values_individual(name = c("where", "who"))
+#'
+#' instances <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_similar_attribute_values_individual()
+#'
+#' @export
+get_similar_attribute_values_individual <- function(db, name, attributes, col_as_vector) UseMethod("get_similar_attribute_values_individual")
+
+#' @rdname get_similar_attribute_values_individual
+#'
+#' @export
+get_similar_attribute_values.star_database <-
+  function(db,
+           name = NULL,
+           col_as_vector = NULL) {
+    stopifnot("Missing dimension name." = !is.null(name))
+    name <- snakecase::to_snake_case(name)
+    stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+    dt <- db$dimensions[[name]]$table
+    att <- colnames(dt)[-1]
+    if (is.null(attributes)) {
+      attributes <- att
+    } else {
+      stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+      for (attribute in attributes) {
+        if (!(attribute %in% att)) {
+          stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
+        }
+      }
+    }
+    dt <- data.frame(dt[, attributes], stringsAsFactors = FALSE)
+    # in one column
+    dt <- do.call(paste, c(dt, sep = ""))
+    # clean values
+    dt <- iconv(dt, to = "ASCII//TRANSLIT")
+    dt <- tolower(dt)
+    dt <- snakecase::to_snake_case(dt)
+    dt <- gsub("_", "", dt)
+    # value frequency
+    t_freq <- table(dt)
+    t_freq <- t_freq[t_freq > 1]
+    # repeated values
+    n_freq <- names(t_freq)
+    res <- list()
+    for (i in seq_along(n_freq)) {
+      v <- db$dimensions[[name]]$table[dt == n_freq[i], attributes]
+      # error in dim-instances.Rmd: transform a column tibble y a vector
+      v <- data.frame(v, stringsAsFactors = FALSE)
+      names(v) <- attributes
+      v <- dplyr::arrange_all(unique(tibble::as_tibble(v)))
+      if (!is.null(col_as_vector)) {
+        v <- add_dput_column(v, col_as_vector)
+      }
+      if (nrow(v) > 1) {
+        res <- c(res, list(v))
+      }
     }
     res
   }
 
 
+
+###############--------------------
 
 #' Get unique attribute values in a dimension
 #'
@@ -719,7 +807,7 @@ get_similar_attribute_values.star_database <-
 #'     attributes = c("City", "State"))
 #'
 #' @export
-get_unique_attribute_values <- function(db, name, attributes, col_as_vector) UseMethod("get_unique_attribute_values")
+get_unique_attribute_values <- function(db, name, col_as_vector) UseMethod("get_unique_attribute_values")
 
 #' @rdname get_unique_attribute_values
 #'
@@ -727,7 +815,6 @@ get_unique_attribute_values <- function(db, name, attributes, col_as_vector) Use
 get_unique_attribute_values.star_database <-
   function(db,
            name,
-           attributes = NULL,
            col_as_vector = NULL) {
     stopifnot("Missing dimension name." = !is.null(name))
     name <- snakecase::to_snake_case(name)
