@@ -57,6 +57,18 @@ db_summary |>
   get_similar_attribute_values('what')
 ```
 
+
+```{r}
+db_summary |>
+  get_similar_attribute_values('who_segment')
+
+db_summary |>
+  get_similar_attribute_values('where_chain')
+```
+
+
+
+
 ```{r, results = "asis"}
 t <- db_summary |>
   get_unique_attribute_values('what', col_as_vector = "As a vector")
@@ -64,6 +76,24 @@ t <- db_summary |>
 pander::pandoc.table(t, split.table = Inf)
 ```
 
+```{r}
+
+t <- db_summary |>
+  get_unique_attribute_values('who_segment', col_as_vector = "As a vector")
+
+pander::pandoc.table(t, split.table = Inf)
+
+t <- db_summary |>
+  get_unique_attribute_values('where_chain')
+
+pander::pandoc.table(t, split.table = Inf)
+
+
+db_summary |>
+  get_similar_attribute_values('where_chain', attributes = 'segment')
+
+
+```
 
 
 
@@ -99,7 +129,7 @@ db_2 <- db_summary |>
     old = c('Autoprísluš.', 'Dalnic.popl.', 'Knihy,nov.', 'LPG', 'Mytí vozidel',
             'Nemrz.kapal.', 'Obcerstvení', 'Oleje,tuky', 'Potraviny', 'Prev.náplne',
             'Provoz.nápl.', 'Umývanie voz', 'Zboží nesp.', 'Zpr.nakupu'),
-    new = c('Ostatní')
+    new = c('Other')
   ) |>
   group_dimension_instances(name = 'what')
 ```
