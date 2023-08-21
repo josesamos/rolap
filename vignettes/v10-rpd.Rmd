@@ -1,8 +1,8 @@
 ---
-title: "Definition of Role-Playing and Role Dimensions"
+title: "Definition of role-playing and role dimensions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Definition of Role-Playing and Role Dimensions}
+  %\VignetteIndexEntry{Definition of role-playing and role dimensions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,15 +18,15 @@ knitr::opts_chunk$set(
 library(rolap)
 ```
 
-# Role-playing and role dimensions
+# Introduction
 
 A single dimension can be referenced multiple times in a fact table, with each reference linked to a different conceptual role. These separate dimension views are called *role dimensions* and the common dimension is called a *role-playing dimension*.
 
 Depending on the OLAP (*On-Line Analytical Processing*) query system that we use, we may be interested in having a single physical table and defining views on it (one view for each role) or a different physical table for each role. The `rolap` package tries to facilitate the operations to achieve the alternative that we decide to implement.
 
-This document shows by means of an example the possibilities offered by the package in this context. First, through a star database, then by implementing a constellation.
+This document shows by means of an example the possibilities offered by the package in this context. First, through a star database, then by implementing a constellation. Finally, the conclusions are presented.
 
-# A star database
+# Role-playing and role dimensions in a star database
 
 First of all, we are going to present the starting data, then we will define the star schema to obtain the star database. Next, we will see the different possibilities with the role-playing dimension and the roles.
 
@@ -164,7 +164,7 @@ db_dm |>
 
 The physical tables are kept in the star database but we work with a RDBMS and we want to work with only one physical table for the dimension, the rest of the tables can be easily defined by views.
 
-# A constellation
+# Role-playing and role dimensions in a constellation
 
 With several star databases we can define a constellation where stars can share dimensions. Common dimensions must have the same name and structure. In the case of having role-playing dimensions and role dimensions, this must be taken into account since the shared dimensions must be transformed into conformed dimensions, but the package takes care of this automatically, as we will see below.
 
