@@ -17,7 +17,7 @@ db_summary
 Multidimensional design with a summary from the data available at the source.
 }
 \details{
-The development has been done in the vignette \code{vignette("rdbms-dm")}.
+The development has been done in the vignette \code{vignette("v20-rdbms-dm")}.
 }
 \seealso{
 \code{\link{mrs_cause_schema}}

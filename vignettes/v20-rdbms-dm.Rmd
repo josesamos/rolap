@@ -267,7 +267,7 @@ sum(db_tl[['transaction_line']]$nrow_agg)
 
 ### Definition of role-playing and role dimensions
 
-In the star database, we can define that any one of the dimensions is the role-playing dimension and the other dimensions are various roles of that dimension, the only requirement is that all dimensions must have the same number of attributes. More details can be found in the vignette titled *Definition of Role-Playing and Role Dimensions*, `vignette("rpd")`.
+In the star database, we can define that any one of the dimensions is the role-playing dimension and the other dimensions are various roles of that dimension, the only requirement is that all dimensions must have the same number of attributes. More details can be found in the vignette titled *Definition of Role-Playing and Role Dimensions*, `vignette("v10-rpd")`.
 
 For the case we are solving, the definition is shown below.
 

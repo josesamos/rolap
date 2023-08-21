@@ -22,7 +22,7 @@ The document is structured as follows: First, we show examples of functions that
 
 # Exploration of dimensions
 
-To show by example the available operations, we are going to use the multidimensional designs developed in the vignette titled *Star databases and RDBMS through the `dm` and `rolap` packages*, `vignette("rdbms-dm")`, which are available as a `star_database` objects (`db_summary` and `db_finest`). 
+To show by example the available operations, we are going to use the multidimensional designs developed in the vignette titled *Star databases and RDBMS through the `dm` and `rolap` packages*, `vignette("v20-rdbms-dm")`, which are available as a `star_database` objects (`db_summary` and `db_finest`). 
 
 ## Consult tables and dimensions
 

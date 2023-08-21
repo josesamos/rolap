@@ -281,7 +281,7 @@
 #'
 #' Multidimensional design with finest detail from the data available at the source.
 #'
-#' The development has been done in the vignette `vignette("rdbms-dm")`.
+#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
 #' @family database example data
 #' @seealso \code{\link{mrs_cause_schema}}
@@ -295,7 +295,7 @@
 #'
 #' Multidimensional design with a summary from the data available at the source.
 #'
-#' The development has been done in the vignette `vignette("rdbms-dm")`.
+#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
 #' @family database example data
 #' @seealso \code{\link{mrs_cause_schema}}
