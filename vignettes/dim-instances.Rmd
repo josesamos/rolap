@@ -16,89 +16,161 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-It is generally recommended to perform data cleansing as close as possible to the original data sources. Sometimes, the need to perform data cleaning operations is detected when the multidimensional system is already implemented, either because it hasn't been detected in the data sources or because it comes from multiple data sources. For example, we can integrate several stars with common dimensions in a constellation and, when conforming the dimensions, we observe that there are instances that are actually the same and should be merged (they only differ in the form of abbreviation or in a misspelling). For these cases, the functions described in this vignette have been developed.
+It is generally recommended to perform data cleansing as close as possible to the original data sources. Sometimes, the need to perform data cleaning operations is detected when the multidimensional system is already implemented, either because it hasn't been detected in the data sources or because it comes from multiple data sources. For example, we can integrate several stars with common dimensions in a constellation and, when conforming the dimensions, we observe that there are instances that are actually the same and should be merged. For these cases, the functions described in this vignette have been developed.
 
-# Detection of repeated values in dimension instances
+# Exploration of dimensions
 
-To show by example the available operations, we are going to use one of the multidimensional designs developed in the vignette titled *Star databases and RDBMS through the `dm` and `rolap` packages*, `vignette("rdbms-dm")`, which is available as a `star_database` object (`db_summary`). As shown below, we can get the names of the available dimensions.
+To show by example the available operations, we are going to use the multidimensional designs developed in the vignette titled *Star databases and RDBMS through the `dm` and `rolap` packages*, `vignette("rdbms-dm")`, which are available as a `star_database` objects (`db_summary` and `db_finest`). 
+
+## Consult tables and dimensions
+
+We will start working on one of the star databases, `db_summary`. As shown below, we can get the names of the available tables and, exporting them as a list of `tibble` objects, we can see their number of instances.
 
 ```{r}
 library(rolap)
 
 class(db_summary)
 
+names <- db_summary |>
+  get_table_names()
+
 db_tl <- db_summary |>
   as_tibble_list()
 
-names <- names(db_tl)
-for (i in seq_along(db_tl)){
-  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+for (n in names) {
+  cat(sprintf("name: %s, %d rows\n", n, nrow(db_tl[[n]])))
 }
 ```
 
-
+If instead of all the tables, we want to focus on the dimensions, we can get their names using the following function.
 
 ```{r}
 db_summary |>
   get_dimension_names()
 ```
 
-
-
-Let's focus on the *what* dimension. 
+Although the design includes all of the above dimensions, we have several dimensions that are role-playing and role dimensions, as shown below.
 
 ```{r}
-db_summary |> 
-  get_attribute_names('what')
+db_summary |>
+  get_role_playing_dimension_names()
 ```
 
+This means that these dimensions are considered to be represented by a single table.
+
+## Detect similar attribute values in dimensions
+
+The goal is to find dimension instances whose attribute values differ in possible different spellings (number of white space, case, use of punctuation). It does not detect abbreviations.
+
+An initial exploration can be done considering individual attributes of the dimensions that are indicated or of all the dimensions, if none are indicated.
+
 ```{r}
 db_summary |>
-  get_similar_attribute_values('what')
+  get_similar_attribute_values_individually()
 ```
 
+Since no dimension has been indicated, all the dimensions have been considered but the role-playing and role dimensions have been taken into account to show the results of only one of them.
+
+In a complementary way, we could consider combinations of attributes within each dimension. If we do not indicate any dimension, the combination of all the attributes of each of the dimensions is considered, as shown below.
 
 ```{r}
 db_summary |>
-  get_similar_attribute_values('who_segment')
+  get_similar_attribute_values()
+```
 
-db_summary |>
+To more clearly show how these functions work, we are going to modify a value in a test star database and perform the query on a single dimension.
+
+```{r}
+db_test <- db_summary
+(value_seg1 <- db_test$dimensions$where_chain$table$chain[3])
+(value_seg2 <- db_test$dimensions$where_chain$table$chain[4])
+db_test$dimensions$where_chain$table$chain[3] <- ' ,1-.% $1)='
+db_test$dimensions$where_chain$table$chain[4] <- ' ,1-.% $1)='
+
+db_test |>
+  get_similar_attribute_values_individually('where_chain')
+
+db_test |>
   get_similar_attribute_values('where_chain')
 ```
 
+## Get unique values of attributes in dimensions
 
-
-
-```{r, results = "asis"}
-t <- db_summary |>
-  get_unique_attribute_values('what', col_as_vector = "As a vector")
-
-pander::pandoc.table(t, split.table = Inf)
-```
+If we focus on a dimension, we can query its attributes and get the unique value formed by combinations of them. We can indicate a set of attributes and, if we do not indicate any, all dimension attributes are considered.
 
 ```{r}
+db_test |> 
+  get_attribute_names('where_chain')
 
-t <- db_summary |>
-  get_unique_attribute_values('who_segment', col_as_vector = "As a vector")
+db_test |>
+  get_unique_attribute_values('where_chain', attributes = c('country', 'segment'))
 
-pander::pandoc.table(t, split.table = Inf)
+db_test |>
+  get_unique_attribute_values('where_chain', attributes = 'chain')
 
-t <- db_summary |>
+db_test |>
   get_unique_attribute_values('where_chain')
-
-pander::pandoc.table(t, split.table = Inf)
-
-
-db_summary |>
-  get_similar_attribute_values('where_chain', attributes = 'segment')
-
-
 ```
 
 
+# Modifying attribute instances in dimensions
+
+In this section we are going to show several cases of modification of attribute values. Surely, the most suitable thing would be to carry out the necessary modification operations in the data sources (or as close to them as possible). In any case, we are going to do them here to show the possibilities of the `rolap` package.
+
+## Modification of a single value indicating several attributes
+
+First, let's start by fixing the bug introduced in the test star database. For all of the above functions, we can define the parameter `col_as_vector` that indicates to display the values as a vector. We will see later that this can be useful to make changes to the values, since it is the way to indicate them. 
 
 ```{r}
-db_2 <- db_summary |>
+db_test |>
+  get_unique_attribute_values(
+    'where_chain',
+    attributes = c('chain', 'country'),
+    col_as_vector = "As a vector"
+  )
+```
+
+Using the following function, we can indicate one or more attributes and the old and new values for them. If we indicate several attributes, in each call we can only change a combination of values. In this way we restore the original values that we had saved, as you can check below.
+
+```{r}
+db_summary2 <- db_test |>
+  replace_attribute_values(
+    name = 'where_chain',
+    attributes = c('chain', 'country'),
+    old = c(' ,1-.% $1)=', 'CZE'),
+    new = c(value_seg1, 'CZE')
+  ) |>
+  replace_attribute_values(
+    name = 'where_chain',
+    attributes = c('chain', 'country'),
+    old = c(' ,1-.% $1)=', 'SVK'),
+    new = c(value_seg2, 'SVK')
+  )
+
+db_summary2 |>
+  get_unique_attribute_values(
+    'where_chain',
+    attributes = c('chain', 'country'),
+    col_as_vector = "As a vector"
+  )
+```
+
+## Modifying multiple values of an attribute
+
+If we want to modify the values of a single attribute, we can indicate several values that correspond to a new value.
+
+In this case, we are going to make modifications in two of the dimensions. First, in dimension *what*.
+
+```{r}
+t <- db_summary2 |>
+  get_unique_attribute_values('what', col_as_vector = "As a vector")
+```
+
+Suppose that, in view of the available values, we consider that we do not need details of all those products, but that we need a simplification: The one shown below. 
+
+
+```{r}
+db_summary3 <- db_summary2 |>
   replace_attribute_values(
     name = 'what',
     attributes = 'product',
@@ -134,55 +206,48 @@ db_2 <- db_summary |>
   group_dimension_instances(name = 'what')
 ```
 
-```{r, results = "asis"}
-t <- db_2 |>
-  get_unique_attribute_values('what', col_as_vector = "As a vector")
+We change the name of some products because there seems to be an error or they were spelled two different ways; in others cases we group several products into a new one, the largest grouping is for products that are renamed *Other*. Finally, if, as a result of the modifications, we have reduced the number of distinct instances of the dimension, when we finish making modifications, we must group the dimension instances to simplify it using the `group_dimension_instances()` function. As a side result, the facts may also be grouped.
 
-pander::pandoc.table(t, split.table = Inf)
+The result for the dimension can be seen below.
+
+```{r}
+db_summary3 |>
+  get_unique_attribute_values('what')
 ```
+
+If we get the number of instances of the tables (as we did at the beginning of this document) we verify that the number of records in the fact table has been reduced. We also check that the number of original records (indicated by measure `transactions`) from which these have been obtained is maintained. That is, several fact table records have been added as a side effect of the dimension changes.
 
 
 ```{r}
-db_tl <- db_2 |>
+db_tl <- db_summary3 |>
   as_tibble_list()
 
-names <- names(db_tl)
-for (i in seq_along(db_tl)){
-  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+for (n in names) {
+  cat(sprintf("name: %s, %d rows\n", n, nrow(db_tl[[n]])))
 }
 
 sum(db_tl[['transaction_summary']]$transactions)
 ```
 
+## Modification of instances in role-playing and role dimensions
 
-```{r, results = "asis"}
-t <- db_2 |>
-  get_unique_attribute_values('when', attributes = c('date'))
-
-pander::pandoc.table(t, split.table = Inf)
-
-
-t <- db_2 |>
-  get_unique_attribute_values('when_paid', attributes = c('payment_date'))
-
-pander::pandoc.table(t, split.table = Inf)
-
-
-db_2 |>
-  get_role_playing_dimension_names()
-```
-
-
-```{r, results = "asis"}
-t <- db_2 |>
-  get_unique_attribute_values('when', attributes = c('hour'), col_as_vector = "As a vector")
-
-pander::pandoc.table(t, split.table = Inf)
-```
-
+The two *When* dimensions are role-playing and role dimensions. That is, they have the same instances and one can be obtained from the other by renaming attributes if necessary and of course the table.
 
 ```{r}
-db_3 <- db_2 |>
+db_summary3 |>
+  get_role_playing_dimension_names()
+
+db_summary3 |>
+  get_unique_attribute_values('when')
+
+db_summary3 |>
+  get_unique_attribute_values('when_paid')
+```
+
+Let us suppose that we are not interested in the specific hours of the operations, but rather the part of the day in which they were carried out. Therefore, we define the modifications on one of the dimensions *When*.
+
+```{r}
+db_summary4 <- db_summary3 |>
   replace_attribute_values(
     name = 'when',
     attributes = 'hour',
@@ -210,31 +275,39 @@ db_3 <- db_2 |>
   group_dimension_instances(name = 'when')
 ```
 
+The result obtained in both dimensions is shown below. That is, the modifications have been propagated to the equivalent dimension.
+
 ```{r}
-db_tl <- db_3 |>
+db_summary4 |>
+  get_unique_attribute_values('when')
+
+db_summary4 |>
+  get_unique_attribute_values('when_paid')
+```
+
+We do the same check as before on the number of instances of the tables and we observe that in this case the number of records in the fact table has also been reduced as a result of the aggregation carried out.
+
+```{r}
+db_tl <- db_summary4 |>
   as_tibble_list()
 
-names <- names(db_tl)
-for (i in seq_along(db_tl)){
-  cat(sprintf("name: %s, %d rows\n", names[i], nrow(db_tl[[i]])))
+for (n in names) {
+  cat(sprintf("name: %s, %d rows\n", n, nrow(db_tl[[n]])))
 }
 
 sum(db_tl[['transaction_summary']]$transactions)
 ```
 
 
-```{r, results = "asis"}
-t <- db_3 |>
-  get_unique_attribute_values('when')
+# Constellation
 
-pander::pandoc.table(t, split.table = Inf)
-```
+ 
 
+agrupar otros productos y ver la propagación mutua de las operaciones.
 
-## Constellation
 
 ```{r}
-ct <- constellation("CSS", list(db_finest, db_3))
+ct <- constellation("CSS", list(db_finest, db_summary4))
 
 ct_dm_all <- ct |>
   as_dm_class(pk_facts = FALSE)
