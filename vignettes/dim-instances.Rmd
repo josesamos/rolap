@@ -16,7 +16,9 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-It is generally recommended to perform data cleansing as close as possible to the original data sources. Sometimes, the need to perform data cleaning operations is detected when the multidimensional system is already implemented, either because it hasn't been detected in the data sources or because it comes from multiple data sources. For example, we can integrate several stars with common dimensions in a constellation and, when conforming the dimensions, we observe that there are instances that are actually the same and should be merged. For these cases, the functions described in this vignette have been developed.
+It is generally recommended to perform data cleansing as close as possible to the original data sources. Sometimes, the need to perform data cleaning operations is detected when the multidimensional system is already implemented, either because it hasn't been detected in the data sources or because it comes from multiple data sources. For example, we can integrate several stars with common dimensions in a constellation and, when conforming the dimensions, we observe that there are instances that are actually the same and should be merged. For these cases, the functions described in this document have been developed.
+
+The document is structured as follows: First, we show examples of functions that allow us to explore the instances of the dimensions; the following shows how to modify instances of dimensions in a star database for several attributes or for a single attribute; the next section explains how the integration of instance modification operations is done when we define a constellation; finally, we end with conclusions.
 
 # Exploration of dimensions
 
@@ -299,30 +301,96 @@ sum(db_tl[['transaction_summary']]$transactions)
 ```
 
 
-# Constellation
+# Modifications of instances in a constellation
 
- 
-
-agrupar otros productos y ver la propagación mutua de las operaciones.
-
+To define a constellation we need at least two star databases. We consider the other star database from the starting example. We look at the instances of the *what* dimension.
 
 ```{r}
-ct <- constellation("CSS", list(db_finest, db_summary4))
-
-ct_dm_all <- ct |>
-  as_dm_class(pk_facts = FALSE)
-
-tables <- ct |>
-  get_table_names()
-
-# Degenerate dimension
-tables <- setdiff(tables, 'transaction')
-
-ct_dm <-
-  ct_dm_all[tables]
-
-ct_dm |> 
-  dm::dm_draw(view_type = "all")
+db_finest |>
+  get_unique_attribute_values('what', col_as_vector = "As a vector")
 ```
 
+Suppose some instances of this dimension are also modified, as shown below.
 
+```{r}
+db_finest2 <- db_finest |>
+  replace_attribute_values(
+    name = 'what',
+    attributes = 'product',
+    old = c('Additivum', 'Autokozmetik'),
+    new = c('Other')
+  ) |>
+  group_dimension_instances(name = 'what')
+
+db_finest2 |>
+  get_unique_attribute_values('what', col_as_vector = "As a vector")
+```
+ 
+We define the constellation and as a result the dimensions are integrated.
+
+```{r}
+ct <- constellation("CSS", list(db_summary4, db_finest2))
+
+class(ct)
+
+names <- ct |>
+  get_table_names()
+
+db_tl <- ct |>
+  as_tibble_list()
+
+for (n in names) {
+  cat(sprintf("name: %s, %d rows\n", n, nrow(db_tl[[n]])))
+}
+```
+
+## Transformations in just one star database
+
+For the dimension *When*, transformations were defined in only one of the star databases. The role-playing and role dimensions of the two star databases are also integrated. As a result, modifications are carried over from one star database to the other. 
+
+```{r}
+ct |>
+  get_role_playing_dimension_names()
+
+ct |>
+  get_unique_attribute_values('when_processed')
+```
+
+The result is shown for dimension *when_processed*, which is not part of the star database on which the modifications were defined but it is modified.
+
+
+## Transformations in both star databases
+
+In the case of the *what* dimension, transformations have been carried out in both star databases: They are combined taking the new operations from one database to another.
+
+```{r}
+ct |>
+  get_unique_attribute_values('what', col_as_vector = "As a vector")
+```
+
+The result obtained is explained because in star database *db_summary* the new operations of star database *db_finest* have been applied and vice versa. In the star database *db_finest*, the *Autokosmet.* to *Autokozmetik* transformation has been applied after the *Autokozmetik* to *Other* transformation, so the *Autokozmetik* value has been generated.
+
+This situation has been sought in this example. When defining a constellation we must review the resulting dimensions. In any case, we can continue to make changes to the constellation, as shown below.
+
+```{r}
+ct2 <- ct |>
+  replace_attribute_values(
+    name = 'what',
+    attributes = 'product',
+    old = c('Autokozmetik'),
+    new = c('Other')
+  ) |>
+  group_dimension_instances(name = 'what')
+
+ct2 |>
+  get_unique_attribute_values('what', col_as_vector = "As a vector")
+```
+ 
+ 
+# Conclusions
+
+This document shows how to perform modification operations on dimension instances in both star databases and constellations. The modifications take into account the definition of role-playing and role dimensions both in a single database and in the integration of several to form a constellation.
+
+In the case of performing operations on common dimensions of several star databases, the new operations are carried from one to another star database. If there is a conflict, we may need to define new operations on the constellation.
+
+Although it is usually advisable to carry out the modification operations as close as possible to the data sources, this mechanism gives us flexibility especially when integrating several star databases into a constellation.
