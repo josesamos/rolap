@@ -3,7 +3,7 @@
 \name{get_similar_attribute_values}
 \alias{get_similar_attribute_values}
 \alias{get_similar_attribute_values.star_database}
-\title{Get similar attribute values combination in a dimension}
+\title{Get similar attribute values combination in dimensions}
 \usage{
 get_similar_attribute_values(db, name, attributes, col_as_vector)
 
@@ -27,10 +27,16 @@ get_similar_attribute_values(db, name, attributes, col_as_vector)
 A vector of \code{tibble} objects with similar instances.
 }
 \description{
-Get sets of attribute values in a dimension that differ only by tildes, spaces,
+Get sets of attribute values in dimensions that differ only by tildes, spaces,
 or punctuation marks, for the combination of the given set of attributes.
 }
 \details{
+A list of dimensions can be indicated, otherwise it considers all dimensions.
+
+If a dimension is indicated, a list of attributes to be considered in it can
+also be indicated. If several dimensions are indicated, the combination of
+all the attributes of each dimension is considered.
+
 If a name is indicated in the \code{col_as_vector} parameter, it includes a column
 with the data in vector form to be used in other functions.
 }

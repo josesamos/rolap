@@ -35,7 +35,7 @@ with the data in vector form to be used in other functions.
 \examples{
 
 instances <- star_database(mrs_cause_schema, ft_num) |>
-  get_similar_attribute_values_individually(name = c("where", "who"))
+  get_similar_attribute_values_individually(name = c("where", "when"))
 
 instances <- star_database(mrs_cause_schema, ft_num) |>
   get_similar_attribute_values_individually()

@@ -572,6 +572,91 @@ test_that("get_similar_attribute_values()", {
   })
 })
 
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db$dimensions$where$table$State[1] <- " c   T "
+    db$dimensions$when$table$Year[3] <- '1963.'
+    db |> get_similar_attribute_values(col_as_vector = 'dput_instance')
+  }, {
+    list(when = list(structure(
+      list(
+        Year = c("1963", "1963."),
+        dput_instance = c("c('1963')",
+                          "c('1963.')")
+      ),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl",
+                "data.frame")
+    )),
+    where = list(structure(
+      list(
+        REGION = c("1",
+                   "1"),
+        State = c(" c   T ", "CT"),
+        City = c("Bridgeport", " BrId  gEport "),
+        dput_instance = c("c('1', ' c   T ', 'Bridgeport')", "c('1', 'CT', ' BrId  gEport ')")
+      ),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )))
+  })
+})
+
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db$dimensions$where$table$State[1] <- " c   T "
+    db$dimensions$when$table$Year[3] <- '1963.'
+    db |> get_similar_attribute_values("where",
+                                       attributes = c('City', 'State'),
+                                       col_as_vector = 'dput_instance')
+  }, {
+    list(structure(
+      list(
+        City = c(" BrId  gEport ", "Bridgeport"),
+        State = c("CT", " c   T "),
+        dput_instance = c("c(' BrId  gEport ', 'CT')",
+                          "c('Bridgeport', ' c   T ')")
+      ),
+      row.names = c(NA,-2L),
+      class = c("tbl_df",
+                "tbl", "data.frame")
+    ))
+  })
+})
+
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db$dimensions$where$table$State[1] <- " c   T "
+    db$dimensions$when$table$Year[3] <- '1963.'
+    db |> get_similar_attribute_values_individually()
+  }, {
+    list(when = list(structure(
+      list(Year = c("1963", "1963.")),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )),
+    where = list(
+      structure(
+        list(State = c(" c   T ", "CT")),
+        row.names = c(NA,-2L),
+        class = c("tbl_df", "tbl", "data.frame")
+      ),
+      structure(
+        list(City = c(" BrId  gEport ", "Bridgeport")),
+        row.names = c(NA,-2L),
+        class = c("tbl_df", "tbl", "data.frame")
+      )
+    ))
+  })
+})
+
+
 test_that("replace_attribute_values()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num)

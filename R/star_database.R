@@ -604,10 +604,16 @@ get_table_names.star_database <- function(db) {
 }
 
 
-#' Get similar attribute values combination in a dimension
+#' Get similar attribute values combination in dimensions
 #'
-#' Get sets of attribute values in a dimension that differ only by tildes, spaces,
+#' Get sets of attribute values in dimensions that differ only by tildes, spaces,
 #' or punctuation marks, for the combination of the given set of attributes.
+#'
+#' A list of dimensions can be indicated, otherwise it considers all dimensions.
+#'
+#' If a dimension is indicated, a list of attributes to be considered in it can
+#' also be indicated. If several dimensions are indicated, the combination of
+#' all the attributes of each dimension is considered.
 #'
 #' If a name is indicated in the `col_as_vector` parameter, it includes a column
 #' with the data in vector form to be used in other functions.
@@ -651,6 +657,9 @@ get_similar_attribute_values.star_database <-
            attributes = NULL,
            col_as_vector = NULL) {
     name <- validate_dimension_names(db, name)
+    if (length(name) > 1 & !is.null(attributes)) {
+      stop("For more than one dimension, a value cannot be indicated for the attributes parameter.")
+    }
     rv =  vector("list", length = length(name))
     names(rv) <- name
     for (dn in name) {
@@ -703,8 +712,6 @@ get_similar_attribute_values.star_database <-
     }
   }
 
-#################################
-
 
 #' Get similar attribute values for individual attributes in dimensions
 #'
@@ -727,7 +734,7 @@ get_similar_attribute_values.star_database <-
 #' @examples
 #'
 #' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values_individually(name = c("where", "who"))
+#'   get_similar_attribute_values_individually(name = c("where", "when"))
 #'
 #' instances <- star_database(mrs_cause_schema, ft_num) |>
 #'   get_similar_attribute_values_individually()
@@ -771,7 +778,9 @@ validate_dimension_names <- function(db, name) {
   if (!is.null(name)) {
     name <- unique(snakecase::to_snake_case(name))
     for (dn in name) {
-      stopifnot("It is not a dimension name." = dn %in% names(db$dimensions))
+      if (!(dn %in% names(db$dimensions))) {
+        stop(sprintf("'%s' is not a dimension name.", dn))
+      }
     }
   } else {
     name <- names(db$dimensions)
