@@ -29,8 +29,9 @@ surrogate keys."><meta property="og:image" content="https://josesamos.github.io/
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/dm.html">Star databases and RDBMS through the dm and rolap packages</a>
-    <a class="dropdown-item" href="../articles/rpd.html">Definition of Role-Playing and Role Dimensions</a>
+    <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of Role-Playing and Role Dimensions</a>
+    <a class="dropdown-item" href="../articles/v20-rdbms-dm.html">Star databases and RDBMS through the dm and rolap packages</a>
+    <a class="dropdown-item" href="../articles/v30-dim-instances.html">Integration of dimension instances</a>
   </div>
 </li>
 <li class="nav-item">
@@ -67,6 +68,7 @@ surrogate keys.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fact_table</span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  surrogate_keys <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  agg <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  dim_int_names <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  instances <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -80,6 +82,10 @@ surrogate keys.</p>
 
 <dt>surrogate_keys</dt>
 <dd><p>A vector of strings, surrogate key names.</p></dd>
+
+
+<dt>agg</dt>
+<dd><p>A vector of strings, aggregation functions.</p></dd>
 
 
 <dt>dim_int_names</dt>
