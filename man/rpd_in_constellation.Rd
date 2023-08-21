@@ -2,12 +2,9 @@
 % Please edit documentation in R/constellation.R
 \name{rpd_in_constellation}
 \alias{rpd_in_constellation}
-\alias{rpd_in_constellation.constellation}
 \title{Transform role playing dimensions in constellation}
 \usage{
 rpd_in_constellation(db)
-
-\method{rpd_in_constellation}{constellation}(db)
 }
 \arguments{
 \item{db}{A \code{constellation} object.}

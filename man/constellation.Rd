@@ -2,7 +2,7 @@
 % Please edit documentation in R/constellation.R
 \name{constellation}
 \alias{constellation}
-\title{\code{constellation} S3 class}
+\title{Create constellation}
 \usage{
 constellation(name = NULL, stars = NULL)
 }
@@ -12,10 +12,10 @@ constellation(name = NULL, stars = NULL)
 \item{stars}{A list of \code{star_database} objects.}
 }
 \value{
-A \code{constellation} object.
+A \code{star_database} object.
 }
 \description{
-Creates a \code{constellation} object from a list of \code{star_database} objects. All
+Creates a constellation from a list of \code{star_database} objects. All
 dimensions with the same name in the star schemas have to be conformable
 (share the same structure, even though they have different instances).
 }
@@ -46,12 +46,19 @@ ct2 <- constellation("MRS", list(db3, db4))
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 
 Other star database and constellation definition functions: 
-\code{\link{get_dimension_attribute_names}()},
-\code{\link{get_fact_measure_names}()},
+\code{\link{get_attribute_names}()},
+\code{\link{get_dimension_names}()},
+\code{\link{get_measure_names}()},
 \code{\link{get_role_playing_dimension_names}()},
+\code{\link{get_similar_attribute_values_individually}()},
+\code{\link{get_similar_attribute_values}()},
+\code{\link{get_table_names}()},
+\code{\link{get_unique_attribute_values}()},
+\code{\link{group_dimension_instances}()},
+\code{\link{replace_attribute_values}()},
 \code{\link{role_playing_dimension}()},
-\code{\link{set_dimension_attribute_names}()},
-\code{\link{set_fact_measure_names}()},
+\code{\link{set_attribute_names}()},
+\code{\link{set_measure_names}()},
 \code{\link{snake_case}()},
 \code{\link{star_database}()}
 }

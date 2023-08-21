@@ -1,13 +1,13 @@
-#' `constellation` S3 class
+#' Create constellation
 #'
-#' Creates a `constellation` object from a list of `star_database` objects. All
+#' Creates a constellation from a list of `star_database` objects. All
 #' dimensions with the same name in the star schemas have to be conformable
 #' (share the same structure, even though they have different instances).
 #'
 #' @param name A string.
 #' @param stars A list of `star_database` objects.
 #'
-#' @return A `constellation` object.
+#' @return A `star_database` object.
 #'
 #' @family star database and constellation definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
@@ -40,30 +40,45 @@ constellation <- function(name = NULL, stars = NULL) {
   stopifnot("A constellation must be made up of more than one star." = length(stars) > 1)
   fct_names <- c()
   dim_names <- c()
-  facts <- vector("list", length = length(stars))
-  rpd <- list()
+  num_stars <- 0
   for (s in seq_along(stars)) {
     stopifnot("A constellation must be made up of stars." = methods::is(stars[[s]], "star_database"))
-    fct_names <- c(fct_names, names(stars[[s]]$instance$facts))
-    dim_names <- c(dim_names, names(stars[[s]]$instance$dimensions))
-    facts[s] <- stars[[s]]$instance$facts
-    rpd <- c(rpd, stars[[s]]$instance$rpd)
+    num_stars <- num_stars + length(stars[[s]]$facts)
+    fct_names <- c(fct_names, names(stars[[s]]$facts))
+    dim_names <- c(dim_names, names(stars[[s]]$dimensions))
   }
-
   fct_names <- unique(fct_names)
-  stopifnot("The stars of a constellation must have different names." = length(stars) == length(fct_names))
-  names(facts) <- fct_names
-
+  stopifnot("The stars of a constellation must have different names." = num_stars == length(fct_names))
   # frequency of dimensions
   dim_freq <- table(dim_names)
+
+  stars <- share_dimension_instance_operations(stars, dim_freq)
+
+  # prepare structures
+  facts <- vector("list", length = num_stars)
+  operations <- vector("list", length = num_stars)
   dimensions = vector("list", length = length(dim_freq))
+  rpd <- list()
+  names(facts) <- fct_names
+  names(operations) <- fct_names
   names(dimensions) <- names(dim_freq)
 
+  # facts, operations and rpd
+  for (s in seq_along(stars)) {
+    rpd <- c(rpd, stars[[s]]$rpd)
+    for (f in seq_along(stars[[s]]$facts)) {
+      sfn <- names(stars[[s]]$facts[f])
+      operations[sfn] <- stars[[s]]$operations[f]
+      facts[sfn] <- stars[[s]]$facts[f]
+    }
+  }
+
+  # dimensions
   for (dn in names(dim_freq[dim_freq == 1])) {
     # finding the dimension in the component stars
     for (s in seq_along(stars)) {
-      if (dn %in% names(stars[[s]]$instance$dimensions)) {
-        dimensions[dn] <- stars[[s]]$instance$dimensions[dn]
+      if (dn %in% names(stars[[s]]$dimensions)) {
+        dimensions[dn] <- stars[[s]]$dimensions[dn]
         break # dim_freq == 1 and found
       }
     }
@@ -74,25 +89,24 @@ constellation <- function(name = NULL, stars = NULL) {
     surrogate_key <- NULL
     attributes <- NULL
     for (s in seq_along(stars)) {
-      if (dn %in% names(stars[[s]]$instance$dimensions)) {
-        dim <- stars[[s]]$instance$dimensions[dn]
-        to_conform[i] <- dim
-        i <- i + 1
-        if (is.null(surrogate_key)) {
-          surrogate_key <- dim[[1]]$surrogate_key
-          attributes <-
-            names(dim[[1]]$table)[names(dim[[1]]$table) != surrogate_key]
+      for (f in seq_along(stars[[s]]$facts)) {
+        if (dn %in% stars[[s]]$facts[[f]]$dim_int_names) {
+          dim <- stars[[s]]$dimensions[dn]
+          to_conform[i] <- dim
+          i <- i + 1
+          if (is.null(surrogate_key)) {
+            surrogate_key <- dim[[1]]$surrogate_key
+            attributes <-
+              names(dim[[1]]$table)[names(dim[[1]]$table) != surrogate_key]
+          }
+          # join facts to original dimension
+          facts[[names(stars[[s]]$facts[f])]]$table <-
+            dplyr::select(
+              dplyr::inner_join(facts[[names(stars[[s]]$facts[f])]]$table,
+                                dim[[1]]$table,
+                                by = surrogate_key),-tidyselect::all_of(surrogate_key)
+            )
         }
-        # join facts to original dimension
-        facts[[names(stars[[s]]$instance$facts)]]$table <-
-          dplyr::select(
-            dplyr::inner_join(facts[[names(stars[[s]]$instance$facts)]]$table,
-                              dim[[1]]$table,
-                              by = surrogate_key),-tidyselect::all_of(surrogate_key)
-          )
-      }
-      if (i > dim_freq[dn]) {
-        break
       }
     }
 
@@ -100,7 +114,6 @@ constellation <- function(name = NULL, stars = NULL) {
 
     # join new dimension to facts
     for (f in seq_along(facts)) {
-      i <- 1
       if (dn %in% facts[[f]]$dim_int_names) {
         facts[[f]]$table <-
           dplyr::select(
@@ -108,10 +121,6 @@ constellation <- function(name = NULL, stars = NULL) {
                               dimensions[[dn]]$table,
                               by = attributes), -tidyselect::all_of(attributes)
           )
-        i <- i + 1
-      }
-      if (i > dim_freq[dn]) {
-        break
       }
     }
   }
@@ -128,16 +137,119 @@ constellation <- function(name = NULL, stars = NULL) {
 
   c <- structure(list(
     name = name,
+    operations = operations,
     facts = facts,
     dimensions = dimensions,
     rpd = rpd
-  ), class = "constellation")
+  ), class = "star_database")
   rpd_in_constellation(c)
 }
+
+#' Share dimension instance operations between all `star_database` objects
+#'
+#' @param stars A list of `star_database` objects.
+#' @param dim_freq Dimension frequency table.
+#'
+#' @return A list of `star_database` objects.
+#'
+#' @keywords internal
+share_dimension_instance_operations <- function(stars, dim_freq) {
+  op_name  <- 'replace_attribute_values'
+  for (dn in names(dim_freq[dim_freq > 1])) {
+    op <- get_common_dimension_operations(op_name = op_name, name = dn, stars)
+    if (nrow(op$operations) > 0) {
+      for (s in seq_along(stars)) {
+        for (f in seq_along(stars[[s]]$facts)) {
+          if (dn %in% stars[[s]]$facts[[f]]$dim_int_names) {
+            next_op <- get_next_operation(op, op_name = op_name, name = dn, actual = NULL)
+            while (!is.null(next_op)) {
+              details <- next_op$details
+              details2 <- next_op$details2
+              if (is_new_operation(stars[[s]]$operations[[f]], op_name, dn, details, details2)) {
+                details <- string_to_vector(details)
+                details2 <- string_to_vector(details2)
+                pos_att <- as.integer(details)
+                attributes <- colnames(stars[[s]]$dimensions[[dn]]$table)[pos_att]
+                # c(old, "-->>", new)
+                old <- c()
+                new <- c()
+                sep_found <- FALSE
+                for (i in seq_along(details2)) {
+                  if (details2[i] == "-->>") {
+                    sep_found <- TRUE
+                  } else {
+                    if (!sep_found) {
+                      old <- c(old, details2[i])
+                    } else {
+                      new <- c(new, details2[i])
+                    }
+                  }
+                }
+                stars[[s]] <- replace_attribute_values(stars[[s]], dn, attributes, old, new)
+              }
+              next_op <- get_next_operation(op, op_name = op_name, name = dn, actual = next_op)
+            }
+            # all operations for a dimension have been carried out
+            stars[[s]] <- group_dimension_instances(stars[[s]], dn)
+          }
+        }
+      }
+    }
+  }
+  stars
+}
+
+
+#' Gets the operations performed on a element in all `star_database` objects
+#'
+#' @param op_name A string, operation name.
+#' @param name A string, element name.
+#' @param stars A list of `star_database` objects.
+#'
+#' @return A `star_operations` object.
+#'
+#' @keywords internal
+get_common_dimension_operations <- function(op_name, name, stars) {
+  op <- star_operation()
+  for (s in seq_along(stars)) {
+    for (f in seq_along(stars[[s]]$facts)) {
+      if (name %in% stars[[s]]$facts[[f]]$dim_int_names) {
+        next_op <-
+          get_next_operation(
+            stars[[s]]$operations[[f]],
+            op_name = op_name,
+            name = name,
+            actual = NULL
+          )
+        while (!is.null(next_op)) {
+          op <-
+            add_operation(
+              op,
+              op_name,
+              name,
+              details = next_op$details,
+              details2 = next_op$details2
+            )
+          next_op <-
+            get_next_operation(
+              stars[[s]]$operations[[f]],
+              op_name = op_name,
+              name = name,
+              actual = next_op
+            )
+        }
+      }
+    }
+  }
+  op
+}
+
 
 #' Unify lists of dimension names if there are any in common
 #'
 #' @param rpd A list of strings (dimension names).
+#'
+#' @return A list of strings (dimension names).
 #'
 #' @keywords internal
 unify_rpd <- function(rpd) {
@@ -169,11 +281,8 @@ unify_rpd <- function(rpd) {
 #'
 #' @return A `constellation` object.
 #'
-rpd_in_constellation <- function(db) UseMethod("rpd_in_constellation")
-#' @rdname rpd_in_constellation
-#'
 #' @keywords internal
-rpd_in_constellation.constellation <- function(db) {
+rpd_in_constellation <- function(db) {
   # frequency of dimensions and shared dimensions
   dim_names <- c()
   for (i in seq_along(db$facts)) {
@@ -197,23 +306,6 @@ rpd_in_constellation.constellation <- function(db) {
   }
   db
 }
-
-
-
-#' @rdname as_tibble_list
-#'
-#' @export
-as_tibble_list.constellation <- function(db) {
-  as_tibble_list_common(db$dimensions, db$facts)
-}
-
-#' @rdname as_dm_class
-#'
-#' @export
-as_dm_class.constellation <- function(db, pk_facts = TRUE) {
-  as_dm_class_common(db$dimensions, db$facts, pk_facts)
-}
-
 
 #' Get the names of the role playing dimensions
 #'
@@ -250,7 +342,7 @@ get_role_playing_dimension_names <- function(db) UseMethod("get_role_playing_dim
 #' @rdname get_role_playing_dimension_names
 #'
 #' @export
-get_role_playing_dimension_names.constellation <- function(db) {
+get_role_playing_dimension_names.star_database <- function(db) {
   r <- db$rpd
   names(r) <- sprintf("rpd_%d", 1:length(r))
   for (i in seq_along(r)) {

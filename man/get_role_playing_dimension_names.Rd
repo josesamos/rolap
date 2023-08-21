@@ -2,12 +2,12 @@
 % Please edit documentation in R/constellation.R
 \name{get_role_playing_dimension_names}
 \alias{get_role_playing_dimension_names}
-\alias{get_role_playing_dimension_names.constellation}
+\alias{get_role_playing_dimension_names.star_database}
 \title{Get the names of the role playing dimensions}
 \usage{
 get_role_playing_dimension_names(db)
 
-\method{get_role_playing_dimension_names}{constellation}(db)
+\method{get_role_playing_dimension_names}{star_database}(db)
 }
 \arguments{
 \item{db}{A \code{constellation} object.}
@@ -42,11 +42,18 @@ rpd <- constellation("MRS", list(db1, db2)) |>
 
 Other star database and constellation definition functions: 
 \code{\link{constellation}()},
-\code{\link{get_dimension_attribute_names}()},
-\code{\link{get_fact_measure_names}()},
+\code{\link{get_attribute_names}()},
+\code{\link{get_dimension_names}()},
+\code{\link{get_measure_names}()},
+\code{\link{get_similar_attribute_values_individually}()},
+\code{\link{get_similar_attribute_values}()},
+\code{\link{get_table_names}()},
+\code{\link{get_unique_attribute_values}()},
+\code{\link{group_dimension_instances}()},
+\code{\link{replace_attribute_values}()},
 \code{\link{role_playing_dimension}()},
-\code{\link{set_dimension_attribute_names}()},
-\code{\link{set_fact_measure_names}()},
+\code{\link{set_attribute_names}()},
+\code{\link{set_measure_names}()},
 \code{\link{snake_case}()},
 \code{\link{star_database}()}
 }

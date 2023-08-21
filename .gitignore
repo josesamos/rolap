@@ -5,6 +5,8 @@
 .DS_Store
 .quarto
 ejemplos.R
+rdbms-dm.R
+dim-instances.R
 datos
 inst/doc
 docs

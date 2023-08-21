@@ -3,6 +3,8 @@
 ^README\.Rmd$
 ^LICENSE\.md$
 ^ejemplos.R$
+^rdbms-dm.R$
+^dim-instances.R$
 ^datos$
 ^\.github$
 ^codecov\.yml$
