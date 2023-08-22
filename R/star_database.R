@@ -615,12 +615,15 @@ get_table_names.star_database <- function(db) {
 #' also be indicated. If several dimensions are indicated, the combination of
 #' all the attributes of each dimension is considered.
 #'
+#' You can indicate that the numbers are ignored to make the comparison.
+#'
 #' If a name is indicated in the `col_as_vector` parameter, it includes a column
 #' with the data in vector form to be used in other functions.
 #'
 #' @param db A `star_database` object.
 #' @param name A string, dimension name.
 #' @param attributes A vector of strings, attribute names.
+#' @param exclude_numbers A boolean, exclude numbers from comparison.
 #' @param col_as_vector A string, name of the column to include a vector of values.
 #'
 #' @return A vector of `tibble` objects with similar instances.
@@ -646,7 +649,7 @@ get_table_names.star_database <- function(db) {
 #'     col_as_vector = "As a vector")
 #'
 #' @export
-get_similar_attribute_values <- function(db, name, attributes, col_as_vector) UseMethod("get_similar_attribute_values")
+get_similar_attribute_values <- function(db, name, attributes, exclude_numbers, col_as_vector) UseMethod("get_similar_attribute_values")
 
 #' @rdname get_similar_attribute_values
 #'
@@ -655,6 +658,7 @@ get_similar_attribute_values.star_database <-
   function(db,
            name = NULL,
            attributes = NULL,
+           exclude_numbers = FALSE,
            col_as_vector = NULL) {
     name <- validate_dimension_names(db, name)
     if (length(name) > 1 & !is.null(attributes)) {
@@ -681,6 +685,9 @@ get_similar_attribute_values.star_database <-
       dt <- do.call(paste, c(dt, sep = ""))
       # clean values
       dt <- iconv(dt, to = "ASCII//TRANSLIT")
+      if (exclude_numbers) {
+        dt <- gsub('[0-9]+', '', dt)
+      }
       dt <- tolower(dt)
       dt <- snakecase::to_snake_case(dt)
       dt <- gsub("_", "", dt)
@@ -719,11 +726,14 @@ get_similar_attribute_values.star_database <-
 #' that differ only by tildes, spaces, or punctuation marks. If no dimension name
 #' is indicated, all dimensions are considered.
 #'
+#' You can indicate that the numbers are ignored to make the comparison.
+#'
 #' If a name is indicated in the `col_as_vector` parameter, it includes a column
 #' with the data in vector form to be used in other functions.
 #'
 #' @param db A `star_database` object.
 #' @param name A vector of strings, dimension names.
+#' @param exclude_numbers A boolean, exclude numbers from comparison.
 #' @param col_as_vector A string, name of the column to include a vector of values.
 #'
 #' @return A vector of `tibble` objects with similar instances.
@@ -740,7 +750,7 @@ get_similar_attribute_values.star_database <-
 #'   get_similar_attribute_values_individually()
 #'
 #' @export
-get_similar_attribute_values_individually <- function(db, name, col_as_vector) UseMethod("get_similar_attribute_values_individually")
+get_similar_attribute_values_individually <- function(db, name, exclude_numbers, col_as_vector) UseMethod("get_similar_attribute_values_individually")
 
 #' @rdname get_similar_attribute_values_individually
 #'
@@ -748,6 +758,7 @@ get_similar_attribute_values_individually <- function(db, name, col_as_vector) U
 get_similar_attribute_values_individually.star_database <-
   function(db,
            name = NULL,
+           exclude_numbers = FALSE,
            col_as_vector = NULL) {
     name <- validate_dimension_names(db, name)
     rv =  vector("list", length = length(name))
@@ -756,7 +767,7 @@ get_similar_attribute_values_individually.star_database <-
       attributes <- colnames(db$dimensions[[dn]]$table)[-1]
       l <- list()
       for (at in attributes) {
-        la <- get_similar_attribute_values(db, dn, at, col_as_vector)
+        la <- get_similar_attribute_values(db, dn, at, exclude_numbers, col_as_vector)
         if (length(la) > 0) {
           l <- c(l, la)
         }

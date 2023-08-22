@@ -5,11 +5,17 @@
 \alias{get_similar_attribute_values_individually.star_database}
 \title{Get similar attribute values for individual attributes in dimensions}
 \usage{
-get_similar_attribute_values_individually(db, name, col_as_vector)
+get_similar_attribute_values_individually(
+  db,
+  name,
+  exclude_numbers,
+  col_as_vector
+)
 
 \method{get_similar_attribute_values_individually}{star_database}(
   db,
   name = NULL,
+  exclude_numbers = FALSE,
   col_as_vector = NULL
 )
 }
@@ -17,6 +23,8 @@ get_similar_attribute_values_individually(db, name, col_as_vector)
 \item{db}{A \code{star_database} object.}
 
 \item{name}{A vector of strings, dimension names.}
+
+\item{exclude_numbers}{A boolean, exclude numbers from comparison.}
 
 \item{col_as_vector}{A string, name of the column to include a vector of values.}
 }
@@ -29,6 +37,8 @@ that differ only by tildes, spaces, or punctuation marks. If no dimension name
 is indicated, all dimensions are considered.
 }
 \details{
+You can indicate that the numbers are ignored to make the comparison.
+
 If a name is indicated in the \code{col_as_vector} parameter, it includes a column
 with the data in vector form to be used in other functions.
 }

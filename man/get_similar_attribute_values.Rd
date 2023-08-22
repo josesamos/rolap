@@ -5,12 +5,19 @@
 \alias{get_similar_attribute_values.star_database}
 \title{Get similar attribute values combination in dimensions}
 \usage{
-get_similar_attribute_values(db, name, attributes, col_as_vector)
+get_similar_attribute_values(
+  db,
+  name,
+  attributes,
+  exclude_numbers,
+  col_as_vector
+)
 
 \method{get_similar_attribute_values}{star_database}(
   db,
   name = NULL,
   attributes = NULL,
+  exclude_numbers = FALSE,
   col_as_vector = NULL
 )
 }
@@ -20,6 +27,8 @@ get_similar_attribute_values(db, name, attributes, col_as_vector)
 \item{name}{A string, dimension name.}
 
 \item{attributes}{A vector of strings, attribute names.}
+
+\item{exclude_numbers}{A boolean, exclude numbers from comparison.}
 
 \item{col_as_vector}{A string, name of the column to include a vector of values.}
 }
@@ -36,6 +45,8 @@ A list of dimensions can be indicated, otherwise it considers all dimensions.
 If a dimension is indicated, a list of attributes to be considered in it can
 also be indicated. If several dimensions are indicated, the combination of
 all the attributes of each dimension is considered.
+
+You can indicate that the numbers are ignored to make the comparison.
 
 If a name is indicated in the \code{col_as_vector} parameter, it includes a column
 with the data in vector form to be used in other functions.
