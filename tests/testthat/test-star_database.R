@@ -508,9 +508,34 @@ test_that("set_attribute_names() and get_attribute_names()",
             expect_equal({
               db <- star_database(mrs_cause_schema, ft_num) |>
                 set_attribute_names(name = "where",
-                                    attributes = c("Region",
-                                                   "State",
-                                                   "City"))
+                                    new = c("Region",
+                                            "State",
+                                            "City"))
+              c(
+                db$operations$mrs_cause$operation$operation,
+                db |>
+                  get_attribute_names(name = "where")
+              )
+            }, {
+              c(
+                "define_dimension",
+                "define_dimension",
+                "define_facts",
+                "set_attribute_names",
+                "Region",
+                "State",
+                "City"
+              )
+            })
+          })
+
+test_that("set_attribute_names() and get_attribute_names()",
+          {
+            expect_equal({
+              db <- star_database(mrs_cause_schema, ft_num) |>
+                set_attribute_names(name = "where",
+                                    old = c("REGION"),
+                                    new = c("Region"))
               c(
                 db$operations$mrs_cause$operation$operation,
                 db |>
@@ -532,7 +557,7 @@ test_that("set_attribute_names() and get_attribute_names()",
 test_that("set_measure_names() and get_measure_names()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num) |>
-      set_measure_names(measures = c("Pneumonia and Influenza",
+      set_measure_names(new = c("Pneumonia and Influenza",
                                      "All",
                                      "Rows Aggregated"))
     c(db$operations$mrs_cause$operation$operation,

@@ -37,5 +37,11 @@ db <- star_database(mrs_cause_schema, ft_num) |>
 }
 \seealso{
 \code{\link{star_database}}, \code{\link{flat_table}}
+
+Other star database and flat table functions: 
+\code{\link{get_attribute_names.flat_table}()},
+\code{\link{get_measure_names.flat_table}()},
+\code{\link{set_attribute_names.flat_table}()},
+\code{\link{set_measure_names.flat_table}()}
 }
-\concept{star database and flat table definition functions}
+\concept{star database and flat table functions}

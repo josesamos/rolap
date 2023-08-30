@@ -31,13 +31,13 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   }
   stopifnot("A tibble with the instances was expected." = tibble::is_tibble(instances))
   instance_attributes <- names(instances)
-  attributes <- get_attribute_names(schema)
+  attributes <- get_attribute_names_schema(schema)
   for (attribute in attributes) {
     if (!(attribute %in% instance_attributes)) {
       stop(sprintf("The schema attribute '%s' is not defined on instances.", attribute))
     }
   }
-  measures <- get_measure_names(schema)
+  measures <- get_measure_names_schema(schema)
   for (measure in measures) {
     if (!(measure %in% instance_attributes)) {
       stop(sprintf("The fact measure '%s' is not defined on instances.", measure))
@@ -88,7 +88,7 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   for (d in names(schema$dimensions)) {
     # generate dimension table
     dim_name <- get_dimension_name(schema$dimensions[[d]])
-    dim_attributes <- get_attribute_names(schema$dimensions[[d]])
+    dim_attributes <- get_attribute_names_schema(schema$dimensions[[d]])
     db$dimensions[[d]] <- dimension_table(dim_name, dim_attributes, instances)
     # include surrogate key in instances
     instances <- add_surrogate_key(db$dimensions[[d]], instances)
@@ -446,157 +446,74 @@ share_dimensions <- function(db, dims) {
 }
 
 
-#' Rename the attributes of a dimension
-#'
-#' The dimension attribute names match those of the flat table from which they
-#' are defined. This function allows you to change their names.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   set_attribute_names(
-#'     name = "where",
-#'     attributes = c(
-#'       "Region",
-#'       "State",
-#'       "City"
-#'     )
-#'   )
-#'
-#' @export
-set_attribute_names <- function(db, name, attributes) UseMethod("set_attribute_names")
-
 #' @rdname set_attribute_names
 #'
 #' @export
-set_attribute_names.star_database <- function(db, name, attributes) {
-  attributes <- unique(attributes)
+set_attribute_names.star_database <- function(db, name, old = NULL, new) {
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   att_names <- names(db$dimensions[[name]]$table)
-  stopifnot("The dimension has a different number of attributes." = length(attributes) == length(att_names) - 1)
-  names(db$dimensions[[name]]$table) <- c(att_names[1], attributes)
-  db$operations[[1]] <- add_operation(db$operations[[1]], "set_attribute_names", name, attributes)
+  old <- validate_attributes(att_names[-1], old)
+  stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(att_names, old, new)
+  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
+    stop("There are repeated attributes.")
+  }
+  names(db$dimensions[[name]]$table) <- names
+  db$operations[[1]] <- add_operation(db$operations[[1]], "set_attribute_names", name, old, new)
   db
 }
 
-#' Get the names of the attributes of a dimension
-#'
-#' Obtain the names of the attributes of a dimension.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#'
-#' @return A vector of strings, attribute names.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_attribute_names(name = "where")
-#'
-#' @export
-get_attribute_names <- function(db, name) UseMethod("get_attribute_names")
 
 #' @rdname get_attribute_names
 #'
 #' @export
-get_attribute_names.star_database <- function(db, name) {
+get_attribute_names.star_database <- function(db, name, ordered = FALSE, as_definition = FALSE) {
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   att_names <- names(db$dimensions[[name]]$table)
-  att_names[-1]
+  transform_names(names = att_names[-1], ordered, as_definition)
 }
 
-
-#' Rename the measures of a star database
-#'
-#' The measure names match those of the flat table from which they
-#' are defined. This function allows you to change their names.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, fact name.
-#' @param measures A vector of strings, measure names.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   set_measure_names(
-#'     measures = c(
-#'       "Pneumonia and Influenza",
-#'       "All",
-#'       "Rows Aggregated"
-#'     )
-#'   )
-#'
-#' @export
-set_measure_names <- function(db, name, measures) UseMethod("set_measure_names")
-
-#' @rdname set_measure_names
-#'
-#' @export
-set_measure_names.star_database <- function(db, name = NULL, measures) {
-  if (is.null(name)) {
-    name <- names(db$facts[1])
-  }
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a fact name." = name %in% names(db$facts))
-  measures <- unique(measures)
-  measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
-  stopifnot("Facts have a different number of measures." = length(measures) == length(measure_names))
-  names(db$facts[[name]]$table) <- c(db$facts[[name]]$surrogate_keys, measures)
-  db$operations[[name]] <- add_operation(db$operations[[name]], "set_measure_names", names(db$facts), measures)
-  db
-}
-
-#' Get the names of the measures of a star database
-#'
-#' Obtain the names of the measures of a star database.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, fact name.
-#'
-#' @return A vector of strings, measure names.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_measure_names()
-#'
-#' @export
-get_measure_names <- function(db, name) UseMethod("get_measure_names")
 
 #' @rdname get_measure_names
 #'
 #' @export
-get_measure_names.star_database <- function(db, name = NULL) {
+get_measure_names.star_database <- function(db, name = NULL, ordered = FALSE, as_definition = FALSE) {
   if (is.null(name)) {
     name <- names(db$facts[1])
   }
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a fact name." = name %in% names(db$facts))
-  setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  transform_names(names, ordered, as_definition)
+}
+
+
+#' @rdname set_measure_names
+#'
+#' @export
+set_measure_names.star_database <- function(db, name = NULL, old = NULL, new) {
+  if (is.null(name)) {
+    name <- names(db$facts[1])
+  }
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a fact name." = name %in% names(db$facts))
+  measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  old <- validate_measures(measure_names, old)
+  stopifnot("There are repeated measures." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(measure_names, old, new)
+  names <- c(db$facts[[name]]$surrogate_keys, names)
+  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
+    stop("There are repeated measures.")
+  }
+  names(db$facts[[name]]$table) <- names
+  db$operations[[name]] <- add_operation(db$operations[[name]], "set_measure_names", names(db$facts), old, new)
+  db
 }
 
 

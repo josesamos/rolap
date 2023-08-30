@@ -162,3 +162,64 @@ test_that("snake_case() creates a flat_table object", {
     "snake_case"
   ))
 })
+
+
+test_that("get_attribute_names()", {
+  expect_equal({
+    flat_table('ft_num', ft_num) |>
+      get_attribute_names()
+  }, c(
+    "Year",
+    "WEEK",
+    "Week Ending Date",
+    "REGION",
+    "State",
+    "City",
+    "<1 year (all cause deaths)",
+    "1-24 years (all cause deaths)",
+    "25-44 years",
+    "45-64 years (all cause deaths)",
+    "65+ years (all cause deaths)"
+  ))
+})
+
+
+test_that("get_attribute_names()", {
+  expect_equal({
+    flat_table('ft_num', ft_num) |>
+      get_attribute_names(as_definition = TRUE)
+  }, "c('Year', 'WEEK', 'Week Ending Date', 'REGION', 'State', 'City', '<1 year (all cause deaths)', '1-24 years (all cause deaths)', '25-44 years', '45-64 years (all cause deaths)', '65+ years (all cause deaths)')")
+})
+
+
+test_that("get_measure_names()", {
+  expect_equal({
+    flat_table('iris', iris) |>
+      get_measure_names()
+  }, c(
+    "Sepal.Length",
+    "Sepal.Width",
+    "Petal.Length",
+    "Petal.Width"
+  ))
+})
+
+
+test_that("get_measure_names()", {
+  expect_equal({
+    flat_table('iris', iris) |>
+      get_measure_names(ordered = TRUE, as_definition = TRUE)
+  }, "c('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width')")
+})
+
+
+test_that("set_attribute_names() and get_attribute_names()", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      set_attribute_names(old = c('Species'),
+                          new = c('species'))
+    c(ft$operations$operation$operation,
+      ft |>
+        get_attribute_names())
+  }, c("set_attribute_names", "species"))
+})

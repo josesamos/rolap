@@ -93,55 +93,57 @@ snake_case.flat_table <- function(db) {
   db
 }
 
-#' Get the names of the attributes of a flat table
-#'
-#' Obtain the names of the attributes of a flat table.
-#'
-#' @param ft A `flat_table` object.
-#' @param ordered A boolean, sort names alphabetically.
-#' @param as_definition A boolean, as the definition of the vector in R.
-#'
-#' @return A vector of strings or a `tibble`, attribute names.
-#'
-#' @family query functions of a flat table
-#' @seealso \code{\link{replace_values}}
-#'
-#' @examples
-#'
-#' names <- flat_table('iris', iris) |>
-#'   get_attribute_names()
-#'
-#' @export
-get_attribute_names <- function(ft, ordered, as_definition) UseMethod("get_attribute_names")
 
 #' @rdname get_attribute_names
 #'
 #' @export
-get_attribute_names.flat_table <- function(ft, ordered = FALSE, as_definition = FALSE) {
-  transform_names(names = ft$attributes, ordered, as_definition)
+get_attribute_names.flat_table <- function(db, name = NULL, ordered = FALSE, as_definition = FALSE) {
+  transform_names(names = db$attributes, ordered, as_definition)
 }
 
 
-# Internal #####################################################################
+#' @rdname get_measure_names
+#'
+#' @export
+get_measure_names.flat_table <- function(db, name = NULL, ordered = FALSE, as_definition = FALSE) {
+  transform_names(names = db$measures, ordered, as_definition)
+}
 
-#' For each row, add a vector of values
+
+#' @rdname set_attribute_names
 #'
-#' @param names A vector of strings, names of attributes or measures.
-#' @param ordered A boolean, sort names alphabetically.
-#' @param as_definition A boolean, as the definition of the vector in R.
-#'
-#' @return A vector of strings, attribute or measure names.
-#'
-#' @keywords internal
-transform_names <- function(names, ordered, as_definition) {
-  if (ordered) {
-    names <- sort(names)
+#' @export
+set_attribute_names.flat_table <- function(db, name = NULL, old = NULL, new) {
+  old <- validate_attributes(db$attributes, old)
+  stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(db$attributes, old, new)
+  if (length(c(names, db$measures)) != length(unique(snakecase::to_snake_case(c(names, db$measures))))) {
+    stop("There are repeated attributes or measures.")
   }
-  if (as_definition & length(names) > 0) {
-    v <- tibble::as_tibble(data.frame(matrix(names, ncol = length(names), nrow = 1)))
-    v <- add_dput_column(v, column = 'vector')
-    names <- v$vector
+  db$table <- db$table[, c(db$attributes, db$measures)]
+  names(db$table) <- c(names, db$measures)
+  db$attributes <- names
+  db$operations <- add_operation(db$operations, "set_attribute_names", name, old, new)
+  db
+}
+
+
+#' @rdname set_measure_names
+#'
+#' @export
+set_measure_names.flat_table <- function(db, name = NULL, old = NULL, new) {
+  old <- validate_measures(db$measures, old)
+  stopifnot("There are repeated measures." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(db$measures, old, new)
+  if (length(c(names, db$attributes)) != length(unique(snakecase::to_snake_case(c(names, db$attributes))))) {
+    stop("There are repeated attributes or measures.")
   }
-  names
+  db$table <- db$table[, c(db$attributes, db$measures)]
+  names(db$table) <- c(db$attributes, names)
+  db$measures <- names
+  db$operations <- add_operation(db$operations, "set_measure_names", name, old, new)
+  db
 }
 

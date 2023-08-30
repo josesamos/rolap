@@ -197,7 +197,7 @@ db_finest <- db_finest |>
   rolap::snake_case() |>
   rolap::set_attribute_names(
     name = "who",
-    attributes = c(
+    new = c(
       "card",
       "customer",
       "segment",
@@ -206,7 +206,7 @@ db_finest <- db_finest |>
   ) |>
   rolap::set_attribute_names(
     name = "where",
-    attributes = c(
+    new = c(
       "gas_station",
       "chain",
       "country",
@@ -215,7 +215,7 @@ db_finest <- db_finest |>
   ) |>
   rolap::set_attribute_names(
     name = "what",
-    attributes = c(
+    new = c(
       "product"
     )
   )
@@ -356,14 +356,14 @@ db_summary <- rolap::star_database(s_summary, transactions_ft) |>
   rolap::snake_case() |>
   rolap::set_attribute_names(
     name = "who_segment",
-    attributes = c(
+    new = c(
       "segment",
       "currency"
     )
   ) |>
   rolap::set_attribute_names(
     name = "where_chain",
-    attributes = c(
+    new = c(
       "chain",
       "country",
       "segment"
@@ -371,7 +371,7 @@ db_summary <- rolap::star_database(s_summary, transactions_ft) |>
   ) |>
   rolap::set_attribute_names(
     name = "what",
-    attributes = c(
+    new = c(
       "product"
     )
   ) |>
