@@ -4,10 +4,10 @@
 \alias{replace_names}
 \title{Replace names}
 \usage{
-replace_names(names, old, new)
+replace_names(original, old, new)
 }
 \arguments{
-\item{names}{A string, original names.}
+\item{original}{A string, original names.}
 
 \item{old}{A vector of names to replace.}
 

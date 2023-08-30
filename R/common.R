@@ -73,15 +73,15 @@ validate_measures <- function(defined_measures, measures) {
 
 #' Replace names
 #'
-#' @param names A string, original names.
+#' @param original A string, original names.
 #' @param old A vector of names to replace.
 #' @param new A vector of names, new names.
 #'
 #' @return A vector of strings, names replaced.
 #'
 #' @keywords internal
-replace_names <- function(names, old, new) {
-  original <- names
+replace_names <- function(original, old, new) {
+  names <- original
   for (i in seq_along(old)) {
     j <- which(original == old[i])
     names[j] <- new[i]

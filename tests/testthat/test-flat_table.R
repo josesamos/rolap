@@ -223,3 +223,24 @@ test_that("set_attribute_names() and get_attribute_names()", {
         get_attribute_names())
   }, c("set_attribute_names", "species"))
 })
+
+
+test_that("set_measure_names() and get_measure_names()", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      set_measure_names(
+        old = c(
+          'Petal.Length',
+          'Petal.Width',
+          'Sepal.Length',
+          'Sepal.Width'
+        ),
+        new = c('pl', 'pw', 'ls', 'sw')
+      )
+    c(ft$operations$operation$operation,
+      ft |>
+        get_measure_names())
+  }, c("set_measure_names", "ls", "sw", "pl", "pw"))
+})
+
+
