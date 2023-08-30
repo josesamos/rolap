@@ -119,52 +119,6 @@ star_database <- function(schema, instances, unknown_value = NULL) {
 }
 
 
-#' Transform names according to the snake case style
-#'
-#' Transform fact, dimension, measures, and attribute names according to the
-#' snake case style.
-#'
-#' This style is suitable if we are going to work with databases.
-#'
-#' @param db A `star_database` object.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' s <- star_schema() |>
-#'   define_facts(fact_schema(
-#'     name = "mrs_cause",
-#'     measures = c(
-#'       "Pneumonia and Influenza Deaths",
-#'       "All Deaths"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "when",
-#'     attributes = c(
-#'       "Year"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "where",
-#'     attributes = c(
-#'       "REGION",
-#'       "State",
-#'       "City"
-#'     )
-#'   ))
-#'
-#' # ft_num contains instances
-#' db <- star_database(s, ft_num) |>
-#'   snake_case()
-#'
-#' @export
-snake_case <- function(db) UseMethod("snake_case")
-
 #' @rdname snake_case
 #'
 #' @export
@@ -180,18 +134,114 @@ snake_case.star_database <- function(db) {
   db
 }
 
+#' Generate a list of tibbles with fact and dimension tables
+#'
+#' To port databases to other work environments it is useful to be able to
+#' export them as a list of tibbles, as this function does.
+#'
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A list of `tibble`
+#'
+#' @family star database and constellation exportation functions
+#' @seealso \code{\link{star_database}}, \code{\link{constellation}}
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' tl1 <- db1 |>
+#'   as_tibble_list()
+#'
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#'
+#' ct <- constellation("MRS", list(db1, db2))
+#' tl <- ct |>
+#'   as_tibble_list()
+#'
+#' @export
+as_tibble_list <- function(db) UseMethod("as_tibble_list")
+
 #' @rdname as_tibble_list
 #'
 #' @export
 as_tibble_list.star_database <- function(db) {
-  as_tibble_list_common(db$dimensions, db$facts)
+  l <- NULL
+  lnames <- NULL
+  for (d in names(db$dimensions)) {
+    l <- c(l, list(db$dimensions[[d]]$table))
+    lnames <- c(lnames, d)
+  }
+  for (f in names(db$facts)) {
+    l <- c(l, list(db$facts[[f]]$table))
+    lnames <- c(lnames, f)
+  }
+  names(l) <- lnames
+  l
 }
+
+
+
+#' Generate a `dm` class with fact and dimension tables
+#'
+#' To port databases to other work environments it is useful to be able to
+#' export them as a `dm` class, as this function does, in this way it can be
+#' saved directly in a DBMS.
+#'
+#'
+#' @param db A `star_database` object.
+#' @param pk_facts A boolean, include primary key in fact tables.
+#'
+#' @return A `dm` object.
+#'
+#' @family star database and constellation exportation functions
+#' @seealso \code{\link{star_database}}, \code{\link{constellation}}
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' dm1 <- db1 |>
+#'   as_dm_class()
+#'
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#'
+#' ct <- constellation("MRS", list(db1, db2))
+#' dm <- ct |>
+#'   as_dm_class()
+#'
+#' @export
+as_dm_class <- function(db, pk_facts) UseMethod("as_dm_class")
 
 #' @rdname as_dm_class
 #'
 #' @export
 as_dm_class.star_database <- function(db, pk_facts = TRUE) {
-  as_dm_class_common(db$dimensions, db$facts, pk_facts)
+  c <- dm::dm()
+  for (d in names(db$dimensions)) {
+    c <- c |>
+      dm::dm(!!d := db$dimensions[[d]]$table) |>
+      dm::dm_add_pk(!!d, !!db$dimensions[[d]]$surrogate_key) |>
+      dm::dm_set_colors(darkgreen = !!d)
+  }
+  for (f in names(db$facts)) {
+    c <- c |>
+      dm::dm(!!f := db$facts[[f]]$table) |>
+      dm::dm_set_colors(darkblue = !!f)
+    for (s in db$facts[[f]]$surrogate_keys) {
+      t <- gsub("_key", "", s)
+      c <- c |>
+        dm::dm_add_fk(!!f, !!s, !!t)
+    }
+    if (pk_facts) {
+      c <- c |>
+        dm::dm_add_pk(!!f, !!db$facts[[f]]$surrogate_keys)
+    }
+  }
+  c
 }
 
 
@@ -334,10 +384,10 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
 
 #' Share the given dimensions in the database
 #'
-#' @param db `star_database` or `constellation` object.
+#' @param db `star_database` object.
 #' @param dims Vector of dimension names.
 #'
-#' @return A `star_database` or `constellation` object.
+#' @return A `star_database` object.
 #' @keywords internal
 share_dimensions <- function(db, dims) {
   # merge dimensions

@@ -7,12 +7,12 @@
 share_dimensions(db, dims)
 }
 \arguments{
-\item{db}{\code{star_database} or \code{constellation} object.}
+\item{db}{\code{star_database} object.}
 
 \item{dims}{Vector of dimension names.}
 }
 \value{
-A \code{star_database} or \code{constellation} object.
+A \code{star_database} object.
 }
 \description{
 Share the given dimensions in the database

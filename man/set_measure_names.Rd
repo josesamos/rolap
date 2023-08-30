@@ -52,7 +52,6 @@ Other star database and constellation definition functions:
 \code{\link{replace_attribute_values}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{set_attribute_names}()},
-\code{\link{snake_case}()},
 \code{\link{star_database}()}
 }
 \concept{star database and constellation definition functions}
