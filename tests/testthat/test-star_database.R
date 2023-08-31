@@ -1,3 +1,4 @@
+
 test_that("star_database() define a a star database", {
   expect_equal({
     s <- star_schema() |>
@@ -318,6 +319,309 @@ test_that("snake_case() transform a a star database in snake case", {
   ))
 })
 
+test_that("set_attribute_names() and get_attribute_names()",
+          {
+            expect_equal({
+              db <- star_database(mrs_cause_schema, ft_num) |>
+                set_attribute_names(name = "where",
+                                    new = c("Region",
+                                            "State",
+                                            "City"))
+              c(
+                db$operations$mrs_cause$operation$operation,
+                db |>
+                  get_attribute_names(name = "where")
+              )
+            }, {
+              c(
+                "define_dimension",
+                "define_dimension",
+                "define_facts",
+                "set_attribute_names",
+                "Region",
+                "State",
+                "City"
+              )
+            })
+          })
+
+test_that("set_attribute_names() and get_attribute_names()",
+          {
+            expect_equal({
+              db <- star_database(mrs_cause_schema, ft_num) |>
+                set_attribute_names(name = "where",
+                                    old = c("REGION"),
+                                    new = c("Region"))
+              c(
+                db$operations$mrs_cause$operation$operation,
+                db |>
+                  get_attribute_names(name = "where")
+              )
+            }, {
+              c(
+                "define_dimension",
+                "define_dimension",
+                "define_facts",
+                "set_attribute_names",
+                "Region",
+                "State",
+                "City"
+              )
+            })
+          })
+
+test_that("set_measure_names() and get_measure_names()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num) |>
+      set_measure_names(new = c("Pneumonia and Influenza",
+                                "All",
+                                "Rows Aggregated"))
+    c(db$operations$mrs_cause$operation$operation,
+      db |>
+        get_measure_names())
+  }, {
+    c(
+      "define_dimension",
+      "define_dimension",
+      "define_facts",
+      "set_measure_names",
+      "Pneumonia and Influenza",
+      "All",
+      "Rows Aggregated"
+    )
+  })
+})
+
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db |> get_similar_attribute_values("where", col_as_vector = 'dput_instance')
+  }, {
+    list(structure(
+      list(
+        REGION = c("1", "1"),
+        State = c("CT", "CT"),
+        City = c(" BrId  gEport ", "Bridgeport"),
+        dput_instance = c("c('1', 'CT', ' BrId  gEport ')",
+                          "c('1', 'CT', 'Bridgeport')")
+      ),
+      row.names = c(NA, -2L),
+      class = c("tbl_df",
+                "tbl", "data.frame")
+    ))
+  })
+})
+
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db$dimensions$where$table$State[1] <- " c   T "
+    db$dimensions$when$table$Year[3] <- '1963.'
+    db |> get_similar_attribute_values(col_as_vector = 'dput_instance')
+  }, {
+    list(when = list(structure(
+      list(
+        Year = c("1963", "1963."),
+        dput_instance = c("c('1963')",
+                          "c('1963.')")
+      ),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl",
+                "data.frame")
+    )),
+    where = list(structure(
+      list(
+        REGION = c("1",
+                   "1"),
+        State = c(" c   T ", "CT"),
+        City = c("Bridgeport", " BrId  gEport "),
+        dput_instance = c("c('1', ' c   T ', 'Bridgeport')", "c('1', 'CT', ' BrId  gEport ')")
+      ),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )))
+  })
+})
+
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db$dimensions$where$table$State[1] <- " c   T "
+    db$dimensions$when$table$Year[3] <- '1963.'
+    db |> get_similar_attribute_values("where",
+                                       attributes = c('City', 'State'),
+                                       col_as_vector = 'dput_instance')
+  }, {
+    list(structure(
+      list(
+        City = c(" BrId  gEport ", "Bridgeport"),
+        State = c("CT", " c   T "),
+        dput_instance = c("c(' BrId  gEport ', 'CT')",
+                          "c('Bridgeport', ' c   T ')")
+      ),
+      row.names = c(NA,-2L),
+      class = c("tbl_df",
+                "tbl", "data.frame")
+    ))
+  })
+})
+
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db$dimensions$where$table$State[1] <- " c   T "
+    db$dimensions$when$table$Year[3] <- '1963.'
+    db |> get_similar_attribute_values_individually()
+  }, {
+    list(when = list(structure(
+      list(Year = c("1963", "1963.")),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )),
+    where = list(
+      structure(
+        list(State = c(" c   T ", "CT")),
+        row.names = c(NA,-2L),
+        class = c("tbl_df", "tbl", "data.frame")
+      ),
+      structure(
+        list(City = c(" BrId  gEport ", "Bridgeport")),
+        row.names = c(NA,-2L),
+        class = c("tbl_df", "tbl", "data.frame")
+      )
+    ))
+  })
+})
+
+test_that("replace_attribute_values()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db <- db |> replace_attribute_values(
+      "where",
+      old = c('1', 'CT', 'Bridgeport'),
+      new = c('1', 'CT', 'Hartford')
+    )
+    db$dimensions$where$table
+  }, {
+    structure(
+      list(
+        where_key = 1:4,
+        REGION = c("1", "1", "1", "1"),
+        State = c("CT", "CT", "MA", "MA"),
+        City = c("Hartford", "Hartford",
+                 "Boston", "Cambridge")
+      ),
+      row.names = c(NA, -4L),
+      class = c("tbl_df",
+                "tbl", "data.frame")
+    )
+  })
+})
+
+test_that("replace_attribute_values() with role_playing_dimension()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+      role_playing_dimension(rpd = "When",
+                             roles = c("When Available", "When Received"))
+    db <- db |> replace_attribute_values(
+      name = "When Available",
+      old = c('1962', '11', '1962-03-14'),
+      new = c('1962', '3', '1962-01-15')
+    )
+    c(
+      db$operations$mrs_cause$operation$operation,
+      db$rpd,
+      nrow(db$dimensions$when$table),
+      nrow(db$dimensions$when_available$table),
+      nrow(db$dimensions$when_received$table),
+      names(db$dimensions$when$table),
+      names(db$dimensions$when_available$table),
+      names(db$dimensions$when_received$table),
+      as.vector(db$dimensions$when$table$WEEK),
+      as.vector(
+        db$dimensions$when_available$table$`Data Availability Week`
+      ),
+      as.vector(db$dimensions$when_received$table$`Reception Week`)
+    )
+  }, {
+    list(
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_dimension",
+      "define_facts",
+      "role_playing_dimension",
+      "replace_attribute_values",
+      when = c("when", "when_available", "when_received"),
+      15L,
+      15L,
+      15L,
+      "when_key",
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "when_available_key",
+      "Data Availability Year",
+      "Data Availability Week",
+      "Data Availability Date",
+      "when_received_key",
+      "Reception Year",
+      "Reception Week",
+      "Reception Date",
+      "1",
+      "3",
+      "11",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "3",
+      "4",
+      "4",
+      "5",
+      "5",
+      "6",
+      "9",
+      "1",
+      "3",
+      "11",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "3",
+      "4",
+      "4",
+      "5",
+      "5",
+      "6",
+      "9",
+      "1",
+      "3",
+      "11",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "3",
+      "4",
+      "4",
+      "5",
+      "5",
+      "6",
+      "9"
+    )
+  })
+})
+
+
 test_that("as_tibble_list() export star_database as a list of tibbles", {
   expect_equal({
     ft1 <- ft_num  |>
@@ -503,305 +807,3 @@ test_that("role_playing_dimension() define a rpd", {
   })
 })
 
-test_that("set_attribute_names() and get_attribute_names()",
-          {
-            expect_equal({
-              db <- star_database(mrs_cause_schema, ft_num) |>
-                set_attribute_names(name = "where",
-                                    new = c("Region",
-                                            "State",
-                                            "City"))
-              c(
-                db$operations$mrs_cause$operation$operation,
-                db |>
-                  get_attribute_names(name = "where")
-              )
-            }, {
-              c(
-                "define_dimension",
-                "define_dimension",
-                "define_facts",
-                "set_attribute_names",
-                "Region",
-                "State",
-                "City"
-              )
-            })
-          })
-
-test_that("set_attribute_names() and get_attribute_names()",
-          {
-            expect_equal({
-              db <- star_database(mrs_cause_schema, ft_num) |>
-                set_attribute_names(name = "where",
-                                    old = c("REGION"),
-                                    new = c("Region"))
-              c(
-                db$operations$mrs_cause$operation$operation,
-                db |>
-                  get_attribute_names(name = "where")
-              )
-            }, {
-              c(
-                "define_dimension",
-                "define_dimension",
-                "define_facts",
-                "set_attribute_names",
-                "Region",
-                "State",
-                "City"
-              )
-            })
-          })
-
-test_that("set_measure_names() and get_measure_names()", {
-  expect_equal({
-    db <- star_database(mrs_cause_schema, ft_num) |>
-      set_measure_names(new = c("Pneumonia and Influenza",
-                                     "All",
-                                     "Rows Aggregated"))
-    c(db$operations$mrs_cause$operation$operation,
-      db |>
-        get_measure_names())
-  }, {
-    c(
-      "define_dimension",
-      "define_dimension",
-      "define_facts",
-      "set_measure_names",
-      "Pneumonia and Influenza",
-      "All",
-      "Rows Aggregated"
-    )
-  })
-})
-
-test_that("get_similar_attribute_values()", {
-  expect_equal({
-    db <- star_database(mrs_cause_schema, ft_num)
-    db$dimensions$where$table$City[2] <- " BrId  gEport "
-    db |> get_similar_attribute_values("where", col_as_vector = 'dput_instance')
-  }, {
-    list(structure(
-      list(
-        REGION = c("1", "1"),
-        State = c("CT", "CT"),
-        City = c(" BrId  gEport ", "Bridgeport"),
-        dput_instance = c("c('1', 'CT', ' BrId  gEport ')",
-                          "c('1', 'CT', 'Bridgeport')")
-      ),
-      row.names = c(NA, -2L),
-      class = c("tbl_df",
-                "tbl", "data.frame")
-    ))
-  })
-})
-
-test_that("get_similar_attribute_values()", {
-  expect_equal({
-    db <- star_database(mrs_cause_schema, ft_num)
-    db$dimensions$where$table$City[2] <- " BrId  gEport "
-    db$dimensions$where$table$State[1] <- " c   T "
-    db$dimensions$when$table$Year[3] <- '1963.'
-    db |> get_similar_attribute_values(col_as_vector = 'dput_instance')
-  }, {
-    list(when = list(structure(
-      list(
-        Year = c("1963", "1963."),
-        dput_instance = c("c('1963')",
-                          "c('1963.')")
-      ),
-      row.names = c(NA,-2L),
-      class = c("tbl_df", "tbl",
-                "data.frame")
-    )),
-    where = list(structure(
-      list(
-        REGION = c("1",
-                   "1"),
-        State = c(" c   T ", "CT"),
-        City = c("Bridgeport", " BrId  gEport "),
-        dput_instance = c("c('1', ' c   T ', 'Bridgeport')", "c('1', 'CT', ' BrId  gEport ')")
-      ),
-      row.names = c(NA,-2L),
-      class = c("tbl_df", "tbl", "data.frame")
-    )))
-  })
-})
-
-test_that("get_similar_attribute_values()", {
-  expect_equal({
-    db <- star_database(mrs_cause_schema, ft_num)
-    db$dimensions$where$table$City[2] <- " BrId  gEport "
-    db$dimensions$where$table$State[1] <- " c   T "
-    db$dimensions$when$table$Year[3] <- '1963.'
-    db |> get_similar_attribute_values("where",
-                                       attributes = c('City', 'State'),
-                                       col_as_vector = 'dput_instance')
-  }, {
-    list(structure(
-      list(
-        City = c(" BrId  gEport ", "Bridgeport"),
-        State = c("CT", " c   T "),
-        dput_instance = c("c(' BrId  gEport ', 'CT')",
-                          "c('Bridgeport', ' c   T ')")
-      ),
-      row.names = c(NA,-2L),
-      class = c("tbl_df",
-                "tbl", "data.frame")
-    ))
-  })
-})
-
-test_that("get_similar_attribute_values()", {
-  expect_equal({
-    db <- star_database(mrs_cause_schema, ft_num)
-    db$dimensions$where$table$City[2] <- " BrId  gEport "
-    db$dimensions$where$table$State[1] <- " c   T "
-    db$dimensions$when$table$Year[3] <- '1963.'
-    db |> get_similar_attribute_values_individually()
-  }, {
-    list(when = list(structure(
-      list(Year = c("1963", "1963.")),
-      row.names = c(NA,-2L),
-      class = c("tbl_df", "tbl", "data.frame")
-    )),
-    where = list(
-      structure(
-        list(State = c(" c   T ", "CT")),
-        row.names = c(NA,-2L),
-        class = c("tbl_df", "tbl", "data.frame")
-      ),
-      structure(
-        list(City = c(" BrId  gEport ", "Bridgeport")),
-        row.names = c(NA,-2L),
-        class = c("tbl_df", "tbl", "data.frame")
-      )
-    ))
-  })
-})
-
-
-test_that("replace_attribute_values()", {
-  expect_equal({
-    db <- star_database(mrs_cause_schema, ft_num)
-    db <- db |> replace_attribute_values(
-      "where",
-      old = c('1', 'CT', 'Bridgeport'),
-      new = c('1', 'CT', 'Hartford')
-    )
-    db$dimensions$where$table
-  }, {
-    structure(
-      list(
-        where_key = 1:4,
-        REGION = c("1", "1", "1", "1"),
-        State = c("CT", "CT", "MA", "MA"),
-        City = c("Hartford", "Hartford",
-                 "Boston", "Cambridge")
-      ),
-      row.names = c(NA, -4L),
-      class = c("tbl_df",
-                "tbl", "data.frame")
-    )
-  })
-})
-
-test_that("replace_attribute_values() with role_playing_dimension()", {
-  expect_equal({
-    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
-      role_playing_dimension(rpd = "When",
-                             roles = c("When Available", "When Received"))
-    db <- db |> replace_attribute_values(
-      name = "When Available",
-      old = c('1962', '11', '1962-03-14'),
-      new = c('1962', '3', '1962-01-15')
-    )
-    c(
-      db$operations$mrs_cause$operation$operation,
-      db$rpd,
-      nrow(db$dimensions$when$table),
-      nrow(db$dimensions$when_available$table),
-      nrow(db$dimensions$when_received$table),
-      names(db$dimensions$when$table),
-      names(db$dimensions$when_available$table),
-      names(db$dimensions$when_received$table),
-      as.vector(db$dimensions$when$table$WEEK),
-      as.vector(
-        db$dimensions$when_available$table$`Data Availability Week`
-      ),
-      as.vector(db$dimensions$when_received$table$`Reception Week`)
-    )
-  }, {
-    list(
-      "define_dimension",
-      "define_dimension",
-      "define_dimension",
-      "define_dimension",
-      "define_facts",
-      "role_playing_dimension",
-      "replace_attribute_values",
-      when = c("when", "when_available", "when_received"),
-      15L,
-      15L,
-      15L,
-      "when_key",
-      "Year",
-      "WEEK",
-      "Week Ending Date",
-      "when_available_key",
-      "Data Availability Year",
-      "Data Availability Week",
-      "Data Availability Date",
-      "when_received_key",
-      "Reception Year",
-      "Reception Week",
-      "Reception Date",
-      "1",
-      "3",
-      "11",
-      "2",
-      "2",
-      "3",
-      "3",
-      "3",
-      "3",
-      "4",
-      "4",
-      "5",
-      "5",
-      "6",
-      "9",
-      "1",
-      "3",
-      "11",
-      "2",
-      "2",
-      "3",
-      "3",
-      "3",
-      "3",
-      "4",
-      "4",
-      "5",
-      "5",
-      "6",
-      "9",
-      "1",
-      "3",
-      "11",
-      "2",
-      "2",
-      "3",
-      "3",
-      "3",
-      "3",
-      "4",
-      "4",
-      "5",
-      "5",
-      "6",
-      "9"
-    )
-  })
-})

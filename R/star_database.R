@@ -134,6 +134,121 @@ snake_case.star_database <- function(db) {
   db
 }
 
+
+#' @rdname get_attribute_names
+#'
+#' @export
+get_attribute_names.star_database <- function(db, name, ordered = FALSE, as_definition = FALSE) {
+  stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  att_names <- names(db$dimensions[[name]]$table)
+  transform_names(names = att_names[-1], ordered, as_definition)
+}
+
+
+#' @rdname get_measure_names
+#'
+#' @export
+get_measure_names.star_database <- function(db, name = NULL, ordered = FALSE, as_definition = FALSE) {
+  if (is.null(name)) {
+    name <- names(db$facts[1])
+  }
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a fact name." = name %in% names(db$facts))
+  names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  transform_names(names, ordered, as_definition)
+}
+
+
+#' @rdname set_attribute_names
+#'
+#' @export
+set_attribute_names.star_database <- function(db, name, old = NULL, new) {
+  stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  att_names <- names(db$dimensions[[name]]$table)
+  old <- validate_attributes(att_names[-1], old)
+  stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(att_names, old, new)
+  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
+    stop("There are repeated attributes.")
+  }
+  names(db$dimensions[[name]]$table) <- names
+  db$operations[[1]] <- add_operation(db$operations[[1]], "set_attribute_names", name, old, new)
+  db
+}
+
+
+#' @rdname set_measure_names
+#'
+#' @export
+set_measure_names.star_database <- function(db, name = NULL, old = NULL, new) {
+  if (is.null(name)) {
+    name <- names(db$facts[1])
+  }
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a fact name." = name %in% names(db$facts))
+  measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  old <- validate_measures(measure_names, old)
+  stopifnot("There are repeated measures." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(measure_names, old, new)
+  names <- c(db$facts[[name]]$surrogate_keys, names)
+  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
+    stop("There are repeated measures.")
+  }
+  names(db$facts[[name]]$table) <- names
+  db$operations[[name]] <-
+    add_operation(db$operations[[name]], "set_measure_names", names(db$facts), old, new)
+  db
+}
+
+
+#' @rdname get_similar_attribute_values
+#'
+#' @export
+get_similar_attribute_values.star_database <-
+  function(db,
+           name = NULL,
+           attributes = NULL,
+           exclude_numbers = FALSE,
+           col_as_vector = NULL) {
+    name <- validate_dimension_names(db, name)
+    if (length(name) > 1 & !is.null(attributes)) {
+      stop("For more than one dimension, a value cannot be indicated for the attributes parameter.")
+    }
+    rv =  vector("list", length = length(name))
+    names(rv) <- name
+    for (dn in name) {
+      dt <- db$dimensions[[dn]]$table
+      att <- colnames(dt)[-1]
+      # avoid attributes parameter if more than 1 dimension is given
+      if (is.null(attributes) | length(name) > 1) {
+        attributes <- att
+      } else {
+        stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+        for (attribute in attributes) {
+          if (!(attribute %in% att)) {
+            stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
+          }
+        }
+      }
+      rv[[dn]] <- get_similar_values_table(dt[, attributes], attributes, exclude_numbers, col_as_vector)
+    }
+    if (length(rv) == 1) {
+      rv[[1]]
+    } else {
+      rv
+    }
+  }
+
+
+#-------------------------------------------------------------------------------
+
+
 #' Generate a list of tibbles with fact and dimension tables
 #'
 #' To port databases to other work environments it is useful to be able to
@@ -446,77 +561,6 @@ share_dimensions <- function(db, dims) {
 }
 
 
-#' @rdname set_attribute_names
-#'
-#' @export
-set_attribute_names.star_database <- function(db, name, old = NULL, new) {
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-  att_names <- names(db$dimensions[[name]]$table)
-  old <- validate_attributes(att_names[-1], old)
-  stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
-  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
-  names <- replace_names(att_names, old, new)
-  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
-    stop("There are repeated attributes.")
-  }
-  names(db$dimensions[[name]]$table) <- names
-  db$operations[[1]] <- add_operation(db$operations[[1]], "set_attribute_names", name, old, new)
-  db
-}
-
-
-#' @rdname get_attribute_names
-#'
-#' @export
-get_attribute_names.star_database <- function(db, name, ordered = FALSE, as_definition = FALSE) {
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-  att_names <- names(db$dimensions[[name]]$table)
-  transform_names(names = att_names[-1], ordered, as_definition)
-}
-
-
-#' @rdname get_measure_names
-#'
-#' @export
-get_measure_names.star_database <- function(db, name = NULL, ordered = FALSE, as_definition = FALSE) {
-  if (is.null(name)) {
-    name <- names(db$facts[1])
-  }
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a fact name." = name %in% names(db$facts))
-  names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
-  transform_names(names, ordered, as_definition)
-}
-
-
-#' @rdname set_measure_names
-#'
-#' @export
-set_measure_names.star_database <- function(db, name = NULL, old = NULL, new) {
-  if (is.null(name)) {
-    name <- names(db$facts[1])
-  }
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a fact name." = name %in% names(db$facts))
-  measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
-  old <- validate_measures(measure_names, old)
-  stopifnot("There are repeated measures." = length(new) == length(unique(new)))
-  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
-  names <- replace_names(measure_names, old, new)
-  names <- c(db$facts[[name]]$surrogate_keys, names)
-  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
-    stop("There are repeated measures.")
-  }
-  names(db$facts[[name]]$table) <- names
-  db$operations[[name]] <- add_operation(db$operations[[name]], "set_measure_names", names(db$facts), old, new)
-  db
-}
-
-
 #' Get the names of the dimensions of a star database
 #'
 #' Obtain the names of the dimensions of a star database.
@@ -571,120 +615,6 @@ get_table_names.star_database <- function(db) {
 }
 
 
-#' Get similar attribute values combination in dimensions
-#'
-#' Get sets of attribute values in dimensions that differ only by tildes, spaces,
-#' or punctuation marks, for the combination of the given set of attributes.
-#'
-#' A list of dimensions can be indicated, otherwise it considers all dimensions.
-#'
-#' If a dimension is indicated, a list of attributes to be considered in it can
-#' also be indicated. If several dimensions are indicated, the combination of
-#' all the attributes of each dimension is considered.
-#'
-#' You can indicate that the numbers are ignored to make the comparison.
-#'
-#' If a name is indicated in the `col_as_vector` parameter, it includes a column
-#' with the data in vector form to be used in other functions.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#' @param exclude_numbers A boolean, exclude numbers from comparison.
-#' @param col_as_vector A string, name of the column to include a vector of values.
-#'
-#' @return A vector of `tibble` objects with similar instances.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values(name = "where")
-#'
-#' db <- star_database(mrs_cause_schema, ft_num)
-#' db$dimensions$where$table$City[2] <- " BrId  gEport "
-#' db |>
-#'   get_similar_attribute_values("where")
-#'
-#' db <- star_database(mrs_cause_schema, ft_num)
-#' db$dimensions$where$table$City[2] <- " BrId  gEport "
-#' db |>
-#'   get_similar_attribute_values("where",
-#'     attributes = c("City", "State"),
-#'     col_as_vector = "As a vector")
-#'
-#' @export
-get_similar_attribute_values <- function(db, name, attributes, exclude_numbers, col_as_vector) UseMethod("get_similar_attribute_values")
-
-#' @rdname get_similar_attribute_values
-#'
-#' @export
-get_similar_attribute_values.star_database <-
-  function(db,
-           name = NULL,
-           attributes = NULL,
-           exclude_numbers = FALSE,
-           col_as_vector = NULL) {
-    name <- validate_dimension_names(db, name)
-    if (length(name) > 1 & !is.null(attributes)) {
-      stop("For more than one dimension, a value cannot be indicated for the attributes parameter.")
-    }
-    rv =  vector("list", length = length(name))
-    names(rv) <- name
-    for (dn in name) {
-      dt <- db$dimensions[[dn]]$table
-      att <- colnames(dt)[-1]
-      # avoid attributes parameter if more than 1 dimension is given
-      if (is.null(attributes) | length(name) > 1) {
-        attributes <- att
-      } else {
-        stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-        for (attribute in attributes) {
-          if (!(attribute %in% att)) {
-            stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
-          }
-        }
-      }
-      dt <- data.frame(dt[, attributes], stringsAsFactors = FALSE)
-      # in one column
-      dt <- do.call(paste, c(dt, sep = ""))
-      # clean values
-      dt <- iconv(dt, to = "ASCII//TRANSLIT")
-      if (exclude_numbers) {
-        dt <- gsub('[0-9]+', '', dt)
-      }
-      dt <- tolower(dt)
-      dt <- snakecase::to_snake_case(dt)
-      dt <- gsub("_", "", dt)
-      # value frequency
-      t_freq <- table(dt)
-      t_freq <- t_freq[t_freq > 1]
-      # repeated values
-      n_freq <- names(t_freq)
-      res <- list()
-      for (i in seq_along(n_freq)) {
-        v <- db$dimensions[[dn]]$table[dt == n_freq[i], attributes]
-        # error in dim-instances.Rmd: transform a column tibble y a vector
-        v <- data.frame(v, stringsAsFactors = FALSE)
-        names(v) <- attributes
-        v <- dplyr::arrange_all(unique(tibble::as_tibble(v)))
-        if (!is.null(col_as_vector)) {
-          v <- add_dput_column(v, col_as_vector)
-        }
-        if (nrow(v) > 1) {
-          res <- c(res, list(v))
-        }
-      }
-      rv[[dn]] <- res
-    }
-    if (length(rv) == 1) {
-      rv[[1]]
-    } else {
-      rv
-    }
-  }
 
 
 #' Get similar attribute values for individual attributes in dimensions

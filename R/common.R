@@ -88,3 +88,46 @@ replace_names <- function(original, old, new) {
   }
   names
 }
+
+
+#' Get similar values in a table
+#'
+#' @param table A `tibble` object.
+#' @param attributes A vector of strings, attribute names.
+#' @param exclude_numbers A boolean, exclude numbers from comparison.
+#' @param col_as_vector A string, name of the column to include a vector of values.
+#'
+#' @return A vector of `tibble` objects with similar instances.
+#'
+#' @keywords internal
+get_similar_values_table <- function(table, attributes, exclude_numbers, col_as_vector) {
+  table <- data.frame(table, stringsAsFactors = FALSE)
+  # in one column
+  dt <- do.call(paste, c(table, sep = ""))
+  # clean values
+  dt <- iconv(dt, to = "ASCII//TRANSLIT")
+  if (exclude_numbers) {
+    dt <- gsub('[0-9]+', '', dt)
+  }
+  dt <- tolower(dt)
+  dt <- snakecase::to_snake_case(dt)
+  dt <- gsub("_", "", dt)
+  # value frequency
+  t_freq <- table(dt)
+  t_freq <- t_freq[t_freq > 1]
+  # repeated values
+  n_freq <- names(t_freq)
+  res <- list()
+  for (i in seq_along(n_freq)) {
+    v <- table[dt == n_freq[i], attributes]
+    v <- dplyr::arrange_all(unique(tibble::as_tibble(v)))
+    if (nrow(v) > 1) {
+      names(v) <- attributes
+      if (!is.null(col_as_vector)) {
+        v <- add_dput_column(v, col_as_vector)
+      }
+      res <- c(res, list(v))
+    }
+  }
+  res
+}

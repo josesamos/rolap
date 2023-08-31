@@ -163,4 +163,54 @@ set_attribute_names <- function(db, name, old, new) UseMethod("set_attribute_nam
 set_measure_names <- function(db, name, old, new) UseMethod("set_measure_names")
 
 
+#' Get similar attribute values combination
+#'
+#' Get sets of attribute values that differ only by tildes, spaces, or punctuation
+#' marks, for the combination of the given set of attributes.
+#'
+#' For star databases, a list of dimensions can be indicated, otherwise it
+#' considers all dimensions. If a dimension is indicated, a list of attributes
+#' to be considered in it can also be indicated. If several dimensions are
+#' indicated, the combination of all the attributes of each dimension is considered.
+#'
+#' You can indicate that the numbers are ignored to make the comparison.
+#'
+#' If a name is indicated in the `col_as_vector` parameter, it includes a column
+#' with the data in vector form to be used in other functions.
+#'
+#' @param db A `flat_table` or `star_database` object.
+#' @param name A string, dimension name.
+#' @param attributes A vector of strings, attribute names.
+#' @param exclude_numbers A boolean, exclude numbers from comparison.
+#' @param col_as_vector A string, name of the column to include a vector of values.
+#'
+#' @return A vector of `tibble` objects with similar instances.
+#'
+#' @family star database and flat table functions
+#' @seealso \code{\link{star_database}}, \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' instances <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_similar_attribute_values(name = "where")
+#'
+#' db <- star_database(mrs_cause_schema, ft_num)
+#' db$dimensions$where$table$City[2] <- " BrId  gEport "
+#' instances <- db |>
+#'   get_similar_attribute_values("where")
+#'
+#' db <- star_database(mrs_cause_schema, ft_num)
+#' db$dimensions$where$table$City[2] <- " BrId  gEport "
+#' instances <- db |>
+#'   get_similar_attribute_values("where",
+#'     attributes = c("City", "State"),
+#'     col_as_vector = "As a vector")
+#'
+#' instances <- flat_table('iris', iris) |>
+#'   get_similar_attribute_values()
+#'
+#' @export
+get_similar_attribute_values <- function(db, name, attributes, exclude_numbers, col_as_vector) UseMethod("get_similar_attribute_values")
+
+
 

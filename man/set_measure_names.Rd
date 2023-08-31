@@ -50,6 +50,7 @@ ft <- flat_table('iris', iris) |>
 Other star database and flat table functions: 
 \code{\link{get_attribute_names.flat_table}()},
 \code{\link{get_measure_names.flat_table}()},
+\code{\link{get_similar_attribute_values.flat_table}()},
 \code{\link{set_attribute_names.flat_table}()},
 \code{\link{snake_case.flat_table}()}
 }

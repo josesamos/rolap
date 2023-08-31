@@ -148,63 +148,19 @@ set_measure_names.flat_table <- function(db, name = NULL, old = NULL, new) {
 }
 
 
-#' Select attributes of a flat table
-#'
-#' Select only the indicated attributes from the flat table.
-#'
-#' @param ft A `flat_table` object.
-#' @param attributes A vector of names.
-#'
-#' @return A `flat_table` object.
-#'
-#' @family flat table definition functions
-#' @seealso \code{\link{star_database}}
-#'
-#' @examples
-#'
-#' names <- flat_table(iris) |>
-#'   select_attributes()
+#' @rdname get_similar_attribute_values
 #'
 #' @export
-select_attributes <- function(ft, attributes) UseMethod("select_attributes")
-
-#' @rdname select_attributes
-#'
-#' @export
-select_attributes.flat_table <- function(ft, attributes) {
-  attributes <- validate_attributes(ft, attributes)
-  ft$table <- ft$table[, c(attributes, ft$measures)]
-  ft$attributes <- attributes
-  ft
-}
+get_similar_attribute_values.flat_table <-
+  function(db,
+           name = NULL,
+           attributes = NULL,
+           exclude_numbers = FALSE,
+           col_as_vector = NULL) {
+    attributes <- validate_attributes(db$attributes, attributes)
+    get_similar_values_table(db$table[, attributes], attributes, exclude_numbers, col_as_vector)
+  }
 
 
-#' Select measures of a flat table
-#'
-#' Select only the indicated measures from the flat table.
-#'
-#' @param ft A `flat_table` object.
-#' @param measures A vector of names.
-#'
-#' @return A `flat_table` object.
-#'
-#' @family flat table definition functions
-#' @seealso \code{\link{star_database}}
-#'
-#' @examples
-#'
-#' names <- flat_table(iris) |>
-#'   select_measures()
-#'
-#' @export
-select_measures <- function(ft, measures) UseMethod("select_measures")
+#-------------------------------------------------------------------------------
 
-#' @rdname select_measures
-#'
-#' @export
-select_measures.flat_table <- function(ft, measures) {
-  measures <- validate_measures(ft, measures)
-  ft$table <- ft$table[, c(ft$attributes, measures)]
-  ft$measures <- measures
-  ft
-}

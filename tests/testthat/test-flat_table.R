@@ -243,4 +243,59 @@ test_that("set_measure_names() and get_measure_names()", {
   }, c("set_measure_names", "ls", "sw", "pl", "pw"))
 })
 
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    ft <- flat_table('iris', iris)
+    ft$table$Species[2] <- "se Tosa"
+    ft$table$Species[20] <- "se.Tosa."
+    ft$table$Species[60] <- "Versicolor"
+    ft |>
+      get_similar_attribute_values()
+  }, {
+    list(
+      structure(
+        list(Species = c("se Tosa", "se.Tosa.", "setosa")),
+        row.names = c(NA,-3L),
+        class = c("tbl_df", "tbl", "data.frame")
+      ),
+      structure(
+        list(Species = c("Versicolor", "versicolor")),
+        row.names = c(NA,-2L),
+        class = c("tbl_df", "tbl", "data.frame")
+      )
+    )
+  })
+})
 
+
+test_that("get_similar_attribute_values()", {
+  expect_equal({
+    ft <- flat_table('iris', iris)
+    ft$table$Species[2] <- "se Tosa"
+    ft$table$Species[20] <- "se.Tosa."
+    ft$table$Species[60] <- "Versicolor"
+    ft |>
+      get_similar_attribute_values(col_as_vector = 'col')
+  }, {
+    list(
+      structure(
+        list(
+          Species = c("se Tosa", "se.Tosa.", "setosa"),
+          col = c("c('se Tosa')", "c('se.Tosa.')", "c('setosa')")
+        ),
+        row.names = c(NA, -3L),
+        class = c("tbl_df", "tbl", "data.frame")
+      ),
+      structure(
+        list(
+          Species = c("Versicolor", "versicolor"),
+          col = c("c('Versicolor')",
+                  "c('versicolor')")
+        ),
+        row.names = c(NA, -2L),
+        class = c("tbl_df",
+                  "tbl", "data.frame")
+      )
+    )
+  })
+})

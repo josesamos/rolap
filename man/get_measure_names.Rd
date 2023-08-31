@@ -41,6 +41,7 @@ names <- star_database(mrs_cause_schema, ft_num) |>
 
 Other star database and flat table functions: 
 \code{\link{get_attribute_names.flat_table}()},
+\code{\link{get_similar_attribute_values.flat_table}()},
 \code{\link{set_attribute_names.flat_table}()},
 \code{\link{set_measure_names.flat_table}()},
 \code{\link{snake_case.flat_table}()}
