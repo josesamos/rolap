@@ -183,7 +183,6 @@ get_similar_attribute_values_individually.flat_table <-
   }
 
 
-
 #' @rdname get_unique_attribute_values
 #'
 #' @export
@@ -245,6 +244,6 @@ replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NU
   db
 }
 
-
 #-------------------------------------------------------------------------------
+
 
