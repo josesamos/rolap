@@ -469,7 +469,7 @@ test_that("get_similar_attribute_values()", {
   })
 })
 
-test_that("get_similar_attribute_values()", {
+test_that("get_similar_attribute_values_individually()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num)
     db$dimensions$where$table$City[2] <- " BrId  gEport "

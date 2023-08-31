@@ -41,7 +41,6 @@ Other star database and constellation definition functions:
 \code{\link{constellation}()},
 \code{\link{get_dimension_names}()},
 \code{\link{get_role_playing_dimension_names}()},
-\code{\link{get_similar_attribute_values_individually}()},
 \code{\link{get_table_names}()},
 \code{\link{group_dimension_instances}()},
 \code{\link{replace_attribute_values}()},

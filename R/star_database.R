@@ -222,20 +222,10 @@ get_similar_attribute_values.star_database <-
     }
     rv =  vector("list", length = length(name))
     names(rv) <- name
+    original_att <- attributes
     for (dn in name) {
       dt <- db$dimensions[[dn]]$table
-      att <- colnames(dt)[-1]
-      # avoid attributes parameter if more than 1 dimension is given
-      if (is.null(attributes) | length(name) > 1) {
-        attributes <- att
-      } else {
-        stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-        for (attribute in attributes) {
-          if (!(attribute %in% att)) {
-            stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
-          }
-        }
-      }
+      attributes <- validate_attributes(colnames(dt)[-1], original_att)
       rv[[dn]] <- get_similar_values_table(dt[, attributes], attributes, exclude_numbers, col_as_vector)
     }
     if (length(rv) == 1) {
@@ -243,6 +233,34 @@ get_similar_attribute_values.star_database <-
     } else {
       rv
     }
+  }
+
+
+#' @rdname get_similar_attribute_values_individually
+#'
+#' @export
+get_similar_attribute_values_individually.star_database <-
+  function(db,
+           name = NULL,
+           attributes = NULL,
+           exclude_numbers = FALSE,
+           col_as_vector = NULL) {
+    name <- validate_dimension_names(db, name)
+    rv =  vector("list", length = length(name))
+    names(rv) <- name
+    original_att <- attributes
+    for (dn in name) {
+      attributes <- validate_attributes(colnames(db$dimensions[[dn]]$table)[-1], original_att)
+      l <- list()
+      for (at in attributes) {
+        la <- get_similar_attribute_values(db, dn, at, exclude_numbers, col_as_vector)
+        if (length(la) > 0) {
+          l <- c(l, la)
+        }
+      }
+      rv[[dn]] <- l
+    }
+    rv
   }
 
 
@@ -617,62 +635,6 @@ get_table_names.star_database <- function(db) {
 
 
 
-#' Get similar attribute values for individual attributes in dimensions
-#'
-#' Get sets of attribute values for individual attributes in the set of dimensions
-#' that differ only by tildes, spaces, or punctuation marks. If no dimension name
-#' is indicated, all dimensions are considered.
-#'
-#' You can indicate that the numbers are ignored to make the comparison.
-#'
-#' If a name is indicated in the `col_as_vector` parameter, it includes a column
-#' with the data in vector form to be used in other functions.
-#'
-#' @param db A `star_database` object.
-#' @param name A vector of strings, dimension names.
-#' @param exclude_numbers A boolean, exclude numbers from comparison.
-#' @param col_as_vector A string, name of the column to include a vector of values.
-#'
-#' @return A vector of `tibble` objects with similar instances.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values_individually(name = c("where", "when"))
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values_individually()
-#'
-#' @export
-get_similar_attribute_values_individually <- function(db, name, exclude_numbers, col_as_vector) UseMethod("get_similar_attribute_values_individually")
-
-#' @rdname get_similar_attribute_values_individually
-#'
-#' @export
-get_similar_attribute_values_individually.star_database <-
-  function(db,
-           name = NULL,
-           exclude_numbers = FALSE,
-           col_as_vector = NULL) {
-    name <- validate_dimension_names(db, name)
-    rv =  vector("list", length = length(name))
-    names(rv) <- name
-    for (dn in name) {
-      attributes <- colnames(db$dimensions[[dn]]$table)[-1]
-      l <- list()
-      for (at in attributes) {
-        la <- get_similar_attribute_values(db, dn, at, exclude_numbers, col_as_vector)
-        if (length(la) > 0) {
-          l <- c(l, la)
-        }
-      }
-      rv[[dn]] <- l
-    }
-    rv
-  }
 
 #' Validate dimension names
 #'

@@ -162,5 +162,26 @@ get_similar_attribute_values.flat_table <-
   }
 
 
+#' @rdname get_similar_attribute_values_individually
+#'
+#' @export
+get_similar_attribute_values_individually.flat_table <-
+  function(db,
+           name = NULL,
+           attributes = NULL,
+           exclude_numbers = FALSE,
+           col_as_vector = NULL) {
+    attributes <- validate_attributes(db$attributes, attributes)
+    res <- list()
+    for (at in attributes) {
+      la <- get_similar_attribute_values(db, name, at, exclude_numbers, col_as_vector)
+      if (length(la) > 0) {
+        res <- c(res, la)
+      }
+    }
+    res
+  }
+
+
 #-------------------------------------------------------------------------------
 

@@ -46,13 +46,13 @@ A vector of \code{tibble} objects with similar instances.
 }
 \description{
 Get sets of attribute values that differ only by tildes, spaces, or punctuation
-marks, for the combination of the given set of attributes.
+marks, for the combination of the given set of attributes. If no attributes are
+indicated, they are all considered together.
 }
 \details{
 For star databases, a list of dimensions can be indicated, otherwise it
 considers all dimensions. If a dimension is indicated, a list of attributes
-to be considered in it can also be indicated. If several dimensions are
-indicated, the combination of all the attributes of each dimension is considered.
+to be considered in it can also be indicated.
 
 You can indicate that the numbers are ignored to make the comparison.
 
@@ -76,7 +76,10 @@ instances <- db |>
     attributes = c("City", "State"),
     col_as_vector = "As a vector")
 
-instances <- flat_table('iris', iris) |>
+ft <- flat_table('iris', iris)
+ft$table$Species[20] <- "se.Tosa."
+ft$table$Species[60] <- "Versicolor"
+instances <- ft |>
   get_similar_attribute_values()
 
 }
@@ -86,6 +89,7 @@ instances <- flat_table('iris', iris) |>
 Other star database and flat table functions: 
 \code{\link{get_attribute_names.flat_table}()},
 \code{\link{get_measure_names.flat_table}()},
+\code{\link{get_similar_attribute_values_individually.flat_table}()},
 \code{\link{set_attribute_names.flat_table}()},
 \code{\link{set_measure_names.flat_table}()},
 \code{\link{snake_case.flat_table}()}

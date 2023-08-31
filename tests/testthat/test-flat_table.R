@@ -299,3 +299,32 @@ test_that("get_similar_attribute_values()", {
     )
   })
 })
+
+test_that("get_similar_attribute_values_individually()", {
+  expect_equal({
+    db <- star_database(mrs_cause_schema, ft_num)
+    db$dimensions$where$table$City[2] <- " BrId  gEport "
+    db$dimensions$where$table$State[1] <- " c   T "
+    db$dimensions$when$table$Year[3] <- '1963.'
+    db |> get_similar_attribute_values_individually()
+  }, {
+    list(when = list(structure(
+      list(Year = c("1963", "1963.")),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )),
+    where = list(
+      structure(
+        list(State = c(" c   T ", "CT")),
+        row.names = c(NA,-2L),
+        class = c("tbl_df", "tbl", "data.frame")
+      ),
+      structure(
+        list(City = c(" BrId  gEport ", "Bridgeport")),
+        row.names = c(NA,-2L),
+        class = c("tbl_df", "tbl", "data.frame")
+      )
+    ))
+  })
+})
+
