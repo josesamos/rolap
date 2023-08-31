@@ -302,29 +302,67 @@ test_that("get_similar_attribute_values()", {
 
 test_that("get_similar_attribute_values_individually()", {
   expect_equal({
-    db <- star_database(mrs_cause_schema, ft_num)
-    db$dimensions$where$table$City[2] <- " BrId  gEport "
-    db$dimensions$where$table$State[1] <- " c   T "
-    db$dimensions$when$table$Year[3] <- '1963.'
-    db |> get_similar_attribute_values_individually()
+    ft <- flat_table('iris', iris)
+    ft$table$Species[2] <- "se Tosa"
+    ft$table$Species[20] <- "se.Tosa."
+    ft$table$Species[60] <- "Versicolor"
+    ft |>
+      get_similar_attribute_values_individually()
   }, {
-    list(when = list(structure(
-      list(Year = c("1963", "1963.")),
-      row.names = c(NA,-2L),
-      class = c("tbl_df", "tbl", "data.frame")
-    )),
-    where = list(
+    list(
       structure(
-        list(State = c(" c   T ", "CT")),
-        row.names = c(NA,-2L),
+        list(Species = c("se Tosa", "se.Tosa.", "setosa")),
+        row.names = c(NA, -3L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
       structure(
-        list(City = c(" BrId  gEport ", "Bridgeport")),
-        row.names = c(NA,-2L),
+        list(Species = c("Versicolor", "versicolor")),
+        row.names = c(NA, -2L),
         class = c("tbl_df", "tbl", "data.frame")
       )
+    )
+  })
+})
+
+test_that("get_similar_attribute_values_individually()", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num)
+    ft$table$Year[3] <- "1.963"
+    ft |>
+      get_similar_attribute_values_individually()
+  }, {
+    list(structure(
+      list(Year = c("1.963", "1963")),
+      row.names = c(NA, -2L),
+      class = c("tbl_df", "tbl", "data.frame")
     ))
   })
 })
 
+
+test_that("get_unique_attribute_values()", {
+  expect_equal({
+    flat_table('iris', iris) |>
+      get_unique_attribute_values()
+  }, {
+    structure(
+      list(Species = c("setosa", "versicolor", "virginica")),
+      row.names = c(NA,-3L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )
+  })
+})
+
+
+test_that("get_unique_attribute_values()", {
+  expect_equal({
+    flat_table('ft_num', ft_num) |>
+      get_unique_attribute_values(attributes = c("REGION", "State"))
+  }, {
+    structure(
+      list(REGION = c("1", "1"), State = c("CT", "MA")),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )
+  })
+})

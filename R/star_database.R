@@ -217,9 +217,6 @@ get_similar_attribute_values.star_database <-
            exclude_numbers = FALSE,
            col_as_vector = NULL) {
     name <- validate_dimension_names(db, name)
-    if (length(name) > 1 & !is.null(attributes)) {
-      stop("For more than one dimension, a value cannot be indicated for the attributes parameter.")
-    }
     rv =  vector("list", length = length(name))
     names(rv) <- name
     original_att <- attributes
@@ -260,7 +257,36 @@ get_similar_attribute_values_individually.star_database <-
       }
       rv[[dn]] <- l
     }
-    rv
+    if (length(rv) == 1) {
+      rv[[1]]
+    } else {
+      rv
+    }
+  }
+
+
+#' @rdname get_unique_attribute_values
+#'
+#' @export
+get_unique_attribute_values.star_database <-
+  function(db,
+           name = NULL,
+           attributes = NULL,
+           col_as_vector = NULL) {
+    name <- validate_dimension_names(db, name)
+    rv =  vector("list", length = length(name))
+    names(rv) <- name
+    original_att <- attributes
+    for (dn in name) {
+      dt <- db$dimensions[[dn]]$table
+      attributes <- validate_attributes(colnames(dt)[-1], original_att)
+      rv[[dn]] <- get_unique_values_table(dt[, attributes], col_as_vector)
+    }
+    if (length(rv) == 1) {
+      rv[[1]]
+    } else {
+      rv
+    }
   }
 
 
@@ -666,90 +692,6 @@ validate_dimension_names <- function(db, name) {
 }
 
 
-#' Get unique attribute values in a dimension
-#'
-#' Get unique set of values in a dimension for the given attributes.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#' @param col_as_vector A string, name of the column to include a vector of values.
-#'
-#' @return A vector of `tibble` objects with unique instances.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_unique_attribute_values(name = "where")
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_unique_attribute_values("where",
-#'     attributes = c("City", "State"))
-#'
-#' @export
-get_unique_attribute_values <- function(db, name, attributes, col_as_vector) UseMethod("get_unique_attribute_values")
-
-#' @rdname get_unique_attribute_values
-#'
-#' @export
-get_unique_attribute_values.star_database <-
-  function(db,
-           name,
-           attributes = NULL,
-           col_as_vector = NULL) {
-    stopifnot("Missing dimension name." = !is.null(name))
-    name <- snakecase::to_snake_case(name)
-    stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-    dt <- db$dimensions[[name]]$table
-    att <- colnames(dt)[-1]
-    if (is.null(attributes)) {
-      attributes <- att
-    } else {
-      stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-      for (attribute in attributes) {
-        if (!(attribute %in% att)) {
-          stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
-        }
-      }
-    }
-    dt <- data.frame(dt[, attributes], stringsAsFactors = FALSE)
-    dt <- dplyr::arrange_all(unique(tibble::as_tibble(dt)))
-    if (!is.null(col_as_vector)) {
-      dt <- add_dput_column(dt, col_as_vector)
-    }
-    dt
-  }
-
-
-#' For each row, add a vector of values
-#'
-#' @param v A `tibble`, rows of a dimension table.
-#' @param column A string, name of the column to include a vector of values.
-#'
-#' @return A `tibble`, rows of a dimension table.
-#'
-#' @keywords internal
-add_dput_column <- function(v, column) {
-  n_att <- ncol(v)
-  v[column] <- ""
-  for (i in 1:nrow(v)) {
-    dt <- "c("
-    for (j in 1:n_att) {
-      if (j == 1) {
-        sep = ""
-      } else {
-        sep = ", "
-      }
-      dt <- paste(dt, sprintf("'%s'", v[i, j]), sep = sep)
-    }
-    dt <- paste(dt, ")", sep = "")
-    v[i, column] <- dt
-  }
-  v
-}
 
 
 #' Replace instance values in a dimension

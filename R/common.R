@@ -90,6 +90,34 @@ replace_names <- function(original, old, new) {
 }
 
 
+#' For each row, add a vector of values
+#'
+#' @param v A `tibble`, rows of a dimension table.
+#' @param column A string, name of the column to include a vector of values.
+#'
+#' @return A `tibble`, rows of a dimension table.
+#'
+#' @keywords internal
+add_dput_column <- function(v, column) {
+  n_att <- ncol(v)
+  v[column] <- ""
+  for (i in 1:nrow(v)) {
+    dt <- "c("
+    for (j in 1:n_att) {
+      if (j == 1) {
+        sep = ""
+      } else {
+        sep = ", "
+      }
+      dt <- paste(dt, sprintf("'%s'", v[i, j]), sep = sep)
+    }
+    dt <- paste(dt, ")", sep = "")
+    v[i, column] <- dt
+  }
+  v
+}
+
+
 #' Get similar values in a table
 #'
 #' @param table A `tibble` object.
@@ -130,4 +158,22 @@ get_similar_values_table <- function(table, attributes, exclude_numbers, col_as_
     }
   }
   res
+}
+
+
+#' Get unique values in a table
+#'
+#' @param table A `tibble` object.
+#' @param col_as_vector A string, name of the column to include a vector of values.
+#'
+#' @return A vector of `tibble` objects with similar instances.
+#'
+#' @keywords internal
+get_unique_values_table <- function(table, col_as_vector) {
+  dt <- data.frame(table, stringsAsFactors = FALSE)
+  dt <- dplyr::arrange_all(unique(tibble::as_tibble(dt)))
+  if (!is.null(col_as_vector)) {
+    dt <- add_dput_column(dt, col_as_vector)
+  }
+  dt
 }

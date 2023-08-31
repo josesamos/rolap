@@ -258,3 +258,39 @@ get_similar_attribute_values <- function(db, name, attributes, exclude_numbers, 
 #' @export
 get_similar_attribute_values_individually <- function(db, name, attributes, exclude_numbers, col_as_vector) UseMethod("get_similar_attribute_values_individually")
 
+
+#' Get unique attribute values
+#'
+#' Get unique set of values for the given attributes. If no attributes are
+#' indicated, all are considered.
+#'
+#' If we work on a star database, a dimension must be indicated.
+#'
+#' @param db A `flat_table` or `star_database` object.
+#' @param name A string, dimension name.
+#' @param attributes A vector of strings, attribute names.
+#' @param col_as_vector A string, name of the column to include a vector of values.
+#'
+#' @return A vector of `tibble` objects with unique instances.
+#'
+#' @family star database and flat table functions
+#' @seealso \code{\link{star_database}}, \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' instances <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_unique_attribute_values()
+#'
+#' instances <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_unique_attribute_values(name = "where")
+#'
+#' instances <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_unique_attribute_values("where",
+#'     attributes = c("REGION", "State"))
+#'
+#' instances <- flat_table('iris', iris) |>
+#'   get_unique_attribute_values()
+#'
+#' @export
+get_unique_attribute_values <- function(db, name, attributes, col_as_vector) UseMethod("get_unique_attribute_values")
+

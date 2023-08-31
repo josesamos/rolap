@@ -183,5 +183,17 @@ get_similar_attribute_values_individually.flat_table <-
   }
 
 
+
+#' @rdname get_unique_attribute_values
+#'
+#' @export
+get_unique_attribute_values.flat_table <- function(db,
+                                                   name = NULL,
+                                                   attributes = NULL,
+                                                   col_as_vector = NULL) {
+  attributes <- validate_attributes(db$attributes, attributes)
+  get_unique_values_table(db$table[, attributes], col_as_vector)
+}
+
 #-------------------------------------------------------------------------------
 

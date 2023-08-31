@@ -497,6 +497,69 @@ test_that("get_similar_attribute_values_individually()", {
   })
 })
 
+
+test_that("get_unique_attribute_values()", {
+  expect_equal({
+    star_database(mrs_cause_schema, ft_num) |>
+      get_unique_attribute_values()
+  }, {
+    list(
+      when = structure(
+        list(Year = c("1962", "1963", "1964")),
+        row.names = c(NA,-3L),
+        class = c("tbl_df", "tbl", "data.frame")
+      ),
+      where = structure(
+        list(
+          REGION = c("1", "1", "1", "1"),
+          State = c("CT", "CT", "MA",
+                    "MA"),
+          City = c("Bridgeport", "Hartford", "Boston", "Cambridge")
+        ),
+        row.names = c(NA,-4L),
+        class = c("tbl_df", "tbl", "data.frame")
+      )
+    )
+  })
+})
+
+
+test_that("get_unique_attribute_values()", {
+  expect_equal({
+    star_database(mrs_cause_schema, ft_num) |>
+      get_unique_attribute_values(name = "where")
+  }, {
+    structure(
+      list(
+        REGION = c("1", "1", "1", "1"),
+        State = c("CT",
+                  "CT", "MA", "MA"),
+        City = c("Bridgeport", "Hartford", "Boston",
+                 "Cambridge")
+      ),
+      row.names = c(NA,-4L),
+      class = c("tbl_df", "tbl",
+                "data.frame")
+    )
+  })
+})
+
+
+test_that("get_unique_attribute_values()", {
+  expect_equal({
+    star_database(mrs_cause_schema, ft_num) |>
+      get_unique_attribute_values("where",
+                                  attributes = c("REGION", "State"))
+  }, {
+    structure(
+      list(REGION = c("1", "1"), State = c("CT", "MA")),
+      row.names = c(NA,-2L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )
+  })
+})
+
+
 test_that("replace_attribute_values()", {
   expect_equal({
     db <- star_database(mrs_cause_schema, ft_num)
