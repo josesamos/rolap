@@ -44,6 +44,9 @@ If we work on a star database, a dimension must be indicated.
 \examples{
 
 instances <- star_database(mrs_cause_schema, ft_num) |>
+  get_unique_attribute_values()
+
+instances <- star_database(mrs_cause_schema, ft_num) |>
   get_unique_attribute_values(name = "where")
 
 instances <- star_database(mrs_cause_schema, ft_num) |>
@@ -62,6 +65,7 @@ Other star database and flat table functions:
 \code{\link{get_measure_names.flat_table}()},
 \code{\link{get_similar_attribute_values.flat_table}()},
 \code{\link{get_similar_attribute_values_individually.flat_table}()},
+\code{\link{replace_attribute_values.flat_table}()},
 \code{\link{set_attribute_names.flat_table}()},
 \code{\link{set_measure_names.flat_table}()},
 \code{\link{snake_case.flat_table}()}

@@ -195,5 +195,56 @@ get_unique_attribute_values.flat_table <- function(db,
   get_unique_values_table(db$table[, attributes], col_as_vector)
 }
 
+
+#' @rdname replace_attribute_values
+#'
+#' @export
+replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NULL, old, new) {
+  attributes <- validate_attributes(db$attributes, attributes)
+  n_att <- length(attributes)
+  stopifnot(
+    "The number of new values must be equal to the number of dimension attributes." = n_att == length(new)
+  )
+  if (n_att > 1) {
+    stopifnot("The number of old and new values must be equal." = length(old) == length(new))
+  }
+  # update various old values
+  if (n_att == 1 &
+      length(new) == 1 & length(old) > 1) {
+    various_old <- TRUE
+  } else {
+    various_old <- FALSE
+  }
+  table <- db$table
+  pos_id <- ncol(table) + 1
+  id <- 1:nrow(table)
+  table[pos_id] <- id
+  if (!various_old) {
+    for (j in 1:n_att) {
+      table <- table[table[, attributes[j]] == old[j], ]
+    }
+  } else {
+    # 1 attribute and n old values
+    or_res <- rep(FALSE, nrow(table))
+    for (j in 1:length(old)) {
+      or_res <- or_res | (table[, attributes[1]] == old[j])
+    }
+    table <- table[or_res, ]
+  }
+  r <- as.vector(table[pos_id])[[1]]
+  if (length(r) > 0) {
+    for (i in 1:length(r)) {
+      for (j in 1:n_att) {
+        db$table[id == r[i], attributes[j]] <- new[j]
+      }
+    }
+  }
+  db$operations <-
+    add_operation(db$operations, "replace_attribute_values",
+                  attributes, old, new)
+  db
+}
+
+
 #-------------------------------------------------------------------------------
 

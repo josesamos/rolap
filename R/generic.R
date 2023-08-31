@@ -294,3 +294,44 @@ get_similar_attribute_values_individually <- function(db, name, attributes, excl
 #' @export
 get_unique_attribute_values <- function(db, name, attributes, col_as_vector) UseMethod("get_unique_attribute_values")
 
+
+#' Replace instance values
+#'
+#' Given the values of a possible instance, for that combination, replace them
+#' with the new data values.
+#'
+#' @param db A `flat_table` or `star_database` object.
+#' @param name A string, dimension name.
+#' @param attributes A vector of strings, attribute names.
+#' @param old A vector of values.
+#' @param new A vector of values.
+#'
+#' @return A `flat_table` or `star_database` object.
+#'
+#' @family star database and flat table functions
+#' @seealso \code{\link{star_database}}, \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   replace_attribute_values(name = "where",
+#'     old = c('1', 'CT', 'Bridgeport'),
+#'     new = c('1', 'CT', 'Hartford'))
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   replace_attribute_values(name = "where",
+#'                            attributes = c('REGION', 'State'),
+#'                            old = c('1', 'CT'),
+#'                            new = c('2', 'CT'))
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   replace_values(
+#'     attributes = 'Species',
+#'     old = c('setosa'),
+#'     new = c('versicolor')
+#'   )
+#'
+#' @export
+replace_attribute_values <- function(db, name, attributes, old, new) UseMethod("replace_attribute_values")
+
+

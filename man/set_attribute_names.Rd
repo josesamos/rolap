@@ -59,6 +59,7 @@ Other star database and flat table functions:
 \code{\link{get_similar_attribute_values.flat_table}()},
 \code{\link{get_similar_attribute_values_individually.flat_table}()},
 \code{\link{get_unique_attribute_values.flat_table}()},
+\code{\link{replace_attribute_values.flat_table}()},
 \code{\link{set_measure_names.flat_table}()},
 \code{\link{snake_case.flat_table}()}
 }

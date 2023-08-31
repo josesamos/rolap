@@ -290,6 +290,71 @@ get_unique_attribute_values.star_database <-
   }
 
 
+#' @rdname replace_attribute_values
+#'
+#' @export
+replace_attribute_values.star_database <- function(db, name, attributes = NULL, old, new) {
+  stopifnot("One dimension must be indicated (only one)." = length(name) == 1)
+  name <- validate_dimension_names(db, name)
+  name <- snakecase::to_snake_case(name)
+  table <- db$dimensions[[name]]$table
+  att <- colnames(table)[-1]
+  attributes <- validate_attributes(att, attributes)
+  pos_att <- c()
+  for (attribute in attributes) {
+    pos <- which(att %in% attribute)
+    pos_att <- c(pos_att, pos + 1)
+  }
+  n_att <- length(pos_att)
+  stopifnot("The number of new values must be equal to the number of dimension attributes." = n_att == length(new))
+  if (n_att > 1) {
+    stopifnot("The number of old and new values must be equal." = length(old) == length(new))
+  }
+  # update various old values
+  if (n_att == 1 & length(new) == 1 & length(old) > 1) {
+    various_old <- TRUE
+  } else {
+    various_old <- FALSE
+  }
+  dims <- get_rpd_dimensions(db, name)
+  for (name in dims) {
+    table <- db$dimensions[[name]]$table
+    if (!various_old) {
+      for (j in 1:n_att) {
+        table <- table[table[, pos_att[j]] == old[j],]
+      }
+    } else {
+      # 1 attribute and n old values
+      or_res <- rep(FALSE, nrow(table))
+      for (j in 1:length(old)) {
+        or_res <- or_res | (table[, pos_att[1]] == old[j])
+      }
+      table <- table[or_res,]
+    }
+    r <- as.vector(table[, 1])[[1]]
+    if (length(r) > 0) {
+      for (i in 1:length(r)) {
+        for (j in 1:n_att) {
+          db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], pos_att[j]] <- new[j]
+        }
+      }
+    }
+  }
+  for (f in seq_along(db$facts)) {
+    for (name in dims) {
+      if (name %in% db$facts[[f]]$dim_int_names) {
+        n <- names(db$facts[f])
+        db$operations[[n]] <-
+          add_operation(db$operations[[n]], "replace_attribute_values",
+                        name, pos_att, c(old, "-->>", new))
+        break
+      }
+    }
+  }
+  db
+}
+
+
 #-------------------------------------------------------------------------------
 
 
@@ -691,113 +756,6 @@ validate_dimension_names <- function(db, name) {
   name
 }
 
-
-
-
-#' Replace instance values in a dimension
-#'
-#' Given the values of a possible instance of a dimension, for that combination,
-#' replace them with the new data values.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#' @param old A vector of values.
-#' @param new A vector of values.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   replace_attribute_values(name = "where",
-#'     old = c('1', 'CT', 'Bridgeport'),
-#'     new = c('1', 'CT', 'Hartford'))
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   replace_attribute_values(name = "where",
-#'                            attributes = c('REGION', 'State'),
-#'                            old = c('1', 'CT'),
-#'                            new = c('2', 'CT'))
-#'
-#' @export
-replace_attribute_values <- function(db, name, attributes, old, new) UseMethod("replace_attribute_values")
-
-#' @rdname replace_attribute_values
-#'
-#' @export
-replace_attribute_values.star_database <- function(db, name, attributes = NULL, old, new) {
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-  table <- db$dimensions[[name]]$table
-  att <- colnames(table)[-1]
-  if (is.null(attributes)) {
-    attributes <- att
-    pos_att <- 2:(length(att) + 1)
-  } else {
-    stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-    pos_att <- c()
-    for (attribute in attributes) {
-      pos <- which(att %in% attribute)
-      if (length(pos) == 0) {
-        stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
-      } else {
-        pos_att <- c(pos_att, pos + 1)
-      }
-    }
-  }
-  n_att <- length(pos_att)
-  stopifnot("The number of new values must be equal to the number of dimension attributes." = n_att == length(new))
-  if (length(attributes) > 1) {
-    stopifnot("The number of old and new values must be equal." = length(old) == length(new))
-  }
-  # update various old values
-  if (length(attributes) == 1 & length(new) == 1 & length(old) > 1) {
-    various_old <- TRUE
-  } else {
-    various_old <- FALSE
-  }
-  dims <- get_rpd_dimensions(db, name)
-  for (name in dims) {
-    table <- db$dimensions[[name]]$table
-    if (!various_old) {
-      for (j in 1:n_att) {
-        table <- table[table[, pos_att[j]] == old[j],]
-      }
-    } else {
-      # 1 attribute and n old values
-      or_res <- rep(FALSE, nrow(table))
-      for (j in 1:length(old)) {
-        or_res <- or_res | (table[, pos_att[1]] == old[j])
-      }
-      table <- table[or_res,]
-    }
-    r <- as.vector(table[, 1])[[1]]
-    if (length(r) > 0) {
-      for (i in 1:length(r)) {
-        for (j in 1:n_att) {
-          db$dimensions[[name]]$table[db$dimensions[[name]]$table[, 1] == r[i], pos_att[j]] <- new[j]
-        }
-      }
-    }
-  }
-  for (f in seq_along(db$facts)) {
-    for (name in dims) {
-      if (name %in% db$facts[[f]]$dim_int_names) {
-        n <- names(db$facts[f])
-        db$operations[[n]] <-
-          add_operation(db$operations[[n]], "replace_attribute_values",
-                        name, pos_att, c(old, "-->>", new))
-        break
-      }
-    }
-  }
-  db
-}
 
 #' Get rpd dimensions of a dimension
 #'

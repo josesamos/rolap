@@ -366,3 +366,55 @@ test_that("get_unique_attribute_values()", {
     )
   })
 })
+
+
+test_that("replace_attribute_values() ", {
+  expect_equal({
+    flat_table('iris', iris) |>
+      replace_attribute_values(
+        attributes = 'Species',
+        old = c('setosa'),
+        new = c('versicolor')
+      ) |>
+      get_unique_attribute_values()
+  }, structure(
+    list(Species = c("versicolor", "virginica")),
+    row.names = c(NA,-2L),
+    class = c("tbl_df", "tbl", "data.frame")
+  ))
+})
+
+
+test_that("replace_attribute_values() ", {
+  expect_equal({
+    flat_table('iris', iris) |>
+      replace_attribute_values(
+        attributes = 'Species',
+        old = c('setosa'),
+        new = c('versicolor')
+      ) |>
+      get_unique_attribute_values()
+  }, structure(
+    list(Species = c("versicolor", "virginica")),
+    row.names = c(NA,-2L),
+    class = c("tbl_df", "tbl", "data.frame")
+  ))
+})
+
+
+test_that("replace_attribute_values() ", {
+  expect_equal({
+    r <- flat_table('ft_num', ft_num) |>
+      replace_attribute_values(
+        attributes = c('Year', 'WEEK'),
+        old = c('1962', '2'),
+        new = c('1932', '12')
+      ) |>
+      get_unique_attribute_values(attributes = c('Year', 'WEEK'))
+    r[1,]
+  }, structure(
+    list(Year = "1932", WEEK = "12"),
+    row.names = c(NA,-1L),
+    class = c("tbl_df", "tbl", "data.frame")
+  ))
+})
