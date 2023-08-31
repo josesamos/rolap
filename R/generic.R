@@ -325,7 +325,7 @@ get_unique_attribute_values <- function(db, name, attributes, col_as_vector) Use
 #'                            new = c('2', 'CT'))
 #'
 #' ft <- flat_table('iris', iris) |>
-#'   replace_values(
+#'   replace_attribute_values(
 #'     attributes = 'Species',
 #'     old = c('setosa'),
 #'     new = c('versicolor')
