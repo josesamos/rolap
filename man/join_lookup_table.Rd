@@ -30,8 +30,13 @@ table are considered.
 }
 \examples{
 
+lookup <- flat_table('iris', iris) |>
+  lookup_table(
+    measures = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+    measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+  )
 ft <- flat_table('iris', iris) |>
-  join_lookup_table()
+  join_lookup_table(lookup = lookup)
 
 }
 \seealso{

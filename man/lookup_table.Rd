@@ -51,7 +51,10 @@ primary key.
 \examples{
 
 ft <- flat_table('iris', iris) |>
-  lookup_table()
+  lookup_table(
+    measures = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+    measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+  )
 
 }
 \seealso{

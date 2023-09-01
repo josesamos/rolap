@@ -23,7 +23,12 @@ if defined.
 }
 \examples{
 
-names <- flat_table('iris', iris) |>
+ft <- flat_table('iris', iris) |>
+  lookup_table(
+    measures = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+    measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+  )
+names <- ft |>
   get_pk_attribute_names()
 
 }

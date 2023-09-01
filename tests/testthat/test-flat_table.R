@@ -730,3 +730,204 @@ test_that("replace_string() ", {
   }, c("Setosa", "versicolor", "virginica"))
 })
 
+test_that("lookup_table() ", {
+  expect_equal({
+    flat_table('iris', iris) |>
+      lookup_table(
+        measures = c(
+          "Sepal.Length",
+          "Sepal.Width",
+          "Petal.Length",
+          "Petal.Width"
+        ),
+        measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+      )
+  }, structure(
+    list(
+      name = "iris",
+      table = structure(
+        list(
+          Species = c("setosa",
+                      "versicolor", "virginica"),
+          Sepal.Length = c(5.8, 7, 7.9),
+          Sepal.Width = c(2.3,
+                          2, 2.2),
+          Petal.Length = c(73.1, 213, 277.6),
+          Petal.Width = c(0.246,
+                          1.326, 2.026)
+        ),
+        row.names = c(NA,-3L),
+        class = c("tbl_df", "tbl",
+                  "data.frame")
+      ),
+      unknown_value = "___UNKNOWN___",
+      operations = structure(list(
+        operations = structure(
+          list(
+            operation = c("flat_table", "lookup_table"),
+            name = c("iris<|>___UNKNOWN___", "Species"),
+            details = c("Species",
+                        "|"),
+            details2 = c(
+              "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+              "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width<|>|<|>MAX<|>MIN<|>SUM<|>MEAN"
+            ),
+            order = c(1, 2)
+          ),
+          row.names = c(NA,-2L),
+          class = "data.frame"
+        )
+      ), class = "star_operation"),
+      pk_attributes = "Species",
+      lookup_tables = list(),
+      attributes = "Species",
+      measures = c(
+        "Sepal.Length",
+        "Sepal.Width",
+        "Petal.Length",
+        "Petal.Width"
+      )
+    ),
+    class = "flat_table"
+  ))
+})
+
+
+test_that("replace_string() ", {
+  expect_equal({
+    flat_table('iris', iris) |>
+      lookup_table(
+        measures = c(
+          "Sepal.Length",
+          "Sepal.Width",
+          "Petal.Length",
+          "Petal.Width"
+        ),
+        measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+      ) |>
+      get_pk_attribute_names()
+  }, "Species")
+})
+
+
+test_that("replace_string() ", {
+  expect_equal({
+    lookup <- flat_table('iris', iris) |>
+      lookup_table(
+        measures = c(
+          "Sepal.Length",
+          "Sepal.Width",
+          "Petal.Length",
+          "Petal.Width"
+        ),
+        measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+      )
+    lookup |>
+      join_lookup_table(lookup = lookup)
+  }, structure(
+    list(
+      name = "iris",
+      table = structure(
+        list(
+          Species = c("setosa",
+                      "versicolor", "virginica"),
+          Sepal.Length = c(5.8, 7, 7.9),
+          Sepal.Width = c(2.3,
+                          2, 2.2),
+          Petal.Length = c(73.1, 213, 277.6),
+          Petal.Width = c(0.246,
+                          1.326, 2.026),
+          Sepal.Length.lookup = c(5.8, 7, 7.9),
+          Sepal.Width.lookup = c(2.3,
+                                 2, 2.2),
+          Petal.Length.lookup = c(73.1, 213, 277.6),
+          Petal.Width.lookup = c(0.246,
+                                 1.326, 2.026)
+        ),
+        row.names = c(NA,-3L),
+        class = c("tbl_df", "tbl",
+                  "data.frame")
+      ),
+      unknown_value = "___UNKNOWN___",
+      operations = structure(list(
+        operations = structure(
+          list(
+            operation = c("flat_table", "lookup_table",
+                          "join_lookup_table"),
+            name = c("iris<|>___UNKNOWN___", "Species",
+                     "Species"),
+            details = c("Species", "|", "1"),
+            details2 = c(
+              "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+              "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width<|>|<|>MAX<|>MIN<|>SUM<|>MEAN",
+              ""
+            ),
+            order = c(1, 2, 3)
+          ),
+          row.names = c(NA,-3L),
+          class = "data.frame"
+        )
+      ), class = "star_operation"),
+      pk_attributes = "Species",
+      lookup_tables = list(structure(
+        list(
+          name = "iris",
+          table = structure(
+            list(
+              Species = c("setosa",
+                          "versicolor", "virginica"),
+              Sepal.Length = c(5.8, 7,
+                               7.9),
+              Sepal.Width = c(2.3, 2, 2.2),
+              Petal.Length = c(73.1,
+                               213, 277.6),
+              Petal.Width = c(0.246, 1.326, 2.026)
+            ),
+            row.names = c(NA,-3L),
+            class = c("tbl_df", "tbl", "data.frame")
+          ),
+          unknown_value = "___UNKNOWN___",
+          operations = structure(list(
+            operations = structure(
+              list(
+                operation = c("flat_table", "lookup_table"),
+                name = c("iris<|>___UNKNOWN___",
+                         "Species"),
+                details = c("Species", "|"),
+                details2 = c(
+                  "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+                  "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width<|>|<|>MAX<|>MIN<|>SUM<|>MEAN"
+                ),
+                order = c(1, 2)
+              ),
+              row.names = c(NA,-2L),
+              class = "data.frame"
+            )
+          ), class = "star_operation"),
+          pk_attributes = "Species",
+          lookup_tables = list(),
+          attributes = "Species",
+          measures = c(
+            "Sepal.Length",
+            "Sepal.Width",
+            "Petal.Length",
+            "Petal.Width"
+          )
+        ),
+        class = "flat_table"
+      )),
+      attributes = "Species",
+      measures = c(
+        "Sepal.Length",
+        "Sepal.Width",
+        "Petal.Length",
+        "Petal.Width",
+        "Sepal.Length.lookup",
+        "Sepal.Width.lookup",
+        "Petal.Length.lookup",
+        "Petal.Width.lookup"
+      )
+    ),
+    class = "flat_table"
+  ))
+})
