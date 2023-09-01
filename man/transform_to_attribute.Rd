@@ -37,15 +37,15 @@ Transform measures into attributes. We can indicate if we want all the numbers
 in the result to have the same length and the number of decimal places.
 }
 \details{
-If a width is specified in the \code{width} parameter, at least that length will
-be obtained in the result, padded with blanks on the left.
+If a number > 1 is specified in the \code{width} parameter, at least that length
+will be obtained in the result, padded with blanks on the left.
 }
 \examples{
 
 ft <- flat_table('iris', iris) |>
   transform_to_attribute(
     measures = "Sepal.Length",
-    equal_length = 3,
+    width = 3,
     decimal_places = 2
   )
 

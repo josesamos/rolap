@@ -448,3 +448,107 @@ test_that("select_attributes() ", {
 })
 
 
+test_that("transform_to_attribute() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris)
+    ft$table[1, 2] <- 4000
+    ft <- ft |>
+      transform_to_attribute(measures = "Sepal.Length",
+                             width = 3,
+                             decimal_places = 2)
+    c(ft$table[1, 2][[1]], ft$attributes, ft$measures)
+  }, c(
+    "4,000.00",
+    "Species",
+    "Sepal.Length",
+    "Sepal.Width",
+    "Petal.Length",
+    "Petal.Width"
+  ))
+})
+
+
+test_that("transform_to_measure() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris)
+    ft$table[1, 2] <- 4000
+    ft <- ft |>
+      transform_to_attribute(
+        measures = "Sepal.Length",
+        width = 3,
+        decimal_places = 2
+      ) |>
+      transform_to_measure(attributes = "Sepal.Length", k_sep = ",", decimal_sep = ".")
+    c(ft$table[1, 5][[1]], ft$attributes, ft$measures)
+  }, c(
+    "4000",
+    "Species",
+    "Sepal.Width",
+    "Petal.Length",
+    "Petal.Width",
+    "Sepal.Length"
+  ))
+})
+
+
+test_that("transform_to_values() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      transform_to_values(attribute = 'Characteristic',
+                          measure = 'Value')
+    c(names(ft$table), ft$attributes, ft$measures)
+  }, c(
+    "Species",
+    "Characteristic",
+    "Value",
+    "Species",
+    "Characteristic",
+    "Value"
+  ))
+})
+
+test_that("transform_to_values() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      transform_to_values(attribute = 'Characteristic',
+                          measure = 'Value',
+                          id_reverse = 'id')
+    c(names(ft$table), ft$attributes, ft$measures)
+  }, c(
+    "id",
+    "Species",
+    "Characteristic",
+    "Value",
+    "id",
+    "Species",
+    "Characteristic",
+    "Value"
+  ))
+})
+
+
+test_that("transform_from_values() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      transform_to_values(attribute = 'Characteristic',
+                          measure = 'Value',
+                          id_reverse = 'id')
+    ft <- ft |>
+      transform_from_values(attribute = 'Characteristic')
+    c(names(ft$table), ft$attributes, ft$measures)
+  }, c(
+    "id",
+    "Species",
+    "Petal.Length",
+    "Petal.Width",
+    "Sepal.Length",
+    "Sepal.Width",
+    "id",
+    "Species",
+    "Petal.Length",
+    "Petal.Width",
+    "Sepal.Length",
+    "Sepal.Width"
+  ))
+})
+

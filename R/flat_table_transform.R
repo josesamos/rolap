@@ -3,7 +3,7 @@
 #' Transform measures into attributes. We can indicate if we want all the numbers
 #' in the result to have the same length and the number of decimal places.
 #'
-#' If a width > 1 is specified in the `width` parameter, at least that length
+#' If a number > 1 is specified in the `width` parameter, at least that length
 #' will be obtained in the result, padded with blanks on the left.
 #'
 #' @param ft A `flat_table` object.
@@ -23,7 +23,7 @@
 #' ft <- flat_table('iris', iris) |>
 #'   transform_to_attribute(
 #'     measures = "Sepal.Length",
-#'     equal_length = 3,
+#'     width = 3,
 #'     decimal_places = 2
 #'   )
 #'
@@ -97,6 +97,16 @@ transform_to_attribute.flat_table <-
       ft$attributes <- c(ft$attributes, measure)
     }
     ft$table <- ft$table[, c(ft$attributes, ft$measures)]
+    ft$operations <-
+      add_operation(
+        ft$operations,
+        "transform_to_attribute",
+        measures,
+        c(width,
+          decimal_places),
+        c(k_sep,
+          decimal_sep)
+      )
     ft
   }
 
@@ -130,44 +140,54 @@ transform_to_measure <- function(ft, attributes, k_sep, decimal_sep) UseMethod("
 #' @rdname transform_to_measure
 #'
 #' @export
-transform_to_measure.flat_table <- function(ft, attributes, k_sep = NULL, decimal_sep = NULL) {
-  attributes <- validate_attributes(ft$attributes, attributes)
-  ft$table[, attributes] <-
-    apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-      gsub(ft$unknown_value, "", x))
-  if (!is.null(k_sep)) {
-    if (k_sep == ".") {
-      pattern <- "\\."
-    } else {
-      pattern <- k_sep
+transform_to_measure.flat_table <-
+  function(ft,
+           attributes,
+           k_sep = NULL,
+           decimal_sep = NULL) {
+    attributes <- validate_attributes(ft$attributes, attributes)
+    ft$table[, attributes] <-
+      apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+        gsub(ft$unknown_value, "", x))
+    if (!is.null(k_sep)) {
+      if (k_sep == ".") {
+        pattern <- "\\."
+      } else {
+        pattern <- k_sep
+      }
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          stringr::str_replace_all(x, pattern, ""))
     }
-    ft$table[, attributes] <-
-      apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-        stringr::str_replace_all(x, pattern, ""))
-  }
-  if (!is.null(decimal_sep)) {
-    if (decimal_sep == ".") {
-      pattern <- ","
+    if (!is.null(decimal_sep)) {
+      if (decimal_sep == ".") {
+        pattern <- ","
+      } else {
+        pattern <- "\\."
+        decimal_sep <- ','
+      }
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          stringr::str_replace(x, pattern, decimal_sep))
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          suppressWarnings(as.double(x)))
     } else {
-      pattern <- "\\."
-      decimal_sep <- ','
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          suppressWarnings(as.integer(x)))
     }
-    ft$table[, attributes] <-
-      apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-        stringr::str_replace(x, pattern, decimal_sep))
-    ft$table[, attributes] <-
-      apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-        suppressWarnings(as.double(x)))
-  } else {
-    ft$table[, attributes] <-
-      apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-        suppressWarnings(as.integer(x)))
+    ft$attributes <- setdiff(ft$attributes, attributes)
+    ft$measures <- c(ft$measures, attributes)
+    ft$table <- ft$table[, c(ft$attributes, ft$measures)]
+    ft$operations <-
+      add_operation(ft$operations,
+                    "transform_to_measure",
+                    attributes,
+                    k_sep,
+                    decimal_sep)
+    ft
   }
-  ft$attributes <- setdiff(ft$attributes, attributes)
-  ft$measures <- c(ft$measures, attributes)
-  ft$table <- ft$table[, c(ft$attributes, ft$measures)]
-  ft
-}
 
 #' Transform measure names into attribute values
 #'
@@ -208,41 +228,54 @@ transform_to_values <- function(ft, attribute, measure, id_reverse) UseMethod("t
 #' @importFrom rlang :=
 #'
 #' @export
-transform_to_values.flat_table <- function(ft, attribute = NULL, measure = NULL, id_reverse = NULL) {
-  stopifnot("Missing attribute name." = !is.null(attribute))
-  stopifnot("Missing measure name." = !is.null(measure))
-  stopifnot("Only one attribute name is needed." = length(attribute) == 1)
-  stopifnot("Only one measure name is needed." = length(measure) == 1)
-  att <- snakecase::to_snake_case(ft$attributes)
-  if (snakecase::to_snake_case(attribute) %in% att) {
-    stop(sprintf(
-      "'%s' is already defined as an attribute in the flat table.",
-      attribute
-    ))
-  }
-  if (!is.null(id_reverse)) {
-    stopifnot("Only one id name is needed." = length(id_reverse) == 1)
-    if (snakecase::to_snake_case(id_reverse) %in% att) {
+transform_to_values.flat_table <-
+  function(ft,
+           attribute = NULL,
+           measure = NULL,
+           id_reverse = NULL) {
+    stopifnot("Missing attribute name." = !is.null(attribute))
+    stopifnot("Missing measure name." = !is.null(measure))
+    stopifnot("Only one attribute name is needed." = length(attribute) == 1)
+    stopifnot("Only one measure name is needed." = length(measure) == 1)
+    att <- snakecase::to_snake_case(ft$attributes)
+    if (snakecase::to_snake_case(attribute) %in% att) {
       stop(sprintf(
         "'%s' is already defined as an attribute in the flat table.",
-        id_reverse
+        attribute
       ))
     }
-    ft$table <- tibble::add_column(ft$table,!!id_reverse := 1:nrow(ft$table), .before = 1)
-    l <- nchar(sprintf("%d", nrow(ft$table)))
-    fo <- paste0("r%0", l, "d")
-    ft$table[, id_reverse] <- sprintf(fo, as.integer(ft$table[, id_reverse][[1]]))
-    ft$attributes <- c(id_reverse, ft$attributes)
+    if (!is.null(id_reverse)) {
+      stopifnot("Only one id name is needed." = length(id_reverse) == 1)
+      if (snakecase::to_snake_case(id_reverse) %in% att) {
+        stop(sprintf(
+          "'%s' is already defined as an attribute in the flat table.",
+          id_reverse
+        ))
+      }
+      ft$table <-
+        tibble::add_column(ft$table, !!id_reverse := 1:nrow(ft$table), .before = 1)
+      l <- nchar(sprintf("%d", nrow(ft$table)))
+      fo <- paste0("r%0", l, "d")
+      ft$table[, id_reverse] <-
+        sprintf(fo, as.integer(ft$table[, id_reverse][[1]]))
+      ft$attributes <- c(id_reverse, ft$attributes)
+    }
+    ft$table <- ft$table[, c(ft$attributes, ft$measures)]
+    interval <- (length(ft$attributes) + 1):length(colnames(ft$table))
+    ft$table <-
+      tidyr::gather(ft$table, attribute, measure,!!interval, na.rm = TRUE)
+    names(ft$table) <- c(ft$attributes, attribute, measure)
+    ft$measures <- measure
+    ft$attributes <- c(ft$attributes, attribute)
+    ft$table <- ft$table[, c(ft$attributes, ft$measures)]
+    ft$operations <-
+      add_operation(ft$operations,
+                    "transform_to_values",
+                    attribute,
+                    measure,
+                    id_reverse)
+    ft
   }
-  ft$table <- ft$table[, c(ft$attributes, ft$measures)]
-  interval <- (length(ft$attributes) + 1):length(colnames(ft$table))
-  ft$table <- tidyr::gather(ft$table, attribute, measure, !!interval, na.rm = TRUE)
-  names(ft$table) <- c(ft$attributes, attribute, measure)
-  ft$measures <- measure
-  ft$attributes <- c(ft$attributes, attribute)
-  ft$table <- ft$table[, c(ft$attributes, ft$measures)]
-  ft
-}
 
 
 #' Transform attribute values into measure names
@@ -278,11 +311,19 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
   stopifnot("Missing attribute name." = !is.null(attribute))
   stopifnot("Only one attribute name is needed." = length(attribute) == 1)
   if (!(attribute %in% ft$attributes)) {
-    stop(sprintf("'%s' is not defined as an attribute in the flat table.", attribute))
+    stop(sprintf(
+      "'%s' is not defined as an attribute in the flat table.",
+      attribute
+    ))
   }
-  ft$table <- tidyr::spread(ft$table, key = !!attribute, value = !!(ft$measures))
+  ft$table <-
+    tidyr::spread(ft$table,
+                  key = !!attribute,
+                  value = !!(ft$measures))
   ft$attributes <- setdiff(ft$attributes, attribute)
   ft$measures <- setdiff(names(ft$table), ft$attributes)
   ft$table <- ft$table[, c(ft$attributes, ft$measures)]
+  ft$operations <-
+    add_operation(ft$operations, "transform_from_values", attribute)
   ft
 }
