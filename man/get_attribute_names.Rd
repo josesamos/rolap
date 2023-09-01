@@ -34,11 +34,11 @@ definition in R
 }
 \examples{
 
-names <- flat_table('iris', iris) |>
-  get_attribute_names()
-
 names <- star_database(mrs_cause_schema, ft_num) |>
   get_attribute_names(name = "where")
+
+names <- flat_table('iris', iris) |>
+  get_attribute_names()
 
 }
 \seealso{

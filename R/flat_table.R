@@ -63,7 +63,8 @@ flat_table <- function(name = NULL, instances, unknown_value = NULL) {
       name = name,
       table = instances[, c(attributes, measures)],
       unknown_value = unknown_value,
-      operations = star_operation(),
+      operations = star_operation() |>
+        add_operation("flat_table", c(name, unknown_value), attributes, measures),
       pk_attributes = NULL,
       lookup_tables = list(),
       attributes = attributes,
@@ -239,11 +240,73 @@ replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NU
     }
   }
   db$operations <-
-    add_operation(db$operations, "replace_attribute_values",
-                  attributes, old, new)
+    add_operation(db$operations, "replace_attribute_values", attributes, old, new)
   db
 }
 
 #-------------------------------------------------------------------------------
 
+
+#' Select attributes of a flat table
+#'
+#' Select only the indicated attributes from the flat table.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of names.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table definition functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   select_attributes(attributes = c('Species'))
+#'
+#' @export
+select_attributes <- function(ft, attributes) UseMethod("select_attributes")
+
+#' @rdname select_attributes
+#'
+#' @export
+select_attributes.flat_table <- function(ft, attributes) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  ft$table <- ft$table[, c(attributes, ft$measures)]
+  ft$attributes <- attributes
+  ft$operations <- add_operation(ft$operations, "select_attributes", attributes)
+  ft
+}
+
+
+#' Select measures of a flat table
+#'
+#' Select only the indicated measures from the flat table.
+#'
+#' @param ft A `flat_table` object.
+#' @param measures A vector of names.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table definition functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
+#'
+#' @export
+select_measures <- function(ft, measures) UseMethod("select_measures")
+
+#' @rdname select_measures
+#'
+#' @export
+select_measures.flat_table <- function(ft, measures) {
+  measures <- validate_measures(ft$measures, measures)
+  ft$table <- ft$table[, c(ft$attributes, measures)]
+  ft$measures <- measures
+  ft$operations <- add_operation(ft$operations, "select_measures", measures)
+  ft
+}
 

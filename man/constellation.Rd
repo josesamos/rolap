@@ -46,11 +46,6 @@ ct2 <- constellation("MRS", list(db3, db4))
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 
 Other star database and constellation definition functions: 
-\code{\link{get_dimension_names}()},
-\code{\link{get_role_playing_dimension_names}()},
-\code{\link{get_table_names}()},
-\code{\link{group_dimension_instances}()},
-\code{\link{role_playing_dimension}()},
-\code{\link{star_database}()}
+\code{\link{get_role_playing_dimension_names}()}
 }
 \concept{star database and constellation definition functions}

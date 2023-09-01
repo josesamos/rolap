@@ -1,4 +1,6 @@
 
+# Internal ---------------------------------------------------------------------
+
 #' For each row, add a vector of values
 #'
 #' @param names A vector of strings, names of attributes or measures.

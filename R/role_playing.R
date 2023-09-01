@@ -14,7 +14,7 @@
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database and constellation definition functions
+#' @family star database definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 #'
 #' @examples
@@ -135,6 +135,7 @@ role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names =
 }
 
 
+# Internal ---------------------------------------------------------------------
 
 #' Get rpd dimensions of a dimension
 #'

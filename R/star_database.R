@@ -16,7 +16,7 @@
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database and constellation definition functions
+#' @family star database definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}
 #'
 #' @examples
@@ -296,7 +296,6 @@ get_unique_attribute_values.star_database <-
 replace_attribute_values.star_database <- function(db, name, attributes = NULL, old, new) {
   stopifnot("One dimension must be indicated (only one)." = length(name) == 1)
   name <- validate_dimension_names(db, name)
-  name <- snakecase::to_snake_case(name)
   table <- db$dimensions[[name]]$table
   att <- colnames(table)[-1]
   attributes <- validate_attributes(att, attributes)
@@ -354,9 +353,7 @@ replace_attribute_values.star_database <- function(db, name, attributes = NULL, 
   db
 }
 
-
 #-------------------------------------------------------------------------------
-
 
 #' Get the names of the dimensions of a star database
 #'
@@ -366,7 +363,7 @@ replace_attribute_values.star_database <- function(db, name, attributes = NULL, 
 #'
 #' @return A vector of strings, dimension names.
 #'
-#' @family star database and constellation definition functions
+#' @family star database definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 #'
 #' @examples
@@ -393,7 +390,7 @@ get_dimension_names.star_database <- function(db) {
 #'
 #' @return A vector of strings, table names.
 #'
-#' @family star database and constellation definition functions
+#' @family star database definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 #'
 #' @examples
@@ -422,7 +419,7 @@ get_table_names.star_database <- function(db) {
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database and constellation definition functions
+#' @family star database definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 #'
 #' @examples
@@ -437,9 +434,8 @@ group_dimension_instances <- function(db, name) UseMethod("group_dimension_insta
 #'
 #' @export
 group_dimension_instances.star_database <- function(db, name) {
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  stopifnot("One dimension must be indicated (only one)." = length(name) == 1)
+  name <- validate_dimension_names(db, name)
   dims <- get_rpd_dimensions(db, name)
 
   db <- share_dimensions(db, dims)
@@ -476,8 +472,6 @@ group_dimension_instances.star_database <- function(db, name) {
 
 # Internal ---------------------------------------------------------------------
 
-
-
 #' Validate dimension names
 #'
 #' @param db A `star_database` object.
@@ -506,5 +500,3 @@ validate_dimension_names <- function(db, name) {
   }
   name
 }
-
-

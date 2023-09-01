@@ -90,12 +90,10 @@ db <- star_database(s, ft_cause_rpd) |>
 \seealso{
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 
-Other star database and constellation definition functions: 
-\code{\link{constellation}()},
+Other star database definition functions: 
 \code{\link{get_dimension_names}()},
-\code{\link{get_role_playing_dimension_names}()},
 \code{\link{get_table_names}()},
 \code{\link{group_dimension_instances}()},
 \code{\link{star_database}()}
 }
-\concept{star database and constellation definition functions}
+\concept{star database definition functions}

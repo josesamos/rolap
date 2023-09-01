@@ -1,11 +1,4 @@
 
-get_measure_names_schema <- function(schema) UseMethod("get_measure_names_schema")
-
-get_attribute_names_schema <- function(schema) UseMethod("get_attribute_names_schema")
-
-snake_case_table <- function(table) UseMethod("snake_case_table")
-
-
 #' Transform names according to the snake case style
 #'
 #' For flat tables, transform attribute and measure names according to the snake
@@ -23,10 +16,10 @@ snake_case_table <- function(table) UseMethod("snake_case_table")
 #'
 #' @examples
 #'
-#' ft <- flat_table('iris', iris) |>
+#' db <- star_database(mrs_cause_schema, ft_num) |>
 #'   snake_case()
 #'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
+#' ft <- flat_table('iris', iris) |>
 #'   snake_case()
 #'
 #' @export
@@ -53,11 +46,11 @@ snake_case <- function(db) UseMethod("snake_case")
 #'
 #' @examples
 #'
-#' names <- flat_table('iris', iris) |>
-#'   get_attribute_names()
-#'
 #' names <- star_database(mrs_cause_schema, ft_num) |>
 #'   get_attribute_names(name = "where")
+#'
+#' names <- flat_table('iris', iris) |>
+#'   get_attribute_names()
 #'
 #' @export
 get_attribute_names <- function(db, name, ordered, as_definition) UseMethod("get_attribute_names")
@@ -79,10 +72,10 @@ get_attribute_names <- function(db, name, ordered, as_definition) UseMethod("get
 #'
 #' @examples
 #'
-#' names <- flat_table('iris', iris) |>
+#' names <- star_database(mrs_cause_schema, ft_num) |>
 #'   get_measure_names()
 #'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
+#' names <- flat_table('iris', iris) |>
 #'   get_measure_names()
 #'
 #' @export
@@ -334,4 +327,12 @@ get_unique_attribute_values <- function(db, name, attributes, col_as_vector) Use
 #' @export
 replace_attribute_values <- function(db, name, attributes, old, new) UseMethod("replace_attribute_values")
 
+
+# Internal ---------------------------------------------------------------------
+
+get_measure_names_schema <- function(schema) UseMethod("get_measure_names_schema")
+
+get_attribute_names_schema <- function(schema) UseMethod("get_attribute_names_schema")
+
+snake_case_table <- function(table) UseMethod("snake_case_table")
 

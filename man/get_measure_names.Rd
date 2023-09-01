@@ -29,10 +29,10 @@ Obtain the names of the measures in a flat table or in a star database.
 }
 \examples{
 
-names <- flat_table('iris', iris) |>
+names <- star_database(mrs_cause_schema, ft_num) |>
   get_measure_names()
 
-names <- star_database(mrs_cause_schema, ft_num) |>
+names <- flat_table('iris', iris) |>
   get_measure_names()
 
 }

@@ -28,10 +28,10 @@ This style is suitable if we are going to work with databases.
 }
 \examples{
 
-ft <- flat_table('iris', iris) |>
+db <- star_database(mrs_cause_schema, ft_num) |>
   snake_case()
 
-db <- star_database(mrs_cause_schema, ft_num) |>
+ft <- flat_table('iris', iris) |>
   snake_case()
 
 }
