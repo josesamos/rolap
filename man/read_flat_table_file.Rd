@@ -43,8 +43,7 @@ We can also indicate the value that is used in the data with undefined values.
 Other flat table definition functions: 
 \code{\link{flat_table}()},
 \code{\link{get_table}()},
-\code{\link{read_flat_table_folder}()},
-\code{\link{select_attributes}()},
-\code{\link{select_measures}()}
+\code{\link{get_unknown_values}()},
+\code{\link{read_flat_table_folder}()}
 }
 \concept{flat table definition functions}

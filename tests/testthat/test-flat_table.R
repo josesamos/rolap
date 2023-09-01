@@ -705,3 +705,28 @@ test_that("separate_measures() ", {
     )
   ))
 })
+
+
+test_that("replace_empty_values() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris)
+    ft$table[1, 1] <- NA
+    ft$table[2, 1] <- ""
+    ft <- ft |>
+      replace_empty_values()
+    c(ft$table[1, 1], ft$table[2, 1])
+  }, list(Species = "___UNKNOWN___", Species = "___UNKNOWN___"))
+})
+
+
+test_that("replace_string() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      replace_string(
+        string = c('set'),
+        replacement = c('Set')
+      )
+    unique(ft$table$Species)
+  }, c("Setosa", "versicolor", "virginica"))
+})
+

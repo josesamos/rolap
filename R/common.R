@@ -179,3 +179,27 @@ get_unique_values_table <- function(table, col_as_vector) {
   }
   dt
 }
+
+
+#' Replace empty values with the unknown value
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of names.
+#'
+#' @return A `flat_table` object.
+#'
+#' @keywords internal
+replace_empty_values_table <- function(ft, attributes = NULL) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  # replace empty and NA with unknown_value (for join)
+  ft$table[, attributes] <-
+    apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+      gsub("\\s+", " ", trimws(x)))
+  ft$table[, attributes] <-
+    apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+      dplyr::na_if(x, ""))
+  ft$table[, attributes] <-
+    apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+      tidyr::replace_na(x, ft$unknown_value))
+  ft
+}

@@ -247,73 +247,6 @@ replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NU
 #-------------------------------------------------------------------------------
 
 
-#' Select attributes of a flat table
-#'
-#' Select only the indicated attributes from the flat table.
-#'
-#' @param ft A `flat_table` object.
-#' @param attributes A vector of names.
-#'
-#' @return A `flat_table` object.
-#'
-#' @family flat table definition functions
-#' @seealso \code{\link{flat_table}}
-#'
-#' @examples
-#'
-#' ft <- flat_table('iris', iris) |>
-#'   select_attributes(attributes = c('Species'))
-#'
-#' ft <- flat_table('ft_num', ft_num) |>
-#'   select_attributes(attributes = c('Year', 'WEEK', 'Week Ending Date'))
-#'
-#' @export
-select_attributes <- function(ft, attributes) UseMethod("select_attributes")
-
-#' @rdname select_attributes
-#'
-#' @export
-select_attributes.flat_table <- function(ft, attributes) {
-  attributes <- validate_attributes(ft$attributes, attributes)
-  ft$table <- ft$table[, c(attributes, ft$measures)]
-  ft$attributes <- attributes
-  ft$operations <- add_operation(ft$operations, "select_attributes", attributes)
-  ft
-}
-
-
-#' Select measures of a flat table
-#'
-#' Select only the indicated measures from the flat table.
-#'
-#' @param ft A `flat_table` object.
-#' @param measures A vector of names.
-#'
-#' @return A `flat_table` object.
-#'
-#' @family flat table definition functions
-#' @seealso \code{\link{flat_table}}
-#'
-#' @examples
-#'
-#' ft <- flat_table('iris', iris) |>
-#'   select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
-#'
-#' @export
-select_measures <- function(ft, measures) UseMethod("select_measures")
-
-#' @rdname select_measures
-#'
-#' @export
-select_measures.flat_table <- function(ft, measures) {
-  measures <- validate_measures(ft$measures, measures)
-  ft$table <- ft$table[, c(ft$attributes, measures)]
-  ft$measures <- measures
-  ft$operations <- add_operation(ft$operations, "select_measures", measures)
-  ft
-}
-
-
 #' Get the table of the flat table
 #'
 #' Obtain the table of a flat table.
@@ -323,7 +256,7 @@ select_measures.flat_table <- function(ft, measures) {
 #' @return A `tibble`, the table.
 #'
 #' @family flat table definition functions
-#' @seealso \code{\link{flat_table}}
+#' @seealso \code{\link{select_attributes}}, \code{\link{select_measures}}
 #'
 #' @examples
 #'
@@ -339,3 +272,50 @@ get_table <- function(ft) UseMethod("get_table")
 get_table.flat_table <- function(ft) {
   ft$table
 }
+
+
+#' Get unknown attribute values
+#'
+#' Obtain the instances that have an empty or unknown value in any given attribute.
+#' If no attribute is given, all are considered.
+#'
+#' If a name is indicated in the `col_as_vector` parameter, it includes a column
+#' with the data in vector form to be used in other functions.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of strings, attribute names.
+#' @param col_as_vector A string, name of the column to include a vector of values.
+#'
+#' @return A `tibble` with unknown values in instances.
+#'
+#' @family flat table definition functions
+#' @seealso \code{\link{replace_empty_values}}
+#'
+#' @examples
+#'
+#' instances <- flat_table('iris', iris) |>
+#'   get_unknown_values()
+#'
+#' @export
+get_unknown_values <- function(ft, attributes, col_as_vector) UseMethod("get_unknown_values")
+
+#' @rdname get_unknown_values
+#'
+#' @export
+get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector = NULL) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  ft <- replace_empty_values_table(ft, attributes)
+  table <- ft$table[, attributes]
+  or_res <- rep(FALSE, nrow(table))
+  for (j in 1:length(attributes)) {
+    or_res <- or_res | (table[, attributes[j]] == ft$unknown_value)
+  }
+  table <- table[or_res, ]
+  table <- dplyr::arrange_all(unique(table))
+  if (!is.null(col_as_vector)) {
+    table <- add_dput_column(table, col_as_vector)
+  }
+  table
+}
+
+

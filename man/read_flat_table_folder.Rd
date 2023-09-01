@@ -62,8 +62,7 @@ one. These operations can be indicated by the corresponding parameters.
 Other flat table definition functions: 
 \code{\link{flat_table}()},
 \code{\link{get_table}()},
-\code{\link{read_flat_table_file}()},
-\code{\link{select_attributes}()},
-\code{\link{select_measures}()}
+\code{\link{get_unknown_values}()},
+\code{\link{read_flat_table_file}()}
 }
 \concept{flat table definition functions}

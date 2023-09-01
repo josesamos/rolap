@@ -37,9 +37,8 @@ ft <- flat_table('ft_num', ft_num)
 
 Other flat table definition functions: 
 \code{\link{get_table}()},
+\code{\link{get_unknown_values}()},
 \code{\link{read_flat_table_file}()},
-\code{\link{read_flat_table_folder}()},
-\code{\link{select_attributes}()},
-\code{\link{select_measures}()}
+\code{\link{read_flat_table_folder}()}
 }
 \concept{flat table definition functions}

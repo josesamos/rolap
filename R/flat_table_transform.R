@@ -1,3 +1,71 @@
+
+#' Select attributes of a flat table
+#'
+#' Select only the indicated attributes from the flat table.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of names.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   select_attributes(attributes = c('Species'))
+#'
+#' ft <- flat_table('ft_num', ft_num) |>
+#'   select_attributes(attributes = c('Year', 'WEEK', 'Week Ending Date'))
+#'
+#' @export
+select_attributes <- function(ft, attributes) UseMethod("select_attributes")
+
+#' @rdname select_attributes
+#'
+#' @export
+select_attributes.flat_table <- function(ft, attributes) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  ft$table <- ft$table[, c(attributes, ft$measures)]
+  ft$attributes <- attributes
+  ft$operations <- add_operation(ft$operations, "select_attributes", attributes)
+  ft
+}
+
+
+#' Select measures of a flat table
+#'
+#' Select only the indicated measures from the flat table.
+#'
+#' @param ft A `flat_table` object.
+#' @param measures A vector of names.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
+#'
+#' @export
+select_measures <- function(ft, measures) UseMethod("select_measures")
+
+#' @rdname select_measures
+#'
+#' @export
+select_measures.flat_table <- function(ft, measures) {
+  measures <- validate_measures(ft$measures, measures)
+  ft$table <- ft$table[, c(ft$attributes, measures)]
+  ft$measures <- measures
+  ft$operations <- add_operation(ft$operations, "select_measures", measures)
+  ft
+}
+
+
 #' Transform to attribute
 #'
 #' Transform measures into attributes. We can indicate if we want all the numbers
@@ -380,4 +448,85 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
     lft[[i]]$operations <- add_operation(ft$operations, "separate_measures", measures[[i]], names[i])
   }
   lft
+}
+
+
+#' Replace empty values with the unknown value
+#'
+#' Transforms the given attributes by replacing the empty values with the unknown
+#' value.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of names.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   replace_empty_values()
+#'
+#' @export
+replace_empty_values <- function(ft, attributes) UseMethod("replace_empty_values")
+
+#' @rdname replace_empty_values
+#'
+#' @export
+replace_empty_values.flat_table <- function(ft, attributes = NULL) {
+  ft <- replace_empty_values_table(ft, attributes)
+  ft$operations <-
+    add_operation(ft$operations, "replace_empty_values", attributes)
+  ft
+}
+
+
+#' Replace strings
+#'
+#' Transforms the given attributes by replacing the string values with the
+#' replacement value.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of strings, attribute names.
+#' @param string A character string to replace.
+#' @param replacement A replacement for matched string.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   replace_string(
+#'     attributes = 'Species',
+#'     string = c('set'),
+#'     replacement = c('Set')
+#'   )
+#'
+#' @export
+replace_string <- function(ft, attributes, string, replacement) UseMethod("replace_string")
+
+#' @rdname replace_string
+#'
+#' @export
+replace_string.flat_table <- function(ft, attributes = NULL, string, replacement = NULL) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  if (is.null(replacement)) {
+    replacement <- ""
+  }
+  ft$table[, attributes] <-
+    lapply(
+      ft$table[, attributes],
+      gsub,
+      pattern = string,
+      replacement = replacement,
+      fixed = TRUE
+    )
+  ft$operations <-
+    add_operation(ft$operations, "replace_string", attributes, string, replacement)
+  ft
 }
