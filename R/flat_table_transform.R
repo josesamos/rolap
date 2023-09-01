@@ -3,13 +3,12 @@
 #' Transform measures into attributes. We can indicate if we want all the numbers
 #' in the result to have the same length and the number of decimal places.
 #'
-#' If a length other than 0 is specified in the `equal_length` parameter, at
-#' least that length will be obtained in the result, padded with zeros on the
-#' left.
+#' If a width > 1 is specified in the `width` parameter, at least that length
+#' will be obtained in the result, padded with blanks on the left.
 #'
 #' @param ft A `flat_table` object.
 #' @param measures A vector of strings, measure names.
-#' @param equal_length An integer, string length.
+#' @param width An integer, string length.
 #' @param decimal_places An integer, number of decimal places.
 #' @param k_sep A character, indicates thousands separator.
 #' @param decimal_sep A character, indicates decimal separator.
@@ -21,7 +20,7 @@
 #'
 #' @examples
 #'
-#' ft <- flat_table(iris) |>
+#' ft <- flat_table('iris', iris) |>
 #'   transform_to_attribute(
 #'     measures = "Sepal.Length",
 #'     equal_length = 3,
@@ -29,7 +28,7 @@
 #'   )
 #'
 #' @export
-transform_to_attribute <- function(ft, measures, equal_length, decimal_places, k_sep, decimal_sep) UseMethod("transform_to_attribute")
+transform_to_attribute <- function(ft, measures, width, decimal_places, k_sep, decimal_sep) UseMethod("transform_to_attribute")
 
 #' @rdname transform_to_attribute
 #'
@@ -37,51 +36,63 @@ transform_to_attribute <- function(ft, measures, equal_length, decimal_places, k
 transform_to_attribute.flat_table <-
   function(ft,
            measures,
-           equal_length = 0,
+           width = 1,
            decimal_places = 0,
            k_sep = ',',
            decimal_sep = '.') {
     stopifnot("Missing measure name." = !is.null(measures))
     measures <- validate_measures(ft$measures, measures)
-    if (decimal_places > 0) {
-      format <- sprintf(".%df", decimal_places)
-    } else {
-      format <- "d"
-    }
     for (measure in measures) {
       if (decimal_places > 0) {
         values <- suppressWarnings(as.double(ft$table[, measure][[1]]))
       } else {
         values <- suppressWarnings(as.integer(ft$table[, measure][[1]]))
       }
-      if (equal_length > 0) {
-        fo <- paste0("%", format)
-        if (equal_length > 0) {
-          s <- sprintf(fo, ft$table[, measure][[1]])
-          l <- max(nchar(s))
-          fo <- paste0("%0", max(l, equal_length), format)
-        }
-        values <- trimws(sprintf(fo, values))
+      if (decimal_places > 0) {
+        values2 <- formatC(
+          values,
+          format = "f",
+          big.mark = k_sep,
+          decimal.mark = decimal_sep,
+          digits = decimal_places,
+          width = width
+        )
       } else {
-        if (decimal_places > 0) {
-          values <- formatC(
-            values,
-            format = "f",
-            big.mark = k_sep,
-            decimal.mark = decimal_sep,
-            digits = decimal_places
-          )
-        } else {
-          values <- formatC(
-            values,
-            format = "d",
-            big.mark = k_sep,
-            decimal.mark = decimal_sep,
-            digits = decimal_places
-          )
+        values2 <- formatC(
+          values,
+          format = "d",
+          big.mark = k_sep,
+          decimal.mark = decimal_sep,
+          digits = decimal_places,
+          width = width
+        )
+      }
+      if (width > 1) {
+        lmax <- max(nchar(values2))
+        if (lmax > width) {
+          if (decimal_places > 0) {
+            values2 <- formatC(
+              values,
+              format = "f",
+              big.mark = k_sep,
+              decimal.mark = decimal_sep,
+              digits = decimal_places,
+              width = lmax
+            )
+          } else {
+            values2 <- formatC(
+              values,
+              format = "d",
+              big.mark = k_sep,
+              decimal.mark = decimal_sep,
+              digits = decimal_places,
+              width = lmax
+            )
+          }
         }
       }
-      ft$table[, measure][[1]] <- gsub("NA", ft$unknown_value, values)
+      ft$table[, measure][[1]] <-
+        gsub("NA", ft$unknown_value, values2)
       ft$measures <- setdiff(ft$measures, measure)
       ft$attributes <- c(ft$attributes, measure)
     }
@@ -109,7 +120,7 @@ transform_to_attribute.flat_table <-
 #'
 #' @examples
 #'
-#' ft <- flat_table(iris) |>
+#' ft <- flat_table('iris', iris) |>
 #'   transform_to_attribute(measures = "Sepal.Length", decimal_places = 2) |>
 #'   transform_to_measure(attributes = "Sepal.Length", decimal_sep = ".")
 #'
@@ -180,11 +191,11 @@ transform_to_measure.flat_table <- function(ft, attributes, k_sep = NULL, decima
 #'
 #' @examples
 #'
-#' ft <- flat_table(iris) |>
+#' ft <- flat_table('iris', iris) |>
 #'   transform_to_values(attribute = 'Characteristic',
 #'                       measure = 'Value')
 #'
-#' ft <- flat_table(iris) |>
+#' ft <- flat_table('iris', iris) |>
 #'   transform_to_values(attribute = 'Characteristic',
 #'                       measure = 'Value',
 #'                       id_reverse = 'id')
@@ -249,7 +260,7 @@ transform_to_values.flat_table <- function(ft, attribute = NULL, measure = NULL,
 #'
 #' @examples
 #'
-#' ft <- flat_table(iris) |>
+#' ft <- flat_table('iris', iris) |>
 #'   transform_to_values(attribute = 'Characteristic',
 #'                       measure = 'Value',
 #'                       id_reverse = 'id')
