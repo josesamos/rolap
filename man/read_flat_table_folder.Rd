@@ -5,6 +5,7 @@
 \title{Import all flat table files in a folder}
 \usage{
 read_flat_table_folder(
+  name,
   folder,
   sep = ",",
   page = NULL,
@@ -14,6 +15,8 @@ read_flat_table_folder(
 )
 }
 \arguments{
+\item{name}{A string, flat table name.}
+
 \item{folder}{A string, folder name.}
 
 \item{sep}{Column separator character.}
@@ -53,7 +56,7 @@ one. These operations can be indicated by the corresponding parameters.
 }
 \examples{
 
-# lpt <- read_flat_table_folder(folder, sep = ';', page = 'page')
+# lpt <- read_flat_table_folder('folder_ft',folder, sep = ';', page = 'page')
 
 }
 \seealso{

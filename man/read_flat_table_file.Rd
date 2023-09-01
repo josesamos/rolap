@@ -4,9 +4,11 @@
 \alias{read_flat_table_file}
 \title{Import flat table file}
 \usage{
-read_flat_table_file(file, sep = ",", page = NULL, unknown_value = NULL)
+read_flat_table_file(name, file, sep = ",", page = NULL, unknown_value = NULL)
 }
 \arguments{
+\item{name}{A string, flat table name.}
+
 \item{file}{A string, name of a text file.}
 
 \item{sep}{Column separator character.}
@@ -34,7 +36,7 @@ We can also indicate the value that is used in the data with undefined values.
 }
 \examples{
 
-# pt <- read_flat_table_file(file, sep = ';', page = 'page')
+# pt <- read_flat_table_file('file_ft', file, sep = ';', page = 'page')
 
 }
 \seealso{

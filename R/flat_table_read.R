@@ -10,6 +10,7 @@
 #'
 #' We can also indicate the value that is used in the data with undefined values.
 #'
+#' @param name A string, flat table name.
 #' @param file A string, name of a text file.
 #' @param sep Column separator character.
 #' @param page A string, name of the new field in which to include the name of
@@ -24,11 +25,12 @@
 #'
 #' @examples
 #'
-#' # pt <- read_flat_table_file(file, sep = ';', page = 'page')
+#' # pt <- read_flat_table_file('file_ft', file, sep = ';', page = 'page')
 #'
 #' @export
 read_flat_table_file <-
-  function(file,
+  function(name,
+           file,
            sep = ',',
            page = NULL,
            unknown_value = NULL) {
@@ -38,7 +40,7 @@ read_flat_table_file <-
       id = page,
       col_types = readr::cols(.default = readr::col_character())
     )
-    flat_table(ft, unknown_value)
+    flat_table(name, ft, unknown_value)
   }
 
 #' Import all flat table files in a folder
@@ -73,11 +75,12 @@ read_flat_table_file <-
 #'
 #' @examples
 #'
-#' # lpt <- read_flat_table_folder(folder, sep = ';', page = 'page')
+#' # lpt <- read_flat_table_folder('folder_ft',folder, sep = ';', page = 'page')
 #'
 #' @export
 read_flat_table_folder <-
-  function (folder,
+  function (name,
+            folder,
             sep = ',',
             page = NULL,
             unknown_value = NULL,
@@ -109,6 +112,6 @@ read_flat_table_folder <-
       names[w] <- paste0("_c_", w, "_")
       names(lft[[i]]) <- names
     }
-    flat_table(dplyr::bind_rows(lft),
+    flat_table(name, dplyr::bind_rows(lft),
                unknown_value)
   }
