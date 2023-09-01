@@ -552,3 +552,156 @@ test_that("transform_from_values() ", {
   ))
 })
 
+test_that("separate_measures() ", {
+  expect_equal({
+    flat_table('iris', head(iris, 2)) |>
+      separate_measures(measures = list(
+        c('Petal.Length'),
+        c('Petal.Width'),
+        c('Sepal.Length'),
+        c('Sepal.Width')
+      ),
+      names = c('PL', 'PW', 'SL', 'SW'))
+  }, list(
+    PL = structure(
+      list(
+        name = "PL",
+        table = structure(
+          list(
+            Species = c("setosa", "setosa"),
+            Petal.Length = c(1.4, 1.4)
+          ),
+          row.names = c(NA,-2L),
+          class = c("tbl_df", "tbl", "data.frame")
+        ),
+        unknown_value = "___UNKNOWN___",
+        operations = structure(list(
+          operations = structure(
+            list(
+              operation = c("flat_table", "separate_measures"),
+              name = c("iris<|>___UNKNOWN___", "Petal.Length"),
+              details = c("Species",
+                          "PL"),
+              details2 = c(
+                "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+                ""
+              ),
+              order = c(1, 2)
+            ),
+            row.names = c(NA,-2L),
+            class = "data.frame"
+          )
+        ), class = "star_operation"),
+        lookup_tables = list(),
+        attributes = "Species",
+        measures = "Petal.Length"
+      ),
+      class = "flat_table"
+    ),
+    PW = structure(
+      list(
+        name = "PW",
+        table = structure(
+          list(
+            Species = c("setosa",
+                        "setosa"),
+            Petal.Width = c(0.2, 0.2)
+          ),
+          row.names = c(NA,-2L),
+          class = c("tbl_df", "tbl", "data.frame")
+        ),
+        unknown_value = "___UNKNOWN___",
+        operations = structure(list(
+          operations = structure(
+            list(
+              operation = c("flat_table", "separate_measures"),
+              name = c("iris<|>___UNKNOWN___", "Petal.Width"),
+              details = c("Species", "PW"),
+              details2 = c(
+                "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+                ""
+              ),
+              order = c(1, 2)
+            ),
+            row.names = c(NA,-2L),
+            class = "data.frame"
+          )
+        ), class = "star_operation"),
+        lookup_tables = list(),
+        attributes = "Species",
+        measures = "Petal.Width"
+      ),
+      class = "flat_table"
+    ),
+    SL = structure(
+      list(
+        name = "SL",
+        table = structure(
+          list(
+            Species = c("setosa",
+                        "setosa"),
+            Sepal.Length = c(5.1, 4.9)
+          ),
+          row.names = c(NA,-2L),
+          class = c("tbl_df", "tbl", "data.frame")
+        ),
+        unknown_value = "___UNKNOWN___",
+        operations = structure(list(
+          operations = structure(
+            list(
+              operation = c("flat_table", "separate_measures"),
+              name = c("iris<|>___UNKNOWN___", "Sepal.Length"),
+              details = c("Species", "SL"),
+              details2 = c(
+                "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+                ""
+              ),
+              order = c(1, 2)
+            ),
+            row.names = c(NA,-2L),
+            class = "data.frame"
+          )
+        ), class = "star_operation"),
+        lookup_tables = list(),
+        attributes = "Species",
+        measures = "Sepal.Length"
+      ),
+      class = "flat_table"
+    ),
+    SW = structure(
+      list(
+        name = "SW",
+        table = structure(
+          list(
+            Species = c("setosa",
+                        "setosa"),
+            Sepal.Width = c(3.5, 3)
+          ),
+          row.names = c(NA,-2L),
+          class = c("tbl_df", "tbl", "data.frame")
+        ),
+        unknown_value = "___UNKNOWN___",
+        operations = structure(list(
+          operations = structure(
+            list(
+              operation = c("flat_table", "separate_measures"),
+              name = c("iris<|>___UNKNOWN___", "Sepal.Width"),
+              details = c("Species", "SW"),
+              details2 = c(
+                "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+                ""
+              ),
+              order = c(1, 2)
+            ),
+            row.names = c(NA,-2L),
+            class = "data.frame"
+          )
+        ), class = "star_operation"),
+        lookup_tables = list(),
+        attributes = "Species",
+        measures = "Sepal.Width"
+      ),
+      class = "flat_table"
+    )
+  ))
+})

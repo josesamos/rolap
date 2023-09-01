@@ -327,3 +327,57 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
     add_operation(ft$operations, "transform_from_values", attribute)
   ft
 }
+
+#' Separate measures in flat tables
+#'
+#' Separate measures listed as list items into flat tables. Each item in the
+#' list is a vector of measures that is uniquely included along with the
+#' attributes in a new flat table.
+#'
+#' A list of flat tables is returned. It assign the names to the result list.
+#'
+#' @param ft A `flat_table` object.
+#' @param measures A list of string vectors, groups of measure names.
+#' @param names A list of string, measure group names.
+#'
+#' @return A list of `flat_table` objects.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' lft <- flat_table('iris', iris) |>
+#'   separate_measures(
+#'     measures = list(
+#'       c('Petal.Length'),
+#'       c('Petal.Width'),
+#'       c('Sepal.Length'),
+#'       c('Sepal.Width')
+#'     ),
+#'     names = c('PL', 'PW', 'SL', 'SW')
+#'   )
+#'
+#' @export
+separate_measures <- function(ft, measures, names) UseMethod("separate_measures")
+
+#' @rdname separate_measures
+#'
+#' @export
+separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
+  stopifnot("Missing measure names." = !is.null(measures))
+  stopifnot("Missing measure group names." = !is.null(names))
+  stopifnot("Missing measure group names." = length(measures) == length(unique(names)))
+  lft <- vector("list", length = length(measures))
+  names(lft) <- names
+  for (i in seq_along(measures)) {
+    measures[[i]] <- validate_measures(ft$measures, measures[[i]])
+    lft[[i]] <-
+      flat_table(name = names[i], instances = ft$table[, c(ft$attributes, measures[[i]])],
+                 unknown_value = ft$unknown_value)
+    lft[[i]]$pk_attributes <- ft$pk_attributes
+    lft[[i]]$lookup_tables <- ft$lookup_tables
+    lft[[i]]$operations <- add_operation(ft$operations, "separate_measures", measures[[i]], names[i])
+  }
+  lft
+}

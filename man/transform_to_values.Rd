@@ -47,6 +47,7 @@ ft <- flat_table('iris', iris) |>
 \code{\link{flat_table}}
 
 Other flat table transformation functions: 
+\code{\link{separate_measures}()},
 \code{\link{transform_from_values}()},
 \code{\link{transform_to_attribute}()},
 \code{\link{transform_to_measure}()}
