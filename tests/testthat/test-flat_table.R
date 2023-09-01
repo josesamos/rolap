@@ -24,14 +24,14 @@ test_that("flat_table() creates a flat_table object", {
       operations = structure(list(
         operations = structure(
           list(
-            operation = character(0),
-            name = character(0),
-            details = character(0),
-            details2 = character(0),
-            order = integer(0)
+            operation = "flat_table",
+            name = "iris<|>___UNKNOWN___",
+            details = "Species",
+            details2 = "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
+            order = 1
           ),
-          class = "data.frame",
-          row.names = integer(0)
+          row.names = c(NA,-1L),
+          class = "data.frame"
         )
       ), class = "star_operation"),
       pk_attributes = NULL,
@@ -103,14 +103,14 @@ test_that("flat_table() creates a flat_table object", {
       operations = structure(list(
         operations = structure(
           list(
-            operation = character(0),
-            name = character(0),
-            details = character(0),
-            details2 = character(0),
-            order = integer(0)
+            operation = "flat_table",
+            name = "ft_num<|>___UNKNOWN___",
+            details = "Year<|>WEEK<|>Week Ending Date<|>REGION<|>State<|>City<|><1 year (all cause deaths)<|>1-24 years (all cause deaths)<|>25-44 years<|>45-64 years (all cause deaths)<|>65+ years (all cause deaths)",
+            details2 = "Pneumonia and Influenza Deaths<|>All Deaths",
+            order = 1
           ),
-          class = "data.frame",
-          row.names = integer(0)
+          row.names = c(NA,-1L),
+          class = "data.frame"
         )
       ), class = "star_operation"),
       pk_attributes = NULL,
@@ -159,6 +159,7 @@ test_that("snake_case() creates a flat_table object", {
     "sepal_width",
     "petal_length",
     "petal_width",
+    "flat_table",
     "snake_case"
   ))
 })
@@ -221,7 +222,7 @@ test_that("set_attribute_names() and get_attribute_names()", {
     c(ft$operations$operation$operation,
       ft |>
         get_attribute_names())
-  }, c("set_attribute_names", "species"))
+  }, c("flat_table", "set_attribute_names", "species"))
 })
 
 
@@ -240,7 +241,7 @@ test_that("set_measure_names() and get_measure_names()", {
     c(ft$operations$operation$operation,
       ft |>
         get_measure_names())
-  }, c("set_measure_names", "ls", "sw", "pl", "pw"))
+  }, c("flat_table", "set_measure_names", "ls", "sw", "pl", "pw"))
 })
 
 test_that("get_similar_attribute_values()", {
@@ -418,3 +419,32 @@ test_that("replace_attribute_values() ", {
     class = c("tbl_df", "tbl", "data.frame")
   ))
 })
+
+
+test_that("select_attributes() ", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num) |>
+      select_attributes(attributes = c('Year', 'WEEK'))
+    c(ft$operations$operation$operation,
+      ft |>
+        get_attribute_names())
+  }, c("flat_table", "select_attributes", "Year", "WEEK"))
+})
+
+
+test_that("select_attributes() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
+    c(ft$operations$operation$operation,
+      ft |>
+        get_measure_names())
+  }, c(
+    "flat_table",
+    "select_measures",
+    "Sepal.Length",
+    "Sepal.Width"
+  ))
+})
+
+

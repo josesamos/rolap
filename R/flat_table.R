@@ -264,6 +264,9 @@ replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NU
 #' ft <- flat_table('iris', iris) |>
 #'   select_attributes(attributes = c('Species'))
 #'
+#' ft <- flat_table('ft_num', ft_num) |>
+#'   select_attributes(attributes = c('Year', 'WEEK', 'Week Ending Date'))
+#'
 #' @export
 select_attributes <- function(ft, attributes) UseMethod("select_attributes")
 
@@ -310,3 +313,29 @@ select_measures.flat_table <- function(ft, measures) {
   ft
 }
 
+
+#' Get the table of the flat table
+#'
+#' Obtain the table of a flat table.
+#'
+#' @param ft A `flat_table` object.
+#'
+#' @return A `tibble`, the table.
+#'
+#' @family flat table definition functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' table <- flat_table('iris', iris) |>
+#'   get_table()
+#'
+#' @export
+get_table <- function(ft) UseMethod("get_table")
+
+#' @rdname get_table
+#'
+#' @export
+get_table.flat_table <- function(ft) {
+  ft$table
+}

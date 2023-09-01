@@ -25,12 +25,16 @@ Select only the indicated attributes from the flat table.
 ft <- flat_table('iris', iris) |>
   select_attributes(attributes = c('Species'))
 
+ft <- flat_table('ft_num', ft_num) |>
+  select_attributes(attributes = c('Year', 'WEEK', 'Week Ending Date'))
+
 }
 \seealso{
 \code{\link{flat_table}}
 
 Other flat table definition functions: 
 \code{\link{flat_table}()},
+\code{\link{get_table}()},
 \code{\link{read_flat_table_file}()},
 \code{\link{read_flat_table_folder}()},
 \code{\link{select_measures}()}

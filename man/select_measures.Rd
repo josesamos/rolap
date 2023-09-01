@@ -31,6 +31,7 @@ ft <- flat_table('iris', iris) |>
 
 Other flat table definition functions: 
 \code{\link{flat_table}()},
+\code{\link{get_table}()},
 \code{\link{read_flat_table_file}()},
 \code{\link{read_flat_table_folder}()},
 \code{\link{select_attributes}()}
