@@ -51,7 +51,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of Role-Playing and Role Dimensions</a>
+    <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of role-playing and role dimensions</a>
     <a class="dropdown-item" href="../articles/v20-rdbms-dm.html">Star databases and RDBMS through the dm and rolap packages</a>
     <a class="dropdown-item" href="../articles/v30-dim-instances.html">Integration of dimension instances</a>
   </div>
@@ -249,8 +249,7 @@ dimension.</p>
 <span></span>
 <span><span class="va">db_test</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_similar_attribute_values_individually.html">get_similar_attribute_values_individually</a></span><span class="op">(</span><span class="st">'where_chain'</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $where_chain</span></span>
-<span><span class="co">#&gt; $where_chain[[1]]</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 1</span></span></span>
 <span><span class="co">#&gt;   chain        </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span></span>
@@ -536,18 +535,18 @@ course the table.</p>
 <span><span class="va">db_summary3</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_unique_attribute_values.html">get_unique_attribute_values</a></span><span class="op">(</span><span class="st">'when_paid'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 84 × 2</span></span></span>
-<span><span class="co">#&gt;    payment_date hour </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23   09   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23   20   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23   21   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-23   22   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-23   23   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-24   00   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-24   03   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-24   04   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-24   05   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-24   06   </span></span>
+<span><span class="co">#&gt;    date       hour </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23 09   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23 20   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23 21   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-23 22   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-23 23   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-24 00   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-24 03   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-24 04   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-24 05   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-24 06   </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 74 more rows</span></span></span></code></pre></div>
 <p>Let us suppose that we are not interested in the specific hours of
 the operations, but rather the part of the day in which they were
@@ -610,26 +609,26 @@ modifications have been propagated to the equivalent dimension.</p>
 <span><span class="va">db_summary4</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_unique_attribute_values.html">get_unique_attribute_values</a></span><span class="op">(</span><span class="st">'when_paid'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 18 × 2</span></span></span>
-<span><span class="co">#&gt;    payment_date hour     </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23   Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23   Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23   Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-24   Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-24   Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-24   Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-24   Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-25   Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-25   Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-25   Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> 2012-08-25   Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> 2012-08-26   Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> 2012-08-26   Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> 2012-08-26   Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> 2012-08-26   Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> 2012-08-27   Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> 2012-08-27   Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> 2012-08-27   Night</span></span></code></pre></div>
+<span><span class="co">#&gt;    date       hour     </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23 Evening  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23 Morning  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23 Night    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-24 Afternoon</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-24 Evening  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-24 Morning  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-24 Night    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-25 Afternoon</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-25 Evening  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-25 Morning  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> 2012-08-25 Night    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> 2012-08-26 Afternoon</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> 2012-08-26 Evening  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> 2012-08-26 Morning  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> 2012-08-26 Night    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> 2012-08-27 Afternoon</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> 2012-08-27 Morning  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> 2012-08-27 Night</span></span></code></pre></div>
 <p>We do the same check as before on the number of instances of the
 tables and we observe that in this case the number of records in the
 fact table has also been reduced as a result of the aggregation carried
@@ -748,18 +747,18 @@ carried over from one star database to the other.</p>
 <span><span class="va">ct</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_unique_attribute_values.html">get_unique_attribute_values</a></span><span class="op">(</span><span class="st">'when_processed'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 22 × 2</span></span></span>
-<span><span class="co">#&gt;    processing_date hour     </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23      Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23      Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23      Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-24      Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-24      Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-24      Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-24      Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-25      Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-25      Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-25      Morning  </span></span>
+<span><span class="co">#&gt;    date       hour     </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23 Evening  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23 Morning  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23 Night    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-24 Afternoon</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-24 Evening  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-24 Morning  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-24 Night    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-25 Afternoon</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-25 Evening  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-25 Morning  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more rows</span></span></span></code></pre></div>
 <p>The result is shown for dimension <em>when_processed</em>, which is
 not part of the star database on which the modifications were defined

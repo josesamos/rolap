@@ -27,7 +27,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of Role-Playing and Role Dimensions</a>
+    <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of role-playing and role dimensions</a>
     <a class="dropdown-item" href="../articles/v20-rdbms-dm.html">Star databases and RDBMS through the dm and rolap packages</a>
     <a class="dropdown-item" href="../articles/v30-dim-instances.html">Integration of dimension instances</a>
   </div>
@@ -112,6 +112,11 @@
         <dd><code>fact_schema</code> S3 class</dd>
       </dl><dl><dt>
           
+          <code><a href="flat_table.html">flat_table()</a></code> 
+        </dt>
+        <dd><code>flat_table</code> S3 class</dd>
+      </dl><dl><dt>
+          
           <code><a href="ft.html">ft</a></code> 
         </dt>
         <dd>Mortality Reporting System</dd>
@@ -139,7 +144,7 @@
           
           <code><a href="get_attribute_names.html">get_attribute_names()</a></code> 
         </dt>
-        <dd>Get the names of the attributes of a dimension</dd>
+        <dd>Get the names of the attributes</dd>
       </dl><dl><dt>
           
           <code><a href="get_dimension_names.html">get_dimension_names()</a></code> 
@@ -149,7 +154,12 @@
           
           <code><a href="get_measure_names.html">get_measure_names()</a></code> 
         </dt>
-        <dd>Get the names of the measures of a star database</dd>
+        <dd>Get the names of the measures</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_pk_attribute_names.html">get_pk_attribute_names()</a></code> 
+        </dt>
+        <dd>Get the names of the primary key attributes of a flat table</dd>
       </dl><dl><dt>
           
           <code><a href="get_role_playing_dimension_names.html">get_role_playing_dimension_names()</a></code> 
@@ -159,12 +169,17 @@
           
           <code><a href="get_similar_attribute_values.html">get_similar_attribute_values()</a></code> 
         </dt>
-        <dd>Get similar attribute values combination in dimensions</dd>
+        <dd>Get similar attribute values combination</dd>
       </dl><dl><dt>
           
           <code><a href="get_similar_attribute_values_individually.html">get_similar_attribute_values_individually()</a></code> 
         </dt>
-        <dd>Get similar attribute values for individual attributes in dimensions</dd>
+        <dd>Get similar values for individual attributes</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_table.html">get_table()</a></code> 
+        </dt>
+        <dd>Get the table of the flat table</dd>
       </dl><dl><dt>
           
           <code><a href="get_table_names.html">get_table_names()</a></code> 
@@ -174,12 +189,27 @@
           
           <code><a href="get_unique_attribute_values.html">get_unique_attribute_values()</a></code> 
         </dt>
-        <dd>Get unique attribute values in a dimension</dd>
+        <dd>Get unique attribute values</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_unknown_values.html">get_unknown_values()</a></code> 
+        </dt>
+        <dd>Get unknown attribute values</dd>
       </dl><dl><dt>
           
           <code><a href="group_dimension_instances.html">group_dimension_instances()</a></code> 
         </dt>
         <dd>Group instances of a dimension</dd>
+      </dl><dl><dt>
+          
+          <code><a href="join_lookup_table.html">join_lookup_table()</a></code> 
+        </dt>
+        <dd>Join a flat table with a lookup table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="lookup_table.html">lookup_table()</a></code> 
+        </dt>
+        <dd>Transform a flat table into a look up table</dd>
       </dl><dl><dt>
           
           <code><a href="mrs_age_schema.html">mrs_age_schema</a></code> 
@@ -202,9 +232,29 @@
         <dd>Star schema for Mortality Reporting System by Cause with additional dates</dd>
       </dl><dl><dt>
           
+          <code><a href="read_flat_table_file.html">read_flat_table_file()</a></code> 
+        </dt>
+        <dd>Import flat table file</dd>
+      </dl><dl><dt>
+          
+          <code><a href="read_flat_table_folder.html">read_flat_table_folder()</a></code> 
+        </dt>
+        <dd>Import all flat table files in a folder</dd>
+      </dl><dl><dt>
+          
           <code><a href="replace_attribute_values.html">replace_attribute_values()</a></code> 
         </dt>
-        <dd>Replace instance values in a dimension</dd>
+        <dd>Replace instance values</dd>
+      </dl><dl><dt>
+          
+          <code><a href="replace_empty_values.html">replace_empty_values()</a></code> 
+        </dt>
+        <dd>Replace empty values with the unknown value</dd>
+      </dl><dl><dt>
+          
+          <code><a href="replace_string.html">replace_string()</a></code> 
+        </dt>
+        <dd>Replace strings</dd>
       </dl><dl><dt>
           
           <code><a href="role_playing_dimension.html">role_playing_dimension()</a></code> 
@@ -212,14 +262,29 @@
         <dd>Define a role playing dimension and its associated dimensions</dd>
       </dl><dl><dt>
           
+          <code><a href="select_attributes.html">select_attributes()</a></code> 
+        </dt>
+        <dd>Select attributes of a flat table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="select_measures.html">select_measures()</a></code> 
+        </dt>
+        <dd>Select measures of a flat table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="separate_measures.html">separate_measures()</a></code> 
+        </dt>
+        <dd>Separate measures in flat tables</dd>
+      </dl><dl><dt>
+          
           <code><a href="set_attribute_names.html">set_attribute_names()</a></code> 
         </dt>
-        <dd>Rename the attributes of a dimension</dd>
+        <dd>Rename attributes</dd>
       </dl><dl><dt>
           
           <code><a href="set_measure_names.html">set_measure_names()</a></code> 
         </dt>
-        <dd>Rename the measures of a star database</dd>
+        <dd>Rename measures</dd>
       </dl><dl><dt>
           
           <code><a href="snake_case.html">snake_case()</a></code> 
@@ -235,6 +300,26 @@
           <code><a href="star_schema.html">star_schema()</a></code> 
         </dt>
         <dd><code>star_schema</code> S3 class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="transform_from_values.html">transform_from_values()</a></code> 
+        </dt>
+        <dd>Transform attribute values into measure names</dd>
+      </dl><dl><dt>
+          
+          <code><a href="transform_to_attribute.html">transform_to_attribute()</a></code> 
+        </dt>
+        <dd>Transform to attribute</dd>
+      </dl><dl><dt>
+          
+          <code><a href="transform_to_measure.html">transform_to_measure()</a></code> 
+        </dt>
+        <dd>Transform to measure</dd>
+      </dl><dl><dt>
+          
+          <code><a href="transform_to_values.html">transform_to_values()</a></code> 
+        </dt>
+        <dd>Transform measure names into attribute values</dd>
       </dl></div>
   </main></div>
 
