@@ -66,6 +66,72 @@ select_measures.flat_table <- function(ft, measures) {
 }
 
 
+#' Select instances of a flat table
+#'
+#' Select only the indicated instances from the flat table.
+#'
+#' Several values can be indicated for attributes (performs an OR operation)
+#' or several attributes and a value for each one (performs an AND operation).
+#'
+#' If the parameter `not` is true, the reported values are those that are not
+#' included.
+#'
+#' @param ft A `flat_table` object.
+#' @param not A boolean.
+#' @param attributes A vector of names.
+#' @param values A list of value vectors.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   select_instances(attributes = c('Species'),
+#'                    values = c('versicolor', 'virginica'))
+#'
+#' ft <- flat_table('ft_num', ft_num) |>
+#'   select_instances(
+#'     not = TRUE,
+#'     attributes = c('Year', 'WEEK'),
+#'     values = list(c('1962', '2'), c('1964', '2'))
+#'   )
+#'
+#' @export
+select_instances <- function(ft, not, attributes, values) UseMethod("select_instances")
+
+#' @rdname select_instances
+#'
+#' @export
+select_instances.flat_table <- function(ft, not = FALSE, attributes = NULL, values) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  n_att <- length(attributes)
+  if (n_att == 1) {
+    values <- unlist(values)
+    stopifnot("The values of the given attribute are missing." = length(values) > 0)
+    values <- as.list(values)
+  }
+  table <- ft$table
+  or_res <- rep(FALSE, nrow(table))
+  for (i in seq_along(values)) {
+    stopifnot('There is not the same number of values as attributes.' = n_att == length(values[[i]]))
+    and_res <- rep(TRUE, nrow(table))
+    for (j in 1:n_att) {
+      and_res <- and_res & table[, attributes[j]] == values[[i]][j]
+    }
+    or_res <- or_res | and_res
+  }
+  if (not == TRUE) {
+    or_res <- !or_res
+  }
+  ft$table <- table[or_res, ]
+  ft$operations <- add_operation(ft$operations, "select_instances", not, attributes, unlist(values))
+  ft
+}
+
+
 #' Transform to attribute
 #'
 #' Transform measures into attributes. We can indicate if we want all the numbers

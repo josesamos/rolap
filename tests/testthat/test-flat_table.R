@@ -793,7 +793,7 @@ test_that("lookup_table() ", {
 })
 
 
-test_that("replace_string() ", {
+test_that("get_pk_attribute_names() ", {
   expect_equal({
     flat_table('iris', iris) |>
       lookup_table(
@@ -810,7 +810,7 @@ test_that("replace_string() ", {
 })
 
 
-test_that("replace_string() ", {
+test_that("join_lookup_table() ", {
   expect_equal({
     lookup <- flat_table('iris', iris) |>
       lookup_table(
@@ -931,3 +931,41 @@ test_that("replace_string() ", {
     class = "flat_table"
   ))
 })
+
+
+test_that("get_pk_attribute_names() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      select_instances(
+        attributes = c('Species'),
+        values = c('versicolor', 'virginica')
+      )
+    unique(ft$table$Species)
+  }, c("versicolor", "virginica"))
+})
+
+
+test_that("get_pk_attribute_names() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      select_instances(not = TRUE,
+                       attributes = c('Species'),
+                       values = c('versicolor', 'virginica'))
+    unique(ft$table$Species)
+  }, "setosa")
+})
+
+
+test_that("get_pk_attribute_names() ", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num) |>
+      select_instances(attributes = c('Year', 'WEEK'),
+                       values = list(c('1962', '2'), c('1964', '2')))
+    unique(ft$table[, c('Year', 'WEEK')])
+  }, structure(
+    list(Year = c("1962", "1964"), WEEK = c("2", "2")),
+    row.names = c(NA,-2L),
+    class = c("tbl_df", "tbl", "data.frame")
+  ))
+})
+
