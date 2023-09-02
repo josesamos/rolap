@@ -102,7 +102,7 @@ get_fact_name.fact_schema <- function(schema) {
 #' @return A vector of strings.
 #'
 #' @keywords internal
-get_measure_names.fact_schema <- function(schema) {
+get_measure_names_schema.fact_schema <- function(schema) {
   schema$measures
 }
 

@@ -177,10 +177,10 @@ define_dimension.star_schema <- function(schema, dimension = NULL, name = NULL, 
 #' @return A vector of strings.
 #'
 #' @keywords internal
-get_measure_names.star_schema <- function(schema) {
+get_measure_names_schema.star_schema <- function(schema) {
   names <- NULL
   for (fact in schema$facts) {
-    names <- c(names, get_measure_names(fact))
+    names <- c(names, get_measure_names_schema(fact))
   }
   unique(names)
 }
@@ -188,18 +188,18 @@ get_measure_names.star_schema <- function(schema) {
 
 #' Get attribute names
 #'
-#' Get the names of the attribute defined in the dimension schemas.
+#' Get the attribute names.
 #'
-#' @param schema A `star_schema` object.
+#' @param schema A `dimension_schema` object.
 #'
-#' @return A vector of strings.
+#' @return A string.
 #'
 #' @keywords internal
-get_attribute_names.star_schema <- function(schema) {
-  names <- NULL
-  for (dimension in schema$dimensions) {
-    names <- c(names, get_attribute_names(dimension))
+get_attribute_names_schema.star_schema <- function(schema) {
+    names <- NULL
+    for (dimension in schema$dimensions) {
+      names <- c(names, get_attribute_names_schema(dimension))
+    }
+    unique(names)
   }
-  unique(names)
-}
 

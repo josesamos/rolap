@@ -57,13 +57,13 @@ get_dimension_name.dimension_schema <- function(schema) {
 
 #' Get attribute names
 #'
-#' Get the names of the attributes defined in the dimension schema.
+#' Get the attribute names.
 #'
 #' @param schema A `dimension_schema` object.
 #'
-#' @return A vector of strings.
+#' @return A string.
 #'
 #' @keywords internal
-get_attribute_names.dimension_schema <- function(schema) {
+get_attribute_names_schema.dimension_schema <- function(schema) {
   schema$attributes
-}
+  }

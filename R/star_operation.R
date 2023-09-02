@@ -47,6 +47,7 @@ add_operation.star_operation <- function(op, op_name, name = NULL, details = NUL
     } else {
       order <- max(op$operations$order) + 1
     }
+    name <- vector_to_string(name)
     details <- vector_to_string(details)
     details2 <- vector_to_string(details2)
     if (is.null(name)) {

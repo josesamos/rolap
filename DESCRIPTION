@@ -24,6 +24,7 @@ Imports:
     dplyr,
     methods,
     purrr,
+    readr,
     rlang,
     snakecase,
     tibble,

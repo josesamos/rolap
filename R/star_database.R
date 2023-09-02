@@ -16,7 +16,7 @@
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database and constellation definition functions
+#' @family star database definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}
 #'
 #' @examples
@@ -31,13 +31,13 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   }
   stopifnot("A tibble with the instances was expected." = tibble::is_tibble(instances))
   instance_attributes <- names(instances)
-  attributes <- get_attribute_names(schema)
+  attributes <- get_attribute_names_schema(schema)
   for (attribute in attributes) {
     if (!(attribute %in% instance_attributes)) {
       stop(sprintf("The schema attribute '%s' is not defined on instances.", attribute))
     }
   }
-  measures <- get_measure_names(schema)
+  measures <- get_measure_names_schema(schema)
   for (measure in measures) {
     if (!(measure %in% instance_attributes)) {
       stop(sprintf("The fact measure '%s' is not defined on instances.", measure))
@@ -88,7 +88,7 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   for (d in names(schema$dimensions)) {
     # generate dimension table
     dim_name <- get_dimension_name(schema$dimensions[[d]])
-    dim_attributes <- get_attribute_names(schema$dimensions[[d]])
+    dim_attributes <- get_attribute_names_schema(schema$dimensions[[d]])
     db$dimensions[[d]] <- dimension_table(dim_name, dim_attributes, instances)
     # include surrogate key in instances
     instances <- add_surrogate_key(db$dimensions[[d]], instances)
@@ -119,52 +119,6 @@ star_database <- function(schema, instances, unknown_value = NULL) {
 }
 
 
-#' Transform names according to the snake case style
-#'
-#' Transform fact, dimension, measures, and attribute names according to the
-#' snake case style.
-#'
-#' This style is suitable if we are going to work with databases.
-#'
-#' @param db A `star_database` object.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' s <- star_schema() |>
-#'   define_facts(fact_schema(
-#'     name = "mrs_cause",
-#'     measures = c(
-#'       "Pneumonia and Influenza Deaths",
-#'       "All Deaths"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "when",
-#'     attributes = c(
-#'       "Year"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "where",
-#'     attributes = c(
-#'       "REGION",
-#'       "State",
-#'       "City"
-#'     )
-#'   ))
-#'
-#' # ft_num contains instances
-#' db <- star_database(s, ft_num) |>
-#'   snake_case()
-#'
-#' @export
-snake_case <- function(db) UseMethod("snake_case")
-
 #' @rdname snake_case
 #'
 #' @export
@@ -180,473 +134,78 @@ snake_case.star_database <- function(db) {
   db
 }
 
-#' @rdname as_tibble_list
-#'
-#' @export
-as_tibble_list.star_database <- function(db) {
-  as_tibble_list_common(db$dimensions, db$facts)
-}
-
-#' @rdname as_dm_class
-#'
-#' @export
-as_dm_class.star_database <- function(db, pk_facts = TRUE) {
-  as_dm_class_common(db$dimensions, db$facts, pk_facts)
-}
-
-
-#' Define a role playing dimension and its associated dimensions
-#'
-#' The same dimension can play several roles in relation to the facts. We can
-#' define the main dimension and the dimensions that play different roles.
-#'
-#' As a result, all the dimensions will have the same instances and, if we deem
-#' it necessary, also the same name of their attributes (except the surrogate key).
-#'
-#' @param db A `star_database` object.
-#' @param rpd A string, dimension name (role playing dimension).
-#' @param roles A vector of strings, dimension names (dimension roles).
-#' @param rpd_att_names A boolean, common attribute names taken from rpd dimension.
-#' @param att_names A vector of strings, common attribute names.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' s <- star_schema() |>
-#'   define_facts(fact_schema(
-#'     name = "mrs_cause",
-#'     measures = c(
-#'       "Pneumonia and Influenza Deaths",
-#'       "All Deaths"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "When",
-#'     attributes = c(
-#'       "Year",
-#'       "WEEK",
-#'       "Week Ending Date"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "When Available",
-#'     attributes = c(
-#'       "Data Availability Year",
-#'       "Data Availability Week",
-#'       "Data Availability Date"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "When Received",
-#'     attributes = c(
-#'       "Reception Year",
-#'       "Reception Week",
-#'       "Reception Date"
-#'     )
-#'   )) |>
-#'   define_dimension(dimension_schema(
-#'     name = "where",
-#'     attributes = c(
-#'       "REGION",
-#'       "State",
-#'       "City"
-#'     )
-#'   ))
-#'
-#' db <- star_database(s, ft_cause_rpd) |>
-#'   role_playing_dimension(
-#'     rpd = "When",
-#'     roles = c("When Available", "When Received"),
-#'     rpd_att_names = TRUE
-#'   )
-#'
-#' db <- star_database(s, ft_cause_rpd) |>
-#'   role_playing_dimension("When",
-#'                          c("When Available", "When Received"),
-#'                          att_names = c("Year", "Week", "Date"))
-#'
-#' @export
-role_playing_dimension <- function(db, rpd, roles, rpd_att_names, att_names) UseMethod("role_playing_dimension")
-
-#' @rdname role_playing_dimension
-#'
-#' @export
-role_playing_dimension.star_database <- function(db, rpd, roles, rpd_att_names = FALSE, att_names = NULL) {
-  rpd <- unique(snakecase::to_snake_case(rpd))
-  stopifnot("Only one value can be indicated in rpd." = length(rpd) == 1)
-  roles <- unique(snakecase::to_snake_case(roles))
-  stopifnot("At least one role must be indicated." = length(roles) >= 1)
-  stopifnot("rpd should not be included in roles." = !(rpd %in% roles))
-  att_names <- unique(att_names)
-  dims <- c(rpd, roles)
-  # have to be dimensions
-  dim_names <- names(db$dimensions)
-  # they should not be previously defined rpd
-  prev_rpd <- NULL
-  for (n in names(db$rpd)) {
-    prev_rpd <-c(prev_rpd, db$rpd[[n]])
-  }
-  # they must have the same structure (number of attributes)
-  n_att <- 0
-  for (d in dims) {
-    if (!(d %in% dim_names)) {
-      stop(sprintf("'%s' is not a dimension name.", d))
-    }
-    if (d %in% prev_rpd) {
-      stop(sprintf("'%s' is included in a previous rpd definition.", d))
-    }
-    if (n_att == 0) {
-      n_att <- ncol(db$dimensions[[d]]$table)
-    } else {
-      stopifnot("rpd and roles must have the same number of attributes." = n_att == ncol(db$dimensions[[d]]$table))
-    }
-  }
-  if (!is.null(att_names)) {
-    stopifnot("The number of attributes does not match those of att_names." = n_att == length(att_names) + 1)
-  }
-  # they meet all the requirements
-
-  # annotate rpd
-  db$rpd[[rpd]] <- dims
-
-  # rename attributes
-  if (rpd_att_names == TRUE) {
-    att_names <- names(db$dimensions[[rpd]]$table)[-1]
-  }
-  if (!is.null(att_names)) {
-    for (d in dims) {
-      names(db$dimensions[[d]]$table) <-
-        c(names(db$dimensions[[d]]$table)[1], att_names)
-    }
-  } else {
-    att_names <- ""
-  }
-
-  db <- share_dimensions(db, dims)
-  db$operations[[1]] <- add_operation(db$operations[[1]], "role_playing_dimension", rpd, roles, att_names)
-  db
-}
-
-
-#' Share the given dimensions in the database
-#'
-#' @param db `star_database` or `constellation` object.
-#' @param dims Vector of dimension names.
-#'
-#' @return A `star_database` or `constellation` object.
-#' @keywords internal
-share_dimensions <- function(db, dims) {
-  # merge dimensions
-  to_conform <- vector("list", length = length(dims))
-  for (i in seq_along(dims)) {
-    to_conform[i] <- db$dimensions[dims[i]]
-    if (i > 1) {
-      # to be able to conform they must have the same columns.
-      names(to_conform[[i]]$table) <- names(to_conform[[1]]$table)
-    }
-  }
-  cd <- conform_dimensions(to_conform)
-
-  for (i in seq_along(dims)) {
-    surrogate_key <- db$dimensions[[dims[i]]]$surrogate_key
-    all_att <- names(db$dimensions[[dims[i]]]$table)
-    attributes <- all_att[all_att != surrogate_key]
-
-    # join facts to original dimension
-    for (f in seq_along(db$facts)) {
-      if (dims[i] %in% db$facts[[f]]$dim_int_names) {
-        db$facts[[f]]$table <-
-          dplyr::select(
-            dplyr::inner_join(db$facts[[f]]$table,
-                              db$dimensions[[dims[i]]]$table,
-                              by = surrogate_key),-tidyselect::all_of(surrogate_key)
-          )
-      }
-    }
-
-    # change dimension table keeping attribute names
-    db$dimensions[[dims[i]]]$table <- cd$table
-    names(db$dimensions[[dims[i]]]$table) <- all_att
-
-    # join new dimension to facts
-    for (f in seq_along(db$facts)) {
-      if (dims[i] %in% db$facts[[f]]$dim_int_names) {
-        db$facts[[f]]$table <-
-          dplyr::select(
-            dplyr::inner_join(db$facts[[f]]$table,
-                              db$dimensions[[dims[i]]]$table,
-                              by = attributes),-tidyselect::all_of(attributes)
-          )
-      }
-    }
-  }
-  # reorder attributes in facts
-  for (f in seq_along(db$facts)) {
-    measures <-
-      setdiff(names(db$facts[[f]]$table),
-              db$facts[[f]]$surrogate_keys)
-    db$facts[[f]]$table <-
-      dplyr::select(db$facts[[f]]$table, tidyselect::all_of(c(db$facts[[f]]$surrogate_keys, measures)))
-  }
-  db
-}
-
-
-#' Rename the attributes of a dimension
-#'
-#' The dimension attribute names match those of the flat table from which they
-#' are defined. This function allows you to change their names.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   set_attribute_names(
-#'     name = "where",
-#'     attributes = c(
-#'       "Region",
-#'       "State",
-#'       "City"
-#'     )
-#'   )
-#'
-#' @export
-set_attribute_names <- function(db, name, attributes) UseMethod("set_attribute_names")
-
-#' @rdname set_attribute_names
-#'
-#' @export
-set_attribute_names.star_database <- function(db, name, attributes) {
-  attributes <- unique(attributes)
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-  att_names <- names(db$dimensions[[name]]$table)
-  stopifnot("The dimension has a different number of attributes." = length(attributes) == length(att_names) - 1)
-  names(db$dimensions[[name]]$table) <- c(att_names[1], attributes)
-  db$operations[[1]] <- add_operation(db$operations[[1]], "set_attribute_names", name, attributes)
-  db
-}
-
-#' Get the names of the attributes of a dimension
-#'
-#' Obtain the names of the attributes of a dimension.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#'
-#' @return A vector of strings, attribute names.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_attribute_names(name = "where")
-#'
-#' @export
-get_attribute_names <- function(db, name) UseMethod("get_attribute_names")
 
 #' @rdname get_attribute_names
 #'
 #' @export
-get_attribute_names.star_database <- function(db, name) {
+get_attribute_names.star_database <- function(db, name, ordered = FALSE, as_definition = FALSE) {
   stopifnot("Missing dimension name." = !is.null(name))
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
   att_names <- names(db$dimensions[[name]]$table)
-  att_names[-1]
+  transform_names(names = att_names[-1], ordered, as_definition)
 }
 
-
-#' Rename the measures of a star database
-#'
-#' The measure names match those of the flat table from which they
-#' are defined. This function allows you to change their names.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, fact name.
-#' @param measures A vector of strings, measure names.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   set_measure_names(
-#'     measures = c(
-#'       "Pneumonia and Influenza",
-#'       "All",
-#'       "Rows Aggregated"
-#'     )
-#'   )
-#'
-#' @export
-set_measure_names <- function(db, name, measures) UseMethod("set_measure_names")
-
-#' @rdname set_measure_names
-#'
-#' @export
-set_measure_names.star_database <- function(db, name = NULL, measures) {
-  if (is.null(name)) {
-    name <- names(db$facts[1])
-  }
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a fact name." = name %in% names(db$facts))
-  measures <- unique(measures)
-  measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
-  stopifnot("Facts have a different number of measures." = length(measures) == length(measure_names))
-  names(db$facts[[name]]$table) <- c(db$facts[[name]]$surrogate_keys, measures)
-  db$operations[[name]] <- add_operation(db$operations[[name]], "set_measure_names", names(db$facts), measures)
-  db
-}
-
-#' Get the names of the measures of a star database
-#'
-#' Obtain the names of the measures of a star database.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, fact name.
-#'
-#' @return A vector of strings, measure names.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_measure_names()
-#'
-#' @export
-get_measure_names <- function(db, name) UseMethod("get_measure_names")
 
 #' @rdname get_measure_names
 #'
 #' @export
-get_measure_names.star_database <- function(db, name = NULL) {
+get_measure_names.star_database <- function(db, name = NULL, ordered = FALSE, as_definition = FALSE) {
   if (is.null(name)) {
     name <- names(db$facts[1])
   }
   name <- snakecase::to_snake_case(name)
   stopifnot("It is not a fact name." = name %in% names(db$facts))
-  setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  transform_names(names, ordered, as_definition)
 }
 
 
-#' Get the names of the dimensions of a star database
-#'
-#' Obtain the names of the dimensions of a star database.
-#'
-#' @param db A `star_database` object.
-#'
-#' @return A vector of strings, dimension names.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_dimension_names()
+#' @rdname set_attribute_names
 #'
 #' @export
-get_dimension_names <- function(db) UseMethod("get_dimension_names")
-
-#' @rdname get_dimension_names
-#'
-#' @export
-get_dimension_names.star_database <- function(db) {
-  sort(names(db$dimensions))
+set_attribute_names.star_database <- function(db, name, old = NULL, new) {
+  stopifnot("Missing dimension name." = !is.null(name))
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  att_names <- names(db$dimensions[[name]]$table)
+  old <- validate_attributes(att_names[-1], old)
+  stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(att_names, old, new)
+  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
+    stop("There are repeated attributes.")
+  }
+  names(db$dimensions[[name]]$table) <- names
+  db$operations[[1]] <- add_operation(db$operations[[1]], "set_attribute_names", name, old, new)
+  db
 }
 
 
-#' Get the names of the tables of a star database
-#'
-#' Obtain the names of the tables of a star database.
-#'
-#' @param db A `star_database` object.
-#'
-#' @return A vector of strings, table names.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_table_names()
+#' @rdname set_measure_names
 #'
 #' @export
-get_table_names <- function(db) UseMethod("get_table_names")
-
-#' @rdname get_table_names
-#'
-#' @export
-get_table_names.star_database <- function(db) {
-  sort(c(names(db$dimensions), names(db$facts)))
+set_measure_names.star_database <- function(db, name = NULL, old = NULL, new) {
+  if (is.null(name)) {
+    name <- names(db$facts[1])
+  }
+  name <- snakecase::to_snake_case(name)
+  stopifnot("It is not a fact name." = name %in% names(db$facts))
+  measure_names <- setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
+  old <- validate_measures(measure_names, old)
+  stopifnot("There are repeated measures." = length(new) == length(unique(new)))
+  stopifnot("The number of new names must be equal to the number of names to replace." = length(old) == length(new))
+  names <- replace_names(measure_names, old, new)
+  names <- c(db$facts[[name]]$surrogate_keys, names)
+  if (length(names) != length(unique(snakecase::to_snake_case(names)))) {
+    stop("There are repeated measures.")
+  }
+  names(db$facts[[name]]$table) <- names
+  db$operations[[name]] <-
+    add_operation(db$operations[[name]], "set_measure_names", names(db$facts), old, new)
+  db
 }
 
-
-#' Get similar attribute values combination in dimensions
-#'
-#' Get sets of attribute values in dimensions that differ only by tildes, spaces,
-#' or punctuation marks, for the combination of the given set of attributes.
-#'
-#' A list of dimensions can be indicated, otherwise it considers all dimensions.
-#'
-#' If a dimension is indicated, a list of attributes to be considered in it can
-#' also be indicated. If several dimensions are indicated, the combination of
-#' all the attributes of each dimension is considered.
-#'
-#' If a name is indicated in the `col_as_vector` parameter, it includes a column
-#' with the data in vector form to be used in other functions.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#' @param col_as_vector A string, name of the column to include a vector of values.
-#'
-#' @return A vector of `tibble` objects with similar instances.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values(name = "where")
-#'
-#' db <- star_database(mrs_cause_schema, ft_num)
-#' db$dimensions$where$table$City[2] <- " BrId  gEport "
-#' db |>
-#'   get_similar_attribute_values("where")
-#'
-#' db <- star_database(mrs_cause_schema, ft_num)
-#' db$dimensions$where$table$City[2] <- " BrId  gEport "
-#' db |>
-#'   get_similar_attribute_values("where",
-#'     attributes = c("City", "State"),
-#'     col_as_vector = "As a vector")
-#'
-#' @export
-get_similar_attribute_values <- function(db, name, attributes, col_as_vector) UseMethod("get_similar_attribute_values")
 
 #' @rdname get_similar_attribute_values
 #'
@@ -655,55 +214,16 @@ get_similar_attribute_values.star_database <-
   function(db,
            name = NULL,
            attributes = NULL,
+           exclude_numbers = FALSE,
            col_as_vector = NULL) {
     name <- validate_dimension_names(db, name)
-    if (length(name) > 1 & !is.null(attributes)) {
-      stop("For more than one dimension, a value cannot be indicated for the attributes parameter.")
-    }
     rv =  vector("list", length = length(name))
     names(rv) <- name
+    original_att <- attributes
     for (dn in name) {
       dt <- db$dimensions[[dn]]$table
-      att <- colnames(dt)[-1]
-      # avoid attributes parameter if more than 1 dimension is given
-      if (is.null(attributes) | length(name) > 1) {
-        attributes <- att
-      } else {
-        stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-        for (attribute in attributes) {
-          if (!(attribute %in% att)) {
-            stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
-          }
-        }
-      }
-      dt <- data.frame(dt[, attributes], stringsAsFactors = FALSE)
-      # in one column
-      dt <- do.call(paste, c(dt, sep = ""))
-      # clean values
-      dt <- iconv(dt, to = "ASCII//TRANSLIT")
-      dt <- tolower(dt)
-      dt <- snakecase::to_snake_case(dt)
-      dt <- gsub("_", "", dt)
-      # value frequency
-      t_freq <- table(dt)
-      t_freq <- t_freq[t_freq > 1]
-      # repeated values
-      n_freq <- names(t_freq)
-      res <- list()
-      for (i in seq_along(n_freq)) {
-        v <- db$dimensions[[dn]]$table[dt == n_freq[i], attributes]
-        # error in dim-instances.Rmd: transform a column tibble y a vector
-        v <- data.frame(v, stringsAsFactors = FALSE)
-        names(v) <- attributes
-        v <- dplyr::arrange_all(unique(tibble::as_tibble(v)))
-        if (!is.null(col_as_vector)) {
-          v <- add_dput_column(v, col_as_vector)
-        }
-        if (nrow(v) > 1) {
-          res <- c(res, list(v))
-        }
-      }
-      rv[[dn]] <- res
+      attributes <- validate_attributes(colnames(dt)[-1], original_att)
+      rv[[dn]] <- get_similar_values_table(dt[, attributes], attributes, exclude_numbers, col_as_vector)
     }
     if (length(rv) == 1) {
       rv[[1]]
@@ -713,238 +233,84 @@ get_similar_attribute_values.star_database <-
   }
 
 
-#' Get similar attribute values for individual attributes in dimensions
-#'
-#' Get sets of attribute values for individual attributes in the set of dimensions
-#' that differ only by tildes, spaces, or punctuation marks. If no dimension name
-#' is indicated, all dimensions are considered.
-#'
-#' If a name is indicated in the `col_as_vector` parameter, it includes a column
-#' with the data in vector form to be used in other functions.
-#'
-#' @param db A `star_database` object.
-#' @param name A vector of strings, dimension names.
-#' @param col_as_vector A string, name of the column to include a vector of values.
-#'
-#' @return A vector of `tibble` objects with similar instances.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values_individually(name = c("where", "when"))
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_similar_attribute_values_individually()
-#'
-#' @export
-get_similar_attribute_values_individually <- function(db, name, col_as_vector) UseMethod("get_similar_attribute_values_individually")
-
 #' @rdname get_similar_attribute_values_individually
 #'
 #' @export
 get_similar_attribute_values_individually.star_database <-
   function(db,
            name = NULL,
+           attributes = NULL,
+           exclude_numbers = FALSE,
            col_as_vector = NULL) {
     name <- validate_dimension_names(db, name)
     rv =  vector("list", length = length(name))
     names(rv) <- name
+    original_att <- attributes
     for (dn in name) {
-      attributes <- colnames(db$dimensions[[dn]]$table)[-1]
+      attributes <- validate_attributes(colnames(db$dimensions[[dn]]$table)[-1], original_att)
       l <- list()
       for (at in attributes) {
-        la <- get_similar_attribute_values(db, dn, at, col_as_vector)
+        la <- get_similar_attribute_values(db, dn, at, exclude_numbers, col_as_vector)
         if (length(la) > 0) {
           l <- c(l, la)
         }
       }
       rv[[dn]] <- l
     }
-    rv
-  }
-
-#' Validate dimension names
-#'
-#' @param db A `star_database` object.
-#' @param name A vector of strings, dimension names.
-#'
-#' @return A vector of strings, dimension names.
-#'
-#' @keywords internal
-validate_dimension_names <- function(db, name) {
-  if (!is.null(name)) {
-    name <- unique(snakecase::to_snake_case(name))
-    for (dn in name) {
-      if (!(dn %in% names(db$dimensions))) {
-        stop(sprintf("'%s' is not a dimension name.", dn))
-      }
-    }
-  } else {
-    name <- names(db$dimensions)
-  }
-  # eliminate repeated rpd from name
-  for (r in seq_along(db$rpd)) {
-    if (length(intersect(name, db$rpd[[r]])) > 0) {
-      name <- setdiff(name, db$rpd[[r]])
-      name <- c(name, db$rpd[[r]][1])
+    if (length(rv) == 1) {
+      rv[[1]]
+    } else {
+      rv
     }
   }
-  name
-}
 
-
-#' Get unique attribute values in a dimension
-#'
-#' Get unique set of values in a dimension for the given attributes.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#' @param col_as_vector A string, name of the column to include a vector of values.
-#'
-#' @return A vector of `tibble` objects with unique instances.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' instances <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_unique_attribute_values(name = "where")
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_unique_attribute_values("where",
-#'     attributes = c("City", "State"))
-#'
-#' @export
-get_unique_attribute_values <- function(db, name, attributes, col_as_vector) UseMethod("get_unique_attribute_values")
 
 #' @rdname get_unique_attribute_values
 #'
 #' @export
 get_unique_attribute_values.star_database <-
   function(db,
-           name,
+           name = NULL,
            attributes = NULL,
            col_as_vector = NULL) {
-    stopifnot("Missing dimension name." = !is.null(name))
-    name <- snakecase::to_snake_case(name)
-    stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
-    dt <- db$dimensions[[name]]$table
-    att <- colnames(dt)[-1]
-    if (is.null(attributes)) {
-      attributes <- att
+    name <- validate_dimension_names(db, name)
+    rv =  vector("list", length = length(name))
+    names(rv) <- name
+    original_att <- attributes
+    for (dn in name) {
+      dt <- db$dimensions[[dn]]$table
+      attributes <- validate_attributes(colnames(dt)[-1], original_att)
+      rv[[dn]] <- get_unique_values_table(dt[, attributes], col_as_vector)
+    }
+    if (length(rv) == 1) {
+      rv[[1]]
     } else {
-      stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-      for (attribute in attributes) {
-        if (!(attribute %in% att)) {
-          stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
-        }
-      }
+      rv
     }
-    dt <- data.frame(dt[, attributes], stringsAsFactors = FALSE)
-    dt <- dplyr::arrange_all(unique(tibble::as_tibble(dt)))
-    if (!is.null(col_as_vector)) {
-      dt <- add_dput_column(dt, col_as_vector)
-    }
-    dt
   }
 
-
-#' For each row, add a vector of values
-#'
-#' @param v A `tibble`, rows of a dimension table.
-#' @param column A string, name of the column to include a vector of values.
-#'
-#' @return A `tibble`, rows of a dimension table.
-#'
-#' @keywords internal
-add_dput_column <- function(v, column) {
-  n_att <- ncol(v)
-  v[column] <- ""
-  for (i in 1:nrow(v)) {
-    dt <- "c("
-    for (j in 1:n_att) {
-      if (j == 1) {
-        sep = ""
-      } else {
-        sep = ", "
-      }
-      dt <- paste(dt, sprintf("'%s'", v[i, j]), sep = sep)
-    }
-    dt <- paste(dt, ")", sep = "")
-    v[i, column] <- dt
-  }
-  v
-}
-
-
-#' Replace instance values in a dimension
-#'
-#' Given the values of a possible instance of a dimension, for that combination,
-#' replace them with the new data values.
-#'
-#' @param db A `star_database` object.
-#' @param name A string, dimension name.
-#' @param attributes A vector of strings, attribute names.
-#' @param old A vector of values.
-#' @param new A vector of values.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database and constellation definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   replace_attribute_values(name = "where",
-#'     old = c('1', 'CT', 'Bridgeport'),
-#'     new = c('1', 'CT', 'Hartford'))
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   replace_attribute_values(name = "where",
-#'                            attributes = c('REGION', 'State'),
-#'                            old = c('1', 'CT'),
-#'                            new = c('2', 'CT'))
-#'
-#' @export
-replace_attribute_values <- function(db, name, attributes, old, new) UseMethod("replace_attribute_values")
 
 #' @rdname replace_attribute_values
 #'
 #' @export
 replace_attribute_values.star_database <- function(db, name, attributes = NULL, old, new) {
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  stopifnot("One dimension must be indicated (only one)." = length(name) == 1)
+  name <- validate_dimension_names(db, name)
   table <- db$dimensions[[name]]$table
   att <- colnames(table)[-1]
-  if (is.null(attributes)) {
-    attributes <- att
-    pos_att <- 2:(length(att) + 1)
-  } else {
-    stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-    pos_att <- c()
-    for (attribute in attributes) {
-      pos <- which(att %in% attribute)
-      if (length(pos) == 0) {
-        stop(sprintf("The attribute '%s' is not defined in the dimension.", attribute))
-      } else {
-        pos_att <- c(pos_att, pos + 1)
-      }
-    }
+  attributes <- validate_attributes(att, attributes)
+  pos_att <- c()
+  for (attribute in attributes) {
+    pos <- which(att %in% attribute)
+    pos_att <- c(pos_att, pos + 1)
   }
   n_att <- length(pos_att)
   stopifnot("The number of new values must be equal to the number of dimension attributes." = n_att == length(new))
-  if (length(attributes) > 1) {
+  if (n_att > 1) {
     stopifnot("The number of old and new values must be equal." = length(old) == length(new))
   }
   # update various old values
-  if (length(attributes) == 1 & length(new) == 1 & length(old) > 1) {
+  if (n_att == 1 & length(new) == 1 & length(old) > 1) {
     various_old <- TRUE
   } else {
     various_old <- FALSE
@@ -987,22 +353,59 @@ replace_attribute_values.star_database <- function(db, name, attributes = NULL, 
   db
 }
 
-#' Get rpd dimensions of a dimension
+#-------------------------------------------------------------------------------
+
+#' Get the names of the dimensions of a star database
+#'
+#' Obtain the names of the dimensions of a star database.
 #'
 #' @param db A `star_database` object.
-#' @param name A string, dimension name.
 #'
-#' @return A vector of dimension names.
+#' @return A vector of strings, dimension names.
 #'
-#' @keywords internal
-get_rpd_dimensions <- function(db, name) {
-  res <- name
-  for (i in seq_along(db$rpd)) {
-    if (name %in% db$rpd[[i]]) {
-      res <- db$rpd[[i]]
-    }
-  }
-  res
+#' @family star database definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_dimension_names()
+#'
+#' @export
+get_dimension_names <- function(db) UseMethod("get_dimension_names")
+
+#' @rdname get_dimension_names
+#'
+#' @export
+get_dimension_names.star_database <- function(db) {
+  sort(names(db$dimensions))
+}
+
+
+#' Get the names of the tables of a star database
+#'
+#' Obtain the names of the tables of a star database.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A vector of strings, table names.
+#'
+#' @family star database definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_table_names()
+#'
+#' @export
+get_table_names <- function(db) UseMethod("get_table_names")
+
+#' @rdname get_table_names
+#'
+#' @export
+get_table_names.star_database <- function(db) {
+  sort(c(names(db$dimensions), names(db$facts)))
 }
 
 
@@ -1016,7 +419,7 @@ get_rpd_dimensions <- function(db, name) {
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database and constellation definition functions
+#' @family star database definition functions
 #' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 #'
 #' @examples
@@ -1031,9 +434,8 @@ group_dimension_instances <- function(db, name) UseMethod("group_dimension_insta
 #'
 #' @export
 group_dimension_instances.star_database <- function(db, name) {
-  stopifnot("Missing dimension name." = !is.null(name))
-  name <- snakecase::to_snake_case(name)
-  stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+  stopifnot("One dimension must be indicated (only one)." = length(name) == 1)
+  name <- validate_dimension_names(db, name)
   dims <- get_rpd_dimensions(db, name)
 
   db <- share_dimensions(db, dims)
@@ -1065,4 +467,36 @@ group_dimension_instances.star_database <- function(db, name) {
     }
   }
   db
+}
+
+
+# Internal ---------------------------------------------------------------------
+
+#' Validate dimension names
+#'
+#' @param db A `star_database` object.
+#' @param name A vector of strings, dimension names.
+#'
+#' @return A vector of strings, dimension names.
+#'
+#' @keywords internal
+validate_dimension_names <- function(db, name) {
+  if (!is.null(name)) {
+    name <- unique(snakecase::to_snake_case(name))
+    for (dn in name) {
+      if (!(dn %in% names(db$dimensions))) {
+        stop(sprintf("'%s' is not a dimension name.", dn))
+      }
+    }
+  } else {
+    name <- names(db$dimensions)
+  }
+  # eliminate repeated rpd from name
+  for (r in seq_along(db$rpd)) {
+    if (length(intersect(name, db$rpd[[r]])) > 0) {
+      name <- setdiff(name, db$rpd[[r]])
+      name <- c(name, db$rpd[[r]][1])
+    }
+  }
+  name
 }
