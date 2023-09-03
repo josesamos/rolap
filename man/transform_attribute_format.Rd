@@ -19,8 +19,8 @@ transform_attribute_format(
   attributes,
   width = 1,
   decimal_places = 0,
-  k_sep = ",",
-  decimal_sep = "."
+  k_sep = NULL,
+  decimal_sep = NULL
 )
 }
 \arguments{

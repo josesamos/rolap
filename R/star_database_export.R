@@ -107,3 +107,56 @@ as_dm_class.star_database <- function(db, pk_facts = TRUE) {
   }
   c
 }
+
+
+
+#' Generate a list of tibbles of flat tables
+#'
+#' Allows you to transform a star database into a flat table. If we have a
+#' constellaton, it returns a list of flat tables.
+#'
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A list of `tibble`
+#'
+#' @family star database exportation functions
+#' @seealso \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' tl1 <- db1 |>
+#'   as_single_tibble_list()
+#'
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#'
+#' ct <- constellation("MRS", list(db1, db2))
+#' tl <- ct |>
+#'   as_single_tibble_list()
+#'
+#' @export
+as_single_tibble_list <- function(db) UseMethod("as_single_tibble_list")
+
+#' @rdname as_single_tibble_list
+#'
+#' @export
+as_single_tibble_list.star_database <- function(db) {
+  res <- vector("list", length = length(db$facts))
+  names(res) <- names(db$facts)
+  for (f in names(db$facts)) {
+    res[[f]] <- db$facts[[f]]$table
+    for (d in db$facts[[f]]$dim_int_names) {
+      key <- db$dimensions[[d]]$surrogate_key
+      res[[f]] <-
+        dplyr::inner_join(res[[f]], db$dimensions[[d]]$table, by = key, suffix = c("", d))
+    }
+    measures <- names(db$facts[[f]]$agg)
+    attributes <- setdiff(names(res[[f]]), c(measures, db$facts[[f]]$surrogate_keys))
+    res[[f]] <- res[[f]][, c(attributes, measures)]
+  }
+  res
+}
+
