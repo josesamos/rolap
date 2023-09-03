@@ -4,12 +4,14 @@
 \alias{validate_attributes}
 \title{Validate attribute names}
 \usage{
-validate_attributes(defined_attributes, attributes)
+validate_attributes(defined_attributes, attributes, repeated = FALSE)
 }
 \arguments{
 \item{defined_attributes}{A vector of strings, defined attribute names.}
 
 \item{attributes}{A vector of strings, new attribute names.}
+
+\item{repeated}{A boolean, repeated attributes allowed.}
 }
 \value{
 A vector of strings, attribute names.

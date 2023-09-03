@@ -26,15 +26,18 @@ transform_names <- function(names, ordered, as_definition) {
 #'
 #' @param defined_attributes A vector of strings, defined attribute names.
 #' @param attributes A vector of strings, new attribute names.
+#' @param repeated A boolean, repeated attributes allowed.
 #'
 #' @return A vector of strings, attribute names.
 #'
 #' @keywords internal
-validate_attributes <- function(defined_attributes, attributes) {
+validate_attributes <- function(defined_attributes, attributes, repeated = FALSE) {
   if (is.null(attributes)) {
     attributes <- defined_attributes
   } else {
-    stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+    if (!repeated) {
+      stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+    }
     for (attribute in attributes) {
       if (!(attribute %in% defined_attributes)) {
         stop(sprintf(
@@ -185,11 +188,12 @@ get_unique_values_table <- function(table, col_as_vector) {
 #'
 #' @param ft A `flat_table` object.
 #' @param attributes A vector of names.
+#' @param empty_values A vector of values that correspond to empty values.
 #'
 #' @return A `flat_table` object.
 #'
 #' @keywords internal
-replace_empty_values_table <- function(ft, attributes = NULL) {
+replace_empty_values_table <- function(ft, attributes = NULL, empty_values = NULL) {
   attributes <- validate_attributes(ft$attributes, attributes)
   # replace empty and NA with unknown_value (for join)
   ft$table[, attributes] <-
@@ -198,6 +202,11 @@ replace_empty_values_table <- function(ft, attributes = NULL) {
   ft$table[, attributes] <-
     apply(ft$table[, attributes, drop = FALSE], 2, function(x)
       dplyr::na_if(x, ""))
+  for (i in seq_along(empty_values)) {
+    ft$table[, attributes] <-
+      apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+        dplyr::na_if(x, empty_values[i]))
+  }
   ft$table[, attributes] <-
     apply(ft$table[, attributes, drop = FALSE], 2, function(x)
       tidyr::replace_na(x, ft$unknown_value))

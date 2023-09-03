@@ -793,7 +793,7 @@ test_that("lookup_table() ", {
 })
 
 
-test_that("replace_string() ", {
+test_that("get_pk_attribute_names() ", {
   expect_equal({
     flat_table('iris', iris) |>
       lookup_table(
@@ -810,7 +810,7 @@ test_that("replace_string() ", {
 })
 
 
-test_that("replace_string() ", {
+test_that("join_lookup_table() ", {
   expect_equal({
     lookup <- flat_table('iris', iris) |>
       lookup_table(
@@ -929,5 +929,182 @@ test_that("replace_string() ", {
       )
     ),
     class = "flat_table"
+  ))
+})
+
+
+test_that("select_instances() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      select_instances(
+        attributes = c('Species'),
+        values = c('versicolor', 'virginica')
+      )
+    unique(ft$table$Species)
+  }, c("versicolor", "virginica"))
+})
+
+
+test_that("select_instances() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      select_instances(not = TRUE,
+                       attributes = c('Species'),
+                       values = c('versicolor', 'virginica'))
+    unique(ft$table$Species)
+  }, "setosa")
+})
+
+
+test_that("select_instances() ", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num) |>
+      select_instances(attributes = c('Year', 'WEEK'),
+                       values = list(c('1962', '2'), c('1964', '2')))
+    unique(ft$table[, c('Year', 'WEEK')])
+  }, structure(
+    list(Year = c("1962", "1964"), WEEK = c("2", "2")),
+    row.names = c(NA,-2L),
+    class = c("tbl_df", "tbl", "data.frame")
+  ))
+})
+
+
+test_that("select_instances_by_comparison() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      select_instances_by_comparison(attributes = 'Species',
+                                     comparisons = '>=',
+                                     values = 'v')
+    unique(ft$table$Species)
+  }, c("versicolor", "virginica"))
+})
+
+
+test_that("select_instances_by_comparison() ", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num) |>
+      select_instances_by_comparison(
+        not = FALSE,
+        attributes = c('Year', 'Year', 'WEEK'),
+        comparisons = c('>=', '<=', '=='),
+        values = c('1962', '1964', '2')
+      )
+    c(ft$table$Year, ft$table$WEEK)
+  }, c("1962", "1964", "1964", "2", "2", "2"))
+})
+
+
+test_that("select_instances_by_comparison() ", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num) |>
+      select_instances_by_comparison(
+        not = FALSE,
+        attributes = c('Year', 'Year', 'WEEK'),
+        comparisons = c('>=', '<=', '=='),
+        values = list(c('1962', '1964', '2'),
+                      c('1962', '1964', '4'))
+      )
+    c(ft$table$Year, ft$table$WEEK)
+  }, c(
+    "1962",
+    "1962",
+    "1963",
+    "1963",
+    "1964",
+    "1962",
+    "1964",
+    "2",
+    "4",
+    "4",
+    "4",
+    "2",
+    "4",
+    "2"
+  ))
+})
+
+test_that("add_custom_column() ", {
+  expect_equal({
+    f <- function(table) {
+      paste0(table$City, '-', table$State)
+    }
+    ft <- flat_table('ft_num', ft_num) |>
+      add_custom_column(name = 'city_state', definition = f)
+    unique(ft$table[, c('city_state')])
+  }, structure(
+    list(
+      city_state = c("Boston-MA", "Bridgeport-CT", "Cambridge-MA",
+                     "Hartford-CT")
+    ),
+    row.names = c(NA,-4L),
+    class = c("tbl_df",
+              "tbl", "data.frame")
+  ))
+})
+
+test_that("add_custom_column() ", {
+  expect_equal({
+    f <- function(table) {
+      paste0(table$City, '-', table$State)
+    }
+    ft <- flat_table('ft_num', ft_num) |>
+      add_custom_column(name = 'city_state', definition = f)
+    unique(ft$table[, c('city_state')])
+  }, structure(
+    list(
+      city_state = c("Boston-MA", "Bridgeport-CT", "Cambridge-MA",
+                     "Hartford-CT")
+    ),
+    row.names = c(NA,-4L),
+    class = c("tbl_df",
+              "tbl", "data.frame")
+  ))
+})
+
+test_that("transform_attribute_format() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      transform_to_attribute(measures = "Sepal.Length", decimal_places = 1) |>
+      transform_attribute_format(attributes = "Sepal.Length",
+                                 width = 5,
+                                 decimal_places = 2)
+    unique(ft$table$Sepal.Length)
+  }, c(
+    " 5.10",
+    " 4.90",
+    " 4.70",
+    " 4.60",
+    " 5.00",
+    " 5.40",
+    " 4.40",
+    " 4.80",
+    " 4.30",
+    " 5.80",
+    " 5.70",
+    " 5.20",
+    " 5.50",
+    " 4.50",
+    " 5.30",
+    " 7.00",
+    " 6.40",
+    " 6.90",
+    " 6.50",
+    " 6.30",
+    " 6.60",
+    " 5.90",
+    " 6.00",
+    " 6.10",
+    " 5.60",
+    " 6.70",
+    " 6.20",
+    " 6.80",
+    " 7.10",
+    " 7.60",
+    " 7.30",
+    " 7.20",
+    " 7.70",
+    " 7.40",
+    " 7.90"
   ))
 })

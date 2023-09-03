@@ -28,6 +28,7 @@ table <- flat_table('iris', iris) |>
 \code{\link{select_attributes}}, \code{\link{select_measures}}
 
 Other flat table definition functions: 
+\code{\link{as_star_database}()},
 \code{\link{flat_table}()},
 \code{\link{get_unknown_values}()},
 \code{\link{read_flat_table_file}()},

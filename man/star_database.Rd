@@ -34,7 +34,7 @@ db <- star_database(mrs_cause_schema, ft_num)
 
 }
 \seealso{
-\code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}
+\code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}, \code{\link{flat_table}}
 
 Other star database definition functions: 
 \code{\link{get_dimension_names}()},

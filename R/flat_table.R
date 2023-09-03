@@ -319,3 +319,36 @@ get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector =
 }
 
 
+#' Get a star database from a flat table
+#'
+#' Obtain a star database from the flat table and a star schema.
+#'
+#' @param ft A `flat_table` object.
+#' @param schema A `star_schema` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @family flat table definition functions
+#' @seealso \code{\link{star_schema}}, \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' db <- flat_table('ft_num', ft_num) |>
+#'   as_star_database(mrs_cause_schema)
+#'
+#' @export
+as_star_database <- function(ft, schema) UseMethod("as_star_database")
+
+#' @rdname as_star_database
+#'
+#' @export
+as_star_database.flat_table <-
+  function(ft, schema) {
+    star_database_with_previous_operations(
+      schema,
+      instances = ft$table,
+      unknown_value = ft$unknown_value,
+      operations = ft$operations
+    )
+  }
+

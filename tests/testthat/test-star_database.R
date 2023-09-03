@@ -870,3 +870,71 @@ test_that("role_playing_dimension() define a rpd", {
   })
 })
 
+test_that("as_single_tibble_list()", {
+  expect_equal({
+    ft1 <- ft_num  |>
+      dplyr::filter(City != "Cambridge") |>
+      dplyr::filter(Year <= "1963")
+
+    db1 <- star_database(mrs_cause_schema, ft1) |>
+      snake_case()
+
+    db1 |>
+      as_single_tibble_list()
+  }, {
+    list(mrs_cause = structure(
+      list(
+        year = c("1962", "1962", "1962",
+                 "1963", "1963", "1963"),
+        region = c("1", "1", "1", "1", "1",
+                   "1"),
+        state = c("CT", "CT", "MA", "CT", "CT", "MA"),
+        city = c(
+          "Bridgeport",
+          "Hartford",
+          "Boston",
+          "Bridgeport",
+          "Hartford",
+          "Boston"
+        ),
+        pneumonia_and_influenza_deaths = c(9L,
+                                           5L, 23L, 2L, 12L, 10L),
+        all_deaths = c(131L, 104L, 555L, 46L,
+                       192L, 276L),
+        nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
+      ),
+      row.names = c(NA,-6L),
+      class = c("tbl_df", "tbl", "data.frame")
+    ))
+  })
+})
+
+test_that("as_single_tibble_list()", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema, ft_num) |>
+      snake_case()
+    db2 <- star_database(mrs_age_schema, ft_age) |>
+      snake_case()
+    ct <- constellation("MRS", list(db1, db2))
+    tl <- ct |>
+      as_single_tibble_list()
+    c(names(tl$mrs_cause), names(tl$mrs_age))
+  }, {
+    c(
+      "year",
+      "region",
+      "state",
+      "city",
+      "pneumonia_and_influenza_deaths",
+      "all_deaths",
+      "nrow_agg",
+      "year",
+      "region",
+      "state",
+      "city",
+      "age",
+      "all_deaths",
+      "nrow_agg"
+    )
+  })
+})

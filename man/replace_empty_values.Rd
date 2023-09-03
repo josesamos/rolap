@@ -5,14 +5,16 @@
 \alias{replace_empty_values.flat_table}
 \title{Replace empty values with the unknown value}
 \usage{
-replace_empty_values(ft, attributes)
+replace_empty_values(ft, attributes, empty_values)
 
-\method{replace_empty_values}{flat_table}(ft, attributes = NULL)
+\method{replace_empty_values}{flat_table}(ft, attributes = NULL, empty_values = NULL)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
 \item{attributes}{A vector of names.}
+
+\item{empty_values}{A vector of values that correspond to empty values.}
 }
 \value{
 A \code{flat_table} object.
@@ -31,10 +33,14 @@ ft <- flat_table('iris', iris) |>
 \code{\link{flat_table}}
 
 Other flat table transformation functions: 
+\code{\link{add_custom_column}()},
 \code{\link{replace_string}()},
 \code{\link{select_attributes}()},
+\code{\link{select_instances_by_comparison}()},
+\code{\link{select_instances}()},
 \code{\link{select_measures}()},
 \code{\link{separate_measures}()},
+\code{\link{transform_attribute_format}()},
 \code{\link{transform_from_values}()},
 \code{\link{transform_to_attribute}()},
 \code{\link{transform_to_measure}()},
