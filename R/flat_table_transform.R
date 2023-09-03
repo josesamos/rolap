@@ -457,6 +457,147 @@ transform_to_measure.flat_table <-
     ft
   }
 
+#' Transform attribute format
+#'
+#' Transforms numeric attributes adapting their format as indicated.
+#'
+#' If a number > 1 is specified in the `width` parameter, at least that length
+#' will be obtained in the result, padded with blanks on the left.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of strings, attribute names.
+#' @param width An integer, string length.
+#' @param decimal_places An integer, number of decimal places.
+#' @param k_sep A character, indicates thousands separator.
+#' @param decimal_sep A character, indicates decimal separator.
+#'
+#' @return ft A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   transform_to_attribute(measures = "Sepal.Length", decimal_places = 2) |>
+#'   transform_attribute_format(
+#'     attributes = "Sepal.Length",
+#'     width = 5,
+#'     decimal_places = 1
+#'   )
+#'
+#' @export
+transform_attribute_format <- function(ft, attributes, width, decimal_places, k_sep, decimal_sep) UseMethod("transform_attribute_format")
+
+#' @rdname transform_attribute_format
+#'
+#' @export
+transform_attribute_format.flat_table <-
+  function(ft,
+           attributes,
+           width = 1,
+           decimal_places = 0,
+           k_sep = NULL,
+           decimal_sep = NULL) {
+    stopifnot("Missing attribute name." = !is.null(attributes))
+    attributes <- validate_attributes(ft$attributes, attributes)
+    ft$table[, attributes] <-
+      apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+        gsub(ft$unknown_value, "", x))
+    if (!is.null(k_sep)) {
+      if (k_sep == ".") {
+        pattern <- "\\."
+      } else {
+        pattern <- k_sep
+      }
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          stringr::str_replace_all(x, pattern, ""))
+    }
+    if (!is.null(decimal_sep)) {
+      if (decimal_sep == ".") {
+        pattern <- ","
+      } else {
+        pattern <- "\\."
+        decimal_sep <- ','
+      }
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          stringr::str_replace(x, pattern, decimal_sep))
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          suppressWarnings(as.double(x)))
+    } else {
+      ft$table[, attributes] <-
+        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+          suppressWarnings(as.integer(x)))
+    }
+    for (measure in attributes) {
+      if (decimal_places > 0) {
+        values <- suppressWarnings(as.double(ft$table[, measure][[1]]))
+      } else {
+        values <- suppressWarnings(as.integer(ft$table[, measure][[1]]))
+      }
+      if (decimal_places > 0) {
+        values2 <- formatC(
+          values,
+          format = "f",
+          big.mark = k_sep,
+          decimal.mark = decimal_sep,
+          digits = decimal_places,
+          width = width
+        )
+      } else {
+        values2 <- formatC(
+          values,
+          format = "d",
+          big.mark = k_sep,
+          decimal.mark = decimal_sep,
+          digits = decimal_places,
+          width = width
+        )
+      }
+      if (width > 1) {
+        lmax <- max(nchar(values2))
+        if (lmax > width) {
+          if (decimal_places > 0) {
+            values2 <- formatC(
+              values,
+              format = "f",
+              big.mark = k_sep,
+              decimal.mark = decimal_sep,
+              digits = decimal_places,
+              width = lmax
+            )
+          } else {
+            values2 <- formatC(
+              values,
+              format = "d",
+              big.mark = k_sep,
+              decimal.mark = decimal_sep,
+              digits = decimal_places,
+              width = lmax
+            )
+          }
+        }
+      }
+      ft$table[, measure][[1]] <-
+        gsub("NA", ft$unknown_value, values2)
+    }
+    ft$operations <-
+      add_operation(
+        ft$operations,
+        "transform_attribute_format",
+        attributes,
+        c(width,
+          decimal_places),
+        c(k_sep,
+          decimal_sep)
+      )
+    ft
+  }
+
+
 #' Transform measure names into attribute values
 #'
 #' Transforms the measure names into values of a new attribute. The values of
@@ -658,6 +799,7 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
 #'
 #' @param ft A `flat_table` object.
 #' @param attributes A vector of names.
+#' @param empty_values A vector of values that correspond to empty values.
 #'
 #' @return A `flat_table` object.
 #'
@@ -670,15 +812,15 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
 #'   replace_empty_values()
 #'
 #' @export
-replace_empty_values <- function(ft, attributes) UseMethod("replace_empty_values")
+replace_empty_values <- function(ft, attributes, empty_values) UseMethod("replace_empty_values")
 
 #' @rdname replace_empty_values
 #'
 #' @export
-replace_empty_values.flat_table <- function(ft, attributes = NULL) {
-  ft <- replace_empty_values_table(ft, attributes)
+replace_empty_values.flat_table <- function(ft, attributes = NULL, empty_values = NULL) {
+  ft <- replace_empty_values_table(ft, attributes, empty_values)
   ft$operations <-
-    add_operation(ft$operations, "replace_empty_values", attributes)
+    add_operation(ft$operations, "replace_empty_values", attributes, empty_values)
   ft
 }
 

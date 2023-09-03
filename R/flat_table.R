@@ -325,7 +325,6 @@ get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector =
 #'
 #' @param ft A `flat_table` object.
 #' @param schema A `star_schema` object.
-#' @param unknown_value A string, value used to replace NA values in dimensions.
 #'
 #' @return A `star_database` object.
 #'
@@ -338,17 +337,17 @@ get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector =
 #'   as_star_database(mrs_cause_schema)
 #'
 #' @export
-as_star_database <- function(ft, schema, unknown_value) UseMethod("as_star_database")
+as_star_database <- function(ft, schema) UseMethod("as_star_database")
 
 #' @rdname as_star_database
 #'
 #' @export
 as_star_database.flat_table <-
-  function(ft, schema, unknown_value = NULL) {
+  function(ft, schema) {
     star_database_with_previous_operations(
       schema,
       instances = ft$table,
-      unknown_value,
+      unknown_value = ft$unknown_value,
       operations = ft$operations
     )
   }

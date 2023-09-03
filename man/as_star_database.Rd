@@ -5,16 +5,14 @@
 \alias{as_star_database.flat_table}
 \title{Get a star database from a flat table}
 \usage{
-as_star_database(ft, schema, unknown_value)
+as_star_database(ft, schema)
 
-\method{as_star_database}{flat_table}(ft, schema, unknown_value = NULL)
+\method{as_star_database}{flat_table}(ft, schema)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
 \item{schema}{A \code{star_schema} object.}
-
-\item{unknown_value}{A string, value used to replace NA values in dimensions.}
 }
 \value{
 A \code{star_database} object.

@@ -37,6 +37,7 @@ Other flat table transformation functions:
 \code{\link{select_instances_by_comparison}()},
 \code{\link{select_instances}()},
 \code{\link{separate_measures}()},
+\code{\link{transform_attribute_format}()},
 \code{\link{transform_from_values}()},
 \code{\link{transform_to_attribute}()},
 \code{\link{transform_to_measure}()},

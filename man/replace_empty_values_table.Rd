@@ -4,12 +4,14 @@
 \alias{replace_empty_values_table}
 \title{Replace empty values with the unknown value}
 \usage{
-replace_empty_values_table(ft, attributes = NULL)
+replace_empty_values_table(ft, attributes = NULL, empty_values = NULL)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
 \item{attributes}{A vector of names.}
+
+\item{empty_values}{A vector of values that correspond to empty values.}
 }
 \value{
 A \code{flat_table} object.
