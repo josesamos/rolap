@@ -499,6 +499,9 @@ transform_attribute_format.flat_table <-
            decimal_places = 0,
            k_sep = NULL,
            decimal_sep = NULL) {
+    if (decimal_places > 0 & is.null(decimal_sep)) {
+      decimal_sep = '.'
+    }
     stopifnot("Missing attribute name." = !is.null(attributes))
     attributes <- validate_attributes(ft$attributes, attributes)
     ft$table[, attributes] <-
@@ -533,6 +536,12 @@ transform_attribute_format.flat_table <-
           suppressWarnings(as.integer(x)))
     }
     for (measure in attributes) {
+      if (is.null(decimal_sep)) {
+        decimal_sep <- '.'
+      }
+      if (is.null(k_sep)) {
+        k_sep <- ','
+      }
       if (decimal_places > 0) {
         values <- suppressWarnings(as.double(ft$table[, measure][[1]]))
       } else {
