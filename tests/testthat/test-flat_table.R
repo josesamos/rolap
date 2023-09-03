@@ -1023,3 +1023,22 @@ test_that("select_instances_by_comparison() ", {
     "2"
   ))
 })
+
+test_that("add_custom_column() ", {
+  expect_equal({
+    f <- function(table) {
+      paste0(table$City, '-', table$State)
+    }
+    ft <- flat_table('ft_num', ft_num) |>
+      add_custom_column(name = 'city_state', definition = f)
+    unique(ft$table[, c('city_state')])
+  }, structure(
+    list(
+      city_state = c("Boston-MA", "Bridgeport-CT", "Cambridge-MA",
+                     "Hartford-CT")
+    ),
+    row.names = c(NA,-4L),
+    class = c("tbl_df",
+              "tbl", "data.frame")
+  ))
+})

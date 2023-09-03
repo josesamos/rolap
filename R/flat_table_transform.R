@@ -730,3 +730,52 @@ replace_string.flat_table <- function(ft, attributes = NULL, string, replacement
     add_operation(ft$operations, "replace_string", attributes, string, replacement)
   ft
 }
+
+
+#' Add custom column
+#'
+#' Add a column returned by a function that takes the data of the flat table as
+#' a parameter.
+#'
+#' @param ft A `flat_table` object.
+#' @param name A string, new column name.
+#' @param definition A function that returns a table column.
+##'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' f <- function(table) {
+#'   paste0(table$City, ' - ', table$State)
+#' }
+#'
+#' ft <- flat_table('ft_num', ft_num) |>
+#'   add_custom_column(name = 'city_state', definition = f)
+#'
+#' @export
+add_custom_column <- function(ft, name, definition) UseMethod("add_custom_column")
+
+#' @rdname add_custom_column
+#'
+#' @export
+add_custom_column.flat_table <- function(ft, name = NULL, definition) {
+  stopifnot("A name (and only one) must be indicated for the new column." = length(name) == 1)
+  names <- snakecase::to_snake_case(colnames(ft$table))
+  if (snakecase::to_snake_case(name) %in% names) {
+    stop("A column with that name already exists in the table.")
+  }
+  ft$table[name] <- definition(ft$table)
+  type <- dplyr::summarise_all(ft$table, class)[[name]]
+  if (type %in% c("integer", "double", "integer64", "numeric")) {
+    ft$measures <- c(ft$measures, name)
+  } else {
+    ft$attributes <- c(ft$attributes, name)
+  }
+  ft$table <- ft$table[, c(ft$attributes, ft$measures)]
+  ft$operations <-
+    add_operation(ft$operations, "add_custom_column", name, as.character(list(definition)))
+  ft
+}

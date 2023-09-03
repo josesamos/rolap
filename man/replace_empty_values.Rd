@@ -31,6 +31,7 @@ ft <- flat_table('iris', iris) |>
 \code{\link{flat_table}}
 
 Other flat table transformation functions: 
+\code{\link{add_custom_column}()},
 \code{\link{replace_string}()},
 \code{\link{select_attributes}()},
 \code{\link{select_instances_by_comparison}()},
