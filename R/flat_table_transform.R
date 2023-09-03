@@ -66,7 +66,7 @@ select_measures.flat_table <- function(ft, measures) {
 }
 
 
-#' Select instances of a flat table
+#' Select instances of a flat table by value
 #'
 #' Select only the indicated instances from the flat table.
 #'
@@ -130,6 +130,140 @@ select_instances.flat_table <- function(ft, not = FALSE, attributes = NULL, valu
   ft$operations <- add_operation(ft$operations, "select_instances", not, attributes, unlist(values))
   ft
 }
+
+
+#' Select instances of a flat table by comparison
+#'
+#' Select only the indicated instances from the flat table by comparison.
+#'
+#' The elements of the three parameter lists correspond (all three must have the
+#' same structure and length or be of length 1). AND is performed for each
+#' combination of attribute, operator and value within each element of each list
+#' and OR between elements of the lists.
+#'
+#' If the parameter `not` is true, the negation operation will be applied to the
+#' result.
+#'
+#' @param ft A `flat_table` object.
+#' @param not A boolean.
+#' @param attributes A list of name vectors.
+#' @param comparisons A list of comparison operator vectors.
+#' @param values A list of value vectors.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   select_instances_by_comparison(attributes = 'Species',
+#'                                  comparisons = '>=',
+#'                                  values = 'v')
+#'
+#' ft <- flat_table('ft_num', ft_num) |>
+#'   select_instances_by_comparison(
+#'     not = FALSE,
+#'     attributes = c('Year', 'Year', 'WEEK'),
+#'     comparisons = c('>=', '<=', '=='),
+#'     values = c('1962', '1964', '2')
+#'   )
+#'
+#' ft <- flat_table('ft_num', ft_num) |>
+#'   select_instances_by_comparison(
+#'     not = FALSE,
+#'     attributes = c('Year', 'Year', 'WEEK'),
+#'     comparisons = c('>=', '<=', '=='),
+#'     values = list(c('1962', '1964', '2'),
+#'                   c('1962', '1964', '4'))
+#'   )
+#'
+#' @export
+select_instances_by_comparison <- function(ft, not, attributes, comparisons, values) UseMethod("select_instances_by_comparison")
+
+#' @rdname select_instances_by_comparison
+#'
+#' @export
+select_instances_by_comparison.flat_table <-
+  function(ft,
+           not = FALSE,
+           attributes = NULL,
+           comparisons,
+           values) {
+    n_att <- 1
+    n_com <- 1
+    n_val <- 1
+    if (is.list(attributes)) {
+      n_att <- length(attributes)
+    }
+    if (is.list(comparisons)) {
+      n_com <- length(comparisons)
+    }
+    if (is.list(values)) {
+      n_val <- length(values)
+    }
+    n_max <- max(n_att, n_com, n_val)
+    if (n_att == 1) {
+      attributes <- rep(list(attributes), n_max)
+    }
+    if (n_com == 1) {
+      comparisons <- rep(list(comparisons), n_max)
+    }
+    if (n_val == 1) {
+      values <- rep(list(values), n_max)
+    }
+    n_att <- length(attributes)
+    n_com <- length(comparisons)
+    n_val <- length(values)
+    stopifnot(
+      "Lists of attributes, comparisons, and values must have the same length or length 1." = n_att == n_com &
+        n_com == n_val
+    )
+    table <- ft$table
+    or_res <- rep(FALSE, nrow(table))
+    n_ele_set <- c()
+    for (i in 1:n_max) {
+      n_ele <- length(attributes[[i]])
+      n_ele_set <- c(n_ele_set, n_ele)
+      attributes[[i]] <-
+        validate_attributes(ft$attributes, attributes[[i]], repeated = TRUE)
+      if (!(n_ele == length(comparisons[[i]]) &
+            n_ele == length(values[[i]]))) {
+        stop(sprintf(
+          "The %d position elements of the lists do not have the same length.",
+          i
+        ))
+      }
+      and_res <- rep(TRUE, nrow(table))
+      for (j in 1:n_ele) {
+        and_res <-
+          and_res &
+          eval(parse(
+            text = paste0(
+              'table[, attributes[[i]][j]]',
+              comparisons[[i]][j] ,
+              'values[[i]][j]'
+            )
+          ))
+      }
+      or_res <- or_res | and_res
+    }
+    if (not == TRUE) {
+      or_res <- !or_res
+    }
+    ft$table <- table[or_res,]
+    ft$operations <-
+      add_operation(
+        ft$operations,
+        "select_instances_by_comparison",
+        c(not, n_ele_set),
+        unlist(attributes),
+        c(unlist(comparisons),
+          unlist(values))
+      )
+    ft
+  }
 
 
 #' Transform to attribute

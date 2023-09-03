@@ -26,15 +26,18 @@ transform_names <- function(names, ordered, as_definition) {
 #'
 #' @param defined_attributes A vector of strings, defined attribute names.
 #' @param attributes A vector of strings, new attribute names.
+#' @param repeated A boolean, repeated attributes allowed.
 #'
 #' @return A vector of strings, attribute names.
 #'
 #' @keywords internal
-validate_attributes <- function(defined_attributes, attributes) {
+validate_attributes <- function(defined_attributes, attributes, repeated = FALSE) {
   if (is.null(attributes)) {
     attributes <- defined_attributes
   } else {
-    stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+    if (!repeated) {
+      stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
+    }
     for (attribute in attributes) {
       if (!(attribute %in% defined_attributes)) {
         stop(sprintf(

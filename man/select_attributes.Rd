@@ -35,6 +35,7 @@ ft <- flat_table('ft_num', ft_num) |>
 Other flat table transformation functions: 
 \code{\link{replace_empty_values}()},
 \code{\link{replace_string}()},
+\code{\link{select_instances_by_comparison}()},
 \code{\link{select_instances}()},
 \code{\link{select_measures}()},
 \code{\link{separate_measures}()},

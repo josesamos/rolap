@@ -933,7 +933,7 @@ test_that("join_lookup_table() ", {
 })
 
 
-test_that("get_pk_attribute_names() ", {
+test_that("select_instances() ", {
   expect_equal({
     ft <- flat_table('iris', iris) |>
       select_instances(
@@ -945,7 +945,7 @@ test_that("get_pk_attribute_names() ", {
 })
 
 
-test_that("get_pk_attribute_names() ", {
+test_that("select_instances() ", {
   expect_equal({
     ft <- flat_table('iris', iris) |>
       select_instances(not = TRUE,
@@ -956,7 +956,7 @@ test_that("get_pk_attribute_names() ", {
 })
 
 
-test_that("get_pk_attribute_names() ", {
+test_that("select_instances() ", {
   expect_equal({
     ft <- flat_table('ft_num', ft_num) |>
       select_instances(attributes = c('Year', 'WEEK'),
@@ -969,3 +969,57 @@ test_that("get_pk_attribute_names() ", {
   ))
 })
 
+
+test_that("select_instances_by_comparison() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris) |>
+      select_instances_by_comparison(attributes = 'Species',
+                                     comparisons = '>=',
+                                     values = 'v')
+    unique(ft$table$Species)
+  }, c("versicolor", "virginica"))
+})
+
+
+test_that("select_instances_by_comparison() ", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num) |>
+      select_instances_by_comparison(
+        not = FALSE,
+        attributes = c('Year', 'Year', 'WEEK'),
+        comparisons = c('>=', '<=', '=='),
+        values = c('1962', '1964', '2')
+      )
+    c(ft$table$Year, ft$table$WEEK)
+  }, c("1962", "1964", "1964", "2", "2", "2"))
+})
+
+
+test_that("select_instances_by_comparison() ", {
+  expect_equal({
+    ft <- flat_table('ft_num', ft_num) |>
+      select_instances_by_comparison(
+        not = FALSE,
+        attributes = c('Year', 'Year', 'WEEK'),
+        comparisons = c('>=', '<=', '=='),
+        values = list(c('1962', '1964', '2'),
+                      c('1962', '1964', '4'))
+      )
+    c(ft$table$Year, ft$table$WEEK)
+  }, c(
+    "1962",
+    "1962",
+    "1963",
+    "1963",
+    "1964",
+    "1962",
+    "1964",
+    "2",
+    "4",
+    "4",
+    "4",
+    "2",
+    "4",
+    "2"
+  ))
+})

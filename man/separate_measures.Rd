@@ -48,6 +48,7 @@ Other flat table transformation functions:
 \code{\link{replace_empty_values}()},
 \code{\link{replace_string}()},
 \code{\link{select_attributes}()},
+\code{\link{select_instances_by_comparison}()},
 \code{\link{select_instances}()},
 \code{\link{select_measures}()},
 \code{\link{transform_from_values}()},
