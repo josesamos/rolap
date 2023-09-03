@@ -43,6 +43,7 @@ We can also indicate the value that is used in the data with undefined values.
 \code{\link{star_database}}
 
 Other flat table definition functions: 
+\code{\link{as_star_database}()},
 \code{\link{flat_table}()},
 \code{\link{get_table}()},
 \code{\link{get_unknown_values}()},

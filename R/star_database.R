@@ -17,7 +17,7 @@
 #' @return A `star_database` object.
 #'
 #' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}, \code{\link{flat_table}}
 #'
 #' @examples
 #'
@@ -25,6 +25,20 @@
 #'
 #' @export
 star_database <- function(schema, instances, unknown_value = NULL) {
+  star_database_with_previous_operations(schema, instances, unknown_value)
+}
+
+#' Creates a `star_database` adding previous operations
+#'
+#' @param schema A `star_schema` object.
+#' @param instances A flat table to define the database instances according to the schema.
+#' @param unknown_value A string, value used to replace NA values in dimensions.
+#' @param operations A list of operations.
+#'
+#' @return A `star_database` object.
+#'
+#' @keywords internal
+star_database_with_previous_operations <- function(schema, instances, unknown_value = NULL, operations = NULL) {
   stopifnot("Schema does not include fact_schema object." = methods::is(schema$facts[[1]], "fact_schema"))
   for (d in seq_along(schema$dimensions)) {
     stopifnot("Schema does not include dimension_schema object." = methods::is(schema$dimensions[[d]], "dimension_schema"))
@@ -82,9 +96,13 @@ star_database <- function(schema, instances, unknown_value = NULL) {
   # (NA values are replaced by unknown_value)
   instances[, attributes] <- prepare_to_join(instances[, attributes], unknown_value)
 
+  if (is.null(operations)) {
+    op <- star_operation()
+  } else {
+    op <- operations
+  }
   # generate dimension tables
   keys <- c()
-  op <- star_operation()
   for (d in names(schema$dimensions)) {
     # generate dimension table
     dim_name <- get_dimension_name(schema$dimensions[[d]])

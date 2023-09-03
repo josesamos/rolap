@@ -63,6 +63,7 @@ one. These operations can be indicated by the corresponding parameters.
 \code{\link{star_database}}
 
 Other flat table definition functions: 
+\code{\link{as_star_database}()},
 \code{\link{flat_table}()},
 \code{\link{get_table}()},
 \code{\link{get_unknown_values}()},
