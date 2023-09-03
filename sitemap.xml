@@ -34,6 +34,9 @@
     <loc>https://josesamos.github.io/rolap/news/index.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/add_custom_column.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/add_dput_column.html</loc>
   </url>
   <url>
@@ -44,6 +47,12 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/as_dm_class.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/as_single_tibble_list.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/as_star_database.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/as_tibble_list.html</loc>
@@ -235,6 +244,12 @@
     <loc>https://josesamos.github.io/rolap/reference/select_attributes.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/select_instances.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/select_instances_by_comparison.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/select_measures.html</loc>
   </url>
   <url>
@@ -265,6 +280,9 @@
     <loc>https://josesamos.github.io/rolap/reference/star_database.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/star_database_with_previous_operations.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/star_operation.html</loc>
   </url>
   <url>
@@ -272,6 +290,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/string_to_vector.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/transform_attribute_format.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/transform_from_values.html</loc>

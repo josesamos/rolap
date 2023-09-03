@@ -6,7 +6,7 @@ articles:
   v10-rpd: v10-rpd.html
   v20-rdbms-dm: v20-rdbms-dm.html
   v30-dim-instances: v30-dim-instances.html
-last_built: 2023-09-02T07:16Z
+last_built: 2023-09-03T17:11Z
 urls:
   reference: https://josesamos.github.io/rolap/reference
   article: https://josesamos.github.io/rolap/articles
