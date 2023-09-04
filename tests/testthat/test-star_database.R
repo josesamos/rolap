@@ -938,3 +938,97 @@ test_that("as_single_tibble_list()", {
     )
   })
 })
+
+
+test_that("as_single_tibble_list()", {
+  expect_equal({
+    s <- star_schema() |>
+      define_facts(fact_schema(
+        name = "mrs_cause",
+        measures = c("Pneumonia and Influenza Deaths",
+                     "All Deaths")
+      )) |>
+      define_dimension(dimension_schema(
+        name = "When",
+        attributes = c("Year",
+                       "WEEK",
+                       "Week Ending Date")
+      )) |>
+      define_dimension(dimension_schema(
+        name = "When Available",
+        attributes = c(
+          "Data Availability Year",
+          "Data Availability Week",
+          "Data Availability Date"
+        )
+      )) |>
+      define_dimension(dimension_schema(
+        name = "When Received",
+        attributes = c("Reception Year",
+                       "Reception Week",
+                       "Reception Date")
+      )) |>
+      define_dimension(dimension_schema(
+        name = "where",
+        attributes = c("REGION",
+                       "State",
+                       "City")
+      ))
+
+    db <- star_database(s, ft_cause_rpd) |>
+      role_playing_dimension(
+        rpd = "When",
+        roles = c("When Available", "When Received"),
+        rpd_att_names = TRUE
+      )
+    r <- db |> as_single_tibble_list()
+    names(r[[1]])
+  }, {
+    c(
+      "Year",
+      "WEEK",
+      "Week Ending Date",
+      "Year_when_available",
+      "WEEK_when_available",
+      "Week Ending Date_when_available",
+      "Year_when_received",
+      "WEEK_when_received",
+      "Week Ending Date_when_received",
+      "REGION",
+      "State",
+      "City",
+      "Pneumonia and Influenza Deaths",
+      "All Deaths",
+      "nrow_agg"
+    )
+  })
+})
+
+test_that("as_single_tibble_list()", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema, ft_num) |>
+      snake_case()
+    db2 <- star_database(mrs_age_schema, ft_age) |>
+      snake_case()
+    ct1 <- constellation("MRS", list(db1, db2))
+    r <- ct1 |> as_single_tibble_list()
+    c(names(r[[1]]), names(r[[2]]))
+  }, {
+    c(
+      "year",
+      "region",
+      "state",
+      "city",
+      "pneumonia_and_influenza_deaths",
+      "all_deaths",
+      "nrow_agg",
+      "year",
+      "region",
+      "state",
+      "city",
+      "age",
+      "all_deaths",
+      "nrow_agg"
+    )
+  })
+})

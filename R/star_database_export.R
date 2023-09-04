@@ -151,7 +151,7 @@ as_single_tibble_list.star_database <- function(db) {
     for (d in db$facts[[f]]$dim_int_names) {
       key <- db$dimensions[[d]]$surrogate_key
       res[[f]] <-
-        dplyr::inner_join(res[[f]], db$dimensions[[d]]$table, by = key, suffix = c("", d))
+        dplyr::inner_join(res[[f]], db$dimensions[[d]]$table, by = key, suffix = c("", paste0('_',d)))
     }
     measures <- names(db$facts[[f]]$agg)
     attributes <- setdiff(names(res[[f]]), c(measures, db$facts[[f]]$surrogate_keys))
