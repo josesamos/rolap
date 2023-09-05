@@ -526,10 +526,10 @@ transform_attribute_format.flat_table <-
       }
       ft$table[, attributes] <-
         apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-          sub(".", "0", x, fixed = TRUE))
+          sub("^\\.$", "0", x))
       ft$table[, attributes] <-
         apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-          sub(",", "0", x, fixed = TRUE))
+          sub("^,$", "0", x))
       ft$table[, attributes] <-
         apply(ft$table[, attributes, drop = FALSE], 2, function(x)
           stringr::str_replace(x, pattern, decimal_sep))
