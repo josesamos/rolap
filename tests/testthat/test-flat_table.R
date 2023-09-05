@@ -405,6 +405,23 @@ test_that("replace_attribute_values() ", {
 
 test_that("replace_attribute_values() ", {
   expect_equal({
+    ft <- flat_table('iris', iris) |>
+      replace_attribute_values(
+        attributes = 'Species',
+        old = c('setosa', 'virginica', 'versicolor'),
+        new = c('flor')
+      ) |>
+      get_unique_attribute_values()
+  }, structure(
+    list(Species = c("flor")),
+    row.names = c(NA,-1L),
+    class = c("tbl_df", "tbl", "data.frame")
+  ))
+})
+
+
+test_that("replace_attribute_values() ", {
+  expect_equal({
     r <- flat_table('ft_num', ft_num) |>
       replace_attribute_values(
         attributes = c('Year', 'WEEK'),
