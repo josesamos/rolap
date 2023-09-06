@@ -37,6 +37,7 @@ Suggests:
     DiagrammeRsvg,
     knitr,
     lubridate,
+    maps,
     pander,
     RMariaDB,
     rmarkdown,

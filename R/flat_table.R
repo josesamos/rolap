@@ -223,6 +223,7 @@ replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NU
     for (j in 1:n_att) {
       table <- table[table[, attributes[j]] == old[j], ]
     }
+    table <- table[stats::complete.cases(table[, attributes]), ]
     r <- as.vector(table[pos_id])[[1]]
     if (length(r) > 0) {
       for (i in 1:length(r)) {

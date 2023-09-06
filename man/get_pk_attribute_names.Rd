@@ -36,6 +36,7 @@ names <- ft |>
 \code{\link{flat_table}}
 
 Other flat table join functions: 
+\code{\link{check_lookup_table}()},
 \code{\link{join_lookup_table}()},
 \code{\link{lookup_table}()}
 }

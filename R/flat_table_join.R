@@ -155,13 +155,13 @@ get_pk_attribute_names.flat_table <- function(ft, as_definition = FALSE) {
 #' the primary key previously defined.
 #'
 #' If no attributes are indicated, those that form the primary key of the lookup
-#' table are considered.
+#' table are considered in the flat table.
 #'
 #' @param ft A `flat_table` object.
 #' @param fk_attributes A vector of strings, attribute names.
 #' @param lookup A `flat_table` object.
 #'
-#' @return A boolean.
+#' @return A `flat_table` object.
 #'
 #' @family flat table join functions
 #' @seealso \code{\link{flat_table}}
@@ -184,22 +184,7 @@ join_lookup_table <- function(ft, fk_attributes, lookup) UseMethod("join_lookup_
 #' @export
 join_lookup_table.flat_table <-
   function(ft, fk_attributes = NULL, lookup) {
-    stopifnot(
-      "The lookup parameter does not include flat_table object." = methods::is(lookup, "flat_table")
-    )
-    stopifnot("The lookup parameter does not have a primary key defined." = length(lookup$pk_attributes) > 0)
-    if (is.null(fk_attributes)) {
-      fk_attributes <- lookup$pk_attributes
-    }
-    fk_attributes <- validate_attributes(ft$attributes, fk_attributes)
-    stopifnot(
-      "The foreign and primary keys do not match." = length(lookup$pk_attributes) == length(fk_attributes)
-    )
-    pk <- unique(lookup$table[, lookup$pk_attributes])
-    stopifnot(
-      "The lookup table has probably changed since its definition." = nrow(lookup$table) == nrow(pk)
-    )
-
+    fk_attributes <- validate_lookup_parameters(ft, fk_attributes, lookup)
     ft <- replace_empty_values_table(ft, fk_attributes)
     rest <-
       setdiff(c(lookup$attributes, lookup$measures),
@@ -233,3 +218,80 @@ join_lookup_table.flat_table <-
       add_operation(ft$operations, "join_lookup_table", fk_attributes, pos)
     ft
   }
+
+
+
+
+#' Check the result of joining a flat table with a lookup table
+#'
+#' Before joining a flat table with a lookup table we can check the result to
+#' determine if we need to adapt the values of some instances or add new elements
+#' to the lookup table. This function returns the values of the foreign key of
+#' the flat table that do not correspond to the primary key of the lookup table.
+#'
+#' If no attributes are indicated, those that form the primary key of the lookup
+#' table are considered in the flat table.
+#'
+#' @param ft A `flat_table` object.
+#' @param fk_attributes A vector of strings, attribute names.
+#' @param lookup A `flat_table` object.
+#'
+#' @return A `tibble` with attribute values.
+#'
+#' @family flat table join functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' lookup <- flat_table('iris', iris) |>
+#'   lookup_table(
+#'     measures = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+#'     measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+#'   )
+#' values <- flat_table('iris', iris) |>
+#'   check_lookup_table(lookup = lookup)
+#'
+#' @export
+check_lookup_table <- function(ft, fk_attributes, lookup) UseMethod("check_lookup_table")
+
+#' @rdname check_lookup_table
+#'
+#' @export
+check_lookup_table.flat_table <-
+  function(ft, fk_attributes = NULL, lookup) {
+    fk_attributes <- validate_lookup_parameters(ft, fk_attributes, lookup)
+    pk <- unique(lookup$table[, lookup$pk_attributes])
+    ft <- replace_empty_values_table(ft, fk_attributes)
+    fk <- unique(ft$table[, fk_attributes])
+    names(pk) <- names(fk)
+    dplyr::setdiff(fk, pk)
+  }
+
+
+#' Validate lookup parameters
+#'
+#' @param ft A `flat_table` object.
+#' @param fk_attributes A vector of strings, attribute names.
+#' @param lookup A `flat_table` object.
+#'
+#' @return A vector of strings, fk attribute names.
+#'
+#' @keywords internal
+validate_lookup_parameters <- function(ft, fk_attributes, lookup) {
+  stopifnot(
+    "The lookup parameter does not include flat_table object." = methods::is(lookup, "flat_table")
+  )
+  stopifnot("The lookup parameter does not have a primary key defined." = length(lookup$pk_attributes) > 0)
+  if (is.null(fk_attributes)) {
+    fk_attributes <- lookup$pk_attributes
+  }
+  fk_attributes <- validate_attributes(ft$attributes, fk_attributes)
+  stopifnot(
+    "The foreign and primary keys do not match." = length(lookup$pk_attributes) == length(fk_attributes)
+  )
+  pk <- unique(lookup$table[, lookup$pk_attributes])
+  stopifnot(
+    "The lookup table has probably changed since its definition." = nrow(lookup$table) == nrow(pk)
+  )
+  fk_attributes
+}
