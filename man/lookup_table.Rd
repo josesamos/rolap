@@ -61,6 +61,7 @@ ft <- flat_table('iris', iris) |>
 \code{\link{flat_table}}
 
 Other flat table join functions: 
+\code{\link{check_lookup_table}()},
 \code{\link{get_pk_attribute_names}()},
 \code{\link{join_lookup_table}()}
 }

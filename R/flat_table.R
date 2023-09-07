@@ -223,20 +223,21 @@ replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NU
     for (j in 1:n_att) {
       table <- table[table[, attributes[j]] == old[j], ]
     }
+    table <- table[stats::complete.cases(table[, attributes]), ]
+    r <- as.vector(table[pos_id])[[1]]
+    if (length(r) > 0) {
+      for (i in 1:length(r)) {
+        for (j in 1:n_att) {
+          db$table[id == r[i], attributes[j]] <- new[j]
+        }
+      }
+    }
   } else {
     # 1 attribute and n old values
-    or_res <- rep(FALSE, nrow(table))
     for (j in 1:length(old)) {
-      or_res <- or_res | (table[, attributes[1]] == old[j])
-    }
-    table <- table[or_res, ]
-  }
-  r <- as.vector(table[pos_id])[[1]]
-  if (length(r) > 0) {
-    for (i in 1:length(r)) {
-      for (j in 1:n_att) {
-        db$table[id == r[i], attributes[j]] <- new[j]
-      }
+      db$table[, attributes[1]] <-
+        apply(db$table[, attributes[1], drop = FALSE], 2, function(x)
+          sub(old[j], new[1], x, fixed = TRUE))
     }
   }
   db$operations <-

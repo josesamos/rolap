@@ -405,6 +405,23 @@ test_that("replace_attribute_values() ", {
 
 test_that("replace_attribute_values() ", {
   expect_equal({
+    ft <- flat_table('iris', iris) |>
+      replace_attribute_values(
+        attributes = 'Species',
+        old = c('setosa', 'virginica', 'versicolor'),
+        new = c('flor')
+      ) |>
+      get_unique_attribute_values()
+  }, structure(
+    list(Species = c("flor")),
+    row.names = c(NA,-1L),
+    class = c("tbl_df", "tbl", "data.frame")
+  ))
+})
+
+
+test_that("replace_attribute_values() ", {
+  expect_equal({
     r <- flat_table('ft_num', ft_num) |>
       replace_attribute_values(
         attributes = c('Year', 'WEEK'),
@@ -932,6 +949,33 @@ test_that("join_lookup_table() ", {
   ))
 })
 
+test_that("check_lookup_table() ", {
+  expect_equal({
+    lookup <- flat_table('iris', iris) |>
+      lookup_table(
+        measures = c(
+          "Sepal.Length",
+          "Sepal.Width",
+          "Petal.Length",
+          "Petal.Width"
+        ),
+        measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
+      )
+    flat_table('iris', iris) |>
+      replace_attribute_values(
+        attributes = 'Species',
+        old = c('setosa'),
+        new = c('flor')
+      ) |>
+      check_lookup_table(lookup = lookup)
+  }, structure(
+    list(Species = "flor"),
+    row.names = c(NA,-1L),
+    class = c("tbl_df",
+              "tbl", "data.frame")
+  ))
+})
+
 
 test_that("select_instances() ", {
   expect_equal({
@@ -1108,3 +1152,4 @@ test_that("transform_attribute_format() ", {
     " 7.90"
   ))
 })
+
