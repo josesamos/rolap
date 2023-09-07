@@ -44,10 +44,10 @@ file <-
   )
 
 mrs_ft <-
-  read_flat_table_file(name = 'mrs', file)
+  read_flat_table_file(name = 'mrs', file, unknown_value = "Not available")
 ```
 
-Using the `read_flat_table_file()` function we read a table stored in a text file and create a `flat_table` object with a name. 
+Using the `read_flat_table_file()` function we read a table stored in a text file and create a `flat_table` object with a name. Through the parameter `unknown_value` we can define the value to use when there is no value available.
 
 Below are the first records of the table. We access the table using the `get_table()` function for the object of the `flat_table` class.
 
@@ -249,7 +249,7 @@ pander::pandoc.table(head(ft), split.table = Inf)
 
 We can add new fields to a table using the `add_custom_column()` function. It is given the name of the new field and a function that returns its values: the function receives the original table as a parameter. Depending on the type of data returned, it will be classified as an attribute or measure in the flat_table object.
 
-Below is the definition of function `city_state()` and the new field obtained through it.
+Below is the definition of function `city_state()` and the new field obtained through it. We will make the changes in a temporary variable, until we are sure that they are appropriate.
 
 ```{r}
 # function to define a derived column
@@ -257,14 +257,14 @@ city_state <- function(table) {
   paste0(table$City, ' ', table$State)
 }
 
-mrs_ft <- mrs_ft|>
+mrs_ft_TMP <- mrs_ft |>
   add_custom_column(name = 'city_state', definition = city_state)
 ```
 
 Once we have the foreign key, before carrying out the join operation, we can check if all the instances will find a match in the lookup table. This operation is performed by the `check_lookup_table()` function, with the same parameters as the `join_lookup_table()` function.
 
 ```{r}
-mrs_ft |>
+mrs_ft_TMP |>
   check_lookup_table(fk_attributes = 'city_state', lookup = usc_ft)
 ```
 
@@ -272,8 +272,24 @@ In addition to the data that is not defined, we check that there are two instanc
 
   - "Washington DC" appears in the lookup table as "WASHINGTON DC".
   - "Wilimington DE" has a typo, it is "Wilmington DE".
+  
+First, let's define a value for the undefined data. Through the `replace_empty_values()` function, it assigns them the value that we indicated at the time of creating the `flat_table` object in the `unknown_value` parameter. 
 
-We have considered it appropriate to correct the first value in the lookup table and the second in the table where the error is. Corrections are carried out using the `replace_attribute_values()` function.
+```{r}
+mrs_ft <- mrs_ft |>
+  replace_empty_values()
+```
+
+If we do not indicate any attributes, it considers all the attributes of the table. 
+
+We define the custom column again.
+
+```{r}
+mrs_ft <- mrs_ft |>
+  add_custom_column(name = 'city_state', definition = city_state)
+```
+
+Once these changes have been made, we will carry out the rest of the modifications to the data. We have considered it appropriate to correct the first value in the lookup table and the second in the table where the error is. Corrections are carried out using the `replace_attribute_values()` function.
 
 ```{r}
 usc_ft <- usc_ft |>
@@ -291,7 +307,7 @@ mrs_ft <- mrs_ft |>
   )
 ```
 
-If we perform the check again, we observe that all the defined data corresponds in the lookup table.
+If we perform the check again, we observe that all the defined data corresponds in the lookup table and that the unknown values have the value indicated in the definition of the flat_table object.
 
 ```{r}
 mrs_ft |>
@@ -305,7 +321,7 @@ mrs_ft <- mrs_ft |>
   join_lookup_table(fk_attributes = 'city_state', lookup = usc_ft)
 ```
 
-Let's check the attributes of the result. Using the 'get_attribute_names()' function, we can indicate that we want them in vector definition format.
+Let's check the attributes of the result. Using the `get_attribute_names()` function, we can indicate that we want them in vector definition format.
 
 ```{r}
 mrs_ft |>
@@ -337,9 +353,13 @@ As a result, we have a flat table with all the data we need.
 
 # Flat table transformation
 
-This section shows various transformations that we can carry out on a flat table.
+We have made some transformations on the `flat_table` objects in the previous section in order to carry out the join operations. In this section we are going to perform some additional transformations.
 
 ## Separate measures
+
+The original Mortality Reporting System data includes details related to the cause of death and others to the age group of the people, but without including the cause. That is, we have data at two different granularities or levels of detail. Let's separate them into different tables.
+
+The separation is carried out by means of the `separate_measures()` function, in which we can indicate lists of measurements and the name of each new flat table that will form the result.
 
 ```{r}
 l_mrs_ft <- mrs_ft |>
@@ -360,12 +380,30 @@ mrs_cause_ft <- l_mrs_ft[['mrs_cause']]
 mrs_age_ft <- l_mrs_ft[['mrs_age']]
 ```
 
+The result is that we have two `flat_table` objects, one with the data referring to the causes and the other with the age data.
 
+## Transform column names
+
+One of the transformations that we can do on the names of the table columns is to change them according to the snake case criterion. We apply this transformation for the table with cause data, as shown below.
 
 ```{r}
 mrs_cause_ft <- mrs_cause_ft |>
   snake_case()
 ```
+
+We can also rename attributes and measures using the `set_attribute_names()` and `set_measure_names()` functions. In this case we don't need to use them.
+
+## Transform measure names into attribute values
+
+Below are the first instances of the flat table with data on people's ages.
+
+```{r, results = "asis", echo=FALSE}
+ft <- mrs_age_ft |> 
+  get_table()
+
+pander::pandoc.table(head(ft), split.table = Inf)
+```
+
 
 
 ```{r}
