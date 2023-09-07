@@ -24,8 +24,8 @@ All these tools are very useful to carry out the transformation process,
 they provide a development environment to define the transformation
 operations in a general way.
 
-Frequently, the operations to be performed aim to transform a flat table
-(with data that comes from operational systems) into a ROLAP
+Frequently, the operations to be performed aim to transform a set of
+tables with data that comes from operational systems into a ROLAP
 (*Relational On-Line Analytical Processing*) star database, made up of
 fact and dimension tables, which implements a multidimensional system.
 With the tools mentioned above, this transformation can be carried out,
@@ -34,7 +34,7 @@ operations designed to specifically support this transformation process.
 
 The goal of `rolap` is to define transformations that allow you to
 easily obtain ROLAP star databases, composed by fact and dimension
-tables, from flat tables and to be able to export them in various
+tables, from operational tables and to be able to export them in various
 formats to be used by OLAP query tools.
 
 The `rolap` package builds on experience with the
@@ -94,7 +94,7 @@ data set in the form of a flat table, available in the package in the
 
 ### Star database definition
 
-The transformation to obtain a star database from the flat table using
+The transformation to obtain a star database from the table using
 `rolap` package is as follows:
 
 ``` r
@@ -171,7 +171,7 @@ ft1 <- ft_num |>
   dplyr::filter(City == "Boston" | City == "Bridgeport")
 ```
 
-The flat table obtained is shown below.
+The table obtained is shown below.
 
 | Year | WEEK | Week Ending Date | REGION | State |    City    | Pneumonia and Influenza Deaths | All Deaths | \<1 year (all cause deaths) | 1-24 years (all cause deaths) | 25-44 years | 45-64 years (all cause deaths) | 65+ years (all cause deaths) |
 |:----:|:----:|:----------------:|:------:|:-----:|:----------:|:------------------------------:|:----------:|:---------------------------:|:-----------------------------:|:-----------:|:------------------------------:|:----------------------------:|
@@ -195,7 +195,7 @@ ft2 <- ft_num |>
 ```
 
 In this case, the data set is adequate to treat the data by age. The
-tidy flat table obtained is shown below.
+tidy table obtained is shown below.
 
 | Year | WEEK | Week Ending Date | REGION | State |   City    |     Age     | All Deaths |
 |:----:|:----:|:----------------:|:------:|:-----:|:---------:|:-----------:|:----------:|

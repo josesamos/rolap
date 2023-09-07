@@ -1,0 +1,392 @@
+---
+title: "Obtaining and transforming flat tables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Obtaining and transforming flat tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The goal of the `rolap` package is to define transformations that allow you to easily obtain ROLAP star databases, composed by fact and dimension tables, from operational tables. The starting point for defining a star database with the `rolap` package is a **flat table**. 
+
+A flat database or flat-file database is a database that only contains a single table. A *flat table* is a generally denormalized table that is not related to other tables. It is not necessarily tidy data (in the sense of the [`tidyverse`](https://CRAN.R-project.org/package=tidyverse) package) but in each column all the data must be of the same type, so that it can be easily stored in a RDBMS (*Relational Database Management System*). It is common for transactional systems to allow their data to be exported as a flat table.
+
+The `rolap` package includes a set of operations that allow defining, transforming and integrating tables to obtain a flat table from which we can define star databases. To work with tables to obtain a flat table, the `flat_table` class is defined: Its main objective is to allow the integration of tables from different sources to obtain a flat table with all the data. It is described in this document using a practical example.
+
+
+# Data sets
+
+This section describes the data sets used in the example.
+
+## 122 US Cities Mortality Reporting System
+
+To illustrate how the package works we will use a small part of the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) dataset. 
+
+We have developed the examples in this document using the dataset downloaded from the source. To reproduce them more easily, from the original file, we have stored in the package a file with the same format as the original file but that includes only 1% of its data, selected at random, which is accessed below.
+
+```{r}
+library(rolap)
+
+file <-
+  system.file(
+    "extdata",
+    "deaths_122_us_cities_1962_2016_mortality_reporting_system.csv",
+    package = "rolap"
+  )
+
+mrs_ft <-
+  read_flat_table_file(name = 'mrs', file)
+```
+
+Using the `read_flat_table_file()` function we read a table stored in a text file and create a `flat_table` object with a name. 
+
+Below are the first records of the table. We access the table using the `get_table()` function for the object of the `flat_table` class.
+
+```{r, results = "asis"}
+ft <- mrs_ft |> 
+  get_table()
+
+pander::pandoc.table(head(ft), split.table = Inf)
+```
+
+This data set has mortality data from 122 US cities. The geographic data that it includes corresponds to the *REGION*, *State* and	*City* attributes of the table.
+
+Apart from this data, we may be interested in adding additional geographical information, such as data on the population of these cities or their specific location.
+
+## Database of US cities
+
+In package `maps`, we find the data set `us.cities` corresponding to a database of US cities with the information that interests us.
+
+```{r, results = "asis"}
+pander::pandoc.table(head(maps::us.cities), split.table = Inf)
+```
+
+The content of the table fields is obvious, except for field *capital*, which is described in the help as containing capital status indication (0 for non-capital, 1 for capital, 2 for state capital).
+
+
+# Flat tables
+
+Our goal is to have all available data, possibly from multiple data sources, in a single table, a flat table. We have defined the `flat_table` class to represent the tables, transform them and be able to integrate them.
+
+This section, for the data sets that are used, describes the functions to create a `flat_table` object and to access and modify its characteristics.
+
+## Create `flat_table` objects
+
+For the mortality data in US cities, we have created the `flat_table` object by directly reading the data from the file where it was stored, using the `read_flat_table_file()` function. The package also includes the `read_flat_table_folder()` function to read and integrate all text files in a folder into a `flat_table` object.
+
+From a dataset in a data frame, using the `flat_table()` function, we obtain a `flat_table` object, as shown below for the US cities dataset.
+
+```{r}
+usc_ft <-
+  flat_table(name = 'us_cities', instances = maps::us.cities)
+```
+
+Using this function, we are going to create an additional `flat_table` object that allows us to associate the capital status codes with their description. To do this, we define before a data frame with the codes and their descriptions and, from it, we create the object, as shown below.
+
+```{r}
+capital_status <- data.frame(
+  code = c('0', '1', '2'),
+  status = c('non-capital', 'capital', 'state capital')
+)
+
+cs_ft <-
+  flat_table(name = 'capital_status', instances = capital_status)
+```
+
+
+## `flat_table` *attributes* and *measures*
+
+Following the criteria of OLAP system design, we distinguish between *attributes* and *measures* in the `flat_table` class, considering the focus of attention of the data:
+
+  - *Measures*: They answer the question "how much?", referring to the focus of attention.
+  
+  - *Attributes*: They define the rest of the context of the focus of attention.
+  
+Not all numerical data are necessarily measures, some should be considered as attributes, it mainly depends on the focus of attention that we consider.
+
+When we define a flat table, its fields are classified based on their type as attributes or measures. Numeric fields are considered measures, the rest of the fields are attributes. No functions are used to find out the type, only the type defined in the starting data frame is considered. In the case of obtaining data from text files, all data is defined as character type, that is, it is classified as attributes. 
+
+For this example, our focus is the Mortality Reporting System data. We have to define the attributes and measures with this point of view.
+
+### Mortality Reporting System
+
+Using the functions shown below we consult the attributes and measures.
+
+```{r}
+mrs_ft |> 
+  get_attribute_names()
+
+mrs_ft |> 
+  get_measure_names()
+```
+
+Since the data comes from a text file, all fields have been defined as attributes.
+
+This is a starting point, next we will see how to change the initial classification. Using the `transform_to_measure()` function, we transform attributes into measurements. In some cases it is required to previously transform the data (remove the thousands separator or change the decimal separator), this can be indicated by the function parameters. In this case, it is not necessary to transform anything.
+
+```{r}
+mrs_ft <- mrs_ft |>
+  transform_to_measure(
+    attributes = c(
+      'Pneumonia and Influenza Deaths',
+      'All Deaths',
+      '<1 year (all cause deaths)',
+      '1-24 years (all cause deaths)',
+      '25-44 years',
+      '45-64 years (all cause deaths)',
+      '65+ years (all cause deaths)'
+    )
+  )
+
+mrs_ft |> 
+  get_attribute_names()
+
+mrs_ft |> 
+  get_measure_names()
+```
+
+### US cities
+
+In this case, the starting data was in a data frame, where each column has a data type associated with it. The initial classification is as follows.
+
+```{r}
+usc_ft |> 
+  get_attribute_names()
+
+usc_ft |> 
+  get_measure_names()
+```
+
+From the point of view of the Mortality Reporting System, all of this data can be considered as attributes. Using the parameters of the `transform_to_attribute()` function, we define the format of the transformation from numeric data to string, as shown below.
+
+```{r}
+usc_ft <- usc_ft |>
+  transform_to_attribute(measures = 'capital') |>
+  transform_to_attribute(measures = 'pop',
+                         width = 5) |>
+  transform_to_attribute(measures = c('lat', 'long'),
+                         width = 2,
+                         decimal_places = 1)
+```
+
+In particular, by using the `width` parameter, we can make the order of the string data match the numerical order (for example, output " 2" instead of "2" to come before "10" when data is presented). This can be important in some tools like *Power BI*.
+
+
+### Capital status
+
+For the capital status table, the columns have been defined as string, therefore both are attributes, which is appropriate for the focus of attention.
+
+```{r}
+cs_ft |> 
+  get_attribute_names()
+
+cs_ft |> 
+  get_measure_names()
+```
+
+
+# Joining flat tables
+
+We currently have the data of interest in three tables and our goal is to have all the data in a single flat table: we have to join the tables.
+
+To join tables represented by `flat_table` objects, we must define a lookup table, so that the other table must contain a foreign key that allows them to be related.
+
+## Joining US cities and capital status tables
+
+Using the `lookup_table()` function we define the attributes that make up the primary key of a loop table, as shown below for the capital status table.
+
+```{r}
+cs_ft <- cs_ft |>
+  lookup_table(pk_attributes = 'code')
+```
+
+The primary key is made up of the *code* field. 
+
+In the definition of the lookup table, it is verified that the set of attributes that are indicated actually form a primary key. Likewise, if they do not form a primary key, the same `lookup_table()` function can be used to group the data using the aggregation functions indicated for the rest of the attributes and measures in the table.
+
+Once we have a lookup table, we can join any other table to it using its primary key, which will be the foreign key of the other table, as shown below for the US cities table using the `join_lookup_table()` function. We only have to indicate the attributes that make up the foreign key and the lookup table.
+
+```{r}
+usc_ft <- usc_ft |>
+  join_lookup_table(fk_attributes = 'capital', lookup = cs_ft)
+```
+
+Below is the data table with the result obtained.
+
+```{r, results = "asis"}
+ft <- usc_ft |> 
+  get_table()
+
+pander::pandoc.table(head(ft), split.table = Inf)
+```
+
+## Joining Mortality Reporting System and US cities tables
+
+First of all we must define table X as a lookup table. Its primary key is formed exclusively by the *name* attribute.
+
+```{r}
+usc_ft <- usc_ft |>
+  lookup_table(pk_attributes = 'name')
+```
+
+If we consult the Mortality Reporting System table again (for convenience it is shown again below), we verify that we do not have a field that corresponds directly to the primary key: we must merge two fields (*City* and *State*) to obtain it.
+
+```{r, results = "asis", echo=FALSE}
+ft <- mrs_ft |> 
+  get_table()
+
+pander::pandoc.table(head(ft), split.table = Inf)
+```
+
+We can add new fields to a table using the `add_custom_column()` function. It is given the name of the new field and a function that returns its values: the function receives the original table as a parameter. Depending on the type of data returned, it will be classified as an attribute or measure in the flat_table object.
+
+Below is the definition of function `city_state()` and the new field obtained through it.
+
+```{r}
+# function to define a derived column
+city_state <- function(table) {
+  paste0(table$City, ' ', table$State)
+}
+
+mrs_ft <- mrs_ft|>
+  add_custom_column(name = 'city_state', definition = city_state)
+```
+
+Once we have the foreign key, before carrying out the join operation, we can check if all the instances will find a match in the lookup table. This operation is performed by the `check_lookup_table()` function, with the same parameters as the `join_lookup_table()` function.
+
+```{r}
+mrs_ft |>
+  check_lookup_table(fk_attributes = 'city_state', lookup = usc_ft)
+```
+
+In addition to the data that is not defined, we check that there are two instances that do not have a correspondence in the lookup table.
+
+  - "Washington DC" appears in the lookup table as "WASHINGTON DC".
+  - "Wilimington DE" has a typo, it is "Wilmington DE".
+
+We have considered it appropriate to correct the first value in the lookup table and the second in the table where the error is. Corrections are carried out using the `replace_attribute_values()` function.
+
+```{r}
+usc_ft <- usc_ft |>
+  replace_attribute_values(
+    attributes = 'name',
+    old = c('WASHINGTON DC'),
+    new = c('Washington DC')
+  )
+
+mrs_ft <- mrs_ft |>
+  replace_attribute_values(
+    attributes = c('City', 'city_state'),
+    old = c('Wilimington', 'Wilimington DE'),
+    new = c('Wilmington', 'Wilmington DE')
+  )
+```
+
+If we perform the check again, we observe that all the defined data corresponds in the lookup table.
+
+```{r}
+mrs_ft |>
+  check_lookup_table(fk_attributes = 'city_state', lookup = usc_ft)
+```
+
+We perform the join operation using the `join_lookup_table()` function.
+
+```{r}
+mrs_ft <- mrs_ft |>
+  join_lookup_table(fk_attributes = 'city_state', lookup = usc_ft)
+```
+
+Let's check the attributes of the result. Using the 'get_attribute_names()' function, we can indicate that we want them in vector definition format.
+
+```{r}
+mrs_ft |>
+  get_attribute_names(as_definition = TRUE)
+```
+
+There are attributes that we do not need, although it is not strictly necessary for our objective, we can exclude them using the `select_attributes()` function. We can use the definition of the vector obtained by the previous function to perform the selection.
+
+```{r}
+mrs_ft <- mrs_ft |>
+  select_attributes(
+    attributes = c(
+      'Year',
+      'WEEK',
+      'Week Ending Date',
+      'REGION',
+      'State',
+      'City',
+      'city_state',
+      'status',
+      'pop',
+      'lat',
+      'long'
+    )
+  )
+```
+
+As a result, we have a flat table with all the data we need.
+
+# Flat table transformation
+
+This section shows various transformations that we can carry out on a flat table.
+
+## Separate measures
+
+```{r}
+l_mrs_ft <- mrs_ft |>
+  separate_measures(measures = list(
+    c('Pneumonia and Influenza Deaths',
+      'All Deaths'),
+    c(
+      '<1 year (all cause deaths)',
+      '1-24 years (all cause deaths)',
+      '25-44 years',
+      '45-64 years (all cause deaths)',
+      '65+ years (all cause deaths)'
+    )
+  ),
+  names = c('mrs_cause', 'mrs_age'))
+
+mrs_cause_ft <- l_mrs_ft[['mrs_cause']]
+mrs_age_ft <- l_mrs_ft[['mrs_age']]
+```
+
+
+
+```{r}
+mrs_cause_ft <- mrs_cause_ft |>
+  snake_case()
+```
+
+
+```{r}
+mrs_age_ft <- mrs_age_ft |>
+  transform_to_values(attribute = 'age',
+                      measure = 'all_deaths') |>
+  snake_case()
+```
+
+
+```{r}
+mrs_age_ft <- mrs_age_ft |>
+  replace_string(
+    attributes = 'age',
+    string = ' (all cause deaths)',
+    replacement = ''
+  )
+```
+
+
+```{r}
+sort(unique(mrs_age_ft$table$age))
+```
+

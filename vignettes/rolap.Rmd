@@ -27,9 +27,9 @@ The *multidimensional data model* was defined in the 1990s with the aim of suppo
 
 Transformations can be carried out using professional ETL (*Extract, Transform and Load*) tools. Recently, tools aimed at end users have emerged, which are also aimed at performing transformation operations. All these tools are very useful to carry out the transformation process, they provide a development environment to define the transformation operations in a general way.
 
-Frequently, the operations to be performed aim to transform a flat table (with data that comes from operational systems) into a ROLAP (*Relational On-Line Analytical Processing*) star database, made up of fact and dimension tables, which implements a multidimensional system. With the tools mentioned above, this transformation can be carried out, but it requires a lot of work. 
+Frequently, the operations to be performed aim to transform tables (with data that comes from operational systems) into a ROLAP (*Relational On-Line Analytical Processing*) star database, made up of fact and dimension tables, which implements a multidimensional system. With the tools mentioned above, this transformation can be carried out, but it requires a lot of work. 
 
-The goal of `rolap` is to define transformations that allow you to easily obtain ROLAP star databases, composed by fact and dimension tables, from flat tables and to be able to export them in various formats to be used by OLAP query tools.
+The goal of `rolap` is to define transformations that allow you to easily obtain ROLAP star databases, composed by fact and dimension tables, from operational tables and to be able to export them in various formats to be used by OLAP query tools.
 
 The rest of this document is structured as follows: First, basic concepts of dimensional modelling and star databases are summarized. The following is an illustrative example of how the package works, to show usage of features it offers. Finally, the document ends with conclusions and bibliography.
 
@@ -160,11 +160,11 @@ ft_age <- ft |>
 pander::pandoc.table(head(ft_age, 15), split.table = Inf)
 ```
 
-`ft_num` and `ft_age` are the flat tables that will be considered as a starting point to obtain star databases from them in this example.
+`ft_num` and `ft_age` are the tables that will be considered as a starting point to obtain star databases from them in this example.
 
 ## Dimensional modelling
 
-For each flat table, the goal is to define the attributes that correspond to measures in facts and those that are in dimensions. For facts, measures and their aggregation functions have to be defined. For dimensions, attributes with natural affinity must be grouped. Each attribute should only appear once in the definition.
+For each table, the goal is to define the attributes that correspond to measures in facts and those that are in dimensions. For facts, measures and their aggregation functions have to be defined. For dimensions, attributes with natural affinity must be grouped. Each attribute should only appear once in the definition.
 
 To avoid having to write the name of the attributes of the table, with the following function we can have them in the form of a string. Thus, we can copy and paste each name as needed.
 
@@ -224,7 +224,7 @@ s_cause <- star_schema() |>
 
 Each measure has an aggregation function associated with it, by default it is *SUM*. Alternatively, the *MAX* or *MIN* functions can be used. *AVG* cannot be used because the average of averages is not the total average. Instead, a field called `nrow_agg` (an alternative name can be specified) is always added where the number of records added in the result row is stored. With that value and the result of *SUM*, the value of the *AVG* function can be obtained.
 
-The aggregation functions are needed to get the data at the granularity defined in the star schema, which can be equal to or coarser than the granularity defined in the flat table.
+The aggregation functions are needed to get the data at the granularity defined in the star schema, which can be equal to or coarser than the granularity defined in the table.
 
 ```{r}
 s_cause <- star_schema() |>
@@ -240,7 +240,7 @@ In the above example, aggregation functions have been explicitly defined for the
 
 ### Star databases
 
-From a `star_schema` object and a flat table (`tibble`) that contains all the fields that appear in it, using the `star_database()` function, we obtain a `star_database` object. As an example we will consider data on causes.
+From a `star_schema` object and a table (`tibble`) that contains all the fields that appear in it, using the `star_database()` function, we obtain a `star_database` object. As an example we will consider data on causes.
 
 The definition of the star schema for the data considered for the cause case is shown below.
 
@@ -282,7 +282,7 @@ for (i in 1:length(l_cause)) {
 }
 ```
 
-It can be seen that the data in the fact table has the same granularity as the data in the original flat table (they have the same number of records). 
+It can be seen that the data in the fact table has the same granularity as the data in the original table (they have the same number of records). 
 
 ```{r}
 nrow(ft_num)
@@ -304,7 +304,7 @@ From two or more star databases we can define a constellation.
 
 #### Definition of star databases
 
-To more effectively demonstrate the functionality, we are going to define the star databases with a coarser granularity than the original flat tables; additionally we are going to select only some of the rows from the flat tables.
+To more effectively demonstrate the functionality, we are going to define the star databases with a coarser granularity than the original tables; additionally we are going to select only some of the rows from the tables.
 
 For the cause case is shown below.
 
@@ -425,7 +425,7 @@ ct2 <- constellation("MRS2", list(ct, db_age2))
 
 To continue working with the result of the implementation of the multidimensional database (star database or constellation) it can be exported as a `tibble` list, suitable for example to pass the data to a spreadsheet, or as an object of the class `dm`, which allows passing the data to a RDBMS.
 
-In some cases, we may be interested in having the data in the form of a flat table again, especially if we want to carry out some statistical analysis with the integrated data. We can export them as a single `tibble` list.
+In some cases, we may be interested in having the data in the form of a table again, especially if we want to carry out some statistical analysis with the integrated data. We can export them as a single `tibble` list.
 
 Functions are defined, applicable to objects of both star databases and constellations.
 
@@ -504,7 +504,7 @@ ct |>
 
 # Conclusions
 
-`rolap` package offers a set of operations that allow us to transform flat tables into star databases.  From several star databases you can define a constellation with conformed dimensions.
+`rolap` package offers a set of operations that allow us to transform tables into star databases.  From several star databases you can define a constellation with conformed dimensions.
 
 Operations have been designed to be intuitive and easy to use. The result greatly facilitates the data transformation process for the exposed situation.
 
