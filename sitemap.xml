@@ -16,6 +16,9 @@
     <loc>https://josesamos.github.io/rolap/articles/rolap.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/articles/v05-flat-table-op.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/articles/v10-rpd.html</loc>
   </url>
   <url>
@@ -56,6 +59,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/as_tibble_list.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/check_lookup_table.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/conform_dimensions.html</loc>
@@ -317,6 +323,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_dimension_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/validate_lookup_parameters.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_measures.html</loc>

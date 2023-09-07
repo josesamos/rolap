@@ -31,6 +31,7 @@ the primary key previously defined."><meta property="og:image" content="https://
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/v05-flat-table-op.html">Obtaining and transforming flat tables</a>
     <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of role-playing and role dimensions</a>
     <a class="dropdown-item" href="../articles/v20-rdbms-dm.html">Star databases and RDBMS through the dm and rolap packages</a>
     <a class="dropdown-item" href="../articles/v30-dim-instances.html">Integration of dimension instances</a>
@@ -92,17 +93,18 @@ the primary key previously defined.</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A boolean.</p>
+<p>A <code>flat_table</code> object.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>If no attributes are indicated, those that form the primary key of the lookup
-table are considered.</p>
+table are considered in the flat table.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="flat_table.html">flat_table</a></code></p>
 <p>Other flat table join functions: 
+<code><a href="check_lookup_table.html">check_lookup_table</a>()</code>,
 <code><a href="get_pk_attribute_names.html">get_pk_attribute_names</a>()</code>,
 <code><a href="lookup_table.html">lookup_table</a>()</code></p></div>
     </div>
