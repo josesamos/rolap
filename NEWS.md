@@ -1,5 +1,7 @@
 # rolap (development version)
-* Vignette about integration of dimension instances
+* Vignette about obtaining and transforming flat tables.
+* Definition of flat_table class with functions to transform an integrate data.
+* Vignette about integration of dimension instances.
 * Functions to query and modify instances of dimensions.
 * Definition of a common data model for star databases and constellations.
 * Vignette about `md` and `rolap` packages.
