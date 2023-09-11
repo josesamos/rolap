@@ -2,10 +2,6 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^LICENSE\.md$
-^ejemplos.R$
-^rdbms-dm.R$
-^dim-instances.R$
-^datos$
 ^\.github$
 ^codecov\.yml$
 ^_pkgdown\.yml$
@@ -13,3 +9,4 @@
 ^pkgdown$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+^datos$
