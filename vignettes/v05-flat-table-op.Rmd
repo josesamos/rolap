@@ -132,7 +132,9 @@ mrs_ft |>
 
 Since the data comes from a text file, all fields have been defined as attributes.
 
-This is a starting point, next we will see how to change the initial classification. Using the `transform_to_measure()` function, we transform attributes into measurements. In some cases it is required to previously transform the data (remove the thousands separator or change the decimal separator), this can be indicated by the function parameters. In this case, it is not necessary to transform anything.
+#### Measures
+
+This is a starting point, next we will see how to change the initial classification. Using the `transform_to_measure()` function, we transform attributes into measurements. In some cases it is required to previously transform the data (remove the thousands separator or change the decimal separator), this can be indicated by the function parameters, although it is not necessary in this case. 
 
 ```{r}
 mrs_ft <- mrs_ft |>
@@ -153,6 +155,27 @@ mrs_ft |>
 
 mrs_ft |> 
   get_measure_names()
+```
+
+#### Attributes
+
+We can change the format of numeric attributes. The main motivation is usually that the alphabetical order coincides with the numerical order. This is often important in user query tools (e.g. *Power BI*).
+
+Below is the change for the *WEEK* field. It is enough to indicate the width. The result is that it fills the width with white spaces on the left, thus achieving the stated objective (for example, output " 2" instead of "2" to come before "10" when data is presented).
+
+```{r}
+mrs_ft <- mrs_ft |>
+  transform_attribute_format(attributes = c('WEEK'),
+                             width = 2)
+```
+
+For example, in this way we will have as output " 2" instead of "2", so that alphabetically ordered it is placed before "10" instead of after it, as it's shown in the following.
+
+```{r}
+table <- mrs_ft |>
+  get_table()
+
+sort(unique(table[['WEEK']]))[1:10]
 ```
 
 ### US cities
@@ -179,7 +202,7 @@ usc_ft <- usc_ft |>
                          decimal_places = 1)
 ```
 
-In particular, by using the `width` parameter, we can make the order of the string data match the numerical order (for example, output " 2" instead of "2" to come before "10" when data is presented). This can be important in some tools like *Power BI*.
+In particular, by using the `width` parameter, as done before to transform the numerical attributes, we can make the order of the string data match the numerical order. 
 
 
 ### Capital status
@@ -471,18 +494,7 @@ pander::pandoc.table(head(ft), split.table = Inf)
 cat(sprintf("Number of rows in the table: %d", nrow(ft)))
 ```
 
-If we compare the number of rows in the table with the original, we see that it does not match. The explanation is in the records that do not have defined values ​​in the considered variables that are eliminated when performing the operation. The difference is 17 rows which is the number of rows that have all undefined values, as shown below.
-
-```{r, results = "asis"}
-t <- l_mrs_ft[['mrs_age']] |>
-  get_table()
-t <- t[, c(12:16)]
-t <- t[is.na(t[, 1]) & is.na(t[, 2]) & is.na(t[, 3]) & is.na(t[, 4]) & is.na(t[, 5]), ]
-
-pander::pandoc.table(t, split.table = Inf)
-
-cat(sprintf("Number of rows in the table: %d", nrow(t)))
-```
+If we compare the number of rows in the table with the original, we see that it coincides. 
 
 # Definition of the star databases
 

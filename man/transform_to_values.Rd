@@ -5,18 +5,26 @@
 \alias{transform_to_values.flat_table}
 \title{Transform measure names into attribute values}
 \usage{
-transform_to_values(ft, attribute, measure, id_reverse)
+transform_to_values(ft, attribute, measure, id_reverse, na_rm)
 
-\method{transform_to_values}{flat_table}(ft, attribute = NULL, measure = NULL, id_reverse = NULL)
+\method{transform_to_values}{flat_table}(
+  ft,
+  attribute = NULL,
+  measure = NULL,
+  id_reverse = NULL,
+  na_rm = TRUE
+)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
 \item{attribute}{A string, new attribute that will store the measures names.}
 
-\item{measure}{A string, new measure that will store the measure names.}
+\item{measure}{A string, new measure that will store the measure value.}
 
 \item{id_reverse}{A string, name of a new attribute that will store the row id.}
+
+\item{na_rm}{A boolean, remove rows from output where the value column is NA.}
 }
 \value{
 A \code{flat_table} object.

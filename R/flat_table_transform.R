@@ -625,8 +625,9 @@ transform_attribute_format.flat_table <-
 #'
 #' @param ft A `flat_table` object.
 #' @param attribute A string, new attribute that will store the measures names.
-#' @param measure A string, new measure that will store the measure names.
+#' @param measure A string, new measure that will store the measure value.
 #' @param id_reverse A string, name of a new attribute that will store the row id.
+#' @param na_rm	A boolean, remove rows from output where the value column is NA.
 #'
 #' @return A `flat_table` object.
 #'
@@ -645,7 +646,7 @@ transform_attribute_format.flat_table <-
 #'                       id_reverse = 'id')
 #'
 #' @export
-transform_to_values <- function(ft, attribute, measure, id_reverse) UseMethod("transform_to_values")
+transform_to_values <- function(ft, attribute, measure, id_reverse, na_rm) UseMethod("transform_to_values")
 
 #' @rdname transform_to_values
 #'
@@ -656,7 +657,8 @@ transform_to_values.flat_table <-
   function(ft,
            attribute = NULL,
            measure = NULL,
-           id_reverse = NULL) {
+           id_reverse = NULL,
+           na_rm = TRUE) {
     stopifnot("Missing attribute name." = !is.null(attribute))
     stopifnot("Missing measure name." = !is.null(measure))
     stopifnot("Only one attribute name is needed." = length(attribute) == 1)
@@ -687,7 +689,7 @@ transform_to_values.flat_table <-
     ft$table <- ft$table[, c(ft$attributes, ft$measures)]
     interval <- (length(ft$attributes) + 1):length(colnames(ft$table))
     ft$table <-
-      tidyr::gather(ft$table, attribute, measure,!!interval, na.rm = TRUE)
+      tidyr::gather(ft$table, attribute, measure,!!interval, na.rm = na_rm)
     names(ft$table) <- c(ft$attributes, attribute, measure)
     ft$measures <- measure
     ft$attributes <- c(ft$attributes, attribute)
@@ -763,6 +765,7 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
 #' @param ft A `flat_table` object.
 #' @param measures A list of string vectors, groups of measure names.
 #' @param names A list of string, measure group names.
+#' @param na_rm	A boolean, remove rows from output where all measure values are NA.
 #'
 #' @return A list of `flat_table` objects.
 #'
@@ -783,12 +786,12 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
 #'   )
 #'
 #' @export
-separate_measures <- function(ft, measures, names) UseMethod("separate_measures")
+separate_measures <- function(ft, measures, names, na_rm) UseMethod("separate_measures")
 
 #' @rdname separate_measures
 #'
 #' @export
-separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
+separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_rm = TRUE) {
   stopifnot("Missing measure names." = !is.null(measures))
   stopifnot("Missing measure group names." = !is.null(names))
   stopifnot("Missing measure group names." = length(measures) == length(unique(names)))
@@ -799,11 +802,30 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
     lft[[i]] <-
       flat_table(name = names[i], instances = ft$table[, c(ft$attributes, measures[[i]])],
                  unknown_value = ft$unknown_value)
+    if (na_rm) {
+      lft[[i]]$table <- remove_all_measures_na(lft[[i]]$table, measures[[i]])
+    }
     lft[[i]]$pk_attributes <- ft$pk_attributes
     lft[[i]]$lookup_tables <- ft$lookup_tables
     lft[[i]]$operations <- add_operation(ft$operations, "separate_measures", measures[[i]], names[i])
   }
   lft
+}
+
+#' Delete if all measures are na
+#'
+#' @param table A `tibble` object.
+#' @param measures A vector of strings, measure names.
+#'
+#' @param table A `tibble` object.
+#'
+#' @keywords internal
+remove_all_measures_na <- function(table, measures) {
+  keep <- rep(FALSE, nrow(table))
+  for (m in measures) {
+    keep <- keep | !is.na(table[, m][[1]])
+  }
+  table[keep, ]
 }
 
 

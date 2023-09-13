@@ -5,9 +5,9 @@
 \alias{separate_measures.flat_table}
 \title{Separate measures in flat tables}
 \usage{
-separate_measures(ft, measures, names)
+separate_measures(ft, measures, names, na_rm)
 
-\method{separate_measures}{flat_table}(ft, measures = NULL, names = NULL)
+\method{separate_measures}{flat_table}(ft, measures = NULL, names = NULL, na_rm = TRUE)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
@@ -15,6 +15,8 @@ separate_measures(ft, measures, names)
 \item{measures}{A list of string vectors, groups of measure names.}
 
 \item{names}{A list of string, measure group names.}
+
+\item{na_rm}{A boolean, remove rows from output where all measure values are NA.}
 }
 \value{
 A list of \code{flat_table} objects.
