@@ -42,7 +42,7 @@ lookup_table.flat_table <-
            measure_agg = NULL) {
     pk_attributes <- validate_attributes(ft$attributes, pk_attributes)
     ft$pk_attributes <- pk_attributes
-    ft <- replace_empty_values_table(ft, pk_attributes)
+    ft$table <- replace_empty_values_table(ft$table, pk_attributes, unknown_value = ft$unknown_value)
     pk <- unique(ft$table[, pk_attributes])
     if (nrow(pk) < nrow(ft$table)) {
       if (length(pk_attributes) == length(ft$attributes) + length(ft$measures)) {
@@ -185,7 +185,7 @@ join_lookup_table <- function(ft, fk_attributes, lookup) UseMethod("join_lookup_
 join_lookup_table.flat_table <-
   function(ft, fk_attributes = NULL, lookup) {
     fk_attributes <- validate_lookup_parameters(ft, fk_attributes, lookup)
-    ft <- replace_empty_values_table(ft, fk_attributes)
+    ft$table <- replace_empty_values_table(ft$table, fk_attributes, unknown_value = ft$unknown_value)
     rest <-
       setdiff(c(lookup$attributes, lookup$measures),
               lookup$pk_attributes)
@@ -218,8 +218,6 @@ join_lookup_table.flat_table <-
       add_operation(ft$operations, "join_lookup_table", fk_attributes, pos)
     ft
   }
-
-
 
 
 #' Check the result of joining a flat table with a lookup table
@@ -261,7 +259,7 @@ check_lookup_table.flat_table <-
   function(ft, fk_attributes = NULL, lookup) {
     fk_attributes <- validate_lookup_parameters(ft, fk_attributes, lookup)
     pk <- unique(lookup$table[, lookup$pk_attributes])
-    ft <- replace_empty_values_table(ft, fk_attributes)
+    ft$table <- replace_empty_values_table(ft$table, fk_attributes, unknown_value = ft$unknown_value)
     fk <- unique(ft$table[, fk_attributes])
     names(pk) <- names(fk)
     dplyr::setdiff(fk, pk)

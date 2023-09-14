@@ -94,6 +94,9 @@ star_database_with_previous_operations <- function(schema, instances, unknown_va
 
   # get a flat table ready to generate facts and dimensions
   # (NA values are replaced by unknown_value)
+  if (is.null(unknown_value)) {
+    unknown_value <- get_default_unknown_value()
+  }
   instances[, attributes] <- prepare_to_join(instances[, attributes], unknown_value)
 
   if (is.null(operations)) {
@@ -467,7 +470,7 @@ group_dimension_instances.star_database <- function(db, name) {
         len <- length(measures)
         db$facts[[f]]$table <-
           group_by_keys(
-            instances = db$facts[[f]]$table,
+            table = db$facts[[f]]$table,
             keys = db$facts[[f]]$surrogate_keys,
             measures = names(db$facts[[f]]$agg),
             agg_functions = db$facts[[f]]$agg,

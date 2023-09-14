@@ -855,7 +855,8 @@ replace_empty_values <- function(ft, attributes, empty_values) UseMethod("replac
 #'
 #' @export
 replace_empty_values.flat_table <- function(ft, attributes = NULL, empty_values = NULL) {
-  ft <- replace_empty_values_table(ft, attributes, empty_values)
+  attributes <- validate_attributes(ft$attributes, attributes)
+  ft$table <- replace_empty_values_table(ft$table, attributes, empty_values, unknown_value = ft$unknown_value)
   ft$operations <-
     add_operation(ft$operations, "replace_empty_values", attributes, empty_values)
   ft

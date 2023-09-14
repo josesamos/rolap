@@ -33,7 +33,7 @@ flat_table <- function(name = NULL, instances, unknown_value = NULL) {
     }
   }
   if (is.null(unknown_value)) {
-    unknown_value <- "___UNKNOWN___"
+    unknown_value <- get_default_unknown_value()
   } else {
     unknown_value <- unknown_value[1]
   }
@@ -305,7 +305,7 @@ get_unknown_values <- function(ft, attributes, col_as_vector) UseMethod("get_unk
 #' @export
 get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector = NULL) {
   attributes <- validate_attributes(ft$attributes, attributes)
-  ft <- replace_empty_values_table(ft, attributes)
+  ft$table <- replace_empty_values_table(ft$table, attributes, unknown_value = ft$unknown_value)
   table <- ft$table[, attributes]
   or_res <- rep(FALSE, nrow(table))
   for (j in 1:length(attributes)) {
@@ -352,4 +352,3 @@ as_star_database.flat_table <-
       operations = ft$operations
     )
   }
-
