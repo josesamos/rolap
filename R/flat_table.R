@@ -333,13 +333,13 @@ get_unknown_values <- function(ft, attributes, col_as_vector) UseMethod("get_unk
 #' @export
 get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector = NULL) {
   attributes <- validate_attributes(ft$attributes, attributes)
-  ft$table <- replace_empty_values_table(ft$table, attributes, unknown_value = ft$unknown_value)
-  table <- ft$table[, attributes]
+  table <- replace_empty_values_table(ft$table, attributes, unknown_value = ft$unknown_value)
+  table <- table[, attributes]
   or_res <- rep(FALSE, nrow(table))
   for (j in 1:length(attributes)) {
     or_res <- or_res | (table[, attributes[j]] == ft$unknown_value)
   }
-  table <- table[or_res, ]
+  table <- ft$table[or_res, attributes]
   table <- dplyr::arrange_all(unique(table))
   if (!is.null(col_as_vector)) {
     table <- add_dput_column(table, col_as_vector)

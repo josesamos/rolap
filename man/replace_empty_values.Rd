@@ -23,9 +23,15 @@ A \code{flat_table} object.
 Transforms the given attributes by replacing the empty values with the unknown
 value.
 }
+\details{
+In addition to the NA or empty values, those indicated (e.g., "-") can be
+considered as empty values.
+}
 \examples{
 
-ft <- flat_table('iris', iris) |>
+iris2 <- iris
+iris2[10, 'Species'] <- NA
+ft <- flat_table('iris', iris2) |>
   replace_empty_values()
 
 }

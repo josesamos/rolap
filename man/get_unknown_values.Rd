@@ -29,7 +29,9 @@ with the data in vector form to be used in other functions.
 }
 \examples{
 
-instances <- flat_table('iris', iris) |>
+iris2 <- iris
+iris2[10, 'Species'] <- NA
+instances <- flat_table('iris', iris2) |>
   get_unknown_values()
 
 }

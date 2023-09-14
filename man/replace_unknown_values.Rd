@@ -25,7 +25,10 @@ the given value.
 }
 \examples{
 
-ft <- flat_table('iris', iris) |>
+iris2 <- iris
+iris2[10, 'Species'] <- NA
+ft <- flat_table('iris', iris2) |>
+  replace_empty_values() |>
   replace_unknown_values(value = "Not available")
 
 }

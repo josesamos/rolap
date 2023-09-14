@@ -135,7 +135,7 @@ test_that("flat_table() creates a flat_table object", {
   ))
 })
 
-test_that("snake_case() creates a flat_table object", {
+test_that("snake_case()", {
   expect_equal({
     ft <- flat_table('iris', head(iris)) |>
       snake_case()
@@ -449,7 +449,7 @@ test_that("select_attributes() ", {
 })
 
 
-test_that("select_attributes() ", {
+test_that("select_measures() ", {
   expect_equal({
     ft <- flat_table('iris', iris) |>
       select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
@@ -735,6 +735,19 @@ test_that("replace_empty_values() ", {
 })
 
 
+test_that("replace_unknown_values() ", {
+  expect_equal({
+    ft <- flat_table('iris', iris)
+    ft$table[1, 1] <- NA
+    ft$table[2, 1] <- ""
+    ft <- ft |>
+      replace_empty_values() |>
+      replace_unknown_values(value = "Not available")
+    c(ft$table[1, 1], ft$table[2, 1])
+  }, list(Species = "Not available", Species = "Not available"))
+})
+
+
 test_that("replace_string() ", {
   expect_equal({
     ft <- flat_table('iris', iris) |>
@@ -745,6 +758,18 @@ test_that("replace_string() ", {
     unique(ft$table$Species)
   }, c("Setosa", "versicolor", "virginica"))
 })
+
+
+test_that("remove_instances_without_measures() ", {
+  expect_equal({
+    iris2 <- iris
+    iris2[10, 1:4] <- NA
+    ft <- flat_table('iris', iris2) |>
+      remove_instances_without_measures()
+    c(nrow(iris2), nrow(ft$table))
+  }, 150:149)
+})
+
 
 test_that("lookup_table() ", {
   expect_equal({
@@ -1086,6 +1111,7 @@ test_that("add_custom_column() ", {
   ))
 })
 
+
 test_that("add_custom_column() ", {
   expect_equal({
     f <- function(table) {
@@ -1104,6 +1130,7 @@ test_that("add_custom_column() ", {
               "tbl", "data.frame")
   ))
 })
+
 
 test_that("transform_attribute_format() ", {
   expect_equal({
@@ -1150,5 +1177,16 @@ test_that("transform_attribute_format() ", {
     " 7.40",
     " 7.90"
   ))
+})
+
+
+test_that("get_unknown_values() ", {
+  expect_equal({
+    iris2 <- iris
+    iris2[10, 'Species'] <- NA
+    flat_table('iris', iris2) |>
+      get_unknown_values()
+  }, structure(list(Species = NA_character_), row.names = c(NA, -1L
+  ), class = c("tbl_df", "tbl", "data.frame")))
 })
 

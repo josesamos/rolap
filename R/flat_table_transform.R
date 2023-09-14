@@ -822,6 +822,9 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_r
 #' Transforms the given attributes by replacing the empty values with the unknown
 #' value.
 #'
+#' In addition to the NA or empty values, those indicated (e.g., "-") can be
+#' considered as empty values.
+#'
 #' @param ft A `flat_table` object.
 #' @param attributes A vector of names.
 #' @param empty_values A vector of values that correspond to empty values.
@@ -833,7 +836,9 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_r
 #'
 #' @examples
 #'
-#' ft <- flat_table('iris', iris) |>
+#' iris2 <- iris
+#' iris2[10, 'Species'] <- NA
+#' ft <- flat_table('iris', iris2) |>
 #'   replace_empty_values()
 #'
 #' @export
@@ -870,6 +875,7 @@ replace_empty_values.flat_table <- function(ft, attributes = NULL, empty_values 
 #' iris2 <- iris
 #' iris2[10, 'Species'] <- NA
 #' ft <- flat_table('iris', iris2) |>
+#'   replace_empty_values() |>
 #'   replace_unknown_values(value = "Not available")
 #'
 #' @export
