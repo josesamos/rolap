@@ -127,6 +127,9 @@
     <loc>https://josesamos.github.io/rolap/reference/get_common_dimension_operations.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_default_unknown_value.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_dimension_name.dimension_schema.html</loc>
   </url>
   <url>
@@ -184,6 +187,9 @@
     <loc>https://josesamos.github.io/rolap/reference/get_unique_values_table.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_unknown_value_defined.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_unknown_values.html</loc>
   </url>
   <url>
@@ -194,6 +200,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/is_empty_string.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/is_new_operation.star_operation.html</loc>
@@ -226,6 +235,12 @@
     <loc>https://josesamos.github.io/rolap/reference/read_flat_table_folder.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/remove_all_measures_na.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/remove_instances_without_measures.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/replace_attribute_values.html</loc>
   </url>
   <url>
@@ -239,6 +254,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/replace_string.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/replace_unknown_values.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/role_playing_dimension.html</loc>

@@ -462,12 +462,15 @@ measures.</p>
 <span><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p>Since the data comes from a text file, all fields have been defined
 as attributes.</p>
+<div class="section level5">
+<h5 id="measures">Measures<a class="anchor" aria-label="anchor" href="#measures"></a>
+</h5>
 <p>This is a starting point, next we will see how to change the initial
 classification. Using the <code><a href="../reference/transform_to_measure.html">transform_to_measure()</a></code> function,
 we transform attributes into measurements. In some cases it is required
 to previously transform the data (remove the thousands separator or
 change the decimal separator), this can be indicated by the function
-parameters. In this case, it is not necessary to transform anything.</p>
+parameters, although it is not necessary in this case.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/transform_to_measure.html">transform_to_measure</a></span><span class="op">(</span></span>
@@ -494,13 +497,40 @@ parameters. In this case, it is not necessary to transform anything.</p>
 <span><span class="co">#&gt; [5] "25-44 years"                    "45-64 years (all cause deaths)"</span></span>
 <span><span class="co">#&gt; [7] "65+ years (all cause deaths)"</span></span></code></pre></div>
 </div>
+<div class="section level5">
+<h5 id="attributes">Attributes<a class="anchor" aria-label="anchor" href="#attributes"></a>
+</h5>
+<p>We can change the format of numeric attributes. The main motivation
+is usually that the alphabetical order coincides with the numerical
+order. This is often important in user query tools (e.g. <em>Power
+BI</em>).</p>
+<p>Below is the change for the <em>WEEK</em> field. It is enough to
+indicate the width. The result is that it fills the width with white
+spaces on the left, thus achieving the stated objective (for example,
+output ” 2” instead of “2” to come before “10” when data is
+presented).</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/transform_attribute_format.html">transform_attribute_format</a></span><span class="op">(</span>attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'WEEK'</span><span class="op">)</span>,</span>
+<span>                             width <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p>For example, in this way we will have as output ” 2” instead of “2”,
+so that alphabetically ordered it is placed before “10” instead of after
+it, as it’s shown in the following.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">table</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/get_table.html">get_table</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">table</span><span class="op">[[</span><span class="st">'WEEK'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
+<span><span class="co">#&gt;  [1] " 1" " 2" " 3" " 4" " 5" " 6" " 7" " 8" " 9" "10"</span></span></code></pre></div>
+</div>
+</div>
 <div class="section level4">
 <h4 id="us-cities">US cities<a class="anchor" aria-label="anchor" href="#us-cities"></a>
 </h4>
 <p>In this case, the starting data was in a data frame, where each
 column has a data type associated with it. The initial classification is
 as follows.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">usc_ft</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/get_attribute_names.html">get_attribute_names</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "name"        "country.etc"</span></span>
@@ -512,7 +542,7 @@ as follows.</p>
 data can be considered as attributes. Using the parameters of the
 <code><a href="../reference/transform_to_attribute.html">transform_to_attribute()</a></code> function, we define the format of
 the transformation from numeric data to string, as shown below.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">usc_ft</span> <span class="op">&lt;-</span> <span class="va">usc_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/transform_to_attribute.html">transform_to_attribute</a></span><span class="op">(</span>measures <span class="op">=</span> <span class="st">'capital'</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/transform_to_attribute.html">transform_to_attribute</a></span><span class="op">(</span>measures <span class="op">=</span> <span class="st">'pop'</span>,</span>
@@ -520,10 +550,9 @@ the transformation from numeric data to string, as shown below.</p>
 <span>  <span class="fu"><a href="../reference/transform_to_attribute.html">transform_to_attribute</a></span><span class="op">(</span>measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lat'</span>, <span class="st">'long'</span><span class="op">)</span>,</span>
 <span>                         width <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                         decimal_places <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>In particular, by using the <code>width</code> parameter, we can make
-the order of the string data match the numerical order (for example,
-output ” 2” instead of “2” to come before “10” when data is presented).
-This can be important in some tools like <em>Power BI</em>.</p>
+<p>In particular, by using the <code>width</code> parameter, as done
+before to transform the numerical attributes, we can make the order of
+the string data match the numerical order.</p>
 </div>
 <div class="section level4">
 <h4 id="capital-status">Capital status<a class="anchor" aria-label="anchor" href="#capital-status"></a>
@@ -531,7 +560,7 @@ This can be important in some tools like <em>Power BI</em>.</p>
 <p>For the capital status table, the columns have been defined as
 string, therefore both are attributes, which is appropriate for the
 focus of attention.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cs_ft</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/get_attribute_names.html">get_attribute_names</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "code"   "status"</span></span>
@@ -557,7 +586,7 @@ foreign key that allows them to be related.</p>
 <p>Using the <code><a href="../reference/lookup_table.html">lookup_table()</a></code> function we define the
 attributes that make up the primary key of a loop table, as shown below
 for the capital status table.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cs_ft</span> <span class="op">&lt;-</span> <span class="va">cs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/lookup_table.html">lookup_table</a></span><span class="op">(</span>pk_attributes <span class="op">=</span> <span class="st">'code'</span><span class="op">)</span></span></code></pre></div>
 <p>The primary key is made up of the <em>code</em> field.</p>
@@ -571,11 +600,11 @@ its primary key, which will be the foreign key of the other table, as
 shown below for the US cities table using the
 <code><a href="../reference/join_lookup_table.html">join_lookup_table()</a></code> function. We only have to indicate the
 attributes that make up the foreign key and the lookup table.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">usc_ft</span> <span class="op">&lt;-</span> <span class="va">usc_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/join_lookup_table.html">join_lookup_table</a></span><span class="op">(</span>fk_attributes <span class="op">=</span> <span class="st">'capital'</span>, lookup <span class="op">=</span> <span class="va">cs_ft</span><span class="op">)</span></span></code></pre></div>
 <p>Below is the data table with the result obtained.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="va">usc_ft</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/get_table.html">get_table</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -662,7 +691,7 @@ attributes that make up the foreign key and the lookup table.</p>
 </h3>
 <p>First of all we must define table X as a lookup table. Its primary
 key is formed exclusively by the <em>name</em> attribute.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">usc_ft</span> <span class="op">&lt;-</span> <span class="va">usc_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/lookup_table.html">lookup_table</a></span><span class="op">(</span>pk_attributes <span class="op">=</span> <span class="st">'name'</span><span class="op">)</span></span></code></pre></div>
 <p>If we consult the Mortality Reporting System table again (for
@@ -802,7 +831,7 @@ flat_table object.</p>
 <p>Below is the definition of function <code>city_state()</code> and the
 new field obtained through it. We will make the changes in a temporary
 variable, until we are sure that they are appropriate.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># function to define a derived column</span></span>
 <span><span class="va">city_state</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">table</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">table</span><span class="op">$</span><span class="va">City</span>, <span class="st">' '</span>, <span class="va">table</span><span class="op">$</span><span class="va">State</span><span class="op">)</span></span>
@@ -815,7 +844,7 @@ we can check if all the instances will find a match in the lookup table.
 This operation is performed by the <code><a href="../reference/check_lookup_table.html">check_lookup_table()</a></code>
 function, with the same parameters as the
 <code><a href="../reference/join_lookup_table.html">join_lookup_table()</a></code> function.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft_TMP</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/check_lookup_table.html">check_lookup_table</a></span><span class="op">(</span>fk_attributes <span class="op">=</span> <span class="st">'city_state'</span>, lookup <span class="op">=</span> <span class="va">usc_ft</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 1</span></span></span>
@@ -834,13 +863,13 @@ two instances that do not have a correspondence in the lookup table.</p>
 <code><a href="../reference/replace_empty_values.html">replace_empty_values()</a></code> function, it assigns them the value
 that we indicated at the time of creating the <code>flat_table</code>
 object in the <code>unknown_value</code> parameter.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/replace_empty_values.html">replace_empty_values</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>If we do not indicate any attributes, it considers all the attributes
 of the table.</p>
 <p>We define the custom column again.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_custom_column.html">add_custom_column</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">'city_state'</span>, definition <span class="op">=</span> <span class="va">city_state</span><span class="op">)</span></span></code></pre></div>
 <p>Once these changes have been made, we will carry out the rest of the
@@ -848,7 +877,7 @@ modifications to the data. We have considered it appropriate to correct
 the first value in the lookup table and the second in the table where
 the error is. Corrections are carried out using the
 <code><a href="../reference/replace_attribute_values.html">replace_attribute_values()</a></code> function.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">usc_ft</span> <span class="op">&lt;-</span> <span class="va">usc_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/replace_attribute_values.html">replace_attribute_values</a></span><span class="op">(</span></span>
 <span>    attributes <span class="op">=</span> <span class="st">'name'</span>,</span>
@@ -865,7 +894,7 @@ the error is. Corrections are carried out using the
 <p>If we perform the check again, we observe that all the defined data
 corresponds in the lookup table and that the unknown values have the
 value indicated in the definition of the flat_table object.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/check_lookup_table.html">check_lookup_table</a></span><span class="op">(</span>fk_attributes <span class="op">=</span> <span class="st">'city_state'</span>, lookup <span class="op">=</span> <span class="va">usc_ft</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 1</span></span></span>
@@ -874,13 +903,13 @@ value indicated in the definition of the flat_table object.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Not available Not available</span></span></code></pre></div>
 <p>We perform the join operation using the
 <code><a href="../reference/join_lookup_table.html">join_lookup_table()</a></code> function.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/join_lookup_table.html">join_lookup_table</a></span><span class="op">(</span>fk_attributes <span class="op">=</span> <span class="st">'city_state'</span>, lookup <span class="op">=</span> <span class="va">usc_ft</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s check the attributes of the result. Using the
 <code><a href="../reference/get_attribute_names.html">get_attribute_names()</a></code> function, we can indicate that we
 want them in vector definition format.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_attribute_names.html">get_attribute_names</a></span><span class="op">(</span>as_definition <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "c('Year', 'WEEK', 'Week Ending Date', 'REGION', 'State', 'City', 'city_state', 'country.etc', 'capital', 'pop', 'lat', 'long', 'status')"</span></span></code></pre></div>
@@ -889,7 +918,7 @@ necessary for our objective, we can exclude them using the
 <code><a href="../reference/select_attributes.html">select_attributes()</a></code> function. We can use the definition of
 the vector obtained by the previous function to perform the
 selection.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/select_attributes.html">select_attributes</a></span><span class="op">(</span></span>
 <span>    attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -928,7 +957,7 @@ tables.</p>
 <code><a href="../reference/separate_measures.html">separate_measures()</a></code> function, in which we can indicate
 lists of measurements and the name of each new flat table that will form
 the result.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">l_mrs_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/separate_measures.html">separate_measures</a></span><span class="op">(</span>measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Pneumonia and Influenza Deaths'</span>,</span>
@@ -956,7 +985,7 @@ data.</p>
 columns is to change them according to the snake case criterion. We
 apply this transformation for the table with cause data, as shown
 below.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_cause_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_cause_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/snake_case.html">snake_case</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>We can also rename attributes and measures using the
@@ -1116,7 +1145,7 @@ ages.</p>
 </tr>
 </tbody>
 </table>
-<p>Number of rows in the table: 3463</p>
+<p>Number of rows in the table: 3446</p>
 <p>Additionally, the number of rows in the table is shown.</p>
 <p>The names of the measures can be considered values of a new attribute
 called <em>age</em>. The numerical values would correspond to a new
@@ -1126,14 +1155,14 @@ measurement that we can call <em>all_deaths</em>.</p>
 indicate more parameters apart from the new names of the attribute and
 the measure because it considers all the available measures to carry out
 the described transformation.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_age_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_age_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/transform_to_values.html">transform_to_values</a></span><span class="op">(</span>attribute <span class="op">=</span> <span class="st">'age'</span>,</span>
 <span>                      measure <span class="op">=</span> <span class="st">'all_deaths'</span><span class="op">)</span></span></code></pre></div>
 <p>Once we have obtained the values of the new variable that were in the
 form of column names, we can adapt the rest of the name according to the
 snake case criterion.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_age_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_age_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/snake_case.html">snake_case</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Finally, we can eliminate from the literals that describe the age,
@@ -1143,7 +1172,7 @@ a string with the value indicated for the selected attributes. This
 function, unlike function <code><a href="../reference/replace_attribute_values.html">replace_attribute_values()</a></code>, does
 not look for the instances to be equal to the indicated value but rather
 to contain it.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_age_ft</span> <span class="op">&lt;-</span> <span class="va">mrs_age_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/replace_string.html">replace_string</a></span><span class="op">(</span></span>
 <span>    attributes <span class="op">=</span> <span class="st">'age'</span>,</span>
@@ -1282,7 +1311,7 @@ appropriate format to define the star database from it.</p>
 operation: transforming attribute values into variable names, taking the
 value of the available measure. This operation can be performed using
 the <code><a href="../reference/transform_from_values.html">transform_from_values()</a></code> function, as shown below.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrs_age_ft_TMP</span> <span class="op">&lt;-</span> <span class="va">mrs_age_ft</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/transform_from_values.html">transform_from_values</a></span><span class="op">(</span></span>
 <span>    attribute <span class="op">=</span> <span class="st">'age'</span></span>
@@ -1439,158 +1468,7 @@ table.</p>
 </table>
 <p>Number of rows in the table: 3446</p>
 <p>If we compare the number of rows in the table with the original, we
-see that it does not match. The explanation is in the records that do
-not have defined values ​​in the considered variables that are eliminated
-when performing the operation. The difference is 17 rows which is the
-number of rows that have all undefined values, as shown below.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="va">l_mrs_ft</span><span class="op">[[</span><span class="st">'mrs_age'</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/get_table.html">get_table</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">t</span> <span class="op">&lt;-</span> <span class="va">t</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span><span class="op">:</span><span class="fl">16</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">t</span> <span class="op">&lt;-</span> <span class="va">t</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">t</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">t</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">t</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">t</span><span class="op">[</span>, <span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">t</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span>, <span class="op">]</span></span>
-<span></span>
-<span><span class="fu">pander</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pander/man/pandoc.table.return.html" class="external-link">pandoc.table</a></span><span class="op">(</span><span class="va">t</span>, split.table <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="20%">
-<col width="22%">
-<col width="9%">
-<col width="23%">
-<col width="23%">
-</colgroup>
-<thead><tr class="header">
-<th align="center">&lt;1 year (all cause deaths)</th>
-<th align="center">1-24 years (all cause deaths)</th>
-<th align="center">25-44 years</th>
-<th align="center">45-64 years (all cause deaths)</th>
-<th align="center">65+ years (all cause deaths)</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Number of rows in the table: %d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Number of rows in the table: 17</p>
+see that it coincides.</p>
 </div>
 </div>
 <div class="section level2">
@@ -1657,8 +1535,8 @@ package.</p>
 <span>  <span class="fu"><a href="../reference/as_dm_class.html">as_dm_class</a></span><span class="op">(</span>pk_facts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">db_dm</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dm</span><span class="fu">::</span><span class="fu"><a href="https://dm.cynkra.com/reference/dm_draw.html" class="external-link">dm_draw</a></span><span class="op">(</span>rankdir <span class="op">=</span> <span class="st">"LR"</span>, view_type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
-<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-93c86d2da7916d60f9d0" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-93c86d2da7916d60f9d0">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_cause\" [id = \"mrs_cause\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_cause<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">pneumonia_and_influenza_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week_ending_date<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">region<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city_state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">status<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">pop<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">lat<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">long<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_cause\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_cause_1\"]\n\"mrs_cause\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_cause_2\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-263365cafa4e85b549c7" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-263365cafa4e85b549c7">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_cause\" [id = \"mrs_cause\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_cause<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">pneumonia_and_influenza_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week_ending_date<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">region<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city_state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">status<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">pop<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">lat<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">long<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_cause\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_cause_1\"]\n\"mrs_cause\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_cause_2\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level3">
 <h3 id="mrs-age-star-database">MRS Age star database<a class="anchor" aria-label="anchor" href="#mrs-age-star-database"></a>
@@ -1692,8 +1570,8 @@ dimensions.</p>
 <span>  <span class="fu"><a href="../reference/as_dm_class.html">as_dm_class</a></span><span class="op">(</span>pk_facts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">db_dm</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dm</span><span class="fu">::</span><span class="fu"><a href="https://dm.cynkra.com/reference/dm_draw.html" class="external-link">dm_draw</a></span><span class="op">(</span>rankdir <span class="op">=</span> <span class="st">"LR"</span>, view_type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
-<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-06c180744a5bafc29e3d" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-06c180744a5bafc29e3d">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_age\" [id = \"mrs_age\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_age<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"who_key\">who_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week_ending_date<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">region<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city_state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">status<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">pop<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">lat<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">long<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"who\" [id = \"who\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">who<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"who_key\"><U>who_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">age<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_age\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_age_1\"]\n\"mrs_age\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_age_2\"]\n\"mrs_age\":\"who_key\"->\"who\":\"who_key\" [id=\"mrs_age_3\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-eacc0510d86a18bdc37f" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-eacc0510d86a18bdc37f">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_age\" [id = \"mrs_age\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_age<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"who_key\">who_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week_ending_date<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">region<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city_state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">status<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">pop<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">lat<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">long<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"who\" [id = \"who\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">who<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"who_key\"><U>who_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">age<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_age\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_age_1\"]\n\"mrs_age\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_age_2\"]\n\"mrs_age\":\"who_key\"->\"who\":\"who_key\" [id=\"mrs_age_3\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level3">
 <h3 id="constellation">Constellation<a class="anchor" aria-label="anchor" href="#constellation"></a>
@@ -1708,8 +1586,8 @@ common dimensions.</p>
 <span>  <span class="fu"><a href="../reference/as_dm_class.html">as_dm_class</a></span><span class="op">(</span>pk_facts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">db_dm</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dm</span><span class="fu">::</span><span class="fu"><a href="https://dm.cynkra.com/reference/dm_draw.html" class="external-link">dm_draw</a></span><span class="op">(</span>rankdir <span class="op">=</span> <span class="st">"LR"</span>, view_type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
-<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-1707196d1c79c0f8b4e6" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-1707196d1c79c0f8b4e6">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_age\" [id = \"mrs_age\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_age<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"who_key\">who_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"mrs_cause\" [id = \"mrs_cause\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_cause<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">pneumonia_and_influenza_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week_ending_date<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">region<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city_state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">status<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">pop<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">lat<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">long<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"who\" [id = \"who\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">who<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"who_key\"><U>who_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">age<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_cause\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_cause_1\"]\n\"mrs_age\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_age_1\"]\n\"mrs_cause\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_cause_2\"]\n\"mrs_age\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_age_2\"]\n\"mrs_age\":\"who_key\"->\"who\":\"who_key\" [id=\"mrs_age_3\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-1361cc33f2a7970d7149" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-1361cc33f2a7970d7149">{"x":{"diagram":"#data_model\ndigraph {\ngraph [rankdir=LR tooltip=\"Data Model\" ]\n\nnode [margin=0 fontcolor = \"#444444\" ]\n\nedge [color = \"#555555\", arrowsize = 1, ]\n\npack=true\npackmode= \"node\"\n\n  \"mrs_age\" [id = \"mrs_age\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_age<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"who_key\">who_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"mrs_cause\" [id = \"mrs_cause\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#00005CAA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#00008BFF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">mrs_cause<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"when_key\">when_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\" PORT=\"where_key\">where_key<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">pneumonia_and_influenza_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">all_deaths<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCCCE7FF\">nrow_agg<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"when\" [id = \"when\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">when<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"when_key\"><U>when_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">year<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">week_ending_date<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"where\" [id = \"where\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">where<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"where_key\"><U>where_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">region<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">city_state<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">status<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">pop<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">lat<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">long<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n  \"who\" [id = \"who\", label = <<TABLE ALIGN=\"LEFT\" BORDER=\"1\" CELLBORDER=\"0\" CELLSPACING=\"0\" COLOR=\"#004200AA\">\n    <TR>\n      <TD COLSPAN=\"1\" BGCOLOR=\"#006400FF\" BORDER=\"0\"><FONT COLOR=\"#FFFFFF\">who<\/FONT>\n<\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\" PORT=\"who_key\"><U>who_key<\/U><\/TD>\n    <\/TR>\n    <TR>\n      <TD ALIGN=\"LEFT\" BGCOLOR=\"#CCE0CCFF\">age<\/TD>\n    <\/TR>\n  <\/TABLE>>, shape = \"plaintext\"] \n\n\"mrs_cause\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_cause_1\"]\n\"mrs_age\":\"when_key\"->\"when\":\"when_key\" [id=\"mrs_age_1\"]\n\"mrs_cause\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_cause_2\"]\n\"mrs_age\":\"where_key\"->\"where\":\"where_key\" [id=\"mrs_age_2\"]\n\"mrs_age\":\"who_key\"->\"who\":\"who_key\" [id=\"mrs_age_3\"]\n}","config":{"engine":null,"options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div class="section level2">
