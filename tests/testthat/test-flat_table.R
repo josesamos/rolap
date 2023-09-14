@@ -601,7 +601,7 @@ test_that("separate_measures() ", {
                           "PL"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
-                ""
+                "TRUE"
               ),
               order = c(1, 2)
             ),
@@ -636,7 +636,7 @@ test_that("separate_measures() ", {
               details = c("Species", "PW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
-                ""
+                "TRUE"
               ),
               order = c(1, 2)
             ),
@@ -671,7 +671,7 @@ test_that("separate_measures() ", {
               details = c("Species", "SL"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
-                ""
+                "TRUE"
               ),
               order = c(1, 2)
             ),
@@ -706,7 +706,7 @@ test_that("separate_measures() ", {
               details = c("Species", "SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
-                ""
+                "TRUE"
               ),
               order = c(1, 2)
             ),
@@ -722,7 +722,6 @@ test_that("separate_measures() ", {
     )
   ))
 })
-
 
 test_that("replace_empty_values() ", {
   expect_equal({

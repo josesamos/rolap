@@ -5,14 +5,16 @@
 \alias{select_measures.flat_table}
 \title{Select measures of a flat table}
 \usage{
-select_measures(ft, measures)
+select_measures(ft, measures, na_rm)
 
-\method{select_measures}{flat_table}(ft, measures)
+\method{select_measures}{flat_table}(ft, measures, na_rm = TRUE)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
 \item{measures}{A vector of names.}
+
+\item{na_rm}{A boolean, remove rows from output where all measure values are NA.}
 }
 \value{
 A \code{flat_table} object.
@@ -31,8 +33,10 @@ ft <- flat_table('iris', iris) |>
 
 Other flat table transformation functions: 
 \code{\link{add_custom_column}()},
+\code{\link{remove_instances_without_measures}()},
 \code{\link{replace_empty_values}()},
 \code{\link{replace_string}()},
+\code{\link{replace_unknown_values}()},
 \code{\link{select_attributes}()},
 \code{\link{select_instances_by_comparison}()},
 \code{\link{select_instances}()},

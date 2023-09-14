@@ -40,6 +40,7 @@ select_attributes.flat_table <- function(ft, attributes) {
 #'
 #' @param ft A `flat_table` object.
 #' @param measures A vector of names.
+#' @param na_rm	A boolean, remove rows from output where all measure values are NA.
 #'
 #' @return A `flat_table` object.
 #'
@@ -52,16 +53,19 @@ select_attributes.flat_table <- function(ft, attributes) {
 #'   select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
 #'
 #' @export
-select_measures <- function(ft, measures) UseMethod("select_measures")
+select_measures <- function(ft, measures, na_rm) UseMethod("select_measures")
 
 #' @rdname select_measures
 #'
 #' @export
-select_measures.flat_table <- function(ft, measures) {
+select_measures.flat_table <- function(ft, measures, na_rm = TRUE) {
   measures <- validate_measures(ft$measures, measures)
   ft$table <- ft$table[, c(ft$attributes, measures)]
   ft$measures <- measures
-  ft$operations <- add_operation(ft$operations, "select_measures", measures)
+  if (na_rm) {
+    ft$table <- remove_all_measures_na(ft$table, ft$measures)
+  }
+  ft$operations <- add_operation(ft$operations, "select_measures", measures, na_rm)
   ft
 }
 
@@ -699,7 +703,7 @@ transform_to_values.flat_table <-
                     "transform_to_values",
                     attribute,
                     measure,
-                    id_reverse)
+                    c(id_reverse, na_rm))
     ft
   }
 
@@ -807,27 +811,11 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_r
     }
     lft[[i]]$pk_attributes <- ft$pk_attributes
     lft[[i]]$lookup_tables <- ft$lookup_tables
-    lft[[i]]$operations <- add_operation(ft$operations, "separate_measures", measures[[i]], names[i])
+    lft[[i]]$operations <-
+      add_operation(ft$operations, "separate_measures", measures[[i]], names[i], na_rm)
   }
   lft
 }
-
-#' Delete if all measures are na
-#'
-#' @param table A `tibble` object.
-#' @param measures A vector of strings, measure names.
-#'
-#' @param table A `tibble` object.
-#'
-#' @keywords internal
-remove_all_measures_na <- function(table, measures) {
-  keep <- rep(FALSE, nrow(table))
-  for (m in measures) {
-    keep <- keep | !is.na(table[, m][[1]])
-  }
-  table[keep, ]
-}
-
 
 #' Replace empty values with the unknown value
 #'
@@ -859,6 +847,42 @@ replace_empty_values.flat_table <- function(ft, attributes = NULL, empty_values 
   ft$table <- replace_empty_values_table(ft$table, attributes, empty_values, unknown_value = ft$unknown_value)
   ft$operations <-
     add_operation(ft$operations, "replace_empty_values", attributes, empty_values)
+  ft
+}
+
+
+#' Replace unknown values with the given value
+#'
+#' Transforms the given attributes by replacing unknown values in them with
+#' the given value.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of names.
+#' @param value A value.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' iris2 <- iris
+#' iris2[10, 'Species'] <- NA
+#' ft <- flat_table('iris', iris2) |>
+#'   replace_unknown_values(value = "Not available")
+#'
+#' @export
+replace_unknown_values <- function(ft, attributes, value) UseMethod("replace_unknown_values")
+
+#' @rdname replace_unknown_values
+#'
+#' @export
+replace_unknown_values.flat_table <- function(ft, attributes = NULL, value) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  ft$table[, attributes] <-
+    apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+      gsub(ft$unknown_value, value, x))
   ft
 }
 
@@ -908,6 +932,34 @@ replace_string.flat_table <- function(ft, attributes = NULL, string, replacement
     )
   ft$operations <-
     add_operation(ft$operations, "replace_string", attributes, string, replacement)
+  ft
+}
+
+
+#' Remove instances without measures
+#'
+#' Delete instances that have all measures undefined.
+#'
+#' @param ft A `flat_table` object.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   remove_instances_without_measures()
+#'
+#' @export
+remove_instances_without_measures <- function(ft) UseMethod("remove_instances_without_measures")
+
+#' @rdname remove_instances_without_measures
+#'
+#' @export
+remove_instances_without_measures.flat_table <- function(ft) {
+  ft$table <- remove_all_measures_na(ft$table, ft$measures)
   ft
 }
 

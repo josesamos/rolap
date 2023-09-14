@@ -32,6 +32,7 @@ db <- flat_table('ft_num', ft_num) |>
 Other flat table definition functions: 
 \code{\link{flat_table}()},
 \code{\link{get_table}()},
+\code{\link{get_unknown_value_defined}()},
 \code{\link{get_unknown_values}()},
 \code{\link{read_flat_table_file}()},
 \code{\link{read_flat_table_folder}()}

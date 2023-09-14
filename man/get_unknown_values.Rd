@@ -40,6 +40,7 @@ Other flat table definition functions:
 \code{\link{as_star_database}()},
 \code{\link{flat_table}()},
 \code{\link{get_table}()},
+\code{\link{get_unknown_value_defined}()},
 \code{\link{read_flat_table_file}()},
 \code{\link{read_flat_table_folder}()}
 }

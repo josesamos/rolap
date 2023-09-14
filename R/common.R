@@ -7,6 +7,18 @@ get_default_unknown_value <- function() {
   "___UNKNOWN___"
 }
 
+#' check if a string is empty
+#'
+#' @param string A string.
+#'
+#' @return A boolean.
+#'
+#' @keywords internal
+is_empty_string <- function(string) {
+  res <- (is.null(string) | identical(string, character(0)))
+  res
+}
+
 
 #' Validate attribute names
 #'

@@ -59,6 +59,28 @@ get_unique_values_table <- function(table, col_as_vector) {
 }
 
 
+#' Remove instance if all measures are na
+#'
+#' @param table A `tibble` object.
+#' @param measures A vector of strings, measure names.
+#'
+#' @param table A `tibble` object.
+#'
+#' @keywords internal
+remove_all_measures_na <- function(table, measures) {
+  if (is_empty_string(measures)) {
+    res <- table
+  } else {
+    keep <- rep(FALSE, nrow(table))
+    for (m in measures) {
+      keep <- keep | !is.na(table[, m][[1]])
+    }
+    res <- table[keep, ]
+  }
+  res
+}
+
+
 #' Replace empty values with the unknown value
 #'
 #' @param ft A `tibble` object.
