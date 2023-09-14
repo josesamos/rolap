@@ -40,6 +40,7 @@ select_attributes.flat_table <- function(ft, attributes) {
 #'
 #' @param ft A `flat_table` object.
 #' @param measures A vector of names.
+#' @param na_rm	A boolean, remove rows from output where all measure values are NA.
 #'
 #' @return A `flat_table` object.
 #'
@@ -52,16 +53,19 @@ select_attributes.flat_table <- function(ft, attributes) {
 #'   select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
 #'
 #' @export
-select_measures <- function(ft, measures) UseMethod("select_measures")
+select_measures <- function(ft, measures, na_rm) UseMethod("select_measures")
 
 #' @rdname select_measures
 #'
 #' @export
-select_measures.flat_table <- function(ft, measures) {
+select_measures.flat_table <- function(ft, measures, na_rm = TRUE) {
   measures <- validate_measures(ft$measures, measures)
   ft$table <- ft$table[, c(ft$attributes, measures)]
   ft$measures <- measures
-  ft$operations <- add_operation(ft$operations, "select_measures", measures)
+  if (na_rm) {
+    ft$table <- remove_all_measures_na(ft$table, ft$measures)
+  }
+  ft$operations <- add_operation(ft$operations, "select_measures", measures, na_rm)
   ft
 }
 
@@ -625,8 +629,9 @@ transform_attribute_format.flat_table <-
 #'
 #' @param ft A `flat_table` object.
 #' @param attribute A string, new attribute that will store the measures names.
-#' @param measure A string, new measure that will store the measure names.
+#' @param measure A string, new measure that will store the measure value.
 #' @param id_reverse A string, name of a new attribute that will store the row id.
+#' @param na_rm	A boolean, remove rows from output where the value column is NA.
 #'
 #' @return A `flat_table` object.
 #'
@@ -645,7 +650,7 @@ transform_attribute_format.flat_table <-
 #'                       id_reverse = 'id')
 #'
 #' @export
-transform_to_values <- function(ft, attribute, measure, id_reverse) UseMethod("transform_to_values")
+transform_to_values <- function(ft, attribute, measure, id_reverse, na_rm) UseMethod("transform_to_values")
 
 #' @rdname transform_to_values
 #'
@@ -656,7 +661,8 @@ transform_to_values.flat_table <-
   function(ft,
            attribute = NULL,
            measure = NULL,
-           id_reverse = NULL) {
+           id_reverse = NULL,
+           na_rm = TRUE) {
     stopifnot("Missing attribute name." = !is.null(attribute))
     stopifnot("Missing measure name." = !is.null(measure))
     stopifnot("Only one attribute name is needed." = length(attribute) == 1)
@@ -687,7 +693,7 @@ transform_to_values.flat_table <-
     ft$table <- ft$table[, c(ft$attributes, ft$measures)]
     interval <- (length(ft$attributes) + 1):length(colnames(ft$table))
     ft$table <-
-      tidyr::gather(ft$table, attribute, measure,!!interval, na.rm = TRUE)
+      tidyr::gather(ft$table, attribute, measure,!!interval, na.rm = na_rm)
     names(ft$table) <- c(ft$attributes, attribute, measure)
     ft$measures <- measure
     ft$attributes <- c(ft$attributes, attribute)
@@ -697,7 +703,7 @@ transform_to_values.flat_table <-
                     "transform_to_values",
                     attribute,
                     measure,
-                    id_reverse)
+                    c(id_reverse, na_rm))
     ft
   }
 
@@ -763,6 +769,7 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
 #' @param ft A `flat_table` object.
 #' @param measures A list of string vectors, groups of measure names.
 #' @param names A list of string, measure group names.
+#' @param na_rm	A boolean, remove rows from output where all measure values are NA.
 #'
 #' @return A list of `flat_table` objects.
 #'
@@ -783,12 +790,12 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
 #'   )
 #'
 #' @export
-separate_measures <- function(ft, measures, names) UseMethod("separate_measures")
+separate_measures <- function(ft, measures, names, na_rm) UseMethod("separate_measures")
 
 #' @rdname separate_measures
 #'
 #' @export
-separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
+separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_rm = TRUE) {
   stopifnot("Missing measure names." = !is.null(measures))
   stopifnot("Missing measure group names." = !is.null(names))
   stopifnot("Missing measure group names." = length(measures) == length(unique(names)))
@@ -799,18 +806,24 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
     lft[[i]] <-
       flat_table(name = names[i], instances = ft$table[, c(ft$attributes, measures[[i]])],
                  unknown_value = ft$unknown_value)
+    if (na_rm) {
+      lft[[i]]$table <- remove_all_measures_na(lft[[i]]$table, measures[[i]])
+    }
     lft[[i]]$pk_attributes <- ft$pk_attributes
     lft[[i]]$lookup_tables <- ft$lookup_tables
-    lft[[i]]$operations <- add_operation(ft$operations, "separate_measures", measures[[i]], names[i])
+    lft[[i]]$operations <-
+      add_operation(ft$operations, "separate_measures", measures[[i]], names[i], na_rm)
   }
   lft
 }
-
 
 #' Replace empty values with the unknown value
 #'
 #' Transforms the given attributes by replacing the empty values with the unknown
 #' value.
+#'
+#' In addition to the NA or empty values, those indicated (e.g., "-") can be
+#' considered as empty values.
 #'
 #' @param ft A `flat_table` object.
 #' @param attributes A vector of names.
@@ -823,7 +836,9 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL) {
 #'
 #' @examples
 #'
-#' ft <- flat_table('iris', iris) |>
+#' iris2 <- iris
+#' iris2[10, 'Species'] <- NA
+#' ft <- flat_table('iris', iris2) |>
 #'   replace_empty_values()
 #'
 #' @export
@@ -833,9 +848,47 @@ replace_empty_values <- function(ft, attributes, empty_values) UseMethod("replac
 #'
 #' @export
 replace_empty_values.flat_table <- function(ft, attributes = NULL, empty_values = NULL) {
-  ft <- replace_empty_values_table(ft, attributes, empty_values)
+  attributes <- validate_attributes(ft$attributes, attributes)
+  ft$table <- replace_empty_values_table(ft$table, attributes, empty_values, unknown_value = ft$unknown_value)
   ft$operations <-
     add_operation(ft$operations, "replace_empty_values", attributes, empty_values)
+  ft
+}
+
+
+#' Replace unknown values with the given value
+#'
+#' Transforms the given attributes by replacing unknown values in them with
+#' the given value.
+#'
+#' @param ft A `flat_table` object.
+#' @param attributes A vector of names.
+#' @param value A value.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' iris2 <- iris
+#' iris2[10, 'Species'] <- NA
+#' ft <- flat_table('iris', iris2) |>
+#'   replace_empty_values() |>
+#'   replace_unknown_values(value = "Not available")
+#'
+#' @export
+replace_unknown_values <- function(ft, attributes, value) UseMethod("replace_unknown_values")
+
+#' @rdname replace_unknown_values
+#'
+#' @export
+replace_unknown_values.flat_table <- function(ft, attributes = NULL, value) {
+  attributes <- validate_attributes(ft$attributes, attributes)
+  ft$table[, attributes] <-
+    apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+      gsub(ft$unknown_value, value, x))
   ft
 }
 
@@ -885,6 +938,34 @@ replace_string.flat_table <- function(ft, attributes = NULL, string, replacement
     )
   ft$operations <-
     add_operation(ft$operations, "replace_string", attributes, string, replacement)
+  ft
+}
+
+
+#' Remove instances without measures
+#'
+#' Delete instances that have all measures undefined.
+#'
+#' @param ft A `flat_table` object.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' ft <- flat_table('iris', iris) |>
+#'   remove_instances_without_measures()
+#'
+#' @export
+remove_instances_without_measures <- function(ft) UseMethod("remove_instances_without_measures")
+
+#' @rdname remove_instances_without_measures
+#'
+#' @export
+remove_instances_without_measures.flat_table <- function(ft) {
+  ft$table <- remove_all_measures_na(ft$table, ft$measures)
   ft
 }
 

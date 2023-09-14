@@ -29,7 +29,9 @@ with the data in vector form to be used in other functions.
 }
 \examples{
 
-instances <- flat_table('iris', iris) |>
+iris2 <- iris
+iris2[10, 'Species'] <- NA
+instances <- flat_table('iris', iris2) |>
   get_unknown_values()
 
 }
@@ -40,6 +42,7 @@ Other flat table definition functions:
 \code{\link{as_star_database}()},
 \code{\link{flat_table}()},
 \code{\link{get_table}()},
+\code{\link{get_unknown_value_defined}()},
 \code{\link{read_flat_table_file}()},
 \code{\link{read_flat_table_folder}()}
 }

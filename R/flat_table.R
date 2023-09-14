@@ -32,8 +32,8 @@ flat_table <- function(name = NULL, instances, unknown_value = NULL) {
       stop("A tibble with the instances was expected.")
     }
   }
-  if (is.null(unknown_value)) {
-    unknown_value <- "___UNKNOWN___"
+  if (is_empty_string(unknown_value)) {
+    unknown_value <- get_default_unknown_value()
   } else {
     unknown_value <- unknown_value[1]
   }
@@ -274,6 +274,32 @@ get_table.flat_table <- function(ft) {
   ft$table
 }
 
+#' Get the unknown value defined
+#'
+#' Obtain the unknown value of a flat table.
+#'
+#' @param ft A `flat_table` object.
+#'
+#' @return A string.
+#'
+#' @family flat table definition functions
+#' @seealso \code{\link{select_attributes}}, \code{\link{select_measures}}
+#'
+#' @examples
+#'
+#' table <- flat_table('iris', iris) |>
+#'   get_unknown_value_defined()
+#'
+#' @export
+get_unknown_value_defined <- function(ft) UseMethod("get_unknown_value_defined")
+
+#' @rdname get_unknown_value_defined
+#'
+#' @export
+get_unknown_value_defined.flat_table <- function(ft) {
+  ft$unknown_value
+}
+
 
 #' Get unknown attribute values
 #'
@@ -294,7 +320,9 @@ get_table.flat_table <- function(ft) {
 #'
 #' @examples
 #'
-#' instances <- flat_table('iris', iris) |>
+#' iris2 <- iris
+#' iris2[10, 'Species'] <- NA
+#' instances <- flat_table('iris', iris2) |>
 #'   get_unknown_values()
 #'
 #' @export
@@ -305,13 +333,13 @@ get_unknown_values <- function(ft, attributes, col_as_vector) UseMethod("get_unk
 #' @export
 get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector = NULL) {
   attributes <- validate_attributes(ft$attributes, attributes)
-  ft <- replace_empty_values_table(ft, attributes)
-  table <- ft$table[, attributes]
+  table <- replace_empty_values_table(ft$table, attributes, unknown_value = ft$unknown_value)
+  table <- table[, attributes]
   or_res <- rep(FALSE, nrow(table))
   for (j in 1:length(attributes)) {
     or_res <- or_res | (table[, attributes[j]] == ft$unknown_value)
   }
-  table <- table[or_res, ]
+  table <- ft$table[or_res, attributes]
   table <- dplyr::arrange_all(unique(table))
   if (!is.null(col_as_vector)) {
     table <- add_dput_column(table, col_as_vector)
@@ -352,4 +380,3 @@ as_star_database.flat_table <-
       operations = ft$operations
     )
   }
-
