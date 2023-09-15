@@ -83,7 +83,7 @@ remove_all_measures_na <- function(table, measures) {
 
 #' Replace empty values with the unknown value
 #'
-#' @param ft A `tibble` object.
+#' @param table A `tibble` object.
 #' @param attributes A vector of names.
 #' @param empty_values A vector of values that correspond to empty values.
 #' @param unknown_value A string.
