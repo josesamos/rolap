@@ -12,13 +12,13 @@ replace_empty_values_table(
 )
 }
 \arguments{
+\item{table}{A \code{tibble} object.}
+
 \item{attributes}{A vector of names.}
 
 \item{empty_values}{A vector of values that correspond to empty values.}
 
 \item{unknown_value}{A string.}
-
-\item{ft}{A \code{tibble} object.}
 }
 \value{
 A \code{tibble} object.
