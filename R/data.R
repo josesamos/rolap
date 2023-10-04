@@ -303,3 +303,17 @@
 #' @format A `star_database`.
 #' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
 "db_summary"
+
+
+#' Flat table generated from MRS file
+#'
+#' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
+#' from the original file, we have stored in the package a file with the same
+#' format as the original file but that includes only 1% of its data, selected at
+#' random.
+#'
+#' @family mrs example data
+#'
+#' @format A `flat_table`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"mrs_ft"

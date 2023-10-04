@@ -33,8 +33,12 @@ This section describes the data sets used in the example.
 To illustrate how the package works we will use a small part of the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) dataset. 
 
 We have developed the examples in this document using the dataset downloaded from the source. To reproduce them more easily, from the original file, we have stored in the package a file with the same format as the original file but that includes only 1% of its data, selected at random, which is accessed below.
+```{r, echo=FALSE}
+library(rolap)
+```
 
-```{r}
+```{r, eval=FALSE}
+#  Problem building macos-latest (release)
 library(rolap)
 
 file <-
