@@ -72,25 +72,40 @@ refresh_new.flat_table <- function(ft, s_op) {
     if (op$operation == "flat_table") {
       stopifnot("The operation of creating the flat table must be the first." = i == 1)
       ft <- interpret_operation_flat_table(ft, op)
-    } else if (op$operation == "transform_to_measure") {
-      ft <- interpret_operation_transform_to_measure(ft, op)
-    } else if (op$operation == "transform_attribute_format") {
-      ft <- interpret_operation_transform_attribute_format(ft, op)
-    } else if (op$operation == "replace_empty_values") {
-      ft <- interpret_operation_replace_empty_values(ft, op)
     } else if (op$operation == "add_custom_column") {
       ft <- interpret_operation_add_custom_column(ft, op)
-    } else if (op$operation == "replace_attribute_values") {
-      ft <- interpret_operation_replace_attribute_values(ft, op)
     } else if (op$operation == "join_lookup_table") {
       ft <- interpret_operation_join_lookup_table(ft, op, s_op$lookup_tables)
+    } else if (op$operation == "replace_attribute_values") {
+      ft <- interpret_operation_replace_attribute_values(ft, op)
+    } else if (op$operation == "replace_empty_values") {
+      ft <- interpret_operation_replace_empty_values(ft, op)
+    } else if (op$operation == "replace_string") {
+      ft <- interpret_operation_replace_string(ft, op)
+    } else if (op$operation == "select_attributes") {
+      ft <- interpret_operation_select_attributes(ft, op)
+    } else if (op$operation == "select_instances") {
+      ft <- interpret_operation_select_instances(ft, op)
+    } else if (op$operation == "transform_attribute_format") {
+      ft <- interpret_operation_transform_attribute_format(ft, op)
+    } else if (op$operation == "transform_to_measure") {
+      ft <- interpret_operation_transform_to_measure(ft, op)
     }
   }
 
   ft
 }
 
-# 8          select_attributes
+# "select_instances_by_comparison"
+# "select_measures"
+# "separate_measures"
+# "set_attribute_names"
+# "set_measure_names"
+# "snake_case"
+# "transform_from_values"
+# "transform_to_attribute"
+# "transform_to_values"
+
 
 
 #' Interpret operation
@@ -235,6 +250,63 @@ interpret_operation_join_lookup_table <- function(ft, op, lookup_tables) {
   lookup <- lookup_tables[[pos]]
   join_lookup_table(ft, fk_attributes, lookup)
 }
+
+
+#' Interpret operation
+#'
+#'  operation,          name
+#' "select_attributes", attributes)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_select_attributes <- function(ft, op) {
+  attributes <- string_to_vector(op$name)
+  select_attributes(ft, attributes = attributes)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,       name,       details, details2
+#' "replace_string", attributes, string, replacement)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_replace_string <- function(ft, op) {
+  attributes <- string_to_vector(op$name)
+  string <- string_to_vector(op$details)
+  replacement <- string_to_vector(op$details2)
+  replace_string(ft, attributes, string, replacement)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,       name,       details, details2
+#' "select_instances", not, attributes, unlist(values)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_select_instances <- function(ft, op) {
+  not <- as.logical(string_to_vector(op$name))
+  attributes <- string_to_vector(op$details)
+  values <- string_to_vector(op$details2)
+  if (length(attributes) > 1) {
+    m <- matrix(values, nrow = length(attributes))
+    values <- split(m, col(m))
+  }
+  select_instances(ft, not, attributes, values)
+}
+
 
 
 # Class que se crea a partir de una star_database y una flat table con dos opciones
