@@ -1,3 +1,5 @@
+# rolap (development version)
+
 # rolap 2.2.0
 * Vignette about obtaining and transforming flat tables.
 * Definition of flat_table class with functions to transform an integrate data.
