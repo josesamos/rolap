@@ -15,6 +15,7 @@ interpret_operation_transform_to_measure(ft, op)
 A flat table.
 }
 \description{
-Interpret operation
+operation,             name,       details, details2
+"transform_to_measure", attributes, k_sep, decimal_sep
 }
 \keyword{internal}

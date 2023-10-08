@@ -61,6 +61,9 @@ refresh_new <- function(ft, s_op) UseMethod("refresh_new")
 #'
 #' @export
 refresh_new.flat_table <- function(ft, s_op) {
+
+  browser()
+
   stopifnot("The flat table to be refreshed can only have the definition operation." = nrow(ft$operations$operations) == 1)
   stopifnot("The flat table to be refreshed can only have the definition operation." = ft$operations$operations[1, 1] == "flat_table")
   operations <- s_op$operations$operations
@@ -71,18 +74,28 @@ refresh_new.flat_table <- function(ft, s_op) {
       ft <- interpret_operation_flat_table(ft, op)
     } else if (op$operation == "transform_to_measure") {
       ft <- interpret_operation_transform_to_measure(ft, op)
+    } else if (op$operation == "transform_attribute_format") {
+      ft <- interpret_operation_transform_attribute_format(ft, op)
+    } else if (op$operation == "replace_empty_values") {
+      ft <- interpret_operation_replace_empty_values(ft, op)
+    }  else if (op$operation == "add_custom_column") {
+      ft <- interpret_operation_add_custom_column(ft, op)
     }
   }
 
   ft
 }
 
+# 6   replace_attribute_values
+# 7          join_lookup_table
+# 8          select_attributes
+
 
 #' Interpret operation
 #'
 #               operation,    name,                   details,    details2
 # add_operation("flat_table", c(name, unknown_value), attributes, measures),
-
+#'
 #' @param ft flat table
 #' @param op operation
 #'
@@ -108,8 +121,9 @@ interpret_operation_flat_table <- function(ft, op) {
 
 #' Interpret operation
 #'
-#  operation,             name,       details, details2
-# "transform_to_measure", attributes, k_sep, decimal_sep
+#'  operation,             name,       details, details2
+#' "transform_to_measure", attributes, k_sep, decimal_sep
+#'
 #' @param ft flat table
 #' @param op operation
 #'
@@ -120,6 +134,67 @@ interpret_operation_transform_to_measure <- function(ft, op) {
   k_sep <- string_to_vector(op$details)
   decimal_sep <- string_to_vector(op$details2)
   transform_to_measure(ft, attributes, k_sep, decimal_sep)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,                   name,       details,                  details2
+#' "transform_attribute_format", attributes, c(width, decimal_places), c(k_sep, decimal_sep)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_transform_attribute_format <- function(ft, op) {
+  attributes <- string_to_vector(op$name)
+  details <- string_to_vector(op$details)
+  width <- as.integer(details[1])
+  decimal_places <- as.integer(details[2])
+  details2 <- string_to_vector(op$details2)
+  k_sep <- details2[1]
+  decimal_sep <- details2[2]
+  transform_attribute_format(ft, attributes, width, decimal_places, k_sep, decimal_sep)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,             name,       details,                  details2
+#' "replace_empty_values", attributes, empty_values
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_replace_empty_values <- function(ft, op) {
+  attributes <- string_to_vector(op$name)
+  empty_values <- string_to_vector(op$details)
+  replace_empty_values(ft, attributes, empty_values)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,          name, details,                  details2
+#' "add_custom_column", name, as.character(list(definition))
+#'
+#' f <- function(...)
+#' g <- as.character(list(f))
+#' h <- eval(parse(text = g))
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_add_custom_column <- function(ft, op) {
+  name <- string_to_vector(op$name)
+  g <- string_to_vector(op$details)
+  definition <- eval(parse(text = g))
+  add_custom_column(ft, name, definition)
 }
 
 
