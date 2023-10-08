@@ -78,16 +78,18 @@ refresh_new.flat_table <- function(ft, s_op) {
       ft <- interpret_operation_transform_attribute_format(ft, op)
     } else if (op$operation == "replace_empty_values") {
       ft <- interpret_operation_replace_empty_values(ft, op)
-    }  else if (op$operation == "add_custom_column") {
+    } else if (op$operation == "add_custom_column") {
       ft <- interpret_operation_add_custom_column(ft, op)
+    } else if (op$operation == "replace_attribute_values") {
+      ft <- interpret_operation_replace_attribute_values(ft, op)
+    } else if (op$operation == "join_lookup_table") {
+      ft <- interpret_operation_join_lookup_table(ft, op, s_op$lookup_tables)
     }
   }
 
   ft
 }
 
-# 6   replace_attribute_values
-# 7          join_lookup_table
 # 8          select_attributes
 
 
@@ -195,6 +197,43 @@ interpret_operation_add_custom_column <- function(ft, op) {
   g <- string_to_vector(op$details)
   definition <- eval(parse(text = g))
   add_custom_column(ft, name, definition)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,                 name,       details, details2
+#' "replace_attribute_values", attributes, old,     new)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_replace_attribute_values <- function(ft, op) {
+  attributes <- string_to_vector(op$name)
+  old <- string_to_vector(op$details)
+  new <- string_to_vector(op$details2)
+  replace_attribute_values(ft, attributes = attributes, old = old, new = new)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,          name,          details, details2
+#' "join_lookup_table", fk_attributes, pos)
+#'
+#' @param ft flat table
+#' @param op operation
+#' @param lookup_tables lookup tables
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_join_lookup_table <- function(ft, op, lookup_tables) {
+  fk_attributes <- string_to_vector(op$name)
+  pos <- as.integer(string_to_vector(op$details))
+  lookup <- lookup_tables[[pos]]
+  join_lookup_table(ft, fk_attributes, lookup)
 }
 
 
