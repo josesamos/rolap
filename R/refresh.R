@@ -68,12 +68,14 @@ refresh_new.flat_table <- function(ft, s_op) {
     } else if (op$operation == "join_lookup_table") {
       ft <- interpret_operation_join_lookup_table(ft, op, s_op$lookup_tables)
     } else if (op$operation %in% c("add_custom_column",
+                                   "lookup_table",
                                    "replace_attribute_values",
                                    "replace_empty_values",
                                    "replace_string",
                                    "select_attributes",
                                    "select_instances",
                                    "transform_attribute_format",
+                                   "transform_to_attribute",
                                    "transform_to_measure")) {
       ft <- eval(parse(text = paste0("interpret_operation_", op$operation, "(ft, op)")))
     } else {
@@ -91,7 +93,6 @@ refresh_new.flat_table <- function(ft, s_op) {
 # "set_measure_names"
 # "snake_case"
 # "transform_from_values"
-# "transform_to_attribute"
 # "transform_to_values"
 
 
@@ -293,6 +294,71 @@ interpret_operation_select_instances <- function(ft, op) {
     values <- split(m, col(m))
   }
   select_instances(ft, not, attributes, values)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,       name,        details,                           details2
+#' "lookup_table", pk_attributes, c(attributes, '|', attribute_agg), c(measures, '|', measure_agg)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_lookup_table <- function(ft, op) {
+  pk_attributes <- string_to_vector(op$name)
+  attributes <- NULL
+  attribute_agg <- NULL
+  measures <- NULL
+  measure_agg <- NULL
+  details <- string_to_vector(op$details)
+  l <- length(details)
+  if (l > 1) {
+    s <- which(details == '|')
+    if (s > 1) {
+      attributes <- details[1:(s-1)]
+    }
+    if (s < l) {
+      attribute_agg <- details[(s+1):l]
+    }
+  }
+  details2 <- string_to_vector(op$details2)
+  l <- length(details2)
+  if (l > 1) {
+    s <- which(details2 == '|')
+    if (s > 1) {
+      measures <- details2[1:(s-1)]
+    }
+    if (s < l) {
+      measure_agg <- details2[(s+1):l]
+    }
+  }
+  lookup_table(ft, pk_attributes, attributes, attribute_agg, measures, measure_agg)
+}
+
+
+
+#' Interpret operation
+#'
+#'  operation,               name,     details,                  details2
+#' "transform_to_attribute", measures, c(width, decimal_places), c(k_sep, decimal_sep)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_transform_to_attribute <- function(ft, op) {
+  measures <- string_to_vector(op$name)
+  details <- string_to_vector(op$details)
+  width <- as.integer(details[1])
+  decimal_places <- as.integer(details[2])
+  details2 <- string_to_vector(op$details2)
+  k_sep <- details2[1]
+  decimal_sep <- details2[2]
+  transform_to_attribute(ft, measures, width, decimal_places, k_sep, decimal_sep)
 }
 
 
