@@ -26,10 +26,6 @@ refresh <- function(ft, attributes) UseMethod("refresh")
 #'
 #' @export
 refresh.flat_table <- function(ft, attributes) {
-  attributes <- validate_attributes(ft$attributes, attributes)
-  ft$table <- ft$table[, c(attributes, ft$measures)]
-  ft$attributes <- attributes
-  ft$operations <- add_operation(ft$operations, "refresh", attributes)
   ft
 }
 
@@ -61,9 +57,6 @@ refresh_new <- function(ft, s_op) UseMethod("refresh_new")
 #'
 #' @export
 refresh_new.flat_table <- function(ft, s_op) {
-
-  browser()
-
   stopifnot("The flat table to be refreshed can only have the definition operation." = nrow(ft$operations$operations) == 1)
   stopifnot("The flat table to be refreshed can only have the definition operation." = ft$operations$operations[1, 1] == "flat_table")
   operations <- s_op$operations$operations
@@ -72,24 +65,19 @@ refresh_new.flat_table <- function(ft, s_op) {
     if (op$operation == "flat_table") {
       stopifnot("The operation of creating the flat table must be the first." = i == 1)
       ft <- interpret_operation_flat_table(ft, op)
-    } else if (op$operation == "add_custom_column") {
-      ft <- interpret_operation_add_custom_column(ft, op)
     } else if (op$operation == "join_lookup_table") {
       ft <- interpret_operation_join_lookup_table(ft, op, s_op$lookup_tables)
-    } else if (op$operation == "replace_attribute_values") {
-      ft <- interpret_operation_replace_attribute_values(ft, op)
-    } else if (op$operation == "replace_empty_values") {
-      ft <- interpret_operation_replace_empty_values(ft, op)
-    } else if (op$operation == "replace_string") {
-      ft <- interpret_operation_replace_string(ft, op)
-    } else if (op$operation == "select_attributes") {
-      ft <- interpret_operation_select_attributes(ft, op)
-    } else if (op$operation == "select_instances") {
-      ft <- interpret_operation_select_instances(ft, op)
-    } else if (op$operation == "transform_attribute_format") {
-      ft <- interpret_operation_transform_attribute_format(ft, op)
-    } else if (op$operation == "transform_to_measure") {
-      ft <- interpret_operation_transform_to_measure(ft, op)
+    } else if (op$operation %in% c("add_custom_column",
+                                   "replace_attribute_values",
+                                   "replace_empty_values",
+                                   "replace_string",
+                                   "select_attributes",
+                                   "select_instances",
+                                   "transform_attribute_format",
+                                   "transform_to_measure")) {
+      ft <- eval(parse(text = paste0("interpret_operation_", op$operation, "(ft, op)")))
+    } else {
+      stop(sprintf("Operation %s is not considered", op$operation))
     }
   }
 
