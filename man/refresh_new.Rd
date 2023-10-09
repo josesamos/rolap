@@ -20,7 +20,7 @@ refresh_new(ft, s_op, star, sel_measure_group)
 groups, indicate which group to consider.}
 }
 \value{
-A \code{flat_table} object.
+A \code{flat_table} or \code{star_database} object.
 }
 \description{
 Refresh a new a flat table with the operations of another structure based on

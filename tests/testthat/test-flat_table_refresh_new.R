@@ -503,3 +503,77 @@ test_that("remove_instances_without_measures() refresh_new", {
       refresh_new(f1)
   })
 })
+
+
+
+test_that("star_database() refresh_new", {
+  expect_equal({
+    s <- star_schema() |>
+      define_facts(fact_schema(
+        name = "MRS Cause",
+        measures = c("Pneumonia and Influenza Deaths",
+                     "All Deaths")
+      )) |>
+      define_dimension(dimension_schema(name = "When",
+                                        attributes = c("Year"))) |>
+      define_dimension(dimension_schema(
+        name = "Where",
+        attributes = c("REGION",
+                       "State")
+      ))
+    f1 <- flat_table('ft_num', ft_num) |>
+      as_star_database(s)
+  }, {
+    f2 <- flat_table('ft_num2', ft_num)
+    f2 |>
+      refresh_new(f1)
+  }
+  )
+})
+
+test_that("star_database() refresh_new", {
+  expect_equal({
+    s <- star_schema() |>
+      define_facts(fact_schema(name = "MRS Cause")) |>
+      define_dimension(dimension_schema(name = "When",
+                                        attributes = c("Year"))) |>
+      define_dimension(dimension_schema(
+        name = "Where",
+        attributes = c("REGION",
+                       "State")
+      ))
+    f1 <- flat_table('ft_num', ft_num) |>
+      as_star_database(s)
+  }, {
+    f2 <- flat_table('ft_num2', ft_num)
+    f2 |>
+      refresh_new(f1)
+  }
+  )
+})
+
+test_that("snake_case() refresh_new", {
+  expect_equal({
+    s <- star_schema() |>
+      define_facts(fact_schema(
+        name = "MRS Cause",
+        measures = c("Pneumonia and Influenza Deaths",
+                     "All Deaths")
+      )) |>
+      define_dimension(dimension_schema(name = "When",
+                                        attributes = c("Year"))) |>
+      define_dimension(dimension_schema(
+        name = "Where",
+        attributes = c("REGION",
+                       "State")
+      ))
+    f1 <- flat_table('ft_num', ft_num) |>
+      as_star_database(s) |>
+      snake_case()
+  }, {
+    f2 <- flat_table('ft_num2', ft_num)
+    f2 |>
+      refresh_new(f1)
+  }
+)
+})

@@ -42,7 +42,7 @@ refresh.flat_table <- function(ft, attributes) {
 #' @param sel_measure_group A vector of integers, if measures are separated into
 #' groups, indicate which group to consider.
 #'
-#' @return A `flat_table` object.
+#' @return A `flat_table` or `star_database` object.
 #'
 #' @family flat table transformation functions
 #' @seealso \code{\link{flat_table}}
@@ -59,61 +59,81 @@ refresh_new <- function(ft, s_op, star, sel_measure_group) UseMethod("refresh_ne
 #' @rdname refresh_new
 #'
 #' @export
-refresh_new.flat_table <- function(ft, s_op, star = 1, sel_measure_group = 1) {
-  stopifnot("The flat table to be refreshed can only have the definition operation." = nrow(ft$operations$operations) == 1)
-  stopifnot("The flat table to be refreshed can only have the definition operation." = ft$operations$operations[1, 1] == "flat_table")
-  if (methods::is(s_op, "flat_table")) {
-    operations <- s_op$operations$operations
-    lookup_tables <- s_op$lookup_tables
-  } else if (methods::is(s_op, "star_database")) {
-    operations <- s_op$operations[[star]]$operations
-    lookup_tables <- s_op$lookup_tables[[star]]
-  } else {
-    stop(sprintf("The %s class is not supported to refresh operations.", class(s_op)))
-  }
-  sel <- 1
-  for (i in 1:nrow(operations)) {
-    op <- operations[i, ]
-    if (op$operation == "flat_table") {
-      stopifnot("The operation of creating the flat table must be the first." = i == 1)
-      ft <- interpret_operation_flat_table(ft, op)
-    } else if (op$operation == "join_lookup_table") {
-      ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables)
-    } else if (op$operation == "separate_measures") {
-      ft <- interpret_operation_separate_measures(ft, op, sel_measure_group[sel])
-      sel <- sel + 1
-    } else if (op$operation %in% c("add_custom_column",
-                                   "lookup_table",
-                                   "remove_instances_without_measures",
-                                   "replace_attribute_values",
-                                   "replace_empty_values",
-                                   "replace_string",
-                                   "replace_unknown_values",
-                                   "select_attributes",
-                                   "select_instances",
-                                   "select_instances_by_comparison",
-                                   "select_measures",
-                                   "set_attribute_names",
-                                   "set_measure_names",
-                                   "snake_case",
-                                   "transform_attribute_format",
-                                   "transform_from_values",
-                                   "transform_to_attribute",
-                                   "transform_to_measure",
-                                   "transform_to_values")) {
-      ft <- eval(parse(text = paste0("interpret_operation_", op$operation, "(ft, op)")))
+refresh_new.flat_table <-
+  function(ft,
+           s_op,
+           star = 1,
+           sel_measure_group = 1) {
+    stopifnot(
+      "The flat table to be refreshed can only have the definition operation." = nrow(ft$operations$operations) == 1
+    )
+    stopifnot(
+      "The flat table to be refreshed can only have the definition operation." = ft$operations$operations[1, 1] == "flat_table"
+    )
+    if (methods::is(s_op, "flat_table")) {
+      operations <- s_op$operations$operations
+      lookup_tables <- s_op$lookup_tables
+    } else if (methods::is(s_op, "star_database")) {
+      operations <- s_op$operations[[star]]$operations
+      lookup_tables <- s_op$lookup_tables[[star]]
+      schema <- s_op$schemas[[star]]
     } else {
-      stop(sprintf("Operation %s is not considered", op$operation))
+      stop(sprintf(
+        "The %s class is not supported to refresh operations.",
+        class(s_op)
+      ))
     }
+    sel <- 1
+    for (i in 1:nrow(operations)) {
+      op <- operations[i, ]
+      if (op$operation == "flat_table") {
+        stopifnot("The operation of creating the flat table must be the first." = i == 1)
+        ft <- interpret_operation_flat_table(ft, op)
+      } else if (op$operation == "star_database") {
+        ft <- interpret_operation_star_database(ft, op, schema)
+        is_star_database <- TRUE
+      } else if (op$operation == "join_lookup_table") {
+        ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables)
+      } else if (op$operation == "separate_measures") {
+        ft <-
+          interpret_operation_separate_measures(ft, op, sel_measure_group[sel])
+        sel <- sel + 1
+      } else if (op$operation %in% c(
+        "add_custom_column",
+        "lookup_table",
+        "remove_instances_without_measures",
+        "replace_attribute_values",
+        "replace_empty_values",
+        "replace_string",
+        "replace_unknown_values",
+        "select_attributes",
+        "select_instances",
+        "select_instances_by_comparison",
+        "select_measures",
+        "set_attribute_names",
+        "set_measure_names",
+        "snake_case",
+        "transform_attribute_format",
+        "transform_from_values",
+        "transform_to_attribute",
+        "transform_to_measure",
+        "transform_to_values"
+      )) {
+        ft <-
+          eval(parse(text = paste0(
+            "interpret_operation_", op$operation, "(ft, op)"
+          )))
+      } else {
+        stop(sprintf("Operation %s is not considered", op$operation))
+      }
+    }
+    ft
   }
-  ft
-}
 
-# "star_database"
-# "snake_case"
 # "set_attribute_names"
 # "set_measure_names"
 # "replace_attribute_values"
+
 # "group_dimension_instances"
 # "role_playing_dimension"
 
@@ -592,6 +612,27 @@ interpret_operation_remove_instances_without_measures <- function(ft, op) {
 }
 
 
+#' Interpret operation
+#'
+#'  operation,                name,    details,      details2
+#' "star_database", names(db$schemas), unknown_value)
+#'
+#' @param ft flat table
+#' @param op operation
+#' @param schema multidimensional schema
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_star_database <- function(ft, op, schema) {
+  unknown_value <- string_to_vector(op$details)
+  star_database_with_previous_operations(
+    schema,
+    instances = ft$table,
+    unknown_value = unknown_value,
+    operations = ft$operations,
+    lookup_tables = ft$lookup_tables
+  )
+}
 
 
 
