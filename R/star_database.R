@@ -431,9 +431,9 @@ replace_attribute_values.star_database <-
             add_operation(
               db$operations[[n]],
               "replace_attribute_values",
-              name,
-              pos_att,
-              c(old, "-->>", new)
+              c(name, "|", attributes),
+              old,
+              new
             )
           break
         }

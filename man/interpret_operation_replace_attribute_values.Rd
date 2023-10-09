@@ -15,7 +15,8 @@ interpret_operation_replace_attribute_values(ft, op)
 A flat table.
 }
 \description{
-operation,                 name,       details, details2
-"replace_attribute_values", attributes, old,     new)
+operation,                 name,                     details, details2
+"replace_attribute_values", attributes,               old,     new)
+"replace_attribute_values", c(name, "|", attributes), old,     new)
 }
 \keyword{internal}

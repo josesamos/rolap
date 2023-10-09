@@ -130,8 +130,6 @@ refresh_new.flat_table <-
     ft
   }
 
-# "set_attribute_names"
-# "set_measure_names"
 # "replace_attribute_values"
 
 # "group_dimension_instances"
@@ -248,8 +246,9 @@ interpret_operation_add_custom_column <- function(ft, op) {
 
 #' Interpret operation
 #'
-#'  operation,                 name,       details, details2
-#' "replace_attribute_values", attributes, old,     new)
+#'  operation,                 name,                     details, details2
+#' "replace_attribute_values", attributes,               old,     new)
+#' "replace_attribute_values", c(name, "|", attributes), old,     new)
 #'
 #' @param ft flat table
 #' @param op operation
@@ -258,9 +257,16 @@ interpret_operation_add_custom_column <- function(ft, op) {
 #' @keywords internal
 interpret_operation_replace_attribute_values <- function(ft, op) {
   attributes <- string_to_vector(op$name)
+  name = NULL
+  if (length(attributes) > 1) {
+    if (attributes[2] == '|') {
+      name <- attributes[1]
+      attributes <- attributes[-c(1, 2)]
+    }
+  }
   old <- string_to_vector(op$details)
   new <- string_to_vector(op$details2)
-  replace_attribute_values(ft, attributes = attributes, old = old, new = new)
+  replace_attribute_values(ft, name, attributes, old, new)
 }
 
 
