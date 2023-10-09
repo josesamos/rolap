@@ -5,14 +5,19 @@
 \alias{refresh_new.flat_table}
 \title{Refresh a new flat table}
 \usage{
-refresh_new(ft, s_op)
+refresh_new(ft, s_op, star, sel_measure_group)
 
-\method{refresh_new}{flat_table}(ft, s_op)
+\method{refresh_new}{flat_table}(ft, s_op, star = 1, sel_measure_group = 1)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
 \item{s_op}{An object with defined modification operations.}
+
+\item{star}{Star database name or index in constellation.}
+
+\item{sel_measure_group}{A vector of integers, if measures are separated into
+groups, indicate which group to consider.}
 }
 \value{
 A \code{flat_table} object.

@@ -4,12 +4,14 @@
 \alias{interpret_operation_separate_measures}
 \title{Interpret operation}
 \usage{
-interpret_operation_separate_measures(ft, op)
+interpret_operation_separate_measures(ft, op, sel_measure_group)
 }
 \arguments{
 \item{ft}{flat table}
 
 \item{op}{operation}
+
+\item{sel_measure_group}{measure group index (to return)}
 }
 \value{
 A flat table.

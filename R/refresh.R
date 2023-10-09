@@ -38,6 +38,9 @@ refresh.flat_table <- function(ft, attributes) {
 #'
 #' @param ft A `flat_table` object.
 #' @param s_op An object with defined modification operations.
+#' @param star Star database name or index in constellation.
+#' @param sel_measure_group A vector of integers, if measures are separated into
+#' groups, indicate which group to consider.
 #'
 #' @return A `flat_table` object.
 #'
@@ -51,22 +54,34 @@ refresh.flat_table <- function(ft, attributes) {
 #' ft <- flat_table('ft_num', ft_num)
 #'
 #' @export
-refresh_new <- function(ft, s_op) UseMethod("refresh_new")
+refresh_new <- function(ft, s_op, star, sel_measure_group) UseMethod("refresh_new")
 
 #' @rdname refresh_new
 #'
 #' @export
-refresh_new.flat_table <- function(ft, s_op) {
+refresh_new.flat_table <- function(ft, s_op, star = 1, sel_measure_group = 1) {
   stopifnot("The flat table to be refreshed can only have the definition operation." = nrow(ft$operations$operations) == 1)
   stopifnot("The flat table to be refreshed can only have the definition operation." = ft$operations$operations[1, 1] == "flat_table")
-  operations <- s_op$operations$operations
+  if (methods::is(s_op, "flat_table")) {
+    operations <- s_op$operations$operations
+    lookup_tables <- s_op$lookup_tables
+  } else if (methods::is(s_op, "star_database")) {
+    operations <- s_op$operations[[star]]$operations
+    lookup_tables <- s_op$lookup_tables[[star]]
+  } else {
+    stop(sprintf("The %s class is not supported to refresh operations.", class(s_op)))
+  }
+  sel <- 1
   for (i in 1:nrow(operations)) {
     op <- operations[i, ]
     if (op$operation == "flat_table") {
       stopifnot("The operation of creating the flat table must be the first." = i == 1)
       ft <- interpret_operation_flat_table(ft, op)
     } else if (op$operation == "join_lookup_table") {
-      ft <- interpret_operation_join_lookup_table(ft, op, s_op$lookup_tables)
+      ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables)
+    } else if (op$operation == "separate_measures") {
+      ft <- interpret_operation_separate_measures(ft, op, sel_measure_group[sel])
+      sel <- sel + 1
     } else if (op$operation %in% c("add_custom_column",
                                    "lookup_table",
                                    "remove_instances_without_measures",
@@ -78,7 +93,6 @@ refresh_new.flat_table <- function(ft, s_op) {
                                    "select_instances",
                                    "select_instances_by_comparison",
                                    "select_measures",
-                                   "separate_measures",
                                    "set_attribute_names",
                                    "set_measure_names",
                                    "snake_case",
@@ -428,14 +442,21 @@ interpret_operation_select_measures <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param sel_measure_group measure group index (to return)
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_separate_measures <- function(ft, op) {
-  measures <- string_to_vector(op$name)
+interpret_operation_separate_measures <- function(ft, op, sel_measure_group) {
+  measures <- as.list(string_to_vector(op$name))
+  for (i in 1:length(measures)) {
+    if (substr(measures[[i]], 1,3) == "c(\"") {
+      measures[[i]] <- eval(parse(text = measures[[i]]))
+    }
+  }
   names <- string_to_vector(op$details)
   na_rm <- as.logical(string_to_vector(op$details2))
-  separate_measures(ft, measures, names, na_rm)
+  groups <- separate_measures(ft, measures, names, na_rm)
+  groups[[sel_measure_group]]
 }
 
 

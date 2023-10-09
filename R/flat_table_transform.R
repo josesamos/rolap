@@ -796,7 +796,7 @@ separate_measures <- function(ft, measures, names, na_rm) UseMethod("separate_me
 #'
 #' @export
 separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_rm = TRUE) {
-  stopifnot("Missing measure names." = !is.null(measures))
+  stopifnot("Missing measure groups." = !is.null(measures))
   stopifnot("Missing measure group names." = !is.null(names))
   stopifnot("Missing measure group names." = length(measures) == length(unique(names)))
   lft <- vector("list", length = length(measures))

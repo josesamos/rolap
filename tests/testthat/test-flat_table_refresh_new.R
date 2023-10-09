@@ -311,12 +311,48 @@ test_that("separate_measures() refresh_new", {
         c('Sepal.Width')
       ),
       names = c('PL', 'PW', 'SL', 'SW'))
+    f1[[1]]
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
       refresh_new(f1[[1]])
   })
 })
+
+test_that("separate_measures() refresh_new", {
+  expect_equal({
+    f1 <- flat_table('iris', head(iris, 2)) |>
+      separate_measures(measures = list(
+        c('Petal.Length'),
+        c('Petal.Width'),
+        c('Sepal.Length'),
+        c('Sepal.Width')
+      ),
+      names = c('PL', 'PW', 'SL', 'SW'))
+    f1[[3]]
+  }, {
+    f2 <- flat_table('iris2', head(iris, 2))
+    f2 |>
+      refresh_new(f1[[3]], sel_measure_group = 3)
+  })
+})
+
+test_that("separate_measures() refresh_new", {
+  expect_equal({
+    f1 <- flat_table('iris', head(iris, 2)) |>
+      separate_measures(measures = list(
+        c('Petal.Length', 'Petal.Width'),
+        c('Sepal.Length', 'Sepal.Width')
+      ),
+      names = c('PL-PW', 'SL-SW'))
+    f1[[1]]
+  }, {
+    f2 <- flat_table('iris2', head(iris, 2))
+    f2 |>
+      refresh_new(f1[[1]])
+  })
+})
+
 
 test_that("set_attribute_names() refresh_new", {
   expect_equal({
