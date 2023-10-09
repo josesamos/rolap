@@ -23,56 +23,84 @@ test_that("constellation() define constellation", {
           mrs_cause = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When",
-                         "Where", "MRS Cause", ""),
-                details = c(
-                  "Year",
-                  "REGION<|>State<|>City",
-                  "Pneumonia and Influenza Deaths<|>All Deaths<|>nrow_agg",
-                  ""
-                ),
-                details2 = c("", "", "SUM<|>SUM<|>SUM", ""),
-                order = c(1,
-                          2, 3, 4)
+                operation = c("star_database",
+                              "snake_case"),
+                name = c("mrs_cause", ""),
+                details = c("___UNKNOWN___",
+                            ""),
+                details2 = c("", ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-4L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation"),
           mrs_age = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When", "Where", "Who", "MRS Age", ""),
-                details = c(
-                  "Year",
-                  "REGION<|>State<|>City",
-                  "Age",
-                  "All Deaths<|>nrow_agg",
-                  ""
-                ),
-                details2 = c("", "", "", "SUM<|>SUM", ""),
-                order = c(1,
-                          2, 3, 4, 5)
+                operation = c("star_database",
+                              "snake_case"),
+                name = c("mrs_age", ""),
+                details = c("___UNKNOWN___",
+                            ""),
+                details2 = c("", ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-5L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation")
         ),
         lookup_tables = list(mrs_cause = NULL, mrs_age = NULL),
+        schemas = list(
+          mrs_cause = structure(list(
+            facts = list(mrs_cause = structure(
+              list(
+                name = "MRS Cause",
+                measures = c("Pneumonia and Influenza Deaths",
+                             "All Deaths"),
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When",
+                attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "State", "City")
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema"),
+          mrs_age = structure(list(
+            facts = list(mrs_age = structure(
+              list(
+                name = "MRS Age",
+                measures = "All Deaths",
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When", attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "State", "City")
+              ), class = "dimension_schema"),
+              who = structure(list(
+                name = "Who", attributes = "Age"
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema")
+        ),
         facts = list(
           mrs_cause = structure(
             list(
@@ -95,7 +123,7 @@ test_that("constellation() define constellation", {
                                  46L, 192L, 276L),
                   nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
                 ),
-                row.names = c(NA, -6L),
+                row.names = c(NA,-6L),
                 class = c("tbl_df", "tbl",
                           "data.frame")
               )
@@ -122,7 +150,7 @@ test_that("constellation() define constellation", {
                   nrow_agg = c(3L, 3L,
                                3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L, 3L, 3L, 3L, 3L, 3L)
                 ),
-                row.names = c(NA, -15L),
+                row.names = c(NA,-15L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -140,7 +168,7 @@ test_that("constellation() define constellation", {
                   year = c("1962",
                            "1963", "1964")
                 ),
-                row.names = c(NA, -3L),
+                row.names = c(NA,-3L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -159,7 +187,7 @@ test_that("constellation() define constellation", {
                   city = c("Bridgeport",
                            "Hartford", "Boston", "Cambridge")
                 ),
-                row.names = c(NA, -4L),
+                row.names = c(NA,-4L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -180,7 +208,7 @@ test_that("constellation() define constellation", {
                     "<1 year"
                   )
                 ),
-                row.names = c(NA, -5L),
+                row.names = c(NA,-5L),
                 class = c("tbl_df", "tbl",
                           "data.frame")
               )
@@ -233,77 +261,124 @@ test_that("constellation() define constellation", {
           mrs_cause = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When",
-                         "Where", "MRS Cause", ""),
-                details = c(
-                  "Year",
-                  "REGION<|>State<|>City",
-                  "Pneumonia and Influenza Deaths<|>All Deaths<|>nrow_agg",
-                  ""
-                ),
-                details2 = c("", "", "SUM<|>SUM<|>SUM", ""),
-                order = c(1,
-                          2, 3, 4)
+                operation = c("star_database",
+                              "snake_case"),
+                name = c("mrs_cause", ""),
+                details = c("___UNKNOWN___",
+                            ""),
+                details2 = c("", ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-4L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation"),
           mrs_age = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When", "Where", "Who", "MRS Age", ""),
-                details = c(
-                  "Year",
-                  "REGION<|>State<|>City",
-                  "Age",
-                  "All Deaths<|>nrow_agg",
-                  ""
-                ),
-                details2 = c("", "", "", "SUM<|>SUM", ""),
-                order = c(1,
-                          2, 3, 4, 5)
+                operation = c("star_database",
+                              "snake_case"),
+                name = c("mrs_age", ""),
+                details = c("___UNKNOWN___",
+                            ""),
+                details2 = c("", ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-5L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation"),
           mrs_cause_2 = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When", "Where",
-                         "MRS Cause 2", ""),
-                details = c("Year", "REGION<|>City<|>State",
-                            "nrow_agg", ""),
-                details2 = c("", "", "SUM", ""),
-                order = c(1,
-                          2, 3, 4)
+                operation = c("star_database", "snake_case"),
+                name = c("mrs_cause_2",
+                         ""),
+                details = c("___UNKNOWN___", ""),
+                details2 = c("",
+                             ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-4L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation")
         ),
-        lookup_tables = list(mrs_cause = NULL, mrs_age = NULL, mrs_cause_2 = NULL),
+        lookup_tables = list(
+          mrs_cause = NULL,
+          mrs_age = NULL,
+          mrs_cause_2 = NULL
+        ),
+        schemas = list(
+          mrs_cause = structure(list(
+            facts = list(mrs_cause = structure(
+              list(
+                name = "MRS Cause",
+                measures = c("Pneumonia and Influenza Deaths",
+                             "All Deaths"),
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When",
+                attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "State", "City")
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema"),
+          mrs_age = structure(list(
+            facts = list(mrs_age = structure(
+              list(
+                name = "MRS Age",
+                measures = "All Deaths",
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When", attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "State", "City")
+              ), class = "dimension_schema"),
+              who = structure(list(
+                name = "Who", attributes = "Age"
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema"),
+          mrs_cause_2 = structure(list(
+            facts = list(mrs_cause_2 = structure(
+              list(
+                name = "MRS Cause 2",
+                measures = NULL,
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When", attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "City", "State")
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema")
+        ),
         facts = list(
           mrs_cause = structure(
             list(
@@ -326,7 +401,7 @@ test_that("constellation() define constellation", {
                                  46L, 192L, 276L),
                   nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
                 ),
-                row.names = c(NA, -6L),
+                row.names = c(NA,-6L),
                 class = c("tbl_df", "tbl",
                           "data.frame")
               )
@@ -353,7 +428,7 @@ test_that("constellation() define constellation", {
                   nrow_agg = c(3L, 3L,
                                3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L, 3L, 3L, 3L, 3L, 3L)
                 ),
-                row.names = c(NA, -15L),
+                row.names = c(NA,-15L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -375,7 +450,7 @@ test_that("constellation() define constellation", {
                   nrow_agg = c(2L, 3L, 1L, 2L, 1L, 1L, 3L, 2L,
                                1L, 3L, 1L)
                 ),
-                row.names = c(NA, -11L),
+                row.names = c(NA,-11L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -394,7 +469,7 @@ test_that("constellation() define constellation", {
                   year = c("1962",
                            "1963", "1964")
                 ),
-                row.names = c(NA, -3L),
+                row.names = c(NA,-3L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -413,7 +488,7 @@ test_that("constellation() define constellation", {
                   city = c("Bridgeport",
                            "Hartford", "Boston", "Cambridge")
                 ),
-                row.names = c(NA, -4L),
+                row.names = c(NA,-4L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -434,7 +509,7 @@ test_that("constellation() define constellation", {
                     "<1 year"
                   )
                 ),
-                row.names = c(NA, -5L),
+                row.names = c(NA,-5L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -487,77 +562,124 @@ test_that("constellation() define constellation", {
           mrs_age = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When", "Where", "Who", "MRS Age", ""),
-                details = c(
-                  "Year",
-                  "REGION<|>State<|>City",
-                  "Age",
-                  "All Deaths<|>nrow_agg",
-                  ""
-                ),
-                details2 = c("", "", "", "SUM<|>SUM", ""),
-                order = c(1,
-                          2, 3, 4, 5)
+                operation = c("star_database",
+                              "snake_case"),
+                name = c("mrs_age", ""),
+                details = c("___UNKNOWN___",
+                            ""),
+                details2 = c("", ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-5L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation"),
           mrs_cause = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When",
-                         "Where", "MRS Cause", ""),
-                details = c(
-                  "Year",
-                  "REGION<|>State<|>City",
-                  "Pneumonia and Influenza Deaths<|>All Deaths<|>nrow_agg",
-                  ""
-                ),
-                details2 = c("", "", "SUM<|>SUM<|>SUM", ""),
-                order = c(1,
-                          2, 3, 4)
+                operation = c("star_database",
+                              "snake_case"),
+                name = c("mrs_cause", ""),
+                details = c("___UNKNOWN___",
+                            ""),
+                details2 = c("", ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-4L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation"),
           mrs_cause_2 = structure(list(
             operations = structure(
               list(
-                operation = c(
-                  "define_dimension",
-                  "define_dimension",
-                  "define_facts",
-                  "snake_case"
-                ),
-                name = c("When", "Where",
-                         "MRS Cause 2", ""),
-                details = c("Year", "REGION<|>City<|>State",
-                            "nrow_agg", ""),
-                details2 = c("", "", "SUM", ""),
-                order = c(1,
-                          2, 3, 4)
+                operation = c("star_database", "snake_case"),
+                name = c("mrs_cause_2",
+                         ""),
+                details = c("___UNKNOWN___", ""),
+                details2 = c("",
+                             ""),
+                order = c(1, 2)
               ),
-              row.names = c(NA,-4L),
+              row.names = c(NA,-2L),
               class = "data.frame"
             )
           ), class = "star_operation")
         ),
-        lookup_tables = list(mrs_age = NULL, mrs_cause = NULL, mrs_cause_2 = NULL),
+        lookup_tables = list(
+          mrs_age = NULL,
+          mrs_cause = NULL,
+          mrs_cause_2 = NULL
+        ),
+        schemas = list(
+          mrs_age = structure(list(
+            facts = list(mrs_age = structure(
+              list(
+                name = "MRS Age",
+                measures = "All Deaths",
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When", attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "State", "City")
+              ), class = "dimension_schema"),
+              who = structure(list(
+                name = "Who", attributes = "Age"
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema"),
+          mrs_cause = structure(list(
+            facts = list(mrs_cause = structure(
+              list(
+                name = "MRS Cause",
+                measures = c("Pneumonia and Influenza Deaths",
+                             "All Deaths"),
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When",
+                attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "State", "City")
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema"),
+          mrs_cause_2 = structure(list(
+            facts = list(mrs_cause_2 = structure(
+              list(
+                name = "MRS Cause 2",
+                measures = NULL,
+                agg_functions = NULL,
+                nrow_agg = NULL
+              ),
+              class = "fact_schema"
+            )),
+            dimensions = list(
+              when = structure(list(
+                name = "When", attributes = "Year"
+              ), class = "dimension_schema"),
+              where = structure(list(
+                name = "Where",
+                attributes = c("REGION",
+                               "City", "State")
+              ), class = "dimension_schema")
+            )
+          ), class = "star_schema")
+        ),
         facts = list(
           mrs_age = structure(
             list(
@@ -579,7 +701,7 @@ test_that("constellation() define constellation", {
                   nrow_agg = c(3L, 3L,
                                3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L, 3L, 3L, 3L, 3L, 3L)
                 ),
-                row.names = c(NA, -15L),
+                row.names = c(NA,-15L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -608,7 +730,7 @@ test_that("constellation() define constellation", {
                                  276L),
                   nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
                 ),
-                row.names = c(NA, -6L),
+                row.names = c(NA,-6L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -629,7 +751,7 @@ test_that("constellation() define constellation", {
                   where_key = c(3L, 1L, 2L, 3L, 1L, 2L),
                   nrow_agg = c(2L, 3L, 2L, 1L, 1L, 3L)
                 ),
-                row.names = c(NA, -6L),
+                row.names = c(NA,-6L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -647,7 +769,7 @@ test_that("constellation() define constellation", {
                   year = c("1962",
                            "1963", "1964")
                 ),
-                row.names = c(NA, -3L),
+                row.names = c(NA,-3L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -666,7 +788,7 @@ test_that("constellation() define constellation", {
                   city = c("Bridgeport",
                            "Hartford", "Boston", "Cambridge")
                 ),
-                row.names = c(NA, -4L),
+                row.names = c(NA,-4L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
@@ -687,7 +809,7 @@ test_that("constellation() define constellation", {
                     "<1 year"
                   )
                 ),
-                row.names = c(NA, -5L),
+                row.names = c(NA,-5L),
                 class = c("tbl_df", "tbl",
                           "data.frame")
               )
@@ -792,7 +914,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
           year = c("1962", "1963",
                    "1964")
         ),
-        row.names = c(NA,-3L),
+        row.names = c(NA, -3L),
         class = c("tbl_df", "tbl",
                   "data.frame")
       ),
@@ -805,7 +927,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
           city = c("Bridgeport",
                    "Hartford", "Boston", "Cambridge")
         ),
-        row.names = c(NA,-4L),
+        row.names = c(NA, -4L),
         class = c("tbl_df",
                   "tbl", "data.frame")
       ),
@@ -820,7 +942,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
             "<1 year"
           )
         ),
-        row.names = c(NA,-5L),
+        row.names = c(NA, -5L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
       mrs_cause = structure(
@@ -834,7 +956,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
                          192L, 276L),
           nrow_agg = c(3L, 2L, 2L, 1L, 3L, 1L)
         ),
-        row.names = c(NA,-6L),
+        row.names = c(NA, -6L),
         class = c("tbl_df", "tbl", "data.frame")
       ),
       mrs_age = structure(
@@ -851,7 +973,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
           nrow_agg = c(3L, 3L, 3L, 3L, 3L, 1L, 1L, 1L, 1L, 1L,
                        3L, 3L, 3L, 3L, 3L)
         ),
-        row.names = c(NA,-15L),
+        row.names = c(NA, -15L),
         class = c("tbl_df",
                   "tbl", "data.frame")
       )
@@ -957,11 +1079,7 @@ test_that("constellation() replace_attribute_values() with role_playing_dimensio
               )
             }, {
               list(
-                "define_dimension",
-                "define_dimension",
-                "define_dimension",
-                "define_dimension",
-                "define_facts",
+                "star_database",
                 "role_playing_dimension",
                 "replace_attribute_values",
                 when = c("when", "when_available", "when_received", "when_arrived"),
@@ -1066,7 +1184,8 @@ test_that("constellation() replace_attribute_values() with role_playing_dimensio
                 role_playing_dimension(rpd = "When",
                                        roles = c("When Available", "When Received"))
 
-              db2 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
+              db2 <-
+                star_database(mrs_age_schema_rpd, ft_age_rpd) |>
                 role_playing_dimension(rpd = "When Arrived",
                                        roles = c("When Available"))
               db <- constellation("MRS", list(db1, db2))
@@ -1097,20 +1216,11 @@ test_that("constellation() replace_attribute_values() with role_playing_dimensio
               )
             }, {
               list(
-                "define_dimension",
-                "define_dimension",
-                "define_dimension",
-                "define_dimension",
-                "define_facts",
+                "star_database",
                 "role_playing_dimension",
                 "replace_attribute_values",
                 "group_dimension_instances",
-                "define_dimension",
-                "define_dimension",
-                "define_dimension",
-                "define_dimension",
-                "define_dimension",
-                "define_facts",
+                "star_database",
                 "role_playing_dimension",
                 "replace_attribute_values",
                 "group_dimension_instances",

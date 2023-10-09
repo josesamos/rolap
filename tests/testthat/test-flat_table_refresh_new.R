@@ -123,10 +123,8 @@ test_that("replace_empty_values() refresh_new", {
 test_that("replace_string() refresh_new", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
-      replace_string(
-        string = c('set'),
-        replacement = c('Set')
-      )
+      replace_string(string = c('set'),
+                     replacement = c('Set'))
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
@@ -165,9 +163,11 @@ test_that("select_instances() refresh_new", {
 test_that("select_instances() refresh_new", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
-      select_instances(not = TRUE,
-                       attributes = c('Species'),
-                       values = c('versicolor', 'virginica'))
+      select_instances(
+        not = TRUE,
+        attributes = c('Species'),
+        values = c('versicolor', 'virginica')
+      )
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
@@ -226,12 +226,12 @@ test_that("transform_to_measure() refresh_new", {
     f1 <- flat_table('iris', iris)
     f1$table[1, 2] <- 4000
     f1 <- f1 |>
-      transform_to_attribute(
-        measures = "Sepal.Length",
-        width = 3,
-        decimal_places = 2
-      ) |>
-      transform_to_measure(attributes = "Sepal.Length", k_sep = ",", decimal_sep = ".")
+      transform_to_attribute(measures = "Sepal.Length",
+                             width = 3,
+                             decimal_places = 2) |>
+      transform_to_measure(attributes = "Sepal.Length",
+                           k_sep = ",",
+                           decimal_sep = ".")
   }, {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 2] <- 4000
@@ -350,6 +350,22 @@ test_that("separate_measures() refresh_new", {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
       refresh_new(f1[[1]])
+  })
+})
+
+test_that("separate_measures() refresh_new", {
+  expect_equal({
+    f1 <- flat_table('iris', head(iris, 2)) |>
+      separate_measures(measures = list(
+        c('Petal.Length', 'Petal.Width'),
+        c('Sepal.Length', 'Sepal.Width')
+      ),
+      names = c('PL-PW', 'SL-SW'))
+    f1[[2]]
+  }, {
+    f2 <- flat_table('iris2', head(iris, 2))
+    f2 |>
+      refresh_new(f1[[2]], sel_measure_group = 2)
   })
 })
 
@@ -487,7 +503,3 @@ test_that("remove_instances_without_measures() refresh_new", {
       refresh_new(f1)
   })
 })
-
-
-
-

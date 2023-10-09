@@ -101,6 +101,7 @@ star_database_with_previous_operations <-
           name = names(schema$facts)[1],
           operations = vector("list", length = length(schema$facts)),
           lookup_tables = vector("list", length = length(schema$facts)),
+          schemas = vector("list", length = length(schema$facts)),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
           rpd = list()
@@ -110,6 +111,7 @@ star_database_with_previous_operations <-
 
     names(db$operations) <- names(schema$facts)
     names(db$lookup_tables) <- names(schema$facts)
+    names(db$schemas) <- names(schema$facts)
     names(db$facts) <- names(schema$facts)
     names(db$dimensions) <- names(schema$dimensions)
 
@@ -138,8 +140,8 @@ star_database_with_previous_operations <-
       # include surrogate key in instances
       instances <- add_surrogate_key(db$dimensions[[d]], instances)
       keys <- c(keys, get_surrogate_key(db$dimensions[[d]]))
-      op <-
-        add_operation(op, "define_dimension", dim_name, dim_attributes)
+      # op <-
+      #   add_operation(op, "define_dimension", dim_name, dim_attributes)
     }
 
     # select only keys and measures in instances
@@ -158,9 +160,12 @@ star_database_with_previous_operations <-
     fact_name <- get_fact_name(schema$fact[[1]])
     db$facts[[1]] <-
       fact_table(fact_name, keys, agg, names(schema$dimensions), instances)
-    db$operations[[1]] <-
-      add_operation(op, "define_facts", fact_name, names(agg), agg)
+    # db$operations[[1]] <-
+    #   add_operation(op, "define_facts", fact_name, names(agg), agg)
     db$lookup_tables[[1]] <- lookup_tables
+    db$schemas[[1]] <- schema
+    db$operations[[1]] <-
+      add_operation(op, "star_database", names(db$schemas), unknown_value)
 
     db
   }

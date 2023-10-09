@@ -58,11 +58,13 @@ constellation <- function(name = NULL, stars = NULL) {
   facts <- vector("list", length = num_stars)
   operations <- vector("list", length = num_stars)
   lookup_tables <- vector("list", length = num_stars)
+  schemas <- vector("list", length = num_stars)
   dimensions = vector("list", length = length(dim_freq))
   rpd <- list()
   names(facts) <- fct_names
   names(operations) <- fct_names
   names(lookup_tables) <- fct_names
+  names(schemas) <- fct_names
   names(dimensions) <- names(dim_freq)
 
   # facts, operations and rpd
@@ -72,6 +74,7 @@ constellation <- function(name = NULL, stars = NULL) {
       sfn <- names(stars[[s]]$facts[f])
       operations[sfn] <- stars[[s]]$operations[f]
       lookup_tables[sfn] <- stars[[s]]$lookup_tables[f]
+      schemas[sfn] <- stars[[s]]$schemas[f]
       facts[sfn] <- stars[[s]]$facts[f]
     }
   }
@@ -142,6 +145,7 @@ constellation <- function(name = NULL, stars = NULL) {
     name = name,
     operations = operations,
     lookup_tables = lookup_tables,
+    schemas = schemas,
     facts = facts,
     dimensions = dimensions,
     rpd = rpd

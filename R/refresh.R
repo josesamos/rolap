@@ -109,6 +109,14 @@ refresh_new.flat_table <- function(ft, s_op, star = 1, sel_measure_group = 1) {
   ft
 }
 
+# "star_database"
+# "snake_case"
+# "set_attribute_names"
+# "set_measure_names"
+# "replace_attribute_values"
+# "group_dimension_instances"
+# "role_playing_dimension"
+
 
 
 #' Interpret operation
