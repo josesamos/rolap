@@ -812,7 +812,7 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_r
     lft[[i]]$pk_attributes <- ft$pk_attributes
     lft[[i]]$lookup_tables <- ft$lookup_tables
     lft[[i]]$operations <-
-      add_operation(ft$operations, "separate_measures", measures[[i]], names[i], na_rm)
+      add_operation(ft$operations, "separate_measures", measures, names, na_rm)
   }
   lft
 }
@@ -889,6 +889,8 @@ replace_unknown_values.flat_table <- function(ft, attributes = NULL, value) {
   ft$table[, attributes] <-
     apply(ft$table[, attributes, drop = FALSE], 2, function(x)
       gsub(ft$unknown_value, value, x))
+  ft$operations <-
+    add_operation(ft$operations, "replace_unknown_values", attributes, value)
   ft
 }
 
@@ -966,6 +968,7 @@ remove_instances_without_measures <- function(ft) UseMethod("remove_instances_wi
 #' @export
 remove_instances_without_measures.flat_table <- function(ft) {
   ft$table <- remove_all_measures_na(ft$table, ft$measures)
+  ft$operations <- add_operation(ft$operations, "remove_instances_without_measures")
   ft
 }
 

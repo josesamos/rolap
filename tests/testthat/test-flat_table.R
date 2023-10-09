@@ -596,9 +596,11 @@ test_that("separate_measures() ", {
           operations = structure(
             list(
               operation = c("flat_table", "separate_measures"),
-              name = c("iris<|>___UNKNOWN___", "Petal.Length"),
-              details = c("Species",
-                          "PL"),
+              name = c(
+                "iris<|>___UNKNOWN___",
+                "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
+              ),
+              details = c("Species", "PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"
@@ -632,8 +634,11 @@ test_that("separate_measures() ", {
           operations = structure(
             list(
               operation = c("flat_table", "separate_measures"),
-              name = c("iris<|>___UNKNOWN___", "Petal.Width"),
-              details = c("Species", "PW"),
+              name = c(
+                "iris<|>___UNKNOWN___",
+                "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
+              ),
+              details = c("Species", "PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"
@@ -667,8 +672,11 @@ test_that("separate_measures() ", {
           operations = structure(
             list(
               operation = c("flat_table", "separate_measures"),
-              name = c("iris<|>___UNKNOWN___", "Sepal.Length"),
-              details = c("Species", "SL"),
+              name = c(
+                "iris<|>___UNKNOWN___",
+                "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
+              ),
+              details = c("Species", "PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"
@@ -702,8 +710,11 @@ test_that("separate_measures() ", {
           operations = structure(
             list(
               operation = c("flat_table", "separate_measures"),
-              name = c("iris<|>___UNKNOWN___", "Sepal.Width"),
-              details = c("Species", "SW"),
+              name = c(
+                "iris<|>___UNKNOWN___",
+                "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
+              ),
+              details = c("Species", "PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"

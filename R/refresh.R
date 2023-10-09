@@ -69,31 +69,31 @@ refresh_new.flat_table <- function(ft, s_op) {
       ft <- interpret_operation_join_lookup_table(ft, op, s_op$lookup_tables)
     } else if (op$operation %in% c("add_custom_column",
                                    "lookup_table",
+                                   "remove_instances_without_measures",
                                    "replace_attribute_values",
                                    "replace_empty_values",
                                    "replace_string",
+                                   "replace_unknown_values",
                                    "select_attributes",
                                    "select_instances",
+                                   "select_instances_by_comparison",
+                                   "select_measures",
+                                   "separate_measures",
+                                   "set_attribute_names",
+                                   "set_measure_names",
+                                   "snake_case",
                                    "transform_attribute_format",
+                                   "transform_from_values",
                                    "transform_to_attribute",
-                                   "transform_to_measure")) {
+                                   "transform_to_measure",
+                                   "transform_to_values")) {
       ft <- eval(parse(text = paste0("interpret_operation_", op$operation, "(ft, op)")))
     } else {
       stop(sprintf("Operation %s is not considered", op$operation))
     }
   }
-
   ft
 }
-
-# "select_instances_by_comparison"
-# "select_measures"
-# "separate_measures"
-# "set_attribute_names"
-# "set_measure_names"
-# "snake_case"
-# "transform_from_values"
-# "transform_to_values"
 
 
 
@@ -360,6 +360,211 @@ interpret_operation_transform_to_attribute <- function(ft, op) {
   decimal_sep <- details2[2]
   transform_to_attribute(ft, measures, width, decimal_places, k_sep, decimal_sep)
 }
+
+
+
+#' Interpret operation
+#'
+#'  operation,                       name,              details,            details2
+#' "select_instances_by_comparison", c(not, n_ele_set), unlist(attributes), c(unlist(comparisons), unlist(values))
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_select_instances_by_comparison <- function(ft, op) {
+  name <- string_to_vector(op$name)
+  not <- as.logical(as.integer(string_to_vector(name[1])))
+  n_ele_set <- as.integer(name[-1])
+  att <- string_to_vector(op$details)
+  details2 <- string_to_vector(op$details2)
+  l <- length(details2)
+  com <- details2[1:(l/2)]
+  val <- details2[(l/2 + 1):l]
+  n <- length(n_ele_set)
+  if (n > 1) {
+    attributes <- vector(mode = "list", length = n)
+    comparisons <- vector(mode = "list", length = n)
+    values <- vector(mode = "list", length = n)
+    j <- 1
+    for (i in 1:n) {
+      k <- j + n_ele_set[i] - 1
+      attributes[[i]] <- att[j:k]
+      comparisons[[i]] <- com[j:k]
+      values[[i]] <- val[j:k]
+      j <- k + 1
+    }
+  } else {
+    attributes <- att
+    comparisons <- com
+    values <- val
+  }
+  select_instances_by_comparison(ft, not, attributes, comparisons, values)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,          name,   details
+#' "select_measures", measures, na_rm
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_select_measures <- function(ft, op) {
+  measures <- string_to_vector(op$name)
+  na_rm <- as.logical(string_to_vector(op$details))
+  select_measures(ft, measures, na_rm)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,          name,     details, details2
+#' "separate_measures", measures, names, na_rm)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_separate_measures <- function(ft, op) {
+  measures <- string_to_vector(op$name)
+  names <- string_to_vector(op$details)
+  na_rm <- as.logical(string_to_vector(op$details2))
+  separate_measures(ft, measures, names, na_rm)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,            name, details, details2
+#' "set_attribute_names", name, old,     new)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_set_attribute_names <- function(ft, op) {
+  name <- string_to_vector(op$name)
+  old <- string_to_vector(op$details)
+  new <- string_to_vector(op$details2)
+  set_attribute_names(ft, name, old, new)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,            name, details, details2
+#' "set_measure_names", name, old,     new)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_set_measure_names <- function(ft, op) {
+  name <- string_to_vector(op$name)
+  old <- string_to_vector(op$details)
+  new <- string_to_vector(op$details2)
+  set_measure_names(ft, name, old, new)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,
+#' "snake_case")
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_snake_case <- function(ft, op) {
+  snake_case(ft)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,              name,
+#' "transform_from_values", attribute)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_transform_from_values <- function(ft, op) {
+  attribute <- string_to_vector(op$name)
+  transform_from_values(ft, attribute)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,            name,      details, details2
+#' "transform_to_values", attribute, measure, c(id_reverse, na_rm))
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_transform_to_values <- function(ft, op) {
+  attribute <- string_to_vector(op$name)
+  measure <- string_to_vector(op$details)
+  details2 <- string_to_vector(op$details2)
+  if (length(details2) == 2) {
+    id_reverse <- details2[1]
+    na_rm <- as.logical(details2[2])
+  } else {
+    id_reverse <- NULL
+    na_rm <- as.logical(details2[1])
+  }
+  transform_to_values(ft, attribute, measure, id_reverse, na_rm)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,                name,       details, details2
+#' "replace_unknown_values",  attributes, value)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_replace_unknown_values <- function(ft, op) {
+  attributes <- string_to_vector(op$name)
+  value <- string_to_vector(op$details)
+  replace_unknown_values(ft, attributes, value)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,
+#' "remove_instances_without_measures")
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_remove_instances_without_measures <- function(ft, op) {
+  remove_instances_without_measures(ft)
+}
+
+
+
+
 
 
 
