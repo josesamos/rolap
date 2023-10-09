@@ -72,6 +72,7 @@ test_that("constellation() define constellation", {
             )
           ), class = "star_operation")
         ),
+        lookup_tables = list(mrs_cause = NULL, mrs_age = NULL),
         facts = list(
           mrs_cause = structure(
             list(
@@ -302,6 +303,7 @@ test_that("constellation() define constellation", {
             )
           ), class = "star_operation")
         ),
+        lookup_tables = list(mrs_cause = NULL, mrs_age = NULL, mrs_cause_2 = NULL),
         facts = list(
           mrs_cause = structure(
             list(
@@ -555,6 +557,7 @@ test_that("constellation() define constellation", {
             )
           ), class = "star_operation")
         ),
+        lookup_tables = list(mrs_age = NULL, mrs_cause = NULL, mrs_cause_2 = NULL),
         facts = list(
           mrs_age = structure(
             list(

@@ -8,7 +8,8 @@ star_database_with_previous_operations(
   schema,
   instances,
   unknown_value = NULL,
-  operations = NULL
+  operations = NULL,
+  lookup_tables = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ star_database_with_previous_operations(
 \item{unknown_value}{A string, value used to replace NA values in dimensions.}
 
 \item{operations}{A list of operations.}
+
+\item{lookup_tables}{A list of lookup tables.}
 }
 \value{
 A \code{star_database} object.
