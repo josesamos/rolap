@@ -117,7 +117,10 @@ refresh_new.flat_table <-
         "transform_from_values",
         "transform_to_attribute",
         "transform_to_measure",
-        "transform_to_values"
+        "transform_to_values",
+              # star_database only
+        "group_dimension_instances",
+        "role_playing_dimension"
       )) {
         ft <-
           eval(parse(text = paste0(
@@ -129,11 +132,6 @@ refresh_new.flat_table <-
     }
     ft
   }
-
-# "replace_attribute_values"
-
-# "group_dimension_instances"
-# "role_playing_dimension"
 
 
 
@@ -638,6 +636,40 @@ interpret_operation_star_database <- function(ft, op, schema) {
     operations = ft$operations,
     lookup_tables = ft$lookup_tables
   )
+}
+
+
+#' Interpret operation
+#'
+#'  operation,                name, details, details2
+#' "role_playing_dimension",  rpd,  roles,   att_names)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_role_playing_dimension <- function(ft, op) {
+  rpd <- string_to_vector(op$name)
+  roles <- string_to_vector(op$details)
+  att_names <- string_to_vector(op$details2)
+  role_playing_dimension(ft, rpd, roles, rpd_att_names = FALSE, att_names =  att_names)
+}
+
+
+#' Interpret operation
+#'
+#'  operation,                  name
+#' "group_dimension_instances", name)
+#'
+#' @param ft flat table
+#' @param op operation
+#'
+#' @return A flat table.
+#' @keywords internal
+interpret_operation_group_dimension_instances <- function(ft, op) {
+  name <- string_to_vector(op$name)
+  group_dimension_instances(ft, name)
 }
 
 

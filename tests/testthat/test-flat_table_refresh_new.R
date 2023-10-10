@@ -646,7 +646,7 @@ test_that("replace_attribute_values() refresh_new", {
 test_that("replace_attribute_values() refresh_new", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_cause_rpd) |>
-      as_star_database(mrs_cause_schema) |>
+      as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received")) |>
       replace_attribute_values(
@@ -655,276 +655,73 @@ test_that("replace_attribute_values() refresh_new", {
         new = c('1962', '3', '1962-01-15')
       )
   }, {
-    f2 <- flat_table('ft_num2', ft_num)
+    f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
       refresh_new(f1)
   })
 })
 
 
-test_that("role_playing_dimension() define a rpd", {
+test_that("role_playing_dimension() refresh_new", {
   expect_equal({
-    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+    f1 <- flat_table('ft_num', ft_cause_rpd) |>
+      as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
-    c(
-      db$operations$mrs_cause$operation$operation,
-      db$rpd,
-      nrow(db$dimensions$when$table),
-      nrow(db$dimensions$when_available$table),
-      nrow(db$dimensions$when_received$table),
-      names(db$dimensions$when$table),
-      names(db$dimensions$when_available$table),
-      names(db$dimensions$when_received$table)
-    )
   }, {
-    list(
-      "star_database",
-      "role_playing_dimension",
-      when = c("when", "when_available", "when_received"),
-      15L,
-      15L,
-      15L,
-      "when_key",
-      "Year",
-      "WEEK",
-      "Week Ending Date",
-      "when_available_key",
-      "Data Availability Year",
-      "Data Availability Week",
-      "Data Availability Date",
-      "when_received_key",
-      "Reception Year",
-      "Reception Week",
-      "Reception Date"
-    )
+    f2 <- flat_table('ft_num2', ft_cause_rpd)
+    f2 |>
+      refresh_new(f1)
   })
 })
 
-test_that("role_playing_dimension() define a rpd", {
+test_that("role_playing_dimension() refresh_new", {
   expect_equal({
-    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+    f1 <- flat_table('ft_num', ft_cause_rpd) |>
+      as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(
         rpd = "When",
         roles = c("When Available", "When Received"),
         rpd_att_names = TRUE
       )
-
-    c(
-      db$operations$mrs_cause$operation$operation,
-      db$rpd,
-      nrow(db$dimensions$when$table),
-      nrow(db$dimensions$when_available$table),
-      nrow(db$dimensions$when_received$table),
-      names(db$dimensions$when$table),
-      names(db$dimensions$when_available$table),
-      names(db$dimensions$when_received$table)
-    )
   }, {
-    list(
-      "star_database",
-      "role_playing_dimension",
-      when = c("when", "when_available", "when_received"),
-      15L,
-      15L,
-      15L,
-      "when_key",
-      "Year",
-      "WEEK",
-      "Week Ending Date",
-      "when_available_key",
-      "Year",
-      "WEEK",
-      "Week Ending Date",
-      "when_received_key",
-      "Year",
-      "WEEK",
-      "Week Ending Date"
-    )
+    f2 <- flat_table('ft_num2', ft_cause_rpd)
+    f2 |>
+      refresh_new(f1)
   })
 })
 
-test_that("role_playing_dimension() define a rpd", {
+test_that("role_playing_dimension() refresh_new", {
   expect_equal({
-    db <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
+    f1 <- flat_table('ft_num', ft_cause_rpd) |>
+      as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(
         rpd = "When",
         roles = c("When Available", "When Received"),
         att_names = c("Year", "Week", "Date")
       )
-
-    c(
-      db$operations$mrs_cause$operation$operation,
-      db$rpd,
-      nrow(db$dimensions$when$table),
-      nrow(db$dimensions$when_available$table),
-      nrow(db$dimensions$when_received$table),
-      names(db$dimensions$when$table),
-      names(db$dimensions$when_available$table),
-      names(db$dimensions$when_received$table)
-    )
   }, {
-    list(
-      "star_database",
-      "role_playing_dimension",
-      when = c("when", "when_available", "when_received"),
-      15L,
-      15L,
-      15L,
-      "when_key",
-      "Year",
-      "Week",
-      "Date",
-      "when_available_key",
-      "Year",
-      "Week",
-      "Date",
-      "when_received_key",
-      "Year",
-      "Week",
-      "Date"
-    )
+    f2 <- flat_table('ft_num2', ft_cause_rpd)
+    f2 |>
+      refresh_new(f1)
   })
 })
 
 
-test_that("constellation() replace_attribute_values() with role_playing_dimension()",
+test_that("group_dimension_instances() refresh_new",
           {
             expect_equal({
-              db1 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
-                role_playing_dimension(rpd = "When",
-                                       roles = c("When Available", "When Received"))
-
-              db2 <-
-                star_database(mrs_age_schema_rpd, ft_age_rpd) |>
-                role_playing_dimension(rpd = "When Arrived",
-                                       roles = c("When Available"))
-              db <- constellation("MRS", list(db1, db2))
-
-              db <- db |> replace_attribute_values(
-                name = "When Available",
-                old = c('1962', '11', '1962-03-14'),
-                new = c('1962', '3', '1962-01-15')
-              ) |>
-                group_dimension_instances(name = "When") |>
-                group_dimension_instances(name = "Who")
-
-              c(
-                db$operations$mrs_cause$operation$operation,
-                db$operations$mrs_age$operation$operation,
-                db$rpd,
-                nrow(db$dimensions$when$table),
-                nrow(db$dimensions$when_available$table),
-                nrow(db$dimensions$when_received$table),
-                names(db$dimensions$when$table),
-                names(db$dimensions$when_available$table),
-                names(db$dimensions$when_received$table),
-                as.vector(db$dimensions$when$table$WEEK),
-                as.vector(
-                  db$dimensions$when_available$table$`Data Availability Week`
-                ),
-                as.vector(db$dimensions$when_received$table$`Reception Week`)
-              )
+              f1 <- flat_table('ft_num', ft_cause_rpd) |>
+                as_star_database(mrs_cause_schema_rpd) |>
+                replace_attribute_values(
+                  name = "When Available",
+                  old = c('1962', '11', '1962-03-14'),
+                  new = c('1962', '3', '1962-01-15')
+                ) |>
+                group_dimension_instances(name = "When")
             }, {
-              list(
-                "star_database",
-                "role_playing_dimension",
-                "replace_attribute_values",
-                "group_dimension_instances",
-                "star_database",
-                "role_playing_dimension",
-                "replace_attribute_values",
-                "group_dimension_instances",
-                "group_dimension_instances",
-                when = c("when", "when_available",
-                         "when_received", "when_arrived"),
-                24L,
-                24L,
-                24L,
-                "when_key",
-                "Year",
-                "WEEK",
-                "Week Ending Date",
-                "when_available_key",
-                "Data Availability Year",
-                "Data Availability Week",
-                "Data Availability Date",
-                "when_received_key",
-                "Reception Year",
-                "Reception Week",
-                "Reception Date",
-                "1",
-                "11",
-                "2",
-                "2",
-                "3",
-                "3",
-                "3",
-                "3",
-                "4",
-                "4",
-                "5",
-                "5",
-                "5",
-                "6",
-                "6",
-                "6",
-                "6",
-                "7",
-                "7",
-                "8",
-                "8",
-                "9",
-                "9",
-                "9",
-                "1",
-                "11",
-                "2",
-                "2",
-                "3",
-                "3",
-                "3",
-                "3",
-                "4",
-                "4",
-                "5",
-                "5",
-                "5",
-                "6",
-                "6",
-                "6",
-                "6",
-                "7",
-                "7",
-                "8",
-                "8",
-                "9",
-                "9",
-                "9",
-                "1",
-                "11",
-                "2",
-                "2",
-                "3",
-                "3",
-                "3",
-                "3",
-                "4",
-                "4",
-                "5",
-                "5",
-                "5",
-                "6",
-                "6",
-                "6",
-                "6",
-                "7",
-                "7",
-                "8",
-                "8",
-                "9",
-                "9",
-                "9"
-              )
+              f2 <- flat_table('ft_num2', ft_cause_rpd)
+              f2 |>
+                refresh_new(f1)
             })
           })
