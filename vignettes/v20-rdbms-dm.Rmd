@@ -415,7 +415,7 @@ Tables can be stored directly in any RDBMS, just as we have done before.
 We can work with the star databases separately or in an integrated way by defining a constellation from them. On the constellation we can carry out the same operations that we perform on a star database.
 
 ```{r}
-ct <- rolap::constellation("CSS", list(db_finest, db_summary))
+ct <- rolap::constellation("CSS", db_finest, db_summary)
 
 db_tl <- ct |>
   rolap::as_tibble_list()

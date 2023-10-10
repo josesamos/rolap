@@ -342,7 +342,7 @@ rpd_in_constellation <- function(db) {
 #'     rpd = "When Arrived",
 #'     roles = c("When Available")
 #'   )
-#' rpd <- constellation("MRS", list(db1, db2)) |>
+#' rpd <- constellation("MRS", db1, db2) |>
 #'   get_role_playing_dimension_names()
 #'
 #' @export

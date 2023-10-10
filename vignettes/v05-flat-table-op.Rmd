@@ -607,7 +607,7 @@ db_dm |>
 From the two star databases we define a constellation that shares common dimensions.
 
 ```{r example5}
-mrs_db <- constellation("mrs", list(mrs_cause_db, mrs_age_db))
+mrs_db <- constellation("mrs", mrs_cause_db, mrs_age_db)
 ```
 
 And we show the graphic representation of the tables.

@@ -329,7 +329,7 @@ db_finest2 |>
 We define the constellation and as a result the dimensions are integrated.
 
 ```{r}
-ct <- constellation("CSS", list(db_summary4, db_finest2))
+ct <- constellation("CSS", db_summary4, db_finest2)
 
 class(ct)
 

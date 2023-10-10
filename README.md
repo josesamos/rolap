@@ -306,7 +306,7 @@ dimensions, they share the same structure.
 Next we define a constellation formed by the two star databases.
 
 ``` r
-ct <- constellation("MRS", list(db1, db2))
+ct <- constellation("MRS", db1, db2)
 ```
 
 Constellation tables can also be exported as a tibble list.

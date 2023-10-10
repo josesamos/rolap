@@ -1,5 +1,5 @@
 # rolap (development version)
-* Change star database list in constellation function.
+* Change star database list as parameter in `constellation()` function.
 * Star databases data refresh functionality.
 
 # rolap 2.2.0

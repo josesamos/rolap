@@ -32,7 +32,7 @@ dm1 <- db1 |>
 db2 <- star_database(mrs_age_schema, ft_age) |>
   snake_case()
 
-ct <- constellation("MRS", list(db1, db2))
+ct <- constellation("MRS", db1, db2)
 dm <- ct |>
   as_dm_class()
 
