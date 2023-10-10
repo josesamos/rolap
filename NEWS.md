@@ -1,4 +1,6 @@
 # rolap (development version)
+* Change star database list in constellation function.
+* Star databases data refresh functionality.
 
 # rolap 2.2.0
 * Vignette about obtaining and transforming flat tables.

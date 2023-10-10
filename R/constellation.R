@@ -5,7 +5,7 @@
 #' (share the same structure, even though they have different instances).
 #'
 #' @param name A string.
-#' @param stars A list of `star_database` objects.
+#' @param ... `star_database` objects.
 #'
 #' @return A `star_database` object.
 #'
@@ -18,7 +18,7 @@
 #'   snake_case()
 #' db2 <- star_database(mrs_age_schema, ft_age) |>
 #'   snake_case()
-#' ct1 <- constellation("MRS", list(db1, db2))
+#' ct1 <- constellation("MRS", db1, db2)
 #'
 #'
 #' db3 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
@@ -32,10 +32,11 @@
 #'     rpd = "When Arrived",
 #'     roles = c("When Available")
 #'   )
-#' ct2 <- constellation("MRS", list(db3, db4))
+#' ct2 <- constellation("MRS", db3, db4)
 #'
 #' @export
-constellation <- function(name = NULL, stars = NULL) {
+constellation <- function(name = NULL, ...) {
+  stars <- list(...)
   stopifnot("Missing constellation name." = !is.null(name))
   stopifnot("A constellation must be made up of more than one star." = length(stars) > 1)
   fct_names <- c()

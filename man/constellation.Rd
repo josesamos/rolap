@@ -4,12 +4,12 @@
 \alias{constellation}
 \title{Create constellation}
 \usage{
-constellation(name = NULL, stars = NULL)
+constellation(name = NULL, ...)
 }
 \arguments{
 \item{name}{A string.}
 
-\item{stars}{A list of \code{star_database} objects.}
+\item{...}{\code{star_database} objects.}
 }
 \value{
 A \code{star_database} object.
@@ -25,7 +25,7 @@ db1 <- star_database(mrs_cause_schema, ft_num) |>
   snake_case()
 db2 <- star_database(mrs_age_schema, ft_age) |>
   snake_case()
-ct1 <- constellation("MRS", list(db1, db2))
+ct1 <- constellation("MRS", db1, db2)
 
 
 db3 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
@@ -39,7 +39,7 @@ db4 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
     rpd = "When Arrived",
     roles = c("When Available")
   )
-ct2 <- constellation("MRS", list(db3, db4))
+ct2 <- constellation("MRS", db3, db4)
 
 }
 \seealso{

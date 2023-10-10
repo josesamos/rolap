@@ -14,7 +14,7 @@ test_that("constellation() define constellation", {
     db2 <- star_database(mrs_age_schema, ft2) |>
       snake_case()
 
-    ct <- constellation("MRS", list(db1, db2))
+    ct <- constellation("MRS", db1, db2)
   }, {
     structure(
       list(
@@ -252,7 +252,7 @@ test_that("constellation() define constellation", {
     db3 <- star_database(s, ft_num) |>
       snake_case()
 
-    ct <- constellation("MRS", list(db1, db2, db3))
+    ct <- constellation("MRS", db1, db2, db3)
   }, {
     structure(
       list(
@@ -552,8 +552,8 @@ test_that("constellation() define constellation", {
     db3 <- star_database(s, ft1) |>
       snake_case()
 
-    ct <- constellation("MRS", list(db1, db3))
-    constellation("MRS", list(db2, ct))
+    ct <- constellation("MRS", db1, db3)
+    constellation("MRS", db2, ct)
   }, {
     structure(
       list(
@@ -853,8 +853,8 @@ test_that("constellation() define constellation", {
     db3 <- star_database(s, ft1) |>
       snake_case()
 
-    ct <- constellation("MRS", list(db1, db3))
-    constellation("MRS", list(db2, ct))
+    ct <- constellation("MRS", db1, db3)
+    constellation("MRS", db2, ct)
   }, {
     ft1 <- ft_num  |>
       dplyr::filter(City != "Cambridge") |>
@@ -883,8 +883,8 @@ test_that("constellation() define constellation", {
     db3 <- star_database(s, ft1) |>
       snake_case()
 
-    ct <- constellation("MRS", list(db2, db1))
-    constellation("MRS", list(ct, db3))
+    ct <- constellation("MRS", db2, db1)
+    constellation("MRS", ct, db3)
   })
 })
 
@@ -904,7 +904,7 @@ test_that("as_tibble_list() export constellation as a list of tibbles", {
     db2 <- star_database(mrs_age_schema, ft2) |>
       snake_case()
 
-    constellation("MRS", list(db1, db2)) |>
+    constellation("MRS", db1, db2) |>
       as_tibble_list()
   }, {
     list(
@@ -990,7 +990,7 @@ test_that("constellation() define constellation with rpd", {
     db2 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
       role_playing_dimension(rpd = "When Arrived",
                              roles = c("When Available"))
-    db <- constellation("MRS", list(db1, db2))
+    db <- constellation("MRS", db1, db2)
     c(
       db$rpd,
       nrow(db$dimensions$when$table),
@@ -1038,7 +1038,7 @@ test_that("constellation() get_role_playing_dimension_names()", {
     db2 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
       role_playing_dimension(rpd = "When Arrived",
                              roles = c("When Available"))
-    constellation("MRS", list(db1, db2)) |>
+    constellation("MRS", db1, db2) |>
       get_role_playing_dimension_names()
   }, {
     list(rpd_1 = c("when", "when_arrived", "when_available", "when_received"))
@@ -1056,7 +1056,7 @@ test_that("constellation() replace_attribute_values() with role_playing_dimensio
                 star_database(mrs_age_schema_rpd, ft_age_rpd) |>
                 role_playing_dimension(rpd = "When Arrived",
                                        roles = c("When Available"))
-              db <- constellation("MRS", list(db1, db2))
+              db <- constellation("MRS", db1, db2)
               db <- db |> replace_attribute_values(
                 name = "When Available",
                 old = c('1962', '11', '1962-03-14'),
@@ -1188,7 +1188,7 @@ test_that("constellation() replace_attribute_values() with role_playing_dimensio
                 star_database(mrs_age_schema_rpd, ft_age_rpd) |>
                 role_playing_dimension(rpd = "When Arrived",
                                        roles = c("When Available"))
-              db <- constellation("MRS", list(db1, db2))
+              db <- constellation("MRS", db1, db2)
 
               db <- db |> replace_attribute_values(
                 name = "When Available",

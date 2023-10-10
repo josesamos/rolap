@@ -946,7 +946,7 @@ test_that("as_single_tibble_list()", {
       snake_case()
     db2 <- star_database(mrs_age_schema, ft_age) |>
       snake_case()
-    ct <- constellation("MRS", list(db1, db2))
+    ct <- constellation("MRS", db1, db2)
     tl <- ct |>
       as_single_tibble_list()
     c(names(tl$mrs_cause), names(tl$mrs_age))
@@ -1041,7 +1041,7 @@ test_that("as_single_tibble_list()", {
       snake_case()
     db2 <- star_database(mrs_age_schema, ft_age) |>
       snake_case()
-    ct1 <- constellation("MRS", list(db1, db2))
+    ct1 <- constellation("MRS", db1, db2)
     r <- ct1 |> as_single_tibble_list()
     c(names(r[[1]]), names(r[[2]]))
   }, {
