@@ -5,8 +5,13 @@
 #' table.
 #'
 #' @param ft A `flat_table` object.
-#' @param ob_op An object with defined modification operations.
-#' @param star Star database name or index in constellation.
+#' @param ob A `flat_table` or `star_database` object with defined modification
+#' operations.
+#' @param return_flat_table Boolean, even if there are more operations, do not
+#' transform the flat table into a star database.
+#' @param begin_in_star_database Boolean, start with star database creation
+#' operation.
+#' @param star A string, star database name or index in constellation.
 #' @param sel_measure_group A vector of integers, if measures are separated into
 #' groups, indicate which group to consider.
 #'
@@ -22,36 +27,51 @@
 #' ft <- flat_table('ft_num', ft_num)
 #'
 #' @export
-update_according_to <- function(ft, ob_op, star, sel_measure_group) UseMethod("update_according_to")
+update_according_to <-
+  function(ft,
+           ob,
+           return_flat_table,
+           begin_in_star_database,
+           star,
+           sel_measure_group)
+    UseMethod("update_according_to")
 
 #' @rdname update_according_to
 #'
 #' @export
 update_according_to.flat_table <-
   function(ft,
-           ob_op,
+           ob,
+           return_flat_table = FALSE,
+           begin_in_star_database = FALSE,
            star = 1,
            sel_measure_group = 1) {
-    if (methods::is(ob_op, "flat_table")) {
-      operations <- ob_op$operations$operations
-      lookup_tables <- ob_op$lookup_tables
-    } else if (methods::is(ob_op, "star_database")) {
-      operations <- ob_op$operations[[star]]$operations
-      lookup_tables <- ob_op$lookup_tables[[star]]
-      schema <- ob_op$schemas[[star]]
+    if (methods::is(ob, "flat_table")) {
+      operations <- ob$operations$operations
+      lookup_tables <- ob$lookup_tables
+    } else if (methods::is(ob, "star_database")) {
+      operations <- ob$operations[[star]]$operations
+      lookup_tables <- ob$lookup_tables[[star]]
+      schema <- ob$schemas[[star]]
     } else {
-      stop(sprintf(
-        "The %s class is not supported to refresh operations.",
-        class(ob_op)
-      ))
+      stop(sprintf( "The %s class is not supported to refresh operations.", class(ob)))
     }
     sel <- 1
-    for (i in 1:nrow(operations)) {
+    if (begin_in_star_database) {
+      k <- which(operations$operation == "star_database")
+      stopifnot("There is no star database creation operation." = length(k) > 0)
+    } else {
+      k <- 1
+    }
+    for (i in k:nrow(operations)) {
       op <- operations[i, ]
       if (op$operation == "flat_table") {
         stopifnot("The operation of creating the flat table must be the first." = i == 1)
         ft <- interpret_operation_flat_table(ft, op)
       } else if (op$operation == "star_database") {
+        if (return_flat_table) {
+          return(ft)
+        }
         ft <- interpret_operation_star_database(ft, op, schema)
         is_star_database <- TRUE
       } else if (op$operation == "join_lookup_table") {

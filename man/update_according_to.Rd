@@ -5,16 +5,37 @@
 \alias{update_according_to.flat_table}
 \title{Update a flat table according to another structure}
 \usage{
-update_according_to(ft, ob_op, star, sel_measure_group)
+update_according_to(
+  ft,
+  ob,
+  return_flat_table,
+  begin_in_star_database,
+  star,
+  sel_measure_group
+)
 
-\method{update_according_to}{flat_table}(ft, ob_op, star = 1, sel_measure_group = 1)
+\method{update_according_to}{flat_table}(
+  ft,
+  ob,
+  return_flat_table = FALSE,
+  begin_in_star_database = FALSE,
+  star = 1,
+  sel_measure_group = 1
+)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
-\item{ob_op}{An object with defined modification operations.}
+\item{ob}{A \code{flat_table} or \code{star_database} object with defined modification
+operations.}
 
-\item{star}{Star database name or index in constellation.}
+\item{return_flat_table}{Boolean, even if there are more operations, do not
+transform the flat table into a star database.}
+
+\item{begin_in_star_database}{Boolean, start with star database creation
+operation.}
+
+\item{star}{A string, star database name or index in constellation.}
 
 \item{sel_measure_group}{A vector of integers, if measures are separated into
 groups, indicate which group to consider.}
