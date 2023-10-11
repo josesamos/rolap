@@ -199,16 +199,8 @@ interpret_operation_transform_to_measure <- function(ft, op, file, last_op) {
     l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
-      paste0("    k_sep = ", ifelse(
-        is.null(k_sep),
-        sprintf('%s,', deparse(k_sep)),
-        sprintf('"%s",', k_sep)
-      )),
-      paste0("    decimal_sep = ", ifelse(
-        is.null(decimal_sep),
-        sprintf('%s,', deparse(decimal_sep)),
-        sprintf('"%s",', decimal_sep)
-      )),
+      paste0("    k_sep = ", string_or_null(k_sep)),
+      paste0("    decimal_sep = ", string_or_null(decimal_sep)),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -244,16 +236,8 @@ interpret_operation_transform_attribute_format <- function(ft, op, file, last_op
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    width = ", sprintf('%d,', width)),
       paste0("    decimal_places = ", sprintf('%d,', decimal_places)),
-      paste0("    k_sep = ", ifelse(
-        is.null(k_sep),
-        sprintf('%s,', deparse(k_sep)),
-        sprintf('"%s",', k_sep)
-      )),
-      paste0("    decimal_sep = ", ifelse(
-        is.null(decimal_sep),
-        sprintf('%s,', deparse(decimal_sep)),
-        sprintf('"%s",', decimal_sep)
-      )),
+      paste0("    k_sep = ", string_or_null(k_sep)),
+      paste0("    decimal_sep = ", string_or_null(decimal_sep)),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -575,16 +559,8 @@ interpret_operation_transform_to_attribute <- function(ft, op, file, last_op) {
       paste0("    measures = c('", paste(measures, collapse = "', '"), "'),"),
       paste0("    width = ", sprintf('%d,', width)),
       paste0("    decimal_places = ", sprintf('%d,', decimal_places)),
-      paste0("    k_sep = ", ifelse(
-        is.null(k_sep),
-        sprintf('%s,', deparse(k_sep)),
-        sprintf('"%s",', k_sep)
-      )),
-      paste0("    decimal_sep = ", ifelse(
-        is.null(decimal_sep),
-        sprintf('%s,', deparse(decimal_sep)),
-        sprintf('"%s",', decimal_sep)
-      )),
+      paste0("    k_sep = ", string_or_null(k_sep)),
+      paste0("    decimal_sep = ", string_or_null(decimal_sep)),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -1034,6 +1010,21 @@ line_last_op <- function(last_op) {
 }
 
 
+#' Get the representation to output
+#'
+#' @param value A string
+#'
+#' @return A string
+#' @keywords internal
+string_or_null <- function(value) {
+  ifelse(
+    is.null(value),
+    sprintf('%s,', deparse(value)),
+    sprintf('"%s",', value)
+  )
+}
+
+
 
 #' Get line last operation
 #'
@@ -1071,6 +1062,7 @@ reformat_file <- function(out_file, function_name) {
   writeLines(paste0("ft <- ", name), file)
   close(file)
 }
+
 
 
 
