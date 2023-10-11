@@ -4,12 +4,16 @@
 \alias{interpret_operation_snake_case}
 \title{Interpret operation}
 \usage{
-interpret_operation_snake_case(ft, op)
+interpret_operation_snake_case(ft, op, file, last_op)
 }
 \arguments{
 \item{ft}{flat table}
 
 \item{op}{operation}
+
+\item{file}{file to write the code}
+
+\item{last_op}{A boolean, is the last operation?}
 }
 \value{
 A flat table.

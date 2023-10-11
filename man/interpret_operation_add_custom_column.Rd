@@ -4,12 +4,16 @@
 \alias{interpret_operation_add_custom_column}
 \title{Interpret operation}
 \usage{
-interpret_operation_add_custom_column(ft, op)
+interpret_operation_add_custom_column(ft, op, file, last_op)
 }
 \arguments{
 \item{ft}{flat table}
 
 \item{op}{operation}
+
+\item{file}{file to write the code}
+
+\item{last_op}{A boolean, is the last operation?}
 }
 \value{
 A flat table.

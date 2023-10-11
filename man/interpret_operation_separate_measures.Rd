@@ -4,7 +4,7 @@
 \alias{interpret_operation_separate_measures}
 \title{Interpret operation}
 \usage{
-interpret_operation_separate_measures(ft, op, sel_measure_group)
+interpret_operation_separate_measures(ft, op, sel_measure_group, file, last_op)
 }
 \arguments{
 \item{ft}{flat table}
@@ -12,6 +12,10 @@ interpret_operation_separate_measures(ft, op, sel_measure_group)
 \item{op}{operation}
 
 \item{sel_measure_group}{measure group index (to return)}
+
+\item{file}{file to write the code}
+
+\item{last_op}{A boolean, is the last operation?}
 }
 \value{
 A flat table.

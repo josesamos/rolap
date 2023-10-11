@@ -4,7 +4,7 @@
 \alias{interpret_operation_join_lookup_table}
 \title{Interpret operation}
 \usage{
-interpret_operation_join_lookup_table(ft, op, lookup_tables)
+interpret_operation_join_lookup_table(ft, op, lookup_tables, file, last_op)
 }
 \arguments{
 \item{ft}{flat table}
@@ -12,6 +12,10 @@ interpret_operation_join_lookup_table(ft, op, lookup_tables)
 \item{op}{operation}
 
 \item{lookup_tables}{lookup tables}
+
+\item{file}{file to write the code}
+
+\item{last_op}{A boolean, is the last operation?}
 }
 \value{
 A flat table.

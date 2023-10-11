@@ -14,7 +14,7 @@
 #' @param star A string, star database name or index in constellation.
 #' @param sel_measure_group A vector of integers, if measures are separated into
 #' groups, indicate which group to consider.
-#' @param output_file A string, name of the file in which to store the update
+#' @param out_file A string, name of the file in which to store the update
 #' instructions that are applied.
 #'
 #' @return A `flat_table` or `star_database` object.
@@ -36,7 +36,7 @@ update_according_to <-
            begin_in_star_database,
            star,
            sel_measure_group,
-           output_file)
+           out_file)
     UseMethod("update_according_to")
 
 #' @rdname update_according_to
@@ -49,7 +49,7 @@ update_according_to.flat_table <-
            begin_in_star_database = FALSE,
            star = 1,
            sel_measure_group = 1,
-           output_file = NULL) {
+           out_file = NULL) {
     if (methods::is(ob, "flat_table")) {
       operations <- ob$operations$operations
       lookup_tables <- ob$lookup_tables
@@ -60,6 +60,12 @@ update_according_to.flat_table <-
     } else {
       stop(sprintf( "The %s class is not supported to refresh operations.", class(ob)))
     }
+    if (!is.null(out_file)) {
+      file <- file(out_file, open = "wt")
+      writeLines("ft <- ", file)
+    } else {
+      file <- NULL
+    }
     sel <- 1
     if (begin_in_star_database) {
       k <- which(operations$operation == "star_database")
@@ -67,22 +73,27 @@ update_according_to.flat_table <-
     } else {
       k <- 1
     }
-    for (i in k:nrow(operations)) {
+    n <- nrow(operations)
+    for (i in k:n) {
+      last_op <- i == n
       op <- operations[i, ]
       if (op$operation == "flat_table") {
         stopifnot("The operation of creating the flat table must be the first." = i == 1)
-        ft <- interpret_operation_flat_table(ft, op)
+        ft <- interpret_operation_flat_table(ft, op, file, last_op)
       } else if (op$operation == "star_database") {
         if (return_flat_table) {
+          if (!is.null(out_file)){
+            close(file)
+          }
           return(ft)
         }
-        ft <- interpret_operation_star_database(ft, op, schema)
+        ft <- interpret_operation_star_database(ft, op, schema, file, last_op)
         is_star_database <- TRUE
       } else if (op$operation == "join_lookup_table") {
-        ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables)
+        ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables, file, last_op)
       } else if (op$operation == "separate_measures") {
         ft <-
-          interpret_operation_separate_measures(ft, op, sel_measure_group[sel])
+          interpret_operation_separate_measures(ft, op, sel_measure_group[sel], file, last_op)
         sel <- sel + 1
       } else if (op$operation %in% c(
         "add_custom_column",
@@ -110,11 +121,14 @@ update_according_to.flat_table <-
       )) {
         ft <-
           eval(parse(text = paste0(
-            "interpret_operation_", op$operation, "(ft, op)"
+            "interpret_operation_", op$operation, "(ft, op, file, last_op)"
           )))
       } else {
         stop(sprintf("Operation %s is not considered", op$operation))
       }
+    }
+    if (!is.null(out_file)){
+      close(file)
     }
     ft
   }
@@ -128,10 +142,12 @@ update_according_to.flat_table <-
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_flat_table <- function(ft, op) {
+interpret_operation_flat_table <- function(ft, op, file, last_op) {
   name <- string_to_vector(op$name)
   unknown_value <- name[2]
   name <- name[1]
@@ -156,10 +172,12 @@ interpret_operation_flat_table <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_transform_to_measure <- function(ft, op) {
+interpret_operation_transform_to_measure <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   k_sep <- string_to_vector(op$details)
   decimal_sep <- string_to_vector(op$details2)
@@ -174,10 +192,12 @@ interpret_operation_transform_to_measure <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_transform_attribute_format <- function(ft, op) {
+interpret_operation_transform_attribute_format <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   details <- string_to_vector(op$details)
   width <- as.integer(details[1])
@@ -196,10 +216,12 @@ interpret_operation_transform_attribute_format <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_replace_empty_values <- function(ft, op) {
+interpret_operation_replace_empty_values <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   empty_values <- string_to_vector(op$details)
   replace_empty_values(ft, attributes, empty_values)
@@ -217,10 +239,12 @@ interpret_operation_replace_empty_values <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_add_custom_column <- function(ft, op) {
+interpret_operation_add_custom_column <- function(ft, op, file, last_op) {
   name <- string_to_vector(op$name)
   g <- string_to_vector(op$details)
   definition <- eval(parse(text = g))
@@ -236,10 +260,12 @@ interpret_operation_add_custom_column <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_replace_attribute_values <- function(ft, op) {
+interpret_operation_replace_attribute_values <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   name = NULL
   if (length(attributes) > 1) {
@@ -262,10 +288,12 @@ interpret_operation_replace_attribute_values <- function(ft, op) {
 #' @param ft flat table
 #' @param op operation
 #' @param lookup_tables lookup tables
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_join_lookup_table <- function(ft, op, lookup_tables) {
+interpret_operation_join_lookup_table <- function(ft, op, lookup_tables, file, last_op) {
   fk_attributes <- string_to_vector(op$name)
   pos <- as.integer(string_to_vector(op$details))
   lookup <- lookup_tables[[pos]]
@@ -280,10 +308,12 @@ interpret_operation_join_lookup_table <- function(ft, op, lookup_tables) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_select_attributes <- function(ft, op) {
+interpret_operation_select_attributes <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   select_attributes(ft, attributes = attributes)
 }
@@ -296,10 +326,12 @@ interpret_operation_select_attributes <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_replace_string <- function(ft, op) {
+interpret_operation_replace_string <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   string <- string_to_vector(op$details)
   replacement <- string_to_vector(op$details2)
@@ -314,10 +346,12 @@ interpret_operation_replace_string <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_select_instances <- function(ft, op) {
+interpret_operation_select_instances <- function(ft, op, file, last_op) {
   not <- as.logical(string_to_vector(op$name))
   attributes <- string_to_vector(op$details)
   values <- string_to_vector(op$details2)
@@ -336,10 +370,12 @@ interpret_operation_select_instances <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_lookup_table <- function(ft, op) {
+interpret_operation_lookup_table <- function(ft, op, file, last_op) {
   pk_attributes <- string_to_vector(op$name)
   attributes <- NULL
   attribute_agg <- NULL
@@ -379,10 +415,12 @@ interpret_operation_lookup_table <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_transform_to_attribute <- function(ft, op) {
+interpret_operation_transform_to_attribute <- function(ft, op, file, last_op) {
   measures <- string_to_vector(op$name)
   details <- string_to_vector(op$details)
   width <- as.integer(details[1])
@@ -402,10 +440,12 @@ interpret_operation_transform_to_attribute <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_select_instances_by_comparison <- function(ft, op) {
+interpret_operation_select_instances_by_comparison <- function(ft, op, file, last_op) {
   name <- string_to_vector(op$name)
   not <- as.logical(as.integer(string_to_vector(name[1])))
   n_ele_set <- as.integer(name[-1])
@@ -443,10 +483,12 @@ interpret_operation_select_instances_by_comparison <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_select_measures <- function(ft, op) {
+interpret_operation_select_measures <- function(ft, op, file, last_op) {
   measures <- string_to_vector(op$name)
   na_rm <- as.logical(string_to_vector(op$details))
   select_measures(ft, measures, na_rm)
@@ -461,10 +503,12 @@ interpret_operation_select_measures <- function(ft, op) {
 #' @param ft flat table
 #' @param op operation
 #' @param sel_measure_group measure group index (to return)
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_separate_measures <- function(ft, op, sel_measure_group) {
+interpret_operation_separate_measures <- function(ft, op, sel_measure_group, file, last_op) {
   measures <- as.list(string_to_vector(op$name))
   for (i in 1:length(measures)) {
     if (substr(measures[[i]], 1,3) == "c(\"") {
@@ -485,10 +529,12 @@ interpret_operation_separate_measures <- function(ft, op, sel_measure_group) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_set_attribute_names <- function(ft, op) {
+interpret_operation_set_attribute_names <- function(ft, op, file, last_op) {
   name <- string_to_vector(op$name)
   old <- string_to_vector(op$details)
   new <- string_to_vector(op$details2)
@@ -503,10 +549,12 @@ interpret_operation_set_attribute_names <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_set_measure_names <- function(ft, op) {
+interpret_operation_set_measure_names <- function(ft, op, file, last_op) {
   name <- string_to_vector(op$name)
   old <- string_to_vector(op$details)
   new <- string_to_vector(op$details2)
@@ -521,10 +569,12 @@ interpret_operation_set_measure_names <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_snake_case <- function(ft, op) {
+interpret_operation_snake_case <- function(ft, op, file, last_op) {
   snake_case(ft)
 }
 
@@ -536,10 +586,12 @@ interpret_operation_snake_case <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_transform_from_values <- function(ft, op) {
+interpret_operation_transform_from_values <- function(ft, op, file, last_op) {
   attribute <- string_to_vector(op$name)
   transform_from_values(ft, attribute)
 }
@@ -552,10 +604,12 @@ interpret_operation_transform_from_values <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_transform_to_values <- function(ft, op) {
+interpret_operation_transform_to_values <- function(ft, op, file, last_op) {
   attribute <- string_to_vector(op$name)
   measure <- string_to_vector(op$details)
   details2 <- string_to_vector(op$details2)
@@ -577,10 +631,12 @@ interpret_operation_transform_to_values <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_replace_unknown_values <- function(ft, op) {
+interpret_operation_replace_unknown_values <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   value <- string_to_vector(op$details)
   replace_unknown_values(ft, attributes, value)
@@ -594,10 +650,12 @@ interpret_operation_replace_unknown_values <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_remove_instances_without_measures <- function(ft, op) {
+interpret_operation_remove_instances_without_measures <- function(ft, op, file, last_op) {
   remove_instances_without_measures(ft)
 }
 
@@ -610,10 +668,12 @@ interpret_operation_remove_instances_without_measures <- function(ft, op) {
 #' @param ft flat table
 #' @param op operation
 #' @param schema multidimensional schema
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_star_database <- function(ft, op, schema) {
+interpret_operation_star_database <- function(ft, op, schema, file, last_op) {
   unknown_value <- string_to_vector(op$details)
   star_database_with_previous_operations(
     schema,
@@ -632,10 +692,12 @@ interpret_operation_star_database <- function(ft, op, schema) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_role_playing_dimension <- function(ft, op) {
+interpret_operation_role_playing_dimension <- function(ft, op, file, last_op) {
   rpd <- string_to_vector(op$name)
   roles <- string_to_vector(op$details)
   att_names <- string_to_vector(op$details2)
@@ -650,10 +712,12 @@ interpret_operation_role_playing_dimension <- function(ft, op) {
 #'
 #' @param ft flat table
 #' @param op operation
+#' @param file file to write the code
+#' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_group_dimension_instances <- function(ft, op) {
+interpret_operation_group_dimension_instances <- function(ft, op, file, last_op) {
   name <- string_to_vector(op$name)
   group_dimension_instances(ft, name)
 }
@@ -674,6 +738,3 @@ interpret_operation_group_dimension_instances <- function(ft, op) {
 # Adicionalmente guardar y restaurar una star_database de una BDR.
 
 
-# fileConn<-file("output.txt")
-# writeLines(c("Hello","World"), fileConn)
-# close(fileConn)
