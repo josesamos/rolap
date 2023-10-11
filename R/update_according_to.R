@@ -200,7 +200,7 @@ interpret_operation_transform_to_measure <- function(ft, op, file, last_op) {
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    k_sep = ", string_or_null(k_sep)),
-      paste0("    decimal_sep = ", string_or_null(decimal_sep)),
+      paste0("    decimal_sep = ", string_or_null(decimal_sep, last = TRUE)),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -237,7 +237,7 @@ interpret_operation_transform_attribute_format <- function(ft, op, file, last_op
       paste0("    width = ", sprintf('%d,', width)),
       paste0("    decimal_places = ", sprintf('%d,', decimal_places)),
       paste0("    k_sep = ", string_or_null(k_sep)),
-      paste0("    decimal_sep = ", string_or_null(decimal_sep)),
+      paste0("    decimal_sep = ", string_or_null(decimal_sep, last = TRUE)),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -560,7 +560,7 @@ interpret_operation_transform_to_attribute <- function(ft, op, file, last_op) {
       paste0("    width = ", sprintf('%d,', width)),
       paste0("    decimal_places = ", sprintf('%d,', decimal_places)),
       paste0("    k_sep = ", string_or_null(k_sep)),
-      paste0("    decimal_sep = ", string_or_null(decimal_sep)),
+      paste0("    decimal_sep = ", string_or_null(decimal_sep, last = TRUE)),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -685,7 +685,7 @@ interpret_operation_separate_measures <- function(ft, op, sel_measure_group, fil
     }
     l <- c(
       paste0("  ", op$operation, "("),
-      paste0("    measures = c('", paste(measures, collapse = "', '"), "'),"),
+      sprintf("    measures = %s,", paste(gsub("\"", "'", deparse(measures), fixed = TRUE), collapse = "")),
       paste0("    names = c('", paste(names, collapse = "', '"), "'),"),
       paste0("    na_rm = ", sprintf('%s', deparse(na_rm))),
       "  ) |>",
@@ -1013,15 +1013,24 @@ line_last_op <- function(last_op) {
 #' Get the representation to output
 #'
 #' @param value A string
+#' @param last A boolean
 #'
 #' @return A string
 #' @keywords internal
-string_or_null <- function(value) {
-  ifelse(
-    is.null(value),
-    sprintf('%s,', deparse(value)),
-    sprintf('"%s",', value)
-  )
+string_or_null <- function(value, last = FALSE) {
+  if (last) {
+    ifelse(
+      is.null(value),
+      sprintf('%s', deparse(value)),
+      sprintf('"%s"', value)
+    )
+  } else {
+    ifelse(
+      is.null(value),
+      sprintf('%s,', deparse(value)),
+      sprintf('"%s",', value)
+    )
+  }
 }
 
 

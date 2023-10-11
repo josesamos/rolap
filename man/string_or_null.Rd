@@ -4,10 +4,12 @@
 \alias{string_or_null}
 \title{Get the representation to output}
 \usage{
-string_or_null(value)
+string_or_null(value, last = FALSE)
 }
 \arguments{
 \item{value}{A string}
+
+\item{last}{A boolean}
 }
 \value{
 A string
