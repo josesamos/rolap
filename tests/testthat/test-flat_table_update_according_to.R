@@ -1,25 +1,25 @@
-test_that("flat_table() refresh_new", {
+test_that("flat_table() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris))
   }, {
     f2 <- flat_table('iris2', head(iris))
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("flat_table() refresh_new", {
+test_that("flat_table() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', head(ft_num))
   }, {
     f2 <- flat_table('ft_num2', head(ft_num))
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("join_lookup_table() refresh_new", {
+test_that("join_lookup_table() update_according_to", {
   expect_equal({
     lookup <- flat_table('iris', iris) |>
       lookup_table(
@@ -36,12 +36,12 @@ test_that("join_lookup_table() refresh_new", {
   }, {
     f2 <- flat_table('iris', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("add_custom_column() refresh_new", {
+test_that("add_custom_column() update_according_to", {
   expect_equal({
     f <- function(table) {
       paste0(table$City, '-', table$State)
@@ -51,12 +51,12 @@ test_that("add_custom_column() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("replace_attribute_values() refresh_new", {
+test_that("replace_attribute_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       replace_attribute_values(
@@ -67,12 +67,12 @@ test_that("replace_attribute_values() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("replace_attribute_values() refresh_new", {
+test_that("replace_attribute_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       replace_attribute_values(
@@ -83,12 +83,12 @@ test_that("replace_attribute_values() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("replace_attribute_values() refresh_new", {
+test_that("replace_attribute_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_num) |>
       replace_attribute_values(
@@ -99,11 +99,11 @@ test_that("replace_attribute_values() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("replace_empty_values() refresh_new", {
+test_that("replace_empty_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris)
     f1$table[1, 1] <- NA
@@ -115,12 +115,12 @@ test_that("replace_empty_values() refresh_new", {
     f2$table[1, 1] <- NA
     f2$table[2, 1] <- ""
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("replace_string() refresh_new", {
+test_that("replace_string() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       replace_string(string = c('set'),
@@ -128,24 +128,24 @@ test_that("replace_string() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_attributes() refresh_new", {
+test_that("select_attributes() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_num) |>
       select_attributes(attributes = c('Year', 'WEEK'))
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_instances() refresh_new", {
+test_that("select_instances() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       select_instances(
@@ -155,12 +155,12 @@ test_that("select_instances() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_instances() refresh_new", {
+test_that("select_instances() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       select_instances(
@@ -171,12 +171,12 @@ test_that("select_instances() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_instances() refresh_new", {
+test_that("select_instances() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_num) |>
       select_instances(attributes = c('Year', 'WEEK'),
@@ -184,12 +184,12 @@ test_that("select_instances() refresh_new", {
   }, {
     f2 <- flat_table('ft_num', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("transform_attribute_format() refresh_new", {
+test_that("transform_attribute_format() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       transform_to_attribute(measures = "Sepal.Length", decimal_places = 1) |>
@@ -199,12 +199,12 @@ test_that("transform_attribute_format() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("transform_to_attribute() refresh_new", {
+test_that("transform_to_attribute() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris)
     f1$table[1, 2] <- 4000
@@ -216,12 +216,12 @@ test_that("transform_to_attribute() refresh_new", {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 2] <- 4000
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("transform_to_measure() refresh_new", {
+test_that("transform_to_measure() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris)
     f1$table[1, 2] <- 4000
@@ -236,12 +236,12 @@ test_that("transform_to_measure() refresh_new", {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 2] <- 4000
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_instances_by_comparison() refresh_new", {
+test_that("select_instances_by_comparison() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       select_instances_by_comparison(attributes = 'Species',
@@ -250,12 +250,12 @@ test_that("select_instances_by_comparison() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_instances_by_comparison() refresh_new", {
+test_that("select_instances_by_comparison() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_num) |>
       select_instances_by_comparison(
@@ -267,12 +267,12 @@ test_that("select_instances_by_comparison() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_instances_by_comparison() refresh_new", {
+test_that("select_instances_by_comparison() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_num) |>
       select_instances_by_comparison(
@@ -285,23 +285,23 @@ test_that("select_instances_by_comparison() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("select_measures() refresh_new", {
+test_that("select_measures() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("separate_measures() refresh_new", {
+test_that("separate_measures() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris, 2)) |>
       separate_measures(measures = list(
@@ -315,11 +315,11 @@ test_that("separate_measures() refresh_new", {
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      refresh_new(f1[[1]])
+      update_according_to(f1[[1]])
   })
 })
 
-test_that("separate_measures() refresh_new", {
+test_that("separate_measures() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris, 2)) |>
       separate_measures(measures = list(
@@ -333,11 +333,11 @@ test_that("separate_measures() refresh_new", {
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      refresh_new(f1[[3]], sel_measure_group = 3)
+      update_according_to(f1[[3]], sel_measure_group = 3)
   })
 })
 
-test_that("separate_measures() refresh_new", {
+test_that("separate_measures() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris, 2)) |>
       separate_measures(measures = list(
@@ -349,11 +349,11 @@ test_that("separate_measures() refresh_new", {
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      refresh_new(f1[[1]])
+      update_according_to(f1[[1]])
   })
 })
 
-test_that("separate_measures() refresh_new", {
+test_that("separate_measures() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris, 2)) |>
       separate_measures(measures = list(
@@ -365,12 +365,12 @@ test_that("separate_measures() refresh_new", {
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      refresh_new(f1[[2]], sel_measure_group = 2)
+      update_according_to(f1[[2]], sel_measure_group = 2)
   })
 })
 
 
-test_that("set_attribute_names() refresh_new", {
+test_that("set_attribute_names() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       set_attribute_names(old = c('Species'),
@@ -378,12 +378,12 @@ test_that("set_attribute_names() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("set_measure_names() refresh_new", {
+test_that("set_measure_names() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       set_measure_names(
@@ -398,22 +398,22 @@ test_that("set_measure_names() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("snake_case() refresh_new", {
+test_that("snake_case() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris)) |>
       snake_case()
   }, {
     f2 <- flat_table('iris2', head(iris))
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("transform_from_values() refresh_new", {
+test_that("transform_from_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       transform_to_values(attribute = 'Characteristic',
@@ -423,11 +423,11 @@ test_that("transform_from_values() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("transform_to_values() refresh_new", {
+test_that("transform_to_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       transform_to_values(attribute = 'Characteristic',
@@ -435,11 +435,11 @@ test_that("transform_to_values() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("transform_to_values() refresh_new", {
+test_that("transform_to_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       transform_to_values(attribute = 'Characteristic',
@@ -448,12 +448,12 @@ test_that("transform_to_values() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("lookup_table() refresh_new", {
+test_that("lookup_table() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       lookup_table(
@@ -468,12 +468,12 @@ test_that("lookup_table() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("replace_unknown_values() refresh_new", {
+test_that("replace_unknown_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris)
     f1$table[1, 1] <- NA
@@ -486,12 +486,12 @@ test_that("replace_unknown_values() refresh_new", {
     f2$table[1, 1] <- NA
     f2$table[2, 1] <- ""
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("remove_instances_without_measures() refresh_new", {
+test_that("remove_instances_without_measures() update_according_to", {
   expect_equal({
     iris2 <- iris
     iris2[10, 1:4] <- NA
@@ -500,13 +500,13 @@ test_that("remove_instances_without_measures() refresh_new", {
   }, {
     f2 <- flat_table('iris2', iris2)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
 
-test_that("star_database() refresh_new", {
+test_that("star_database() update_according_to", {
   expect_equal({
     s <- star_schema() |>
       define_facts(fact_schema(
@@ -526,12 +526,12 @@ test_that("star_database() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   }
   )
 })
 
-test_that("star_database() refresh_new", {
+test_that("star_database() update_according_to", {
   expect_equal({
     s <- star_schema() |>
       define_facts(fact_schema(name = "MRS Cause")) |>
@@ -547,12 +547,12 @@ test_that("star_database() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   }
   )
 })
 
-test_that("snake_case() refresh_new", {
+test_that("snake_case() update_according_to", {
   expect_equal({
     s <- star_schema() |>
       define_facts(fact_schema(
@@ -573,12 +573,12 @@ test_that("snake_case() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   }
 )
 })
 
-test_that("set_attribute_names() refresh_new",
+test_that("set_attribute_names() update_according_to",
           {
             expect_equal({
               f1 <- flat_table('ft_num', ft_num) |>
@@ -590,12 +590,12 @@ test_that("set_attribute_names() refresh_new",
             }, {
               f2 <- flat_table('ft_num2', ft_num)
               f2 |>
-                refresh_new(f1)
+                update_according_to(f1)
             })
           })
 
 
-test_that("set_attribute_names() refresh_new",
+test_that("set_attribute_names() update_according_to",
           {
             expect_equal({
               f1 <- flat_table('ft_num', ft_num) |>
@@ -608,12 +608,12 @@ test_that("set_attribute_names() refresh_new",
             }, {
               f2 <- flat_table('ft_num2', ft_num)
               f2 |>
-                refresh_new(f1)
+                update_according_to(f1)
             })
           })
 
 
-test_that("set_measure_names() refresh_new", {
+test_that("set_measure_names() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_num) |>
       as_star_database(mrs_cause_schema) |>
@@ -623,11 +623,11 @@ test_that("set_measure_names() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("replace_attribute_values() refresh_new", {
+test_that("replace_attribute_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_num) |>
       as_star_database(mrs_cause_schema) |>
@@ -639,11 +639,11 @@ test_that("replace_attribute_values() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("replace_attribute_values() refresh_new", {
+test_that("replace_attribute_values() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_cause_rpd) |>
       as_star_database(mrs_cause_schema_rpd) |>
@@ -657,12 +657,12 @@ test_that("replace_attribute_values() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("role_playing_dimension() refresh_new", {
+test_that("role_playing_dimension() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_cause_rpd) |>
       as_star_database(mrs_cause_schema_rpd) |>
@@ -671,11 +671,11 @@ test_that("role_playing_dimension() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("role_playing_dimension() refresh_new", {
+test_that("role_playing_dimension() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_cause_rpd) |>
       as_star_database(mrs_cause_schema_rpd) |>
@@ -687,11 +687,11 @@ test_that("role_playing_dimension() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
-test_that("role_playing_dimension() refresh_new", {
+test_that("role_playing_dimension() update_according_to", {
   expect_equal({
     f1 <- flat_table('ft_num', ft_cause_rpd) |>
       as_star_database(mrs_cause_schema_rpd) |>
@@ -703,12 +703,12 @@ test_that("role_playing_dimension() refresh_new", {
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      refresh_new(f1)
+      update_according_to(f1)
   })
 })
 
 
-test_that("group_dimension_instances() refresh_new",
+test_that("group_dimension_instances() update_according_to",
           {
             expect_equal({
               f1 <- flat_table('ft_num', ft_cause_rpd) |>
@@ -722,6 +722,6 @@ test_that("group_dimension_instances() refresh_new",
             }, {
               f2 <- flat_table('ft_num2', ft_cause_rpd)
               f2 |>
-                refresh_new(f1)
+                update_according_to(f1)
             })
           })

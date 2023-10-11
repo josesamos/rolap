@@ -1,43 +1,11 @@
 
-#' Select attributes of a flat table
+#' Update a flat table according to another structure
 #'
-#' Select only the indicated attributes from the flat table.
-#'
-#' @param ft A `flat_table` object.
-#' @param attributes A vector of names.
-#'
-#' @return A `flat_table` object.
-#'
-#' @family flat table transformation functions
-#' @seealso \code{\link{flat_table}}
-#'
-#' @examples
-#'
-#' ft <- flat_table('iris', iris) |>
-#'   refresh(attributes = c('Species'))
-#'
-#' ft <- flat_table('ft_num', ft_num) |>
-#'   refresh(attributes = c('Year', 'WEEK', 'Week Ending Date'))
-#'
-#' @export
-refresh <- function(ft, attributes) UseMethod("refresh")
-
-#' @rdname refresh
-#'
-#' @export
-refresh.flat_table <- function(ft, attributes) {
-  ft
-}
-
-
-
-#' Refresh a new flat table
-#'
-#' Refresh a new a flat table with the operations of another structure based on
-#' a flat table.
+#' Update a flat table with the operations of another structure based on a flat
+#' table.
 #'
 #' @param ft A `flat_table` object.
-#' @param s_op An object with defined modification operations.
+#' @param ob_op An object with defined modification operations.
 #' @param star Star database name or index in constellation.
 #' @param sel_measure_group A vector of integers, if measures are separated into
 #' groups, indicate which group to consider.
@@ -54,33 +22,27 @@ refresh.flat_table <- function(ft, attributes) {
 #' ft <- flat_table('ft_num', ft_num)
 #'
 #' @export
-refresh_new <- function(ft, s_op, star, sel_measure_group) UseMethod("refresh_new")
+update_according_to <- function(ft, ob_op, star, sel_measure_group) UseMethod("update_according_to")
 
-#' @rdname refresh_new
+#' @rdname update_according_to
 #'
 #' @export
-refresh_new.flat_table <-
+update_according_to.flat_table <-
   function(ft,
-           s_op,
+           ob_op,
            star = 1,
            sel_measure_group = 1) {
-    stopifnot(
-      "The flat table to be refreshed can only have the definition operation." = nrow(ft$operations$operations) == 1
-    )
-    stopifnot(
-      "The flat table to be refreshed can only have the definition operation." = ft$operations$operations[1, 1] == "flat_table"
-    )
-    if (methods::is(s_op, "flat_table")) {
-      operations <- s_op$operations$operations
-      lookup_tables <- s_op$lookup_tables
-    } else if (methods::is(s_op, "star_database")) {
-      operations <- s_op$operations[[star]]$operations
-      lookup_tables <- s_op$lookup_tables[[star]]
-      schema <- s_op$schemas[[star]]
+    if (methods::is(ob_op, "flat_table")) {
+      operations <- ob_op$operations$operations
+      lookup_tables <- ob_op$lookup_tables
+    } else if (methods::is(ob_op, "star_database")) {
+      operations <- ob_op$operations[[star]]$operations
+      lookup_tables <- ob_op$lookup_tables[[star]]
+      schema <- ob_op$schemas[[star]]
     } else {
       stop(sprintf(
         "The %s class is not supported to refresh operations.",
-        class(s_op)
+        class(ob_op)
       ))
     }
     sel <- 1

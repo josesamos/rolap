@@ -40,8 +40,6 @@ ft <- flat_table('iris', iris2) |>
 
 Other flat table transformation functions: 
 \code{\link{add_custom_column}()},
-\code{\link{refresh_new}()},
-\code{\link{refresh}()},
 \code{\link{remove_instances_without_measures}()},
 \code{\link{replace_string}()},
 \code{\link{replace_unknown_values}()},
@@ -54,6 +52,7 @@ Other flat table transformation functions:
 \code{\link{transform_from_values}()},
 \code{\link{transform_to_attribute}()},
 \code{\link{transform_to_measure}()},
-\code{\link{transform_to_values}()}
+\code{\link{transform_to_values}()},
+\code{\link{update_according_to}()}
 }
 \concept{flat table transformation functions}
