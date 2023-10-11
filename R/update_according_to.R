@@ -65,7 +65,6 @@ update_according_to.flat_table <-
     }
     if (!is.null(out_file)) {
       file <- file(out_file, open = "wt")
- ##     file <- file(out_file, open = "at") # only test
       writeLines("ft <- ", file)
     } else {
       file <- NULL
@@ -200,8 +199,16 @@ interpret_operation_transform_to_measure <- function(ft, op, file, last_op) {
     l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
-      paste0("    k_sep = ", sprintf('"%s",', k_sep)),
-      paste0("    decimal_sep = ", sprintf('"%s"', decimal_sep)),
+      paste0("    k_sep = ", ifelse(
+        is.null(k_sep),
+        sprintf('%s,', deparse(k_sep)),
+        sprintf('"%s",', k_sep)
+      )),
+      paste0("    decimal_sep = ", ifelse(
+        is.null(decimal_sep),
+        sprintf('%s,', deparse(decimal_sep)),
+        sprintf('"%s",', decimal_sep)
+      )),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -237,8 +244,16 @@ interpret_operation_transform_attribute_format <- function(ft, op, file, last_op
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    width = ", sprintf('%d,', width)),
       paste0("    decimal_places = ", sprintf('%d,', decimal_places)),
-      paste0("    k_sep = ", sprintf('"%s",', k_sep)),
-      paste0("    decimal_sep = ", sprintf('"%s"', decimal_sep)),
+      paste0("    k_sep = ", ifelse(
+        is.null(k_sep),
+        sprintf('%s,', deparse(k_sep)),
+        sprintf('"%s",', k_sep)
+      )),
+      paste0("    decimal_sep = ", ifelse(
+        is.null(decimal_sep),
+        sprintf('%s,', deparse(decimal_sep)),
+        sprintf('"%s",', decimal_sep)
+      )),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -560,8 +575,16 @@ interpret_operation_transform_to_attribute <- function(ft, op, file, last_op) {
       paste0("    measures = c('", paste(measures, collapse = "', '"), "'),"),
       paste0("    width = ", sprintf('%d,', width)),
       paste0("    decimal_places = ", sprintf('%d,', decimal_places)),
-      paste0("    k_sep = ", sprintf('"%s",', k_sep)),
-      paste0("    decimal_sep = ", sprintf('"%s"', decimal_sep)),
+      paste0("    k_sep = ", ifelse(
+        is.null(k_sep),
+        sprintf('%s,', deparse(k_sep)),
+        sprintf('"%s",', k_sep)
+      )),
+      paste0("    decimal_sep = ", ifelse(
+        is.null(decimal_sep),
+        sprintf('%s,', deparse(decimal_sep)),
+        sprintf('"%s",', decimal_sep)
+      )),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
@@ -925,7 +948,7 @@ interpret_operation_star_database <- function(ft, op, schema, file, last_op) {
   if (!is.null(file)) {
     writeLines(c(
       paste0("  ", "as_star_database", "("),
-      paste0("    STAR SCHEMA"),
+      paste0("    schema = **$STAR$SCHEMA$**"),
       line_last_op(last_op)
     ), file)
   }
@@ -1023,6 +1046,7 @@ reformat_file <- function(out_file, function_name) {
   l <- readLines(out_file)
   lft <- sum(grepl("**$LOOKUP$FLAT$TABLE$**", l, fixed = TRUE))
   fun <- sum(grepl("**$FUNCTION$**", l, fixed = TRUE))
+  sch <- sum(grepl("**$STAR$SCHEMA$**", l, fixed = TRUE))
 
   name <- paste0(function_name, " <- function(instance_df")
   if (lft > 0) {
@@ -1033,11 +1057,18 @@ reformat_file <- function(out_file, function_name) {
     name <- paste0(name, ", definition_fun")
     l <- gsub("**$FUNCTION$**", "definition_fun", l, fixed = TRUE)
   }
+  if (sch > 0) {
+    name <- paste0(name, ", star_sch")
+    l <- gsub("**$STAR$SCHEMA$**", "star_sch", l, fixed = TRUE)
+  }
   name <- paste0(name, ") {")
   file <- file(out_file, open = "wt")
   writeLines(name, file)
   writeLines(paste0("  ", l), file)
-  writeLines(c("", "  ft", "}"), file)
+  writeLines(c("", "  ft", "}", ""), file)
+  name <- gsub(" <- function", "", name, fixed = TRUE)
+  name <- gsub(" {", "", name, fixed = TRUE)
+  writeLines(paste0("ft <- ", name), file)
   close(file)
 }
 
