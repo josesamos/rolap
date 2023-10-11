@@ -16,6 +16,7 @@
 #' groups, indicate which group to consider.
 #' @param out_file A string, name of the file in which to store the update
 #' instructions that are applied.
+#' @param function_name A string, name of the function to generate in the file.
 #'
 #' @return A `flat_table` or `star_database` object.
 #'
@@ -36,7 +37,8 @@ update_according_to <-
            begin_in_star_database,
            star,
            sel_measure_group,
-           out_file)
+           out_file,
+           function_name)
     UseMethod("update_according_to")
 
 #' @rdname update_according_to
@@ -49,7 +51,8 @@ update_according_to.flat_table <-
            begin_in_star_database = FALSE,
            star = 1,
            sel_measure_group = 1,
-           out_file = NULL) {
+           out_file = NULL,
+           function_name = "transform_instance_table") {
     if (methods::is(ob, "flat_table")) {
       operations <- ob$operations$operations
       lookup_tables <- ob$lookup_tables
@@ -61,8 +64,8 @@ update_according_to.flat_table <-
       stop(sprintf( "The %s class is not supported to refresh operations.", class(ob)))
     }
     if (!is.null(out_file)) {
- ##     file <- file(out_file, open = "wt")
-      file <- file(out_file, open = "at") # only test
+      file <- file(out_file, open = "wt")
+ ##     file <- file(out_file, open = "at") # only test
       writeLines("ft <- ", file)
     } else {
       file <- NULL
@@ -85,6 +88,7 @@ update_according_to.flat_table <-
         if (return_flat_table) {
           if (!is.null(out_file)){
             close(file)
+            reformat_file(out_file)
           }
           return(ft)
         }
@@ -130,6 +134,7 @@ update_according_to.flat_table <-
     }
     if (!is.null(out_file)){
       close(file)
+      reformat_file(out_file, function_name)
     }
     ft
   }
@@ -166,7 +171,7 @@ interpret_operation_flat_table <- function(ft, op, file, last_op) {
     writeLines(c(
       paste0("  ", op$operation, "("),
       paste0("    name = ", sprintf('"%s",', name)),
-      paste0("    instances = DATA FRAME,"),
+      paste0("    instances = instance_df,"),
       paste0("    unknown_value = ", sprintf('"%s"', unknown_value)),
       line_last_op(last_op)
     ), file)
@@ -192,13 +197,15 @@ interpret_operation_transform_to_measure <- function(ft, op, file, last_op) {
   k_sep <- string_to_vector(op$details)
   decimal_sep <- string_to_vector(op$details2)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    k_sep = ", sprintf('"%s",', k_sep)),
       paste0("    decimal_sep = ", sprintf('"%s"', decimal_sep)),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   transform_to_measure(ft, attributes, k_sep, decimal_sep)
 }
@@ -225,7 +232,7 @@ interpret_operation_transform_attribute_format <- function(ft, op, file, last_op
   k_sep <- details2[1]
   decimal_sep <- details2[2]
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    width = ", sprintf('%d,', width)),
@@ -233,7 +240,9 @@ interpret_operation_transform_attribute_format <- function(ft, op, file, last_op
       paste0("    k_sep = ", sprintf('"%s",', k_sep)),
       paste0("    decimal_sep = ", sprintf('"%s"', decimal_sep)),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   transform_attribute_format(ft, attributes, width, decimal_places, k_sep, decimal_sep)
 }
@@ -255,12 +264,14 @@ interpret_operation_replace_empty_values <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   empty_values <- string_to_vector(op$details)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    empty_values = c('", paste(empty_values, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   replace_empty_values(ft, attributes, empty_values)
 }
@@ -290,7 +301,7 @@ interpret_operation_add_custom_column <- function(ft, op, file, last_op) {
     writeLines(c(
       paste0("  ", op$operation, "("),
       paste0("    name = ", sprintf('"%s",', name)),
-      paste0("    definition = FUNCTION"),
+      paste0("    definition = **$FUNCTION$**"),
       line_last_op(last_op)
     ), file)
   }
@@ -323,14 +334,19 @@ interpret_operation_replace_attribute_values <- function(ft, op, file, last_op) 
   old <- string_to_vector(op$details)
   new <- string_to_vector(op$details2)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
-      paste0("    name = ", ifelse(is.null(name), sprintf('%s,', deparse(name)), sprintf('"%s",', name))),
+      sprintf('    name = "%s",', ifelse(is.null(name), deparse(name), name)),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    old = c('", paste(old, collapse = "', '"), "'),"),
       paste0("    new = c('", paste(new, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    if (is.null(name)) {
+      l <- l[-2]
+    }
+    writeLines(l, file)
   }
   replace_attribute_values(ft, name, attributes, old, new)
 }
@@ -354,12 +370,14 @@ interpret_operation_join_lookup_table <- function(ft, op, lookup_tables, file, l
   pos <- as.integer(string_to_vector(op$details))
   lookup <- lookup_tables[[pos]]
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    fk_attributes = c('", paste(fk_attributes, collapse = "', '"), "'),"),
-      paste0("    lookup = LOOKUP FLAT TABLE"),
+      paste0("    lookup = **$LOOKUP$FLAT$TABLE$**"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   join_lookup_table(ft, fk_attributes, lookup)
 }
@@ -380,11 +398,13 @@ interpret_operation_join_lookup_table <- function(ft, op, lookup_tables, file, l
 interpret_operation_select_attributes <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   select_attributes(ft, attributes = attributes)
 }
@@ -407,13 +427,15 @@ interpret_operation_replace_string <- function(ft, op, file, last_op) {
   string <- string_to_vector(op$details)
   replacement <- string_to_vector(op$details2)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    string = c('", paste(string, collapse = "', '"), "'),"),
       paste0("    replacement = c('", paste(replacement, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   replace_string(ft, attributes, string, replacement)
 }
@@ -440,13 +462,15 @@ interpret_operation_select_instances <- function(ft, op, file, last_op) {
     values <- split(m, col(m))
   }
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    not = ", sprintf('%s,', deparse(not))),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    values = c('", paste(values, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   select_instances(ft, not, attributes, values)
 }
@@ -493,7 +517,7 @@ interpret_operation_lookup_table <- function(ft, op, file, last_op) {
     }
   }
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    pk_attributes = c('", paste(pk_attributes, collapse = "', '"), "'),"),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
@@ -501,7 +525,9 @@ interpret_operation_lookup_table <- function(ft, op, file, last_op) {
       paste0("    measures = c('", paste(measures, collapse = "', '"), "'),"),
       paste0("    measure_agg = c('", paste(measure_agg, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   lookup_table(ft, pk_attributes, attributes, attribute_agg, measures, measure_agg)
 }
@@ -529,7 +555,7 @@ interpret_operation_transform_to_attribute <- function(ft, op, file, last_op) {
   k_sep <- details2[1]
   decimal_sep <- details2[2]
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    measures = c('", paste(measures, collapse = "', '"), "'),"),
       paste0("    width = ", sprintf('%d,', width)),
@@ -537,7 +563,9 @@ interpret_operation_transform_to_attribute <- function(ft, op, file, last_op) {
       paste0("    k_sep = ", sprintf('"%s",', k_sep)),
       paste0("    decimal_sep = ", sprintf('"%s"', decimal_sep)),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   transform_to_attribute(ft, measures, width, decimal_places, k_sep, decimal_sep)
 }
@@ -584,14 +612,16 @@ interpret_operation_select_instances_by_comparison <- function(ft, op, file, las
     values <- val
   }
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    not = ", sprintf('%s,', deparse(not))),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    comparisons = c('", paste(comparisons, collapse = "', '"), "'),"),
       paste0("    values = c('", paste(values, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   select_instances_by_comparison(ft, not, attributes, comparisons, values)
 }
@@ -613,12 +643,14 @@ interpret_operation_select_measures <- function(ft, op, file, last_op) {
   measures <- string_to_vector(op$name)
   na_rm <- as.logical(string_to_vector(op$details))
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    measures = c('", paste(measures, collapse = "', '"), "'),"),
       paste0("    na_rm = ", sprintf('%s', deparse(na_rm))),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   select_measures(ft, measures, na_rm)
 }
@@ -652,14 +684,16 @@ interpret_operation_separate_measures <- function(ft, op, sel_measure_group, fil
     } else {
       last_line <- sprintf("  magrittr::extract2(%d) |>", sel_measure_group)
     }
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    measures = c('", paste(measures, collapse = "', '"), "'),"),
       paste0("    names = c('", paste(names, collapse = "', '"), "'),"),
       paste0("    na_rm = ", sprintf('%s', deparse(na_rm))),
       "  ) |>",
       last_line
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   groups <- separate_measures(ft, measures, names, na_rm)
   groups[[sel_measure_group]]
@@ -683,13 +717,18 @@ interpret_operation_set_attribute_names <- function(ft, op, file, last_op) {
   old <- string_to_vector(op$details)
   new <- string_to_vector(op$details2)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
-      paste0("    name = ", ifelse(is.null(name), sprintf('%s,', deparse(name)), sprintf('"%s",', name))),
+      sprintf('    name = "%s",', ifelse(is.null(name), deparse(name), name)),
       paste0("    old = c('", paste(old, collapse = "', '"), "'),"),
       paste0("    new = c('", paste(new, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    if (is.null(name)) {
+      l <- l[-2]
+    }
+    writeLines(l, file)
   }
   set_attribute_names(ft, name, old, new)
 }
@@ -712,13 +751,18 @@ interpret_operation_set_measure_names <- function(ft, op, file, last_op) {
   old <- string_to_vector(op$details)
   new <- string_to_vector(op$details2)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
-      paste0("    name = ", ifelse(is.null(name), sprintf('%s,', deparse(name)), sprintf('"%s",', name))),
+      sprintf('    name = "%s",', ifelse(is.null(name), deparse(name), name)),
       paste0("    old = c('", paste(old, collapse = "', '"), "'),"),
       paste0("    new = c('", paste(new, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    if (is.null(name)) {
+      l <- l[-2]
+    }
+    writeLines(l, file)
   }
   set_measure_names(ft, name, old, new)
 }
@@ -827,12 +871,14 @@ interpret_operation_replace_unknown_values <- function(ft, op, file, last_op) {
   attributes <- string_to_vector(op$name)
   value <- string_to_vector(op$details)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    attributes = c('", paste(attributes, collapse = "', '"), "'),"),
       paste0("    value = ", sprintf('"%s"', value)),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   replace_unknown_values(ft, attributes, value)
 }
@@ -910,13 +956,15 @@ interpret_operation_role_playing_dimension <- function(ft, op, file, last_op) {
   roles <- string_to_vector(op$details)
   att_names <- string_to_vector(op$details2)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", op$operation, "("),
       paste0("    rpd = ", sprintf('"%s",', rpd)),
       paste0("    roles = c('", paste(roles, collapse = "', '"), "'),"),
       paste0("    att_names = c('", paste(att_names, collapse = "', '"), "')"),
       line_last_op(last_op)
-    ), file)
+    )
+    l <- gsub("c('')", "NULL", l, fixed = TRUE)
+    writeLines(l, file)
   }
   role_playing_dimension(ft, rpd, roles, rpd_att_names = FALSE, att_names =  att_names)
 }
@@ -960,6 +1008,37 @@ line_last_op <- function(last_op) {
     res <- "  ) |>"
   }
   res
+}
+
+
+
+#' Get line last operation
+#'
+#' @param out_file A string, file name.
+#' @param function_name A string, name of the function to generate in the file.
+#'
+#' @return A string
+#' @keywords internal
+reformat_file <- function(out_file, function_name) {
+  l <- readLines(out_file)
+  lft <- sum(grepl("**$LOOKUP$FLAT$TABLE$**", l, fixed = TRUE))
+  fun <- sum(grepl("**$FUNCTION$**", l, fixed = TRUE))
+
+  name <- paste0(function_name, " <- function(instance_df")
+  if (lft > 0) {
+    name <- paste0(name, ", lookup_ft")
+    l <- gsub("**$LOOKUP$FLAT$TABLE$**", "lookup_ft", l, fixed = TRUE)
+  }
+  if (fun > 0) {
+    name <- paste0(name, ", definition_fun")
+    l <- gsub("**$FUNCTION$**", "definition_fun", l, fixed = TRUE)
+  }
+  name <- paste0(name, ") {")
+  file <- file(out_file, open = "wt")
+  writeLines(name, file)
+  writeLines(paste0("  ", l), file)
+  writeLines(c("", "  ft", "}"), file)
+  close(file)
 }
 
 

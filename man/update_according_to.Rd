@@ -12,7 +12,8 @@ update_according_to(
   begin_in_star_database,
   star,
   sel_measure_group,
-  out_file
+  out_file,
+  function_name
 )
 
 \method{update_according_to}{flat_table}(
@@ -22,7 +23,8 @@ update_according_to(
   begin_in_star_database = FALSE,
   star = 1,
   sel_measure_group = 1,
-  out_file = NULL
+  out_file = NULL,
+  function_name = "transform_instance_table"
 )
 }
 \arguments{
@@ -44,6 +46,8 @@ groups, indicate which group to consider.}
 
 \item{out_file}{A string, name of the file in which to store the update
 instructions that are applied.}
+
+\item{function_name}{A string, name of the function to generate in the file.}
 }
 \value{
 A \code{flat_table} or \code{star_database} object.
