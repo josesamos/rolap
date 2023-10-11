@@ -14,6 +14,8 @@
 #' @param star A string, star database name or index in constellation.
 #' @param sel_measure_group A vector of integers, if measures are separated into
 #' groups, indicate which group to consider.
+#' @param output_file A string, name of the file in which to store the update
+#' instructions that are applied.
 #'
 #' @return A `flat_table` or `star_database` object.
 #'
@@ -33,7 +35,8 @@ update_according_to <-
            return_flat_table,
            begin_in_star_database,
            star,
-           sel_measure_group)
+           sel_measure_group,
+           output_file)
     UseMethod("update_according_to")
 
 #' @rdname update_according_to
@@ -45,7 +48,8 @@ update_according_to.flat_table <-
            return_flat_table = FALSE,
            begin_in_star_database = FALSE,
            star = 1,
-           sel_measure_group = 1) {
+           sel_measure_group = 1,
+           output_file = NULL) {
     if (methods::is(ob, "flat_table")) {
       operations <- ob$operations$operations
       lookup_tables <- ob$lookup_tables
