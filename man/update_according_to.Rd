@@ -13,7 +13,8 @@ update_according_to(
   star,
   sel_measure_group,
   out_file,
-  function_name
+  function_name,
+  only_show_function
 )
 
 \method{update_according_to}{flat_table}(
@@ -24,7 +25,8 @@ update_according_to(
   star = 1,
   sel_measure_group = 1,
   out_file = NULL,
-  function_name = "transform_instance_table"
+  function_name = "transform_instance_table",
+  only_show_function = FALSE
 )
 }
 \arguments{
@@ -48,6 +50,8 @@ groups, indicate which group to consider.}
 instructions that are applied.}
 
 \item{function_name}{A string, name of the function to generate in the file.}
+
+\item{only_show_function}{A boolean, return a vector with the function lines.}
 }
 \value{
 A \code{flat_table} or \code{star_database} object.
