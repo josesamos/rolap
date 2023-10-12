@@ -95,11 +95,15 @@ update_according_to.flat_table <-
         if (return_flat_table) {
           if (!is.null(out_file)){
             close(file)
-            reformat_file(out_file)
+            r <- reformat_file(out_file, function_name)
           }
-          return(ft)
+          if (only_show_function) {
+            return(r)
+          } else {
+            return(ft)
+          }
         }
-        ft <- interpret_operation_star_database(ft, op, schema, file, last_op)
+        ft <- interpret_operation_star_database(ft, op, schema, file, last_op, begin_in_star_database)
         is_star_database <- TRUE
       } else if (op$operation == "join_lookup_table") {
         ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables, file, last_op)
@@ -928,17 +932,28 @@ interpret_operation_remove_instances_without_measures <- function(ft, op, file, 
 #' @param schema multidimensional schema
 #' @param file file to write the code
 #' @param last_op A boolean, is the last operation?
+#' @param begin_in_star_database A boolean, is the first operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_star_database <- function(ft, op, schema, file, last_op) {
+interpret_operation_star_database <- function(ft, op, schema, file, last_op, begin_in_star_database) {
   unknown_value <- string_to_vector(op$details)
   if (!is.null(file)) {
-    writeLines(c(
+    l <- c(
       paste0("  ", "as_star_database", "("),
       paste0("    schema = **$STAR$SCHEMA$**"),
       line_last_op(last_op)
-    ), file)
+    )
+    if (begin_in_star_database) {
+      l <- c(
+        paste0("  ", "star_database", "("),
+        paste0("    schema = **$STAR$SCHEMA$**,"),
+        paste0("    instances = instance_df,"),
+        paste0("    unknown_value = ", sprintf('"%s"', unknown_value)),
+        line_last_op(last_op)
+      )
+    }
+    writeLines(l, file)
   }
   star_database_with_previous_operations(
     schema,
@@ -1087,6 +1102,8 @@ reformat_file <- function(out_file, function_name) {
   file <- file(out_file, open = "wt")
   writeLines(name, file)
   l <- gsub("\"", "'", l, fixed = TRUE)
+  n <- length(l)
+  l[n] <- gsub(") |>", ")", l[n], fixed = TRUE)
   writeLines(paste0("  ", l), file)
   writeLines(c("", "  ft", "}", ""), file)
   name <- gsub(" <- function", "", name, fixed = TRUE)

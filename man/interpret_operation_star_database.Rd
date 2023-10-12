@@ -4,7 +4,14 @@
 \alias{interpret_operation_star_database}
 \title{Interpret operation}
 \usage{
-interpret_operation_star_database(ft, op, schema, file, last_op)
+interpret_operation_star_database(
+  ft,
+  op,
+  schema,
+  file,
+  last_op,
+  begin_in_star_database
+)
 }
 \arguments{
 \item{ft}{flat table}
@@ -16,6 +23,8 @@ interpret_operation_star_database(ft, op, schema, file, last_op)
 \item{file}{file to write the code}
 
 \item{last_op}{A boolean, is the last operation?}
+
+\item{begin_in_star_database}{A boolean, is the first operation?}
 }
 \value{
 A flat table.

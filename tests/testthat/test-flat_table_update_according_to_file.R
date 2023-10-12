@@ -597,10 +597,30 @@ test_that("select_instances_by_comparison() update_according_to", {
         comparisons = c('>=', '<=', '=='),
         values = c('1962', '1964', '2')
       )
-  }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    select_instances_by_comparison(",
+      "      not = FALSE,",
+      "      attributes = c('Year', 'Year', 'WEEK'),",
+      "      comparisons = c('>=', '<=', '=='),",
+      "      values = c('1962', '1964', '2')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -615,22 +635,59 @@ test_that("select_instances_by_comparison() update_according_to", {
         values = list(c('1962', '1964', '2'),
                       c('1962', '1964', '4'))
       )
-  }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    select_instances_by_comparison(",
+      "      not = FALSE,",
+      "      attributes = list(c('Year', 'Year', 'WEEK'), c('Year', 'Year', 'WEEK')),",
+      "      comparisons = list(c('>=', '<=', '=='), c('>=', '<=', '==')),",
+      "      values = list(c('1962', '1964', '2'), c('1962', '1964', '4'))",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
-
 
 test_that("select_measures() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', iris) |>
       select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
-  }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    select_measures(",
+      "      measures = c('Sepal.Length', 'Sepal.Width'),",
+      "      na_rm = TRUE",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -645,10 +702,30 @@ test_that("separate_measures() update_according_to", {
       ),
       names = c('PL', 'PW', 'SL', 'SW'))
     f1[[1]]
-  }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      update_according_to(f1[[1]])
+      update_according_to(f1[[1]], only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    separate_measures(",
+      "      measures = list('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width'),",
+      "      names = c('PL', 'PW', 'SL', 'SW'),",
+      "      na_rm = TRUE",
+      "    ) |>",
+      "    magrittr::extract2(1)",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -663,10 +740,32 @@ test_that("separate_measures() update_according_to", {
       ),
       names = c('PL', 'PW', 'SL', 'SW'))
     f1[[3]]
-  }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      update_according_to(f1[[3]], sel_measure_group = 3)
+      update_according_to(f1[[3]],
+                          sel_measure_group = 3,
+                          only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    separate_measures(",
+      "      measures = list('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width'),",
+      "      names = c('PL', 'PW', 'SL', 'SW'),",
+      "      na_rm = TRUE",
+      "    ) |>",
+      "    magrittr::extract2(3)",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -679,10 +778,31 @@ test_that("separate_measures() update_according_to", {
       ),
       names = c('PL-PW', 'SL-SW'))
     f1[[1]]
-  }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      update_according_to(f1[[1]])
+      update_according_to(f1[[1]],
+                          only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    separate_measures(",
+      "      measures = list(c('Petal.Length', 'Petal.Width'), c('Sepal.Length', 'Sepal.Width')),",
+      "      names = c('PL-PW', 'SL-SW'),",
+      "      na_rm = TRUE",
+      "    ) |>",
+      "    magrittr::extract2(1)",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -695,10 +815,32 @@ test_that("separate_measures() update_according_to", {
       ),
       names = c('PL-PW', 'SL-SW'))
     f1[[2]]
-  }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      update_according_to(f1[[2]], sel_measure_group = 2)
+      update_according_to(f1[[2]],
+                          sel_measure_group = 2,
+                          only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    separate_measures(",
+      "      measures = list(c('Petal.Length', 'Petal.Width'), c('Sepal.Length', 'Sepal.Width')),",
+      "      names = c('PL-PW', 'SL-SW'),",
+      "      na_rm = TRUE",
+      "    ) |>",
+      "    magrittr::extract2(2)",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -708,10 +850,28 @@ test_that("set_attribute_names() update_according_to", {
     f1 <- flat_table('iris', iris) |>
       set_attribute_names(old = 'Species',
                           new = c('species'))
-  }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    set_attribute_names(",
+      "      old = 'Species',",
+      "      new = 'species'",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -728,10 +888,28 @@ test_that("set_measure_names() update_according_to", {
         ),
         new = c('pl', 'pw', 'ls', 'sw')
       )
-  }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    set_measure_names(",
+      "      old = c('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width'),",
+      "      new = c('pl', 'pw', 'ls', 'sw')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -739,10 +917,26 @@ test_that("snake_case() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris)) |>
       snake_case()
-  }, {
     f2 <- flat_table('iris2', head(iris))
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    snake_case(",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -753,10 +947,33 @@ test_that("transform_from_values() update_according_to", {
                           measure = 'Value',
                           id_reverse = 'id') |>
       transform_from_values(attribute = 'Characteristic')
-  }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    transform_to_values(",
+      "      attribute = 'Characteristic',",
+      "      measure = 'Value',",
+      "      id_reverse = 'id',",
+      "      na_rm = TRUE",
+      "    ) |>",
+      "    transform_from_values(",
+      "      attribute = 'Characteristic'",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -765,10 +982,30 @@ test_that("transform_to_values() update_according_to", {
     f1 <- flat_table('iris', iris) |>
       transform_to_values(attribute = 'Characteristic',
                           measure = 'Value')
-  }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    transform_to_values(",
+      "      attribute = 'Characteristic',",
+      "      measure = 'Value',",
+      "      id_reverse = NULL,",
+      "      na_rm = TRUE",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -778,13 +1015,32 @@ test_that("transform_to_values() update_according_to", {
       transform_to_values(attribute = 'Characteristic',
                           measure = 'Value',
                           id_reverse = 'id')
-  }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    transform_to_values(",
+      "      attribute = 'Characteristic',",
+      "      measure = 'Value',",
+      "      id_reverse = 'id',",
+      "      na_rm = TRUE",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
-
 
 test_that("lookup_table() update_according_to", {
   expect_equal({
@@ -798,10 +1054,31 @@ test_that("lookup_table() update_according_to", {
         ),
         measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
       )
-  }, {
     f2 <- flat_table('iris2', iris)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    lookup_table(",
+      "      pk_attributes = 'Species',",
+      "      attributes = NULL,",
+      "      attribute_agg = NULL,",
+      "      measures = c('Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width'),",
+      "      measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -814,12 +1091,34 @@ test_that("replace_unknown_values() update_according_to", {
     f1 <- f1 |>
       replace_empty_values() |>
       replace_unknown_values(value = "Not available")
-  }, {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 1] <- NA
     f2$table[2, 1] <- ""
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    replace_empty_values(",
+      "      attributes = 'Species',",
+      "      empty_values = NULL",
+      "    ) |>",
+      "    replace_unknown_values(",
+      "      attributes = 'Species',",
+      "      value = 'Not available'",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -830,10 +1129,26 @@ test_that("remove_instances_without_measures() update_according_to", {
     iris2[10, 1:4] <- NA
     f1 <- flat_table('iris', iris2) |>
       remove_instances_without_measures()
-  }, {
     f2 <- flat_table('iris2', iris2)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'iris',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    remove_instances_without_measures(",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df)"
+    )
   })
 })
 
@@ -856,13 +1171,30 @@ test_that("star_database() update_according_to", {
       ))
     f1 <- flat_table('ft_num', ft_num) |>
       as_star_database(s)
-  }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      update_according_to(f1)
-  }
-  )
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
+  })
 })
+
 
 test_that("star_database() update_according_to", {
   expect_equal({
@@ -877,12 +1209,28 @@ test_that("star_database() update_according_to", {
       ))
     f1 <- flat_table('ft_num', ft_num) |>
       as_star_database(s)
-  }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      update_according_to(f1)
-  }
-  )
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
+  })
 })
 
 test_that("snake_case() update_according_to", {
@@ -903,12 +1251,30 @@ test_that("snake_case() update_according_to", {
     f1 <- flat_table('ft_num', ft_num) |>
       as_star_database(s) |>
       snake_case()
-  }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      update_according_to(f1)
-  }
-)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    ) |>",
+      "    snake_case(",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
+  })
 })
 
 test_that("set_attribute_names() update_according_to",
@@ -920,10 +1286,32 @@ test_that("set_attribute_names() update_according_to",
                                     new = c("Region",
                                             "State",
                                             "City"))
-            }, {
               f2 <- flat_table('ft_num2', ft_num)
               f2 |>
-                update_according_to(f1)
+                update_according_to(f1, only_show_function = TRUE)
+            }, {
+              c(
+                "transform_instance_table <- function(instance_df, star_sch) {",
+                "  ft <- ",
+                "    flat_table(",
+                "      name = 'ft_num',",
+                "      instances = instance_df,",
+                "      unknown_value = '___UNKNOWN___'",
+                "    ) |>",
+                "    as_star_database(",
+                "      schema = star_sch",
+                "    ) |>",
+                "    set_attribute_names(",
+                "      name = 'where',",
+                "      old = c('REGION', 'State', 'City'),",
+                "      new = c('Region', 'State', 'City')",
+                "    )",
+                "",
+                "  ft",
+                "}",
+                "",
+                "ft <- transform_instance_table(instance_df, star_sch)"
+              )
             })
           })
 
@@ -938,10 +1326,32 @@ test_that("set_attribute_names() update_according_to",
                   old = c("REGION"),
                   new = c("Region")
                 )
-            }, {
               f2 <- flat_table('ft_num2', ft_num)
               f2 |>
-                update_according_to(f1)
+                update_according_to(f1, only_show_function = TRUE)
+            }, {
+              c(
+                "transform_instance_table <- function(instance_df, star_sch) {",
+                "  ft <- ",
+                "    flat_table(",
+                "      name = 'ft_num',",
+                "      instances = instance_df,",
+                "      unknown_value = '___UNKNOWN___'",
+                "    ) |>",
+                "    as_star_database(",
+                "      schema = star_sch",
+                "    ) |>",
+                "    set_attribute_names(",
+                "      name = 'where',",
+                "      old = 'REGION',",
+                "      new = 'Region'",
+                "    )",
+                "",
+                "  ft",
+                "}",
+                "",
+                "ft <- transform_instance_table(instance_df, star_sch)"
+              )
             })
           })
 
@@ -953,10 +1363,32 @@ test_that("set_measure_names() update_according_to", {
       set_measure_names(new = c("Pneumonia and Influenza",
                                 "All",
                                 "Rows Aggregated"))
-  }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    ) |>",
+      "    set_measure_names(",
+      "      name = 'mrs_cause',",
+      "      old = c('Pneumonia and Influenza Deaths', 'All Deaths', 'nrow_agg'),",
+      "      new = c('Pneumonia and Influenza', 'All', 'Rows Aggregated')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
   })
 })
 
@@ -969,10 +1401,33 @@ test_that("replace_attribute_values() update_according_to", {
         old = c('1', 'CT', 'Bridgeport'),
         new = c('1', 'CT', 'Hartford')
       )
-  }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    ) |>",
+      "    replace_attribute_values(",
+      "      name = 'where',",
+      "      attributes = c('REGION', 'State', 'City'),",
+      "      old = c('1', 'CT', 'Bridgeport'),",
+      "      new = c('1', 'CT', 'Hartford')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
   })
 })
 
@@ -987,10 +1442,38 @@ test_that("replace_attribute_values() update_according_to", {
         old = c('1962', '11', '1962-03-14'),
         new = c('1962', '3', '1962-01-15')
       )
-  }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    ) |>",
+      "    role_playing_dimension(",
+      "      rpd = 'when',",
+      "      roles = c('when_available', 'when_received'),",
+      "      att_names = NULL",
+      "    ) |>",
+      "    replace_attribute_values(",
+      "      name = 'when',",
+      "      attributes = c('Year', 'WEEK', 'Week Ending Date'),",
+      "      old = c('1962', '11', '1962-03-14'),",
+      "      new = c('1962', '3', '1962-01-15')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
   })
 })
 
@@ -1001,10 +1484,32 @@ test_that("role_playing_dimension() update_according_to", {
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
-  }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    ) |>",
+      "    role_playing_dimension(",
+      "      rpd = 'when',",
+      "      roles = c('when_available', 'when_received'),",
+      "      att_names = NULL",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
   })
 })
 
@@ -1017,10 +1522,32 @@ test_that("role_playing_dimension() update_according_to", {
         roles = c("When Available", "When Received"),
         rpd_att_names = TRUE
       )
-  }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    ) |>",
+      "    role_playing_dimension(",
+      "      rpd = 'when',",
+      "      roles = c('when_available', 'when_received'),",
+      "      att_names = c('Year', 'WEEK', 'Week Ending Date')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
   })
 })
 
@@ -1033,10 +1560,32 @@ test_that("role_playing_dimension() update_according_to", {
         roles = c("When Available", "When Received"),
         att_names = c("Year", "Week", "Date")
       )
-  }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 |>
-      update_according_to(f1)
+      update_according_to(f1, only_show_function = TRUE)
+  }, {
+    c(
+      "transform_instance_table <- function(instance_df, star_sch) {",
+      "  ft <- ",
+      "    flat_table(",
+      "      name = 'ft_num',",
+      "      instances = instance_df,",
+      "      unknown_value = '___UNKNOWN___'",
+      "    ) |>",
+      "    as_star_database(",
+      "      schema = star_sch",
+      "    ) |>",
+      "    role_playing_dimension(",
+      "      rpd = 'when',",
+      "      roles = c('when_available', 'when_received'),",
+      "      att_names = c('Year', 'Week', 'Date')",
+      "    )",
+      "",
+      "  ft",
+      "}",
+      "",
+      "ft <- transform_instance_table(instance_df, star_sch)"
+    )
   })
 })
 
@@ -1052,10 +1601,36 @@ test_that("group_dimension_instances() update_according_to",
                   new = c('1962', '3', '1962-01-15')
                 ) |>
                 group_dimension_instances(name = "When")
-            }, {
               f2 <- flat_table('ft_num2', ft_cause_rpd)
               f2 |>
-                update_according_to(f1)
+                update_according_to(f1, only_show_function = TRUE)
+            }, {
+              c(
+                "transform_instance_table <- function(instance_df, star_sch) {",
+                "  ft <- ",
+                "    flat_table(",
+                "      name = 'ft_num',",
+                "      instances = instance_df,",
+                "      unknown_value = '___UNKNOWN___'",
+                "    ) |>",
+                "    as_star_database(",
+                "      schema = star_sch",
+                "    ) |>",
+                "    replace_attribute_values(",
+                "      name = 'when_available',",
+                "      attributes = c('Data Availability Year', 'Data Availability Week', 'Data Availability Date'),",
+                "      old = c('1962', '11', '1962-03-14'),",
+                "      new = c('1962', '3', '1962-01-15')",
+                "    ) |>",
+                "    group_dimension_instances(",
+                "      name = 'when'",
+                "    )",
+                "",
+                "  ft",
+                "}",
+                "",
+                "ft <- transform_instance_table(instance_df, star_sch)"
+              )
             })
           })
 
@@ -1072,13 +1647,28 @@ test_that("return_flat_table parameter, update_according_to",
                                             "State",
                                             "City"))
               f3
-            }, {
               f2 <- flat_table('ft_num2', ft_num)
               f2 |>
-                update_according_to(f1, return_flat_table = TRUE)
+                update_according_to(f1,
+                                    return_flat_table = TRUE,
+                                    only_show_function = TRUE)
+            }, {
+              c(
+                "transform_instance_table <- function(instance_df) {",
+                "  ft <- ",
+                "    flat_table(",
+                "      name = 'ft_num',",
+                "      instances = instance_df,",
+                "      unknown_value = '___UNKNOWN___'",
+                "    )",
+                "",
+                "  ft",
+                "}",
+                "",
+                "ft <- transform_instance_table(instance_df)"
+              )
             })
           })
-
 
 test_that("begin_in_star_database parameter, update_according_to",
           {
@@ -1095,14 +1685,33 @@ test_that("begin_in_star_database parameter, update_according_to",
                                     new = c("Region",
                                             "State",
                                             "City"))
-            }, {
               f2 <- flat_table('ft_num2', ft_num)
               f2 |>
-                update_according_to(f1, begin_in_star_database = TRUE)
+                update_according_to(f1,
+                                    begin_in_star_database = TRUE,
+                                    only_show_function = TRUE)
+            }, {
+              c(
+                "transform_instance_table <- function(instance_df, star_sch) {",
+                "  ft <- ",
+                "    star_database(",
+                "      schema = star_sch,",
+                "      instances = instance_df,",
+                "      unknown_value = '___UNKNOWN___'",
+                "    ) |>",
+                "    set_attribute_names(",
+                "      name = 'where',",
+                "      old = c('REGION', 'State', 'City'),",
+                "      new = c('Region', 'State', 'City')",
+                "    )",
+                "",
+                "  ft",
+                "}",
+                "",
+                "ft <- transform_instance_table(instance_df, star_sch)"
+              )
             })
           })
-
-
 
 
 test_that("group_dimension_instances() update_according_to",
@@ -1116,9 +1725,36 @@ test_that("group_dimension_instances() update_according_to",
                   new = c('1962', '3', '1962-01-15')
                 ) |>
                 group_dimension_instances(name = "When")
-            }, {
               f2 <- flat_table('ft_num2', ft_cause_rpd)
               f2 |>
-                update_according_to(f1, out_file = tempfile())
+                update_according_to(f1, out_file = tempfile(),
+                                    only_show_function = TRUE)
+            }, {
+              c(
+                "transform_instance_table <- function(instance_df, star_sch) {",
+                "  ft <- ",
+                "    flat_table(",
+                "      name = 'ft_num',",
+                "      instances = instance_df,",
+                "      unknown_value = '___UNKNOWN___'",
+                "    ) |>",
+                "    as_star_database(",
+                "      schema = star_sch",
+                "    ) |>",
+                "    replace_attribute_values(",
+                "      name = 'when_available',",
+                "      attributes = c('Data Availability Year', 'Data Availability Week', 'Data Availability Date'),",
+                "      old = c('1962', '11', '1962-03-14'),",
+                "      new = c('1962', '3', '1962-01-15')",
+                "    ) |>",
+                "    group_dimension_instances(",
+                "      name = 'when'",
+                "    )",
+                "",
+                "  ft",
+                "}",
+                "",
+                "ft <- transform_instance_table(instance_df, star_sch)"
+              )
             })
           })

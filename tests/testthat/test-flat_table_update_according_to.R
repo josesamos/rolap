@@ -770,8 +770,6 @@ test_that("begin_in_star_database parameter, update_according_to",
           })
 
 
-
-
 test_that("group_dimension_instances() update_according_to",
           {
             expect_equal({
