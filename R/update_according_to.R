@@ -26,9 +26,16 @@
 #'
 #' @examples
 #'
-#' ft <- flat_table('iris', iris)
-#'
-#' ft <- flat_table('ft_num', ft_num)
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd) |>
+#'   replace_attribute_values(
+#'     name = "When Available",
+#'     old = c('1962', '11', '1962-03-14'),
+#'     new = c('1962', '3', '1962-01-15')
+#'   ) |>
+#'   group_dimension_instances(name = "When")
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
 #'
 #' @export
 update_according_to <-
