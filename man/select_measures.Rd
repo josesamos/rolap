@@ -40,6 +40,7 @@ Other flat table transformation functions:
 \code{\link{select_attributes}()},
 \code{\link{select_instances_by_comparison}()},
 \code{\link{select_instances}()},
+\code{\link{select_measure_group}()},
 \code{\link{separate_measures}()},
 \code{\link{transform_attribute_format}()},
 \code{\link{transform_from_values}()},

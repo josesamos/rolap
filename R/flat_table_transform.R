@@ -760,9 +760,9 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
 
 #' Separate measures in flat tables
 #'
-#' Separate measures listed as list items into flat tables. Each item in the
-#' list is a vector of measures that is uniquely included along with the
-#' attributes in a new flat table.
+#' Separate groups of measures into different flat tables. For each group we
+#' must indicate a name. If we indicate more names than groups of measures, the
+#' measures not included in other groups are also included in a new group.
 #'
 #' A list of flat tables is returned. It assign the names to the result list.
 #'
@@ -798,24 +798,78 @@ separate_measures <- function(ft, measures, names, na_rm) UseMethod("separate_me
 separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_rm = TRUE) {
   stopifnot("Missing measure groups." = !is.null(measures))
   stopifnot("Missing measure group names." = !is.null(names))
-  stopifnot("Missing measure group names." = length(measures) == length(unique(names)))
-  lft <- vector("list", length = length(measures))
+  names <- unique(names)
+  stopifnot("Missing measure group names." = length(measures) == length(names) |
+              length(measures) + 1 == length(names))
+  lft <- vector("list", length = length(names))
   names(lft) <- names
-  for (i in seq_along(measures)) {
-    measures[[i]] <- validate_measures(ft$measures, measures[[i]])
+  if (length(names) > length(measures)) {
+    m <- unique(unlist(measures))
+    rest <- setdiff(ft$measures, m)
+    measures <- c(measures, rest)
+  }
+  for (i in seq_along(names)) {
+    if (i > length(measures)) {
+      sel_m <- NULL
+    } else {
+      sel_m <- validate_measures(ft$measures, measures[[i]])
+    }
     lft[[i]] <-
-      flat_table(name = names[i], instances = ft$table[, c(ft$attributes, measures[[i]])],
+      flat_table(name = names[i], instances = ft$table[, c(ft$attributes, sel_m)],
                  unknown_value = ft$unknown_value)
-    if (na_rm) {
-      lft[[i]]$table <- remove_all_measures_na(lft[[i]]$table, measures[[i]])
+    if (na_rm & !is.null(sel_m)) {
+      lft[[i]]$table <- remove_all_measures_na(lft[[i]]$table, sel_m)
     }
     lft[[i]]$pk_attributes <- ft$pk_attributes
     lft[[i]]$lookup_tables <- ft$lookup_tables
     lft[[i]]$operations <-
-      add_operation(ft$operations, "separate_measures", measures, names, na_rm)
+      add_operation(ft$operations, "select_measures", sel_m, names, na_rm)
   }
   lft
 }
+
+
+#' Select a measure group from a list
+#'
+#' Once the measures are separated into groups, we have a list of flat tables,
+#' we select one of the groups using this function, indicating its name.
+#'
+#' The operation is registered, to know which group we will continue working
+#' with. For this reason we should not use direct selection of elements from a
+#' list.
+#'
+#' @param lft A list of `flat_table` objects.
+#' @param name A string, measure group name.
+#'
+#' @return A `flat_table` object.
+#'
+#' @family flat table transformation functions
+#' @seealso \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' lft <- flat_table('iris', iris) |>
+#'   separate_measures(
+#'     measures = list(
+#'       c('Petal.Length'),
+#'       c('Petal.Width'),
+#'       c('Sepal.Length'),
+#'       c('Sepal.Width')
+#'     ),
+#'     names = c('PL', 'PW', 'SL', 'SW')
+#'   )
+#' ft <- lft |>
+#'   select_measure_group('SL')
+#'
+#' @export
+select_measure_group <- function(lft, name) {
+  stopifnot("Missing measure group name." = !is.null(name))
+  stopifnot("The name does not correspond to any group on the list." = name %in% names(lft))
+  lft[[name]]$operations <-
+    add_operation(lft[[name]]$operations, "select_measure_group", name)
+  lft[[name]]
+}
+
 
 #' Replace empty values with the unknown value
 #'
