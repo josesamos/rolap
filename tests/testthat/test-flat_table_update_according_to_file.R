@@ -719,7 +719,7 @@ test_that("separate_measures() update_according_to", {
       "      names = c('PL', 'PW', 'SL', 'SW'),",
       "      na_rm = TRUE",
       "    ) |>",
-      "    magrittr::extract2(1)",
+      "    magrittr::extract2('PL')",
       "",
       "  ft",
       "}",
@@ -743,7 +743,6 @@ test_that("separate_measures() update_according_to", {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
       update_according_to(f1[[3]],
-                          sel_measure_group = 3,
                           only_show_function = TRUE)
   }, {
     c(
@@ -759,7 +758,7 @@ test_that("separate_measures() update_according_to", {
       "      names = c('PL', 'PW', 'SL', 'SW'),",
       "      na_rm = TRUE",
       "    ) |>",
-      "    magrittr::extract2(3)",
+      "    magrittr::extract2('SL')",
       "",
       "  ft",
       "}",
@@ -796,7 +795,7 @@ test_that("separate_measures() update_according_to", {
       "      names = c('PL-PW', 'SL-SW'),",
       "      na_rm = TRUE",
       "    ) |>",
-      "    magrittr::extract2(1)",
+      "    magrittr::extract2('PL-PW')",
       "",
       "  ft",
       "}",
@@ -818,7 +817,6 @@ test_that("separate_measures() update_according_to", {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
       update_according_to(f1[[2]],
-                          sel_measure_group = 2,
                           only_show_function = TRUE)
   }, {
     c(
@@ -834,7 +832,7 @@ test_that("separate_measures() update_according_to", {
       "      names = c('PL-PW', 'SL-SW'),",
       "      na_rm = TRUE",
       "    ) |>",
-      "    magrittr::extract2(2)",
+      "    magrittr::extract2('SL-SW')",
       "",
       "  ft",
       "}",

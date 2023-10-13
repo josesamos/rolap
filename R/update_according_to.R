@@ -12,8 +12,6 @@
 #' @param begin_in_star_database Boolean, start with star database creation
 #' operation.
 #' @param star A string, star database name or index in constellation.
-#' @param sel_measure_group A vector of integers, if measures are separated into
-#' groups, indicate which group to consider.
 #' @param out_file A string, name of the file in which to store the update
 #' instructions that are applied.
 #' @param function_name A string, name of the function to generate in the file.
@@ -44,7 +42,6 @@ update_according_to <-
            return_flat_table,
            begin_in_star_database,
            star,
-           sel_measure_group,
            out_file,
            function_name,
            only_show_function)
@@ -59,7 +56,6 @@ update_according_to.flat_table <-
            return_flat_table = FALSE,
            begin_in_star_database = FALSE,
            star = 1,
-           sel_measure_group = 1,
            out_file = NULL,
            function_name = "transform_instance_table",
            only_show_function = FALSE) {
@@ -84,7 +80,6 @@ update_according_to.flat_table <-
     } else {
       file <- NULL
     }
-    sel <- 1
     if (begin_in_star_database) {
       k <- which(operations$operation == "star_database")
       stopifnot("There is no star database creation operation." = length(k) > 0)
@@ -114,10 +109,6 @@ update_according_to.flat_table <-
         is_star_database <- TRUE
       } else if (op$operation == "join_lookup_table") {
         ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables, file, last_op)
-      } else if (op$operation == "separate_measures") {
-        ft <-
-          interpret_operation_separate_measures(ft, op, sel_measure_group[sel], file, last_op)
-        sel <- sel + 1
       } else if (op$operation %in% c(
         "add_custom_column",
         "lookup_table",
@@ -130,6 +121,7 @@ update_according_to.flat_table <-
         "select_instances",
         "select_instances_by_comparison",
         "select_measures",
+        "separate_measures",
         "set_attribute_names",
         "set_measure_names",
         "snake_case",
@@ -680,18 +672,17 @@ interpret_operation_select_measures <- function(ft, op, file, last_op) {
 
 #' Interpret operation
 #'
-#'  operation,          name,     details, details2
-#' "separate_measures", measures, names, na_rm)
+#'  operation,          name,     details,            details2
+#' "separate_measures", measures, c(name, names), na_rm)
 #'
 #' @param ft flat table
 #' @param op operation
-#' @param sel_measure_group measure group index (to return)
 #' @param file file to write the code
 #' @param last_op A boolean, is the last operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_separate_measures <- function(ft, op, sel_measure_group, file, last_op) {
+interpret_operation_separate_measures <- function(ft, op, file, last_op) {
   measures <- as.list(string_to_vector(op$name))
   for (i in 1:length(measures)) {
     if (substr(measures[[i]], 1,3) == "c(\"") {
@@ -699,12 +690,14 @@ interpret_operation_separate_measures <- function(ft, op, sel_measure_group, fil
     }
   }
   names <- string_to_vector(op$details)
+  name <- names[1] # selected name
+  names <- names[-1]
   na_rm <- as.logical(string_to_vector(op$details2))
   if (!is.null(file)) {
     if (last_op) {
-      last_line <- sprintf("  magrittr::extract2(%d)", sel_measure_group)
+      last_line <- sprintf("  magrittr::extract2('%s')", name)
     } else {
-      last_line <- sprintf("  magrittr::extract2(%d) |>", sel_measure_group)
+      last_line <- sprintf("  magrittr::extract2('%s') |>", name)
     }
     l <- c(
       paste0("  ", op$operation, "("),
@@ -718,7 +711,7 @@ interpret_operation_separate_measures <- function(ft, op, sel_measure_group, fil
     writeLines(l, file)
   }
   groups <- separate_measures(ft, measures, names, na_rm)
-  groups[[sel_measure_group]]
+  groups[[name]]
 }
 
 

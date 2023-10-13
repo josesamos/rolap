@@ -7,7 +7,7 @@
 \usage{
 select_measures(ft, measures, na_rm)
 
-\method{select_measures}{flat_table}(ft, measures, na_rm = TRUE)
+\method{select_measures}{flat_table}(ft, measures = NULL, na_rm = TRUE)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
@@ -40,7 +40,6 @@ Other flat table transformation functions:
 \code{\link{select_attributes}()},
 \code{\link{select_instances_by_comparison}()},
 \code{\link{select_instances}()},
-\code{\link{select_measure_group}()},
 \code{\link{separate_measures}()},
 \code{\link{transform_attribute_format}()},
 \code{\link{transform_from_values}()},

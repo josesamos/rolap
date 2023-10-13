@@ -11,7 +11,6 @@ update_according_to(
   return_flat_table,
   begin_in_star_database,
   star,
-  sel_measure_group,
   out_file,
   function_name,
   only_show_function
@@ -23,7 +22,6 @@ update_according_to(
   return_flat_table = FALSE,
   begin_in_star_database = FALSE,
   star = 1,
-  sel_measure_group = 1,
   out_file = NULL,
   function_name = "transform_instance_table",
   only_show_function = FALSE
@@ -42,9 +40,6 @@ transform the flat table into a star database.}
 operation.}
 
 \item{star}{A string, star database name or index in constellation.}
-
-\item{sel_measure_group}{A vector of integers, if measures are separated into
-groups, indicate which group to consider.}
 
 \item{out_file}{A string, name of the file in which to store the update
 instructions that are applied.}
@@ -86,7 +81,6 @@ Other flat table transformation functions:
 \code{\link{select_attributes}()},
 \code{\link{select_instances_by_comparison}()},
 \code{\link{select_instances}()},
-\code{\link{select_measure_group}()},
 \code{\link{select_measures}()},
 \code{\link{separate_measures}()},
 \code{\link{transform_attribute_format}()},

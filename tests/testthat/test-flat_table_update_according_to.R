@@ -333,7 +333,7 @@ test_that("separate_measures() update_according_to", {
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      update_according_to(f1[[3]], sel_measure_group = 3)
+      update_according_to(f1[[3]])
   })
 })
 
@@ -365,7 +365,7 @@ test_that("separate_measures() update_according_to", {
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
     f2 |>
-      update_according_to(f1[[2]], sel_measure_group = 2)
+      update_according_to(f1[[2]])
   })
 })
 

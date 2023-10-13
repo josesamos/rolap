@@ -600,7 +600,7 @@ test_that("separate_measures() ", {
                 "iris<|>___UNKNOWN___",
                 "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
               ),
-              details = c("Species", "PL<|>PW<|>SL<|>SW"),
+              details = c("Species", "PL<|>PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"
@@ -638,7 +638,7 @@ test_that("separate_measures() ", {
                 "iris<|>___UNKNOWN___",
                 "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
               ),
-              details = c("Species", "PL<|>PW<|>SL<|>SW"),
+              details = c("Species", "PW<|>PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"
@@ -676,7 +676,7 @@ test_that("separate_measures() ", {
                 "iris<|>___UNKNOWN___",
                 "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
               ),
-              details = c("Species", "PL<|>PW<|>SL<|>SW"),
+              details = c("Species", "SL<|>PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"
@@ -714,7 +714,7 @@ test_that("separate_measures() ", {
                 "iris<|>___UNKNOWN___",
                 "Petal.Length<|>Petal.Width<|>Sepal.Length<|>Sepal.Width"
               ),
-              details = c("Species", "PL<|>PW<|>SL<|>SW"),
+              details = c("Species", "SW<|>PL<|>PW<|>SL<|>SW"),
               details2 = c(
                 "Sepal.Length<|>Sepal.Width<|>Petal.Length<|>Petal.Width",
                 "TRUE"
