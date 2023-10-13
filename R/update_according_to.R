@@ -685,7 +685,8 @@ interpret_operation_select_measures <- function(ft, op, file, last_op) {
 interpret_operation_separate_measures <- function(ft, op, file, last_op) {
   measures <- as.list(string_to_vector(op$name))
   for (i in 1:length(measures)) {
-    if (substr(measures[[i]], 1,3) == "c(\"") {
+    if (substr(measures[[i]], 1, 3) == "c(\"" |
+        measures[[i]] == 'NULL' | measures[[i]] == 'character(0)') {
       measures[[i]] <- eval(parse(text = measures[[i]]))
     }
   }
@@ -1080,7 +1081,6 @@ vector_presentation <- function(vector) {
 #' @keywords internal
 reformat_file <- function(out_file, function_name) {
   l <- readLines(out_file)
-  unlink(out_file)
   lft <- sum(grepl("**$LOOKUP$FLAT$TABLE$**", l, fixed = TRUE))
   fun <- sum(grepl("**$FUNCTION$**", l, fixed = TRUE))
   sch <- sum(grepl("**$STAR$SCHEMA$**", l, fixed = TRUE))
@@ -1110,7 +1110,5 @@ reformat_file <- function(out_file, function_name) {
   name <- gsub(" {", "", name, fixed = TRUE)
   writeLines(paste0("ft <- ", name), file)
   close(file)
-  l <- readLines(out_file)
-  unlink(out_file)
-  l
+  readLines(out_file)
 }

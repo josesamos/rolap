@@ -812,6 +812,9 @@ separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_r
   if (length(names) > length(measures)) {
     m <- unique(unlist(measures))
     rest <- setdiff(ft$measures, m)
+    if (length(rest) == 0) {
+      rest <- NULL
+    }
     measures <- c(measures, list(rest))
   }
   for (i in seq_along(names)) {
