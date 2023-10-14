@@ -12,8 +12,7 @@
 #'
 #' @return A `star_database_update` object.
 #'
-#' @family flat table transformation functions
-#' @seealso \code{\link{flat_table}}
+#' @family star database refresh functions
 #'
 #' @examples
 #'

@@ -41,23 +41,8 @@ f2 <- flat_table('ft_num2', ft_cause_rpd) |>
 
 }
 \seealso{
-\code{\link{flat_table}}
-
-Other flat table transformation functions: 
-\code{\link{add_custom_column}()},
-\code{\link{remove_instances_without_measures}()},
-\code{\link{replace_empty_values}()},
-\code{\link{replace_string}()},
-\code{\link{replace_unknown_values}()},
-\code{\link{select_attributes}()},
-\code{\link{select_instances_by_comparison}()},
-\code{\link{select_instances}()},
-\code{\link{select_measures}()},
-\code{\link{separate_measures}()},
-\code{\link{transform_attribute_format}()},
-\code{\link{transform_from_values}()},
-\code{\link{transform_to_attribute}()},
-\code{\link{transform_to_measure}()},
-\code{\link{transform_to_values}()}
+Other star database refresh functions: 
+\code{\link{get_existing_fact_instances}()},
+\code{\link{get_new_dimension_instances}()}
 }
-\concept{flat table transformation functions}
+\concept{star database refresh functions}

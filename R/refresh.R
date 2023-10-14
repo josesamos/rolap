@@ -1,4 +1,6 @@
 
+
+
 #' Checks the refresh of the selected star database from the given database
 #'
 #' Checks the refresh operation of the selected star database from the given
@@ -48,6 +50,114 @@ check_refesh <- function(db, refresh_db) {
   rf <- list(rf)
   names(rf) <- star
   c(rf, rd)
+}
+
+
+
+#' Get existing fact instances
+#'
+#' From the planned update, it obtains the instances of the update facts that
+#' are already included in the star database facts to be updated.
+#'
+#' When the update occurs, we need to determine what happens to these instances.
+#'
+#' @param sdbu A `star_database_update` object.
+#'
+#' @return A `tibble` object.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd) |>
+#'   replace_attribute_values(
+#'     name = "When Available",
+#'     old = c('1962', '11', '1962-03-14'),
+#'     new = c('1962', '3', '1962-01-15')
+#'   ) |>
+#'   group_dimension_instances(name = "When")
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' fact_instances <- f2 |>
+#'   get_existing_fact_instances()
+#'
+#' @export
+get_existing_fact_instances <- function(sdbu) UseMethod("get_existing_fact_instances")
+
+#' @rdname get_existing_fact_instances
+#'
+#' @export
+get_existing_fact_instances.star_database_update <- function(sdbu) {
+  ft <- sdbu$combination[[1]]$table[sdbu$combination[[1]]$table$existing_fact, ]
+  sk <- sdbu$combination[[1]]$surrogate_keys
+  measures <- setdiff(names(ft), c(sk, paste0('original_', sk), 'existing_fact'))
+  attributes <- NULL
+  dimensions <- sdbu$combination[-1]
+  for (d in names(dimensions)) {
+    dim <- dimensions[[d]]$table
+    key <- dimensions[[d]]$surrogate_key
+    attributes <-
+      c(attributes, setdiff(names(dim), c(key, paste0('original_', key))))
+    ft <- ft |>
+      dplyr::inner_join(dim, by = key)
+  }
+  ft <- ft |>
+    dplyr::select(tidyselect::all_of(c(attributes, measures)))
+  ft
+}
+
+
+#' Get new dimension instances
+#'
+#' From the planned update, it obtains the instances of the update dimensions
+#' that are not included in the star database dimensions to be updated.
+#'
+#' @param sdbu A `star_database_update` object.
+#'
+#' @return A list of `tibble` objects.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd) |>
+#'   replace_attribute_values(
+#'     name = "When Available",
+#'     old = c('1962', '11', '1962-03-14'),
+#'     new = c('1962', '3', '1962-01-15')
+#'   ) |>
+#'   group_dimension_instances(name = "When")
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' dim_instances <- f2 |>
+#'   get_new_dimension_instances()
+#'
+#' @export
+get_new_dimension_instances <- function(sdbu) UseMethod("get_new_dimension_instances")
+
+#' @rdname get_new_dimension_instances
+#'
+#' @export
+get_new_dimension_instances.star_database_update <- function(sdbu) {
+  dimensions <- sdbu$combination[-1]
+  res <- list()
+  for (d in names(dimensions)) {
+    dim <- dimensions[[d]]$table
+    pk <- dimensions[[d]]$surrogate_key
+    pko <-  paste0('original_', pk)
+    attributes <- setdiff(names(dim), c(pk, pko))
+    dim <- dim[is.na(dim[pko]), ]
+    dim <- dim |>
+      dplyr::select(tidyselect::all_of(attributes))
+    if (nrow(dim) > 0) {
+      dim <- list(dim)
+      names(dim) <- d
+      res <- c(res, dim)
+    }
+  }
+  res
 }
 
 

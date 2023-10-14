@@ -48,7 +48,6 @@ Other flat table transformation functions:
 \code{\link{transform_attribute_format}()},
 \code{\link{transform_to_attribute}()},
 \code{\link{transform_to_measure}()},
-\code{\link{transform_to_values}()},
-\code{\link{update_according_to}()}
+\code{\link{transform_to_values}()}
 }
 \concept{flat table transformation functions}
