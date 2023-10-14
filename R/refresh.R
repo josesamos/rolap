@@ -6,30 +6,48 @@
 #' the new instances in dimensions or existing instances in the facts.
 #'
 #' @param db A `star_database` object.
-#' @param star A string, star database name or index in constellation, database
-#' to refresh.
 #' @param refresh_db A `star_database` object with the same structure with
 #' new data.
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database transformation functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   check_refesh()
-#'
-#' @export
-check_refesh <- function(db, star, refresh_db)
-  UseMethod("check_refesh")
+#' @keywords internal
+check_refesh <- function(db, refresh_db) {
+  star <- names(refresh_db$facts)
+  of <- db$facts[[star]]
+  od <- db$dimensions[of$dim_int_names]
+  rf <- refresh_db$facts[[star]]
+  rd <- refresh_db$dimensions
+  for (d in names(od)) {
+    # rename dimension surrogate key
+    names <- names(od[[d]]$table)
+    i <- which(names == rd[[d]]$surrogate_key)
+    names[i] <- paste0('original_', names[i])
+    names(od[[d]]$table) <- names
+    attributes <- names[-i]
+    # rename fact surrogate key
+    names <- names(of$table)
+    i <- which(names == rd[[d]]$surrogate_key)
+    names[i] <- paste0('original_', names[i])
+    names(of$table) <- names
 
-#' @rdname check_refesh
-#'
-#' @export
-check_refesh.star_database <- function(db, star = 1, refresh_db) {
-  sort(names(db$dimensions))
+    rd[[d]]$table <- rd[[d]]$table |>
+      dplyr::left_join(od[[d]]$table, by = attributes)
+    rf$table <- rf$table |>
+      dplyr::inner_join(rd[[d]]$table,
+                        by = rd[[d]]$surrogate_key) |>
+      dplyr::select(-tidyselect::all_of(attributes))
+  }
+  measures <-
+    setdiff(names(of$table), c(of$surrogate_keys, paste0('original_', rf$surrogate_keys)))
+  of$table$existing_fact <- TRUE
+  rf$table <- rf$table |>
+    dplyr::left_join(dplyr::select(of$table, -tidyselect::all_of(measures)),
+                      by = paste0('original_', rf$surrogate_keys))
+  rf$table$existing_fact[is.na(rf$table$existing_fact)] <-  FALSE
+  rf <- list(rf)
+  names(rf) <- star
+  c(rf, rd)
 }
 
 

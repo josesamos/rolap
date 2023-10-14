@@ -106,14 +106,18 @@ update_according_to.flat_table <-
     }
     close(file)
     r <- reformat_file(out_file, function_name = 'transform_instance_table')
+    if (methods::is(sdb, "star_database")) {
+      combination <- check_refesh(sdb, ft)
+    } else {
+      combination <- NULL
+    }
     db <-
       structure(
         list(
           file = out_file,
           code = r,
           star_database = ft,
-          new_instance_dim = NULL,
-          old_instance_facts = NULL
+          combination = combination
         ),
         class = "star_database_update"
       )
