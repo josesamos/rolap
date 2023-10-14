@@ -43,6 +43,7 @@ Other star database refresh functions:
 \code{\link{get_new_dimension_instances}()},
 \code{\link{get_transformation_code}()},
 \code{\link{get_transformation_file}()},
+\code{\link{incremental_refresh}()},
 \code{\link{update_according_to}()}
 }
 \concept{star database refresh functions}

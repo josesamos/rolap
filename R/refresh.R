@@ -1,3 +1,42 @@
+#' Refresh a star database in a constellation
+#'
+#' Obtain the names of the tables of a star database.
+#'
+#' @param db A `star_database` object.
+#' @param sdbu A `star_database_update` object.
+#' @param existing_instances A string, operation to be carried out on the instances
+#' of already existing facts. The possible values are: "ignore", "replace",
+#' "group" and "delete".
+#' @param replace_transformations A boolean, replace the `star_database`
+#' transformation code with the `star_database_update` one.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num)
+#' sdbu <- flat_table('ft_num2', ft_num) |>
+#'   update_according_to(db)
+#'
+#' db <- db |>
+#'   incremental_refresh(sdbu)
+#'
+#' @export
+incremental_refresh <- function(db, sdbu, existing_instances, replace_transformations)
+  UseMethod("incremental_refresh")
+
+#' @rdname incremental_refresh
+#'
+#' @export
+incremental_refresh.star_database <-
+  function(db,
+           sdbu,
+           existing_instances = "ignore",
+           replace_transformations = FALSE) {
+    db
+  }
 
 
 
@@ -242,4 +281,3 @@ get_transformation_file.star_database_update <- function(sdbu, file = NULL) {
 }
 
 
-# the possible values of the existing parameter are: "ignore", "replace", "group"

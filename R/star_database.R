@@ -164,7 +164,9 @@ star_database_with_previous_operations <-
       fact_table(fact_name, keys, agg, names(schema$dimensions), instances)
     # db$operations[[1]] <-
     #   add_operation(op, "define_facts", fact_name, names(agg), agg)
-    db$lookup_tables[[1]] <- lookup_tables
+    if (!is.null(lookup_tables)) {
+      db$lookup_tables[[1]] <- lookup_tables
+    }
     db$schemas[[1]] <- schema
     db$operations[[1]] <-
       add_operation(op, "star_database", names(db$schemas), unknown_value)
