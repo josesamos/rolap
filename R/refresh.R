@@ -161,6 +161,86 @@ get_new_dimension_instances.star_database_update <- function(sdbu) {
 }
 
 
+#' Get transformation function code
+#'
+#' From the planned update, it obtains the function with the source code of the
+#' transformations performed on the original data in string vector format.
+#'
+#' @param sdbu A `star_database_update` object.
+#'
+#' @return A vector of strings.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd) |>
+#'   replace_attribute_values(
+#'     name = "When Available",
+#'     old = c('1962', '11', '1962-03-14'),
+#'     new = c('1962', '3', '1962-01-15')
+#'   ) |>
+#'   group_dimension_instances(name = "When")
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' code <- f2 |>
+#'   get_transformation_code()
+#'
+#' @export
+get_transformation_code <- function(sdbu) UseMethod("get_transformation_code")
+
+#' @rdname get_transformation_code
+#'
+#' @export
+get_transformation_code.star_database_update <- function(sdbu) {
+  sdbu$code
+}
+
+
+#' Get transformation function file
+#'
+#' From the planned update, it obtains the function with the source code of the
+#' transformations performed on the original data in file format.
+#'
+#' @param sdbu A `star_database_update` object.
+#' @param file A string, file name.
+#'
+#' @return A string, file name.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd) |>
+#'   replace_attribute_values(
+#'     name = "When Available",
+#'     old = c('1962', '11', '1962-03-14'),
+#'     new = c('1962', '3', '1962-01-15')
+#'   ) |>
+#'   group_dimension_instances(name = "When")
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' file <- f2 |>
+#'   get_transformation_file(file)
+#'
+#' @export
+get_transformation_file <- function(sdbu, file) UseMethod("get_transformation_file")
+
+#' @rdname get_transformation_file
+#'
+#' @export
+get_transformation_file.star_database_update <- function(sdbu, file = NULL) {
+  if (is.null(file)) {
+    res <- sdbu$file
+  } else {
+    file.copy(from = sdbu$file, to = file, overwrite = TRUE)
+    res <- file
+  }
+  res
+}
+
 
 # Class que se crea a partir de una star_database y una flat table con dos opciones
 # según se quiera hacer con las instancias de los hechos que ya existan (las nuevas no hay problema)
