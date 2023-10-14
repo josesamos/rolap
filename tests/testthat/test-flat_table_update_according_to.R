@@ -674,7 +674,8 @@ test_that("replace_attribute_values() update_according_to", {
         "where",
         old = c('1', 'CT', 'Bridgeport'),
         new = c('1', 'CT', 'Hartford')
-      )
+      ) |>
+      group_dimension_instances("where")
   }, {
     f2 <- flat_table('ft_num2', ft_num)
     f2 <- f2 |>
@@ -693,7 +694,8 @@ test_that("replace_attribute_values() update_according_to", {
         name = "When Available",
         old = c('1962', '11', '1962-03-14'),
         new = c('1962', '3', '1962-01-15')
-      )
+      ) |>
+      group_dimension_instances("When Available")
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 <- f2 |>
@@ -771,3 +773,72 @@ test_that("group_dimension_instances() update_according_to",
             })
           })
 
+
+
+test_that("get_existing_fact_instances() update_according_to",
+          {
+            expect_equal({
+              f1 <-
+                flat_table('ft_num', ft_num[ft_num$City != 'Cambridge' &
+                                              ft_num$Year != '1963',]) |>
+                as_star_database(mrs_cause_schema)
+
+              r <- c(15L, 1L, 5L, 2L, 12L, 14L, 3L, 7L, 10L, 12L)
+              f2 <- flat_table('ft_num2', ft_num[r,])
+              f2 <- f2 |>
+                update_according_to(f1)
+              f2 |> get_existing_fact_instances()
+            }, {
+              structure(
+                list(
+                  Year = c("1962", "1962", "1962", "1964", "1964"),
+                  REGION = c("1", "1", "1", "1", "1"),
+                  State = c("CT", "CT",
+                            "MA", "CT", "MA"),
+                  City = c("Bridgeport", "Hartford", "Boston",
+                           "Bridgeport", "Boston"),
+                  `Pneumonia and Influenza Deaths` = c(5L,
+                                                       1L, 23L, 8L, 9L),
+                  `All Deaths` = c(46L, 47L, 555L, 45L, 244L),
+                  nrow_agg = c(1L, 1L, 2L, 1L, 1L)
+                ),
+                row.names = c(NA,-5L),
+                class = c("tbl_df",
+                          "tbl", "data.frame")
+              )
+            })
+          })
+
+
+test_that("get_new_dimension_instances() update_according_to",
+          {
+            expect_equal({
+              f1 <-
+                flat_table('ft_num', ft_num[ft_num$City != 'Cambridge' &
+                                              ft_num$Year != '1963', ]) |>
+                as_star_database(mrs_cause_schema)
+
+              r <- c(15L, 1L, 5L, 2L, 12L, 14L, 3L, 7L, 10L, 12L)
+              f2 <- flat_table('ft_num2', ft_num[r, ])
+              f2 <- f2 |>
+                update_according_to(f1)
+              f2 |> get_new_dimension_instances()
+            }, {
+              list(
+                when = structure(
+                  list(Year = "1963"),
+                  row.names = c(NA,-1L),
+                  class = c("tbl_df", "tbl", "data.frame")
+                ),
+                where = structure(
+                  list(
+                    REGION = "1",
+                    State = "MA",
+                    City = "Cambridge"
+                  ),
+                  row.names = c(NA,-1L),
+                  class = c("tbl_df", "tbl", "data.frame")
+                )
+              )
+            })
+          })

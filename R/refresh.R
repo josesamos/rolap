@@ -36,7 +36,7 @@ check_refesh <- function(db, refresh_db) {
     rd[[d]]$table <- rd[[d]]$table |>
       dplyr::left_join(od[[d]]$table, by = attributes)
     rf$table <- rf$table |>
-      dplyr::inner_join(rd[[d]]$table,
+      dplyr::left_join(rd[[d]]$table,
                         by = rd[[d]]$surrogate_key) |>
       dplyr::select(-tidyselect::all_of(attributes))
   }
@@ -223,7 +223,7 @@ get_transformation_code.star_database_update <- function(sdbu) {
 #' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
 #'   update_according_to(f1)
 #' file <- f2 |>
-#'   get_transformation_file(file)
+#'   get_transformation_file()
 #'
 #' @export
 get_transformation_file <- function(sdbu, file) UseMethod("get_transformation_file")
@@ -242,13 +242,4 @@ get_transformation_file.star_database_update <- function(sdbu, file = NULL) {
 }
 
 
-# Class que se crea a partir de una star_database y una flat table con dos opciones
-# según se quiera hacer con las instancias de los hechos que ya existan (las nuevas no hay problema)
-# 1. sustituir las instancias de los hechos existentes con las nuevas que aparezcan
-# 2. agregar las instancias de los hechos existentes y las nuevas que aparezcan
-# se aplican las transformaciones sobre la flat table
-# se actualiza la star_database (hechos y dimensiones)
-# se generan nuevas instancias en dimensiones y hechos
-# se generan actualizaciones sobre instancias existentes en los hechos
-#
-# Adicionalmente guardar y restaurar una star_database de una BDR.
+# the possible values of the existing parameter are: "ignore", "replace", "group"

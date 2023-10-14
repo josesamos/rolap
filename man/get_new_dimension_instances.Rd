@@ -38,6 +38,8 @@ dim_instances <- f2 |>
 \seealso{
 Other star database refresh functions: 
 \code{\link{get_existing_fact_instances}()},
+\code{\link{get_transformation_code}()},
+\code{\link{get_transformation_file}()},
 \code{\link{update_according_to}()}
 }
 \concept{star database refresh functions}

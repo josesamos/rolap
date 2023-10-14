@@ -102,6 +102,7 @@ star_database_with_previous_operations <-
           operations = vector("list", length = length(schema$facts)),
           lookup_tables = vector("list", length = length(schema$facts)),
           schemas = vector("list", length = length(schema$facts)),
+          refresh = vector("list", length = length(schema$facts)),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
           rpd = list()
@@ -112,6 +113,7 @@ star_database_with_previous_operations <-
     names(db$operations) <- names(schema$facts)
     names(db$lookup_tables) <- names(schema$facts)
     names(db$schemas) <- names(schema$facts)
+    names(db$refresh) <- names(schema$facts)
     names(db$facts) <- names(schema$facts)
     names(db$dimensions) <- names(schema$dimensions)
 

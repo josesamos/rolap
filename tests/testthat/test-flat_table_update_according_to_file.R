@@ -1407,7 +1407,8 @@ test_that("replace_attribute_values() update_according_to", {
         "where",
         old = c('1', 'CT', 'Bridgeport'),
         new = c('1', 'CT', 'Hartford')
-      )
+      ) |>
+      group_dimension_instances("where")
     f2 <- flat_table('ft_num2', ft_num)
     f2 <- f2 |>
       update_according_to(f1)
@@ -1429,6 +1430,9 @@ test_that("replace_attribute_values() update_according_to", {
       "      attributes = c('REGION', 'State', 'City'),",
       "      old = c('1', 'CT', 'Bridgeport'),",
       "      new = c('1', 'CT', 'Hartford')",
+      "    ) |>",
+      "    group_dimension_instances(",
+      "      name = 'where'",
       "    )",
       "",
       "  ft",
@@ -1449,7 +1453,8 @@ test_that("replace_attribute_values() update_according_to", {
         name = "When Available",
         old = c('1962', '11', '1962-03-14'),
         new = c('1962', '3', '1962-01-15')
-      )
+      ) |>
+      group_dimension_instances("When Available")
     f2 <- flat_table('ft_num2', ft_cause_rpd)
     f2 <- f2 |>
       update_according_to(f1)
@@ -1476,6 +1481,9 @@ test_that("replace_attribute_values() update_according_to", {
       "      attributes = c('Year', 'WEEK', 'Week Ending Date'),",
       "      old = c('1962', '11', '1962-03-14'),",
       "      new = c('1962', '3', '1962-01-15')",
+      "    ) |>",
+      "    group_dimension_instances(",
+      "      name = 'when'",
       "    )",
       "",
       "  ft",

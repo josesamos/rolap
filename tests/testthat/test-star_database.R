@@ -58,6 +58,7 @@ test_that("star_database() define a a star database", {
           )
         ), class = "star_schema"
       )),
+      refresh = list(mrs_cause = NULL),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
@@ -180,6 +181,7 @@ test_that("star_database() define a a star database", {
           )
         ), class = "star_schema"
       )),
+      refresh = list(mrs_cause = NULL),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
@@ -304,6 +306,7 @@ test_that("snake_case() transform a a star database in snake case", {
           )
         ), class = "star_schema"
       )),
+      refresh = list(mrs_cause = NULL),
       facts = list(mrs_cause = structure(
         list(
           name = "mrs_cause",
