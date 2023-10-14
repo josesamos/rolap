@@ -35,6 +35,22 @@ incremental_refresh.star_database <-
            sdbu,
            existing_instances = "ignore",
            replace_transformations = FALSE) {
+
+    if (!(existing_instances %in% c("ignore", "replace", "group", "delete"))) {
+      stop(
+        sprintf(
+          "Operation %s not available. It has to be: 'ignore', 'replace', 'group' or 'delete'.",
+          existing_instances
+        )
+      )
+    }
+    star <- names(sdbu$star_database$facts)
+    if (replace_transformations) {
+      db$operations[[star]] <- sdbu$star_database$operations[[star]]
+      db$lookup_tables[[star]] <- sdbu$star_database$lookup_tables[[star]]
+      db$schemas[[star]] <- sdbu$star_database$schemas[[star]]
+    }
+
     db
   }
 
