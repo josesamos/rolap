@@ -3,8 +3,9 @@ test_that("flat_table() update_according_to", {
     f1 <- flat_table('iris', head(iris))
   }, {
     f2 <- flat_table('iris2', head(iris))
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -13,8 +14,9 @@ test_that("flat_table() update_according_to", {
     f1 <- flat_table('ft_num', head(ft_num))
   }, {
     f2 <- flat_table('ft_num2', head(ft_num))
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -35,8 +37,9 @@ test_that("join_lookup_table() update_according_to", {
       join_lookup_table(lookup = lookup)
   }, {
     f2 <- flat_table('iris', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -50,8 +53,9 @@ test_that("add_custom_column() update_according_to", {
       add_custom_column(name = 'city_state', definition = f)
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -66,8 +70,9 @@ test_that("replace_attribute_values() update_according_to", {
       )
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -82,8 +87,9 @@ test_that("replace_attribute_values() update_according_to", {
       )
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -98,8 +104,9 @@ test_that("replace_attribute_values() update_according_to", {
       )
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -114,8 +121,9 @@ test_that("replace_empty_values() update_according_to", {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 1] <- NA
     f2$table[2, 1] <- ""
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -127,8 +135,9 @@ test_that("replace_string() update_according_to", {
                      replacement = c('Set'))
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -139,8 +148,9 @@ test_that("select_attributes() update_according_to", {
       select_attributes(attributes = c('Year', 'WEEK'))
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -154,8 +164,9 @@ test_that("select_instances() update_according_to", {
       )
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -170,8 +181,9 @@ test_that("select_instances() update_according_to", {
       )
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -183,8 +195,9 @@ test_that("select_instances() update_according_to", {
                        values = list(c('1962', '2'), c('1964', '2')))
   }, {
     f2 <- flat_table('ft_num', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -198,8 +211,9 @@ test_that("transform_attribute_format() update_according_to", {
                                  decimal_places = 2)
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -215,8 +229,9 @@ test_that("transform_to_attribute() update_according_to", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 2] <- 4000
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -235,8 +250,9 @@ test_that("transform_to_measure() update_according_to", {
   }, {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 2] <- 4000
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -249,8 +265,9 @@ test_that("select_instances_by_comparison() update_according_to", {
                                      values = 'v')
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -266,8 +283,9 @@ test_that("select_instances_by_comparison() update_according_to", {
       )
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -284,8 +302,9 @@ test_that("select_instances_by_comparison() update_according_to", {
       )
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -296,8 +315,9 @@ test_that("select_measures() update_according_to", {
       select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -314,8 +334,9 @@ test_that("separate_measures() update_according_to", {
     f1[[1]]
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1[[1]])
+    f2$star_database
   })
 })
 
@@ -332,8 +353,9 @@ test_that("separate_measures() update_according_to", {
     f1[[3]]
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1[[3]])
+    f2$star_database
   })
 })
 
@@ -348,8 +370,9 @@ test_that("separate_measures() update_according_to", {
     f1[[1]]
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1[[1]])
+    f2$star_database
   })
 })
 
@@ -364,8 +387,9 @@ test_that("separate_measures() update_according_to", {
     f1[[2]]
   }, {
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1[[2]])
+    f2$star_database
   })
 })
 
@@ -377,8 +401,9 @@ test_that("set_attribute_names() update_according_to", {
                           new = c('species'))
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -397,8 +422,9 @@ test_that("set_measure_names() update_according_to", {
       )
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -408,8 +434,9 @@ test_that("snake_case() update_according_to", {
       snake_case()
   }, {
     f2 <- flat_table('iris2', head(iris))
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -422,8 +449,9 @@ test_that("transform_from_values() update_according_to", {
       transform_from_values(attribute = 'Characteristic')
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -434,8 +462,9 @@ test_that("transform_to_values() update_according_to", {
                           measure = 'Value')
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -447,8 +476,9 @@ test_that("transform_to_values() update_according_to", {
                           id_reverse = 'id')
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -467,8 +497,9 @@ test_that("lookup_table() update_according_to", {
       )
   }, {
     f2 <- flat_table('iris2', iris)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -485,8 +516,9 @@ test_that("replace_unknown_values() update_according_to", {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 1] <- NA
     f2$table[2, 1] <- ""
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -499,8 +531,9 @@ test_that("remove_instances_without_measures() update_according_to", {
       remove_instances_without_measures()
   }, {
     f2 <- flat_table('iris2', iris2)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -525,8 +558,9 @@ test_that("star_database() update_according_to", {
       as_star_database(s)
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   }
   )
 })
@@ -546,8 +580,9 @@ test_that("star_database() update_according_to", {
       as_star_database(s)
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   }
   )
 })
@@ -572,8 +607,9 @@ test_that("snake_case() update_according_to", {
       snake_case()
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   }
 )
 })
@@ -589,8 +625,9 @@ test_that("set_attribute_names() update_according_to",
                                             "City"))
             }, {
               f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
+              f2 <- f2 |>
                 update_according_to(f1)
+              f2$star_database
             })
           })
 
@@ -607,8 +644,9 @@ test_that("set_attribute_names() update_according_to",
                 )
             }, {
               f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
+              f2 <- f2 |>
                 update_according_to(f1)
+              f2$star_database
             })
           })
 
@@ -622,8 +660,9 @@ test_that("set_measure_names() update_according_to", {
                                 "Rows Aggregated"))
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -638,8 +677,9 @@ test_that("replace_attribute_values() update_according_to", {
       )
   }, {
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -656,8 +696,9 @@ test_that("replace_attribute_values() update_according_to", {
       )
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -670,8 +711,9 @@ test_that("role_playing_dimension() update_according_to", {
                              roles = c("When Available", "When Received"))
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -686,8 +728,9 @@ test_that("role_playing_dimension() update_according_to", {
       )
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -702,8 +745,9 @@ test_that("role_playing_dimension() update_according_to", {
       )
   }, {
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
+    f2 <- f2 |>
       update_according_to(f1)
+    f2$star_database
   })
 })
 
@@ -721,69 +765,9 @@ test_that("group_dimension_instances() update_according_to",
                 group_dimension_instances(name = "When")
             }, {
               f2 <- flat_table('ft_num2', ft_cause_rpd)
-              f2 |>
+              f2 <- f2 |>
                 update_according_to(f1)
+              f2$star_database
             })
           })
 
-
-test_that("return_flat_table parameter, update_according_to",
-          {
-            expect_equal({
-              f1 <- flat_table('ft_num', ft_num)
-              f3 <- f1
-              f1 <- f1 |>
-                as_star_database(mrs_cause_schema) |>
-                set_attribute_names(name = "where",
-                                    new = c("Region",
-                                            "State",
-                                            "City"))
-              f3
-            }, {
-              f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
-                update_according_to(f1, return_flat_table = TRUE)
-            })
-          })
-
-
-test_that("begin_in_star_database parameter, update_according_to",
-          {
-            expect_equal({
-              f1 <- flat_table('ft_num', ft_num) |>
-                as_star_database(mrs_cause_schema) |>
-                set_attribute_names(name = "where",
-                                    new = c("Region",
-                                            "State",
-                                            "City"))
-              flat_table('ft_num2', ft_num) |>
-                as_star_database(mrs_cause_schema) |>
-                set_attribute_names(name = "where",
-                                    new = c("Region",
-                                            "State",
-                                            "City"))
-            }, {
-              f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
-                update_according_to(f1, begin_in_star_database = TRUE)
-            })
-          })
-
-
-test_that("group_dimension_instances() update_according_to",
-          {
-            expect_equal({
-              f1 <- flat_table('ft_num', ft_cause_rpd) |>
-                as_star_database(mrs_cause_schema_rpd) |>
-                replace_attribute_values(
-                  name = "When Available",
-                  old = c('1962', '11', '1962-03-14'),
-                  new = c('1962', '3', '1962-01-15')
-                ) |>
-                group_dimension_instances(name = "When")
-            }, {
-              f2 <- flat_table('ft_num2', ft_cause_rpd)
-              f2 |>
-                update_according_to(f1, out_file = tempfile())
-            })
-          })

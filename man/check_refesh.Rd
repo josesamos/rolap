@@ -5,9 +5,9 @@
 \alias{check_refesh.star_database}
 \title{Checks the refresh of the selected star database from the given database}
 \usage{
-check_refesh(db, star = 1, refresh_db)
+check_refesh(db, star, refresh_db)
 
-\method{check_refesh}{star_database}(db)
+\method{check_refesh}{star_database}(db, star = 1, refresh_db)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}

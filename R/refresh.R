@@ -22,13 +22,13 @@
 #'   check_refesh()
 #'
 #' @export
-check_refesh <- function(db, star = 1, refresh_db)
+check_refesh <- function(db, star, refresh_db)
   UseMethod("check_refesh")
 
 #' @rdname check_refesh
 #'
 #' @export
-check_refesh.star_database <- function(db) {
+check_refesh.star_database <- function(db, star = 1, refresh_db) {
   sort(names(db$dimensions))
 }
 

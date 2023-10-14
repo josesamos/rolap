@@ -5,19 +5,12 @@
 #' table.
 #'
 #' @param ft A `flat_table` object.
-#' @param ob A `flat_table` or `star_database` object with defined modification
+#' @param sdb A `star_database` object with defined modification operations.
+#' @param star A string or integer, star database name or index in constellation.
+#' @param sdb_operations A `star_database` object with new defined modification
 #' operations.
-#' @param return_flat_table Boolean, even if there are more operations, do not
-#' transform the flat table into a star database.
-#' @param begin_in_star_database Boolean, start with star database creation
-#' operation.
-#' @param star A string, star database name or index in constellation.
-#' @param out_file A string, name of the file in which to store the update
-#' instructions that are applied.
-#' @param function_name A string, name of the function to generate in the file.
-#' @param only_show_function A boolean, return a vector with the function lines.
 #'
-#' @return A `flat_table` or `star_database` object.
+#' @return A `star_database_update` object.
 #'
 #' @family flat table transformation functions
 #' @seealso \code{\link{flat_table}}
@@ -38,13 +31,9 @@
 #' @export
 update_according_to <-
   function(ft,
-           ob,
-           return_flat_table,
-           begin_in_star_database,
+           sdb,
            star,
-           out_file,
-           function_name,
-           only_show_function)
+           sdb_operations)
     UseMethod("update_according_to")
 
 #' @rdname update_according_to
@@ -52,65 +41,38 @@ update_according_to <-
 #' @export
 update_according_to.flat_table <-
   function(ft,
-           ob,
-           return_flat_table = FALSE,
-           begin_in_star_database = FALSE,
+           sdb,
            star = 1,
-           out_file = NULL,
-           function_name = "transform_instance_table",
-           only_show_function = FALSE) {
-    if (methods::is(ob, "flat_table")) {
-      operations <- ob$operations$operations
-      lookup_tables <- ob$lookup_tables
-    } else if (methods::is(ob, "star_database")) {
-      operations <- ob$operations[[star]]$operations
-      lookup_tables <- ob$lookup_tables[[star]]
-      schema <- ob$schemas[[star]]
+           sdb_operations = NULL) {
+    if (!is.null(sdb_operations)) {
+      source_op <- sdb_operations
     } else {
-      stop(sprintf( "The %s class is not supported to refresh operations.", class(ob)))
+      source_op <- sdb
     }
-    if (only_show_function) {
-      if (is.null(out_file)) {
-        out_file <- tempfile()
-      }
-    }
-    if (!is.null(out_file)) {
-      file <- file(out_file, open = "wt")
-      writeLines("ft <- ", file)
+    if (methods::is(source_op, "flat_table")) {
+      operations <- source_op$operations$operations
+      lookup_tables <- source_op$lookup_tables
+    } else if (methods::is(source_op, "star_database")) {
+      operations <- source_op$operations[[star]]$operations
+      lookup_tables <- source_op$lookup_tables[[star]]
+      schema <- source_op$schemas[[star]]
     } else {
-      file <- NULL
+      stop(sprintf( "The %s class is not supported to update operations.", class(source_op)))
     }
-    if (begin_in_star_database) {
-      k <- which(operations$operation == "star_database")
-      stopifnot("There is no star database creation operation." = length(k) > 0)
-    } else {
-      k <- 1
-    }
+    out_file <- tempfile()
+    file <- file(out_file, open = "wt")
+    writeLines("ft <- ", file)
     n <- nrow(operations)
-    for (i in k:n) {
+    for (i in 1:n) {
       last_op <- i == n
       op <- operations[i, ]
-      if (op$operation == "flat_table") {
-        stopifnot("The operation of creating the flat table must be the first." = i == 1)
-        ft <- interpret_operation_flat_table(ft, op, file, last_op)
-      } else if (op$operation == "star_database") {
-        if (return_flat_table) {
-          if (!is.null(out_file)){
-            close(file)
-            r <- reformat_file(out_file, function_name)
-          }
-          if (only_show_function) {
-            return(r)
-          } else {
-            return(ft)
-          }
-        }
-        ft <- interpret_operation_star_database(ft, op, schema, file, last_op, begin_in_star_database)
-        is_star_database <- TRUE
+      if (op$operation == "star_database") {
+        ft <- interpret_operation_star_database(ft, op, schema, file, last_op)
       } else if (op$operation == "join_lookup_table") {
         ft <- interpret_operation_join_lookup_table(ft, op, lookup_tables, file, last_op)
       } else if (op$operation %in% c(
         "add_custom_column",
+        "flat_table",
         "lookup_table",
         "remove_instances_without_measures",
         "replace_attribute_values",
@@ -142,15 +104,19 @@ update_according_to.flat_table <-
         stop(sprintf("Operation %s is not considered", op$operation))
       }
     }
-    if (!is.null(out_file)){
-      close(file)
-      r <- reformat_file(out_file, function_name)
-    }
-    if (only_show_function) {
-      r
-    } else {
-      ft
-    }
+    close(file)
+    r <- reformat_file(out_file, function_name = 'transform_instance_table')
+    db <-
+      structure(
+        list(
+          file = out_file,
+          code = r,
+          star_database = ft,
+          new_instance_dim = NULL,
+          old_instance_facts = NULL
+        ),
+        class = "star_database_update"
+      )
   }
 
 
@@ -933,11 +899,10 @@ interpret_operation_remove_instances_without_measures <- function(ft, op, file, 
 #' @param schema multidimensional schema
 #' @param file file to write the code
 #' @param last_op A boolean, is the last operation?
-#' @param begin_in_star_database A boolean, is the first operation?
 #'
 #' @return A flat table.
 #' @keywords internal
-interpret_operation_star_database <- function(ft, op, schema, file, last_op, begin_in_star_database) {
+interpret_operation_star_database <- function(ft, op, schema, file, last_op) {
   unknown_value <- string_to_vector(op$details)
   if (!is.null(file)) {
     l <- c(
@@ -945,15 +910,6 @@ interpret_operation_star_database <- function(ft, op, schema, file, last_op, beg
       paste0("    schema = **$STAR$SCHEMA$**"),
       line_last_op(last_op)
     )
-    if (begin_in_star_database) {
-      l <- c(
-        paste0("  ", "star_database", "("),
-        paste0("    schema = **$STAR$SCHEMA$**,"),
-        paste0("    instances = instance_df,"),
-        paste0("    unknown_value = ", sprintf('"%s"', unknown_value)),
-        line_last_op(last_op)
-      )
-    }
     writeLines(l, file)
   }
   star_database_with_previous_operations(

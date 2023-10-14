@@ -5,51 +5,22 @@
 \alias{update_according_to.flat_table}
 \title{Update a flat table according to another structure}
 \usage{
-update_according_to(
-  ft,
-  ob,
-  return_flat_table,
-  begin_in_star_database,
-  star,
-  out_file,
-  function_name,
-  only_show_function
-)
+update_according_to(ft, sdb, star, sdb_operations)
 
-\method{update_according_to}{flat_table}(
-  ft,
-  ob,
-  return_flat_table = FALSE,
-  begin_in_star_database = FALSE,
-  star = 1,
-  out_file = NULL,
-  function_name = "transform_instance_table",
-  only_show_function = FALSE
-)
+\method{update_according_to}{flat_table}(ft, sdb, star = 1, sdb_operations = NULL)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}
 
-\item{ob}{A \code{flat_table} or \code{star_database} object with defined modification
+\item{sdb}{A \code{star_database} object with defined modification operations.}
+
+\item{star}{A string or integer, star database name or index in constellation.}
+
+\item{sdb_operations}{A \code{star_database} object with new defined modification
 operations.}
-
-\item{return_flat_table}{Boolean, even if there are more operations, do not
-transform the flat table into a star database.}
-
-\item{begin_in_star_database}{Boolean, start with star database creation
-operation.}
-
-\item{star}{A string, star database name or index in constellation.}
-
-\item{out_file}{A string, name of the file in which to store the update
-instructions that are applied.}
-
-\item{function_name}{A string, name of the function to generate in the file.}
-
-\item{only_show_function}{A boolean, return a vector with the function lines.}
 }
 \value{
-A \code{flat_table} or \code{star_database} object.
+A \code{star_database_update} object.
 }
 \description{
 Update a flat table with the operations of another structure based on a flat

@@ -3,8 +3,9 @@ test_that("flat_table() update_according_to", {
   expect_equal({
     f1 <- flat_table('iris', head(iris))
     f2 <- flat_table('iris2', head(iris))
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -19,32 +20,6 @@ test_that("flat_table() update_according_to", {
       "}",
       "",
       "ft <- transform_instance_table(instance_df)"
-    )
-  })
-})
-
-test_that("flat_table() update_according_to", {
-  expect_equal({
-    f1 <- flat_table('ft_num', head(ft_num))
-    f2 <- flat_table('ft_num2', head(ft_num))
-    f2 |>
-      update_according_to(f1,
-                          function_name = "tit",
-                          only_show_function = TRUE)
-  }, {
-    c(
-      "tit <- function(instance_df) {",
-      "  ft <- ",
-      "    flat_table(",
-      "      name = 'ft_num',",
-      "      instances = instance_df,",
-      "      unknown_value = '___UNKNOWN___'",
-      "    )",
-      "",
-      "  ft",
-      "}",
-      "",
-      "ft <- tit(instance_df)"
     )
   })
 })
@@ -64,8 +39,9 @@ test_that("join_lookup_table() update_according_to", {
     f1 <- lookup |>
       join_lookup_table(lookup = lookup)
     f2 <- flat_table('iris', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, lookup_ft) {",
@@ -103,8 +79,9 @@ test_that("add_custom_column() update_according_to", {
     f1 <- flat_table('ft_num', ft_num) |>
       add_custom_column(name = 'city_state', definition = f)
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, definition_fun) {",
@@ -136,8 +113,9 @@ test_that("replace_attribute_values() update_according_to", {
         new = 'versicolor'
       )
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -171,8 +149,9 @@ test_that("replace_attribute_values() update_according_to", {
         new = 'flor'
       )
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -205,8 +184,9 @@ test_that("replace_attribute_values() update_according_to", {
         new = c('1932', '12')
       )
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -240,8 +220,9 @@ test_that("replace_empty_values() update_according_to", {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 1] <- NA
     f2$table[2, 1] <- ""
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -271,8 +252,9 @@ test_that("replace_string() update_according_to", {
       replace_string(string = c('set'),
                      replacement = c('Set'))
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -302,8 +284,9 @@ test_that("select_attributes() update_according_to", {
     f1 <- flat_table('ft_num', ft_num) |>
       select_attributes(attributes = c('Year', 'WEEK'))
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -334,8 +317,9 @@ test_that("select_instances() update_according_to", {
         values = c('versicolor', 'virginica')
       )
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -369,8 +353,9 @@ test_that("select_instances() update_according_to", {
         values = c('versicolor', 'virginica')
       )
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -401,8 +386,9 @@ test_that("select_instances() update_according_to", {
       select_instances(attributes = c('Year', 'WEEK'),
                        values = list(c('1962', '2'), c('1964', '2')))
     f2 <- flat_table('ft_num', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -435,8 +421,9 @@ test_that("transform_attribute_format() update_according_to", {
                                  width = 5,
                                  decimal_places = 2)
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -480,8 +467,9 @@ test_that("transform_to_attribute() update_according_to", {
                              decimal_places = 2)
     f2 <- flat_table('iris2', iris)
     f2$table[1, 2] <- 4000
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -521,8 +509,9 @@ test_that("transform_to_measure() update_according_to", {
                            decimal_sep = ".")
     f2 <- flat_table('iris2', iris)
     f2$table[1, 2] <- 4000
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -561,8 +550,9 @@ test_that("select_instances_by_comparison() update_according_to", {
                                      comparisons = '>=',
                                      values = 'v')
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -598,8 +588,9 @@ test_that("select_instances_by_comparison() update_according_to", {
         values = c('1962', '1964', '2')
       )
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -636,8 +627,9 @@ test_that("select_instances_by_comparison() update_according_to", {
                       c('1962', '1964', '4'))
       )
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -667,8 +659,9 @@ test_that("select_measures() update_according_to", {
     f1 <- flat_table('iris', iris) |>
       select_measures(measures = c('Sepal.Length', 'Sepal.Width'))
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -703,8 +696,9 @@ test_that("separate_measures() update_according_to", {
       names = c('PL', 'PW', 'SL', 'SW'))
     f1[[1]]
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
-      update_according_to(f1[[1]], only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1[[1]])
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -741,9 +735,9 @@ test_that("separate_measures() update_according_to", {
       names = c('PL', 'PW', 'SL', 'SW'))
     f1[[3]]
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
-      update_according_to(f1[[3]],
-                          only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1[[3]])
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -778,9 +772,9 @@ test_that("separate_measures() update_according_to", {
       names = c('PL-PW', 'SL-SW'))
     f1[[1]]
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
-      update_according_to(f1[[1]],
-                          only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1[[1]])
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -815,9 +809,9 @@ test_that("separate_measures() update_according_to", {
       names = c('PL-PW', 'SL-SW'))
     f1[[2]]
     f2 <- flat_table('iris2', head(iris, 2))
-    f2 |>
-      update_according_to(f1[[2]],
-                          only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1[[2]])
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -849,8 +843,9 @@ test_that("set_attribute_names() update_according_to", {
       set_attribute_names(old = 'Species',
                           new = c('species'))
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -887,8 +882,9 @@ test_that("set_measure_names() update_according_to", {
         new = c('pl', 'pw', 'ls', 'sw')
       )
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -916,8 +912,9 @@ test_that("snake_case() update_according_to", {
     f1 <- flat_table('iris', head(iris)) |>
       snake_case()
     f2 <- flat_table('iris2', head(iris))
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -946,8 +943,9 @@ test_that("transform_from_values() update_according_to", {
                           id_reverse = 'id') |>
       transform_from_values(attribute = 'Characteristic')
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -981,8 +979,9 @@ test_that("transform_to_values() update_according_to", {
       transform_to_values(attribute = 'Characteristic',
                           measure = 'Value')
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -1014,8 +1013,9 @@ test_that("transform_to_values() update_according_to", {
                           measure = 'Value',
                           id_reverse = 'id')
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -1053,8 +1053,9 @@ test_that("lookup_table() update_according_to", {
         measure_agg = c('MAX', 'MIN', 'SUM', 'MEAN')
       )
     f2 <- flat_table('iris2', iris)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -1092,8 +1093,9 @@ test_that("replace_unknown_values() update_according_to", {
     f2 <- flat_table('iris2', iris)
     f2$table[1, 1] <- NA
     f2$table[2, 1] <- ""
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -1128,8 +1130,9 @@ test_that("remove_instances_without_measures() update_according_to", {
     f1 <- flat_table('iris', iris2) |>
       remove_instances_without_measures()
     f2 <- flat_table('iris2', iris2)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df) {",
@@ -1170,8 +1173,9 @@ test_that("star_database() update_according_to", {
     f1 <- flat_table('ft_num', ft_num) |>
       as_star_database(s)
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1208,8 +1212,9 @@ test_that("star_database() update_according_to", {
     f1 <- flat_table('ft_num', ft_num) |>
       as_star_database(s)
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1250,8 +1255,9 @@ test_that("snake_case() update_according_to", {
       as_star_database(s) |>
       snake_case()
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1285,8 +1291,9 @@ test_that("set_attribute_names() update_according_to",
                                             "State",
                                             "City"))
               f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
-                update_according_to(f1, only_show_function = TRUE)
+              f2 <- f2 |>
+                update_according_to(f1)
+              f2$code
             }, {
               c(
                 "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1325,8 +1332,9 @@ test_that("set_attribute_names() update_according_to",
                   new = c("Region")
                 )
               f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
-                update_according_to(f1, only_show_function = TRUE)
+              f2 <- f2 |>
+                update_according_to(f1)
+              f2$code
             }, {
               c(
                 "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1362,8 +1370,9 @@ test_that("set_measure_names() update_according_to", {
                                 "All",
                                 "Rows Aggregated"))
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1400,8 +1409,9 @@ test_that("replace_attribute_values() update_according_to", {
         new = c('1', 'CT', 'Hartford')
       )
     f2 <- flat_table('ft_num2', ft_num)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1441,8 +1451,9 @@ test_that("replace_attribute_values() update_according_to", {
         new = c('1962', '3', '1962-01-15')
       )
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1483,8 +1494,9 @@ test_that("role_playing_dimension() update_according_to", {
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1521,8 +1533,9 @@ test_that("role_playing_dimension() update_according_to", {
         rpd_att_names = TRUE
       )
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1559,8 +1572,9 @@ test_that("role_playing_dimension() update_according_to", {
         att_names = c("Year", "Week", "Date")
       )
     f2 <- flat_table('ft_num2', ft_cause_rpd)
-    f2 |>
-      update_according_to(f1, only_show_function = TRUE)
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2$code
   }, {
     c(
       "transform_instance_table <- function(instance_df, star_sch) {",
@@ -1600,133 +1614,9 @@ test_that("group_dimension_instances() update_according_to",
                 ) |>
                 group_dimension_instances(name = "When")
               f2 <- flat_table('ft_num2', ft_cause_rpd)
-              f2 |>
-                update_according_to(f1, only_show_function = TRUE)
-            }, {
-              c(
-                "transform_instance_table <- function(instance_df, star_sch) {",
-                "  ft <- ",
-                "    flat_table(",
-                "      name = 'ft_num',",
-                "      instances = instance_df,",
-                "      unknown_value = '___UNKNOWN___'",
-                "    ) |>",
-                "    as_star_database(",
-                "      schema = star_sch",
-                "    ) |>",
-                "    replace_attribute_values(",
-                "      name = 'when_available',",
-                "      attributes = c('Data Availability Year', 'Data Availability Week', 'Data Availability Date'),",
-                "      old = c('1962', '11', '1962-03-14'),",
-                "      new = c('1962', '3', '1962-01-15')",
-                "    ) |>",
-                "    group_dimension_instances(",
-                "      name = 'when'",
-                "    )",
-                "",
-                "  ft",
-                "}",
-                "",
-                "ft <- transform_instance_table(instance_df, star_sch)"
-              )
-            })
-          })
-
-
-test_that("return_flat_table parameter, update_according_to",
-          {
-            expect_equal({
-              f1 <- flat_table('ft_num', ft_num)
-              f3 <- f1
-              f1 <- f1 |>
-                as_star_database(mrs_cause_schema) |>
-                set_attribute_names(name = "where",
-                                    new = c("Region",
-                                            "State",
-                                            "City"))
-              f3
-              f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
-                update_according_to(f1,
-                                    return_flat_table = TRUE,
-                                    only_show_function = TRUE)
-            }, {
-              c(
-                "transform_instance_table <- function(instance_df) {",
-                "  ft <- ",
-                "    flat_table(",
-                "      name = 'ft_num',",
-                "      instances = instance_df,",
-                "      unknown_value = '___UNKNOWN___'",
-                "    )",
-                "",
-                "  ft",
-                "}",
-                "",
-                "ft <- transform_instance_table(instance_df)"
-              )
-            })
-          })
-
-test_that("begin_in_star_database parameter, update_according_to",
-          {
-            expect_equal({
-              f1 <- flat_table('ft_num', ft_num) |>
-                as_star_database(mrs_cause_schema) |>
-                set_attribute_names(name = "where",
-                                    new = c("Region",
-                                            "State",
-                                            "City"))
-              flat_table('ft_num2', ft_num) |>
-                as_star_database(mrs_cause_schema) |>
-                set_attribute_names(name = "where",
-                                    new = c("Region",
-                                            "State",
-                                            "City"))
-              f2 <- flat_table('ft_num2', ft_num)
-              f2 |>
-                update_according_to(f1,
-                                    begin_in_star_database = TRUE,
-                                    only_show_function = TRUE)
-            }, {
-              c(
-                "transform_instance_table <- function(instance_df, star_sch) {",
-                "  ft <- ",
-                "    star_database(",
-                "      schema = star_sch,",
-                "      instances = instance_df,",
-                "      unknown_value = '___UNKNOWN___'",
-                "    ) |>",
-                "    set_attribute_names(",
-                "      name = 'where',",
-                "      old = c('REGION', 'State', 'City'),",
-                "      new = c('Region', 'State', 'City')",
-                "    )",
-                "",
-                "  ft",
-                "}",
-                "",
-                "ft <- transform_instance_table(instance_df, star_sch)"
-              )
-            })
-          })
-
-
-test_that("group_dimension_instances() update_according_to",
-          {
-            expect_equal({
-              f1 <- flat_table('ft_num', ft_cause_rpd) |>
-                as_star_database(mrs_cause_schema_rpd) |>
-                replace_attribute_values(
-                  name = "When Available",
-                  old = c('1962', '11', '1962-03-14'),
-                  new = c('1962', '3', '1962-01-15')
-                ) |>
-                group_dimension_instances(name = "When")
-              f2 <- flat_table('ft_num2', ft_cause_rpd)
-              f2 |>
-                update_according_to(f1, out_file = tempfile(),
-                                    only_show_function = TRUE)
+              f2 <- f2 |>
+                update_according_to(f1)
+              f2$code
             }, {
               c(
                 "transform_instance_table <- function(instance_df, star_sch) {",
