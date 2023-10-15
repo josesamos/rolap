@@ -1,0 +1,36 @@
+---
+title: "Incremental refresh of star databases"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Incremental refresh of star databases}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, message=FALSE}
+library(rolap)
+```
+
+# Introduction
+
+Once we have star databases built with the data available at the moment, periodically we may obtain additional data, with the same structure as the initial data but from a later time or from another place. Sometimes the new data also contains instances which are already included in the star database to operate on them.
+
+Suppose we need to jointly analyse all the data available at the moment: We must include them in the star database. One possibility is to integrate all available data into a flat table and build the star database again. Another possibility is to use the *incremental refresh* mechanism described in this document.
+
+This document shows by means of an example the possibilities offered by the package in this context. First,  , then  . Finally, the conclusions are presented.
+
+# Starting data set
+
+The starting data set is the content in the variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`.
+
+
+# Conclusions
+
+The `rolap` package supports the definition
