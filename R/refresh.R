@@ -58,7 +58,66 @@ incremental_refresh.star_database <-
       db <- res[[1]]
       new_rows <- c(new_rows, res[-1])
     }
+    combination <- check_refesh(db, sdbu$star_database)
+    facts <- combination[[star]]
+    facts$table <- facts$table |>
+      dplyr::select(-tidyselect::all_of(facts$surrogate_keys))
+    # rename fact surrogate key
+    sk <- paste0('original_', facts$surrogate_keys)
+    names <- names(facts$table)
+    i <- which(names %in% sk)
+    names[i] <- facts$surrogate_keys
+    names(facts$table) <- names
+    rest <- setdiff(names, facts$surrogate_keys)
+    facts$table <- facts$table[, c(facts$surrogate_keys, rest)]
+    facts_new <- facts$table[facts$table$existing_fact == FALSE, ] |>
+      dplyr::select(-tidyselect::all_of('existing_fact'))
+    facts_exist <- facts$table[facts$table$existing_fact == TRUE, ] |>
+      dplyr::select(-tidyselect::all_of('existing_fact'))
 
+    # new facts
+    db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_new)
+    facts_new <- list(facts_new)
+    names(facts_new) <- star
+    new_rows <- c(new_rows, facts_new)
+
+    # refresh data
+    db$refresh[[star]] <- vector("list", length = 3)
+    names(db$refresh[[star]]) <- c('insert', 'replace', 'delete')
+    db$refresh[[star]][['insert']] <- new_rows
+
+    # existing facts: 'replace', 'group' or 'delete'
+    if (existing_instances == 'group') {
+      db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_exist)
+      db$facts[[star]]$table <-
+        group_by_keys(
+          table = db$facts[[star]]$table,
+          keys = db$facts[[star]]$surrogate_keys,
+          measures = names(db$facts[[star]]$agg),
+          agg_functions = db$facts[[star]]$agg,
+          nrow_agg = NULL
+        )
+      facts_exist <- facts_exist |>
+        dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)) |>
+        dplyr::left_join(db$facts[[star]]$table, by = db$facts[[star]]$surrogate_keys)
+      db$refresh[[star]][['replace']] <- facts_exist
+    } else {
+      only_key <- facts_exist |>
+        dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
+      only_key$existing_fact <- TRUE
+      t <- db$facts[[star]]$table |>
+        dplyr::left_join(only_key, by = db$facts[[star]]$surrogate_keys)
+      t$existing_fact[is.na(t$existing_fact)] <-  FALSE
+
+      if (existing_instances == 'replace') {
+        db$facts[[star]]$table[t$existing_fact, ] <- facts_exist
+        db$refresh[[star]][['replace']] <- facts_exist
+      } else if (existing_instances == 'delete') {
+        db$facts[[star]]$table <- db$facts[[star]]$table[!(t$existing_fact), ]
+        db$refresh[[star]][['delete']] <- facts_exist |>
+          dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
+      }
+    }
     db
   }
 
