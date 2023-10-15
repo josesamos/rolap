@@ -50,6 +50,14 @@ incremental_refresh.star_database <-
       db$lookup_tables[[star]] <- sdbu$star_database$lookup_tables[[star]]
       db$schemas[[star]] <- sdbu$star_database$schemas[[star]]
     }
+    new_dim <- get_new_dimension_instances(sdbu)
+    new_rows <- list()
+    for (d in names(new_dim)) {
+      table <- new_dim[[d]]
+      res <- add_dimension_instances(db, d, table)
+      db <- res[[1]]
+      new_rows <- c(new_rows, res[-1])
+    }
 
     db
   }
@@ -66,7 +74,7 @@ incremental_refresh.star_database <-
 #' @param refresh_db A `star_database` object with the same structure with
 #' new data.
 #'
-#' @return A `star_database` object.
+#' @return A list of facts and dimensions, first facts, then dimensions.
 #'
 #' @keywords internal
 check_refesh <- function(db, refresh_db) {
@@ -198,7 +206,9 @@ get_new_dimension_instances <- function(sdbu) UseMethod("get_new_dimension_insta
 get_new_dimension_instances.star_database_update <- function(sdbu) {
   dimensions <- sdbu$combination[-1]
   res <- list()
-  for (d in names(dimensions)) {
+  dim_names <- names(dimensions)
+  dim_names <- simplify_rpd_dimensions(sdbu$star_database, dim_names)
+  for (d in dim_names) {
     dim <- dimensions[[d]]$table
     pk <- dimensions[[d]]$surrogate_key
     pko <-  paste0('original_', pk)

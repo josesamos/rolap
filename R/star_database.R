@@ -597,3 +597,30 @@ validate_dimension_names <- function(db, name) {
   }
   name
 }
+
+
+#' Add dimension instances
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#' @param table A table of new instances.
+#'
+#' @return A `star_database` object.
+#'
+#' @keywords internal
+add_dimension_instances <- function(db, name, table) {
+  dim <- db$dimensions[[name]]
+  last <- max(dim$table[, dim$surrogate_key])
+  table <-
+    tibble::add_column(table,!!dim$surrogate_key := (last + 1:nrow(table)), .before = 1)
+  rpd <- get_rpd_dimensions(db, name)
+  res <- vector("list", length = length(rpd))
+  names(res) <- rpd
+  for (d in rpd) {
+    dim <- db$dimensions[[d]]
+    names(table) <- names(dim$table)
+    db$dimensions[[d]]$table <- rbind(dim$table, table)
+    res[[d]] <- table
+  }
+  c(list(db), res)
+}

@@ -842,3 +842,44 @@ test_that("get_new_dimension_instances() update_according_to",
               )
             })
           })
+
+
+test_that("get_new_dimension_instances() update_according_to", {
+  expect_equal({
+    f1 <-
+      flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
+                                          ft_cause_rpd$WEEK != '4',]) |>
+      as_star_database(mrs_cause_schema_rpd) |>
+      role_playing_dimension(rpd = "When",
+                             roles = c("When Available", "When Received"))
+    r <- c(5L, 1L, 5L, 2L, 2L, 4L, 3L, 7L, 10L, 2L)
+    f2 <- flat_table('ft_num2', ft_cause_rpd[r,])
+    f2 <- f2 |>
+      update_according_to(f1)
+    f2 |> get_new_dimension_instances()
+  }, {
+    list(
+      when = structure(
+        list(
+          Year = c("1962", "1962", "1962"),
+          WEEK = c("4", "5", "6"),
+          `Week Ending Date` = c("1962-01-27",
+                                 "1962-02-01", "1962-02-07")
+        ),
+        row.names = c(NA,-3L),
+        class = c("tbl_df",
+                  "tbl", "data.frame")
+      ),
+      where = structure(
+        list(
+          REGION = "1",
+          State = "MA",
+          City = "Cambridge"
+        ),
+        row.names = c(NA,-1L),
+        class = c("tbl_df",
+                  "tbl", "data.frame")
+      )
+    )
+  })
+})

@@ -13,7 +13,7 @@ check_refesh(db, refresh_db)
 new data.}
 }
 \value{
-A \code{star_database} object.
+A list of facts and dimensions, first facts, then dimensions.
 }
 \description{
 Checks the refresh operation of the selected star database from the given
