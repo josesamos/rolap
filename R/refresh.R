@@ -1,6 +1,17 @@
 #' Refresh a star database in a constellation
 #'
-#' Obtain the names of the tables of a star database.
+#' Incremental update of a star database from the star database generated with
+#' the new data.
+#'
+#' There may be data in the update that already exists in the facts: it is
+#' indicated what to do with it, replace it, group it, delete it or ignore it in
+#' the update.
+#'
+#' If to obtain the update data we have had to perform new transformations (which
+#' were not necessary to obtain the star database), we can indicate that these are
+#' the new transformation operations for the star database. These operations are
+#' not applied to the star database, they will only be applied to new periodic
+#' updates.
 #'
 #' @param db A `star_database` object.
 #' @param sdbu A `star_database_update` object.
@@ -16,12 +27,19 @@
 #'
 #' @examples
 #'
-#' db <- star_database(mrs_cause_schema, ft_num)
-#' sdbu <- flat_table('ft_num2', ft_num) |>
-#'   update_according_to(db)
+#' f1 <-
+#'   flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
+#'                                       ft_cause_rpd$WEEK != '4',]) |>
+#'   as_star_database(mrs_cause_schema_rpd) |>
+#'   role_playing_dimension(rpd = "When",
+#'                          roles = c("When Available", "When Received"))
+#' f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
+#'                                            ft_cause_rpd$WEEK != '2',])
+#' f2 <- f2 |>
+#'   update_according_to(f1)
 #'
-#' db <- db |>
-#'   incremental_refresh(sdbu)
+#' f1 <- f1 |>
+#'   incremental_refresh(f2)
 #'
 #' @export
 incremental_refresh <- function(db, sdbu, existing_instances, replace_transformations)
@@ -191,15 +209,15 @@ check_refesh <- function(db, refresh_db) {
 #'
 #' @examples
 #'
-#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#' f1 <-
+#'   flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
+#'                                       ft_cause_rpd$WEEK != '4',]) |>
 #'   as_star_database(mrs_cause_schema_rpd) |>
-#'   replace_attribute_values(
-#'     name = "When Available",
-#'     old = c('1962', '11', '1962-03-14'),
-#'     new = c('1962', '3', '1962-01-15')
-#'   ) |>
-#'   group_dimension_instances(name = "When")
-#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   role_playing_dimension(rpd = "When",
+#'                          roles = c("When Available", "When Received"))
+#' f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
+#'                                            ft_cause_rpd$WEEK != '2',])
+#' f2 <- f2 |>
 #'   update_according_to(f1)
 #' fact_instances <- f2 |>
 #'   get_existing_fact_instances()
@@ -243,15 +261,15 @@ get_existing_fact_instances.star_database_update <- function(sdbu) {
 #'
 #' @examples
 #'
-#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#' f1 <-
+#'   flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
+#'                                       ft_cause_rpd$WEEK != '4',]) |>
 #'   as_star_database(mrs_cause_schema_rpd) |>
-#'   replace_attribute_values(
-#'     name = "When Available",
-#'     old = c('1962', '11', '1962-03-14'),
-#'     new = c('1962', '3', '1962-01-15')
-#'   ) |>
-#'   group_dimension_instances(name = "When")
-#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   role_playing_dimension(rpd = "When",
+#'                          roles = c("When Available", "When Received"))
+#' f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
+#'                                            ft_cause_rpd$WEEK != '2',])
+#' f2 <- f2 |>
 #'   update_according_to(f1)
 #' dim_instances <- f2 |>
 #'   get_new_dimension_instances()

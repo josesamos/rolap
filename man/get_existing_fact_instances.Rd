@@ -24,15 +24,15 @@ When the update occurs, we need to determine what happens to these instances.
 }
 \examples{
 
-f1 <- flat_table('ft_num', ft_cause_rpd) |>
+f1 <-
+  flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
+                                      ft_cause_rpd$WEEK != '4',]) |>
   as_star_database(mrs_cause_schema_rpd) |>
-  replace_attribute_values(
-    name = "When Available",
-    old = c('1962', '11', '1962-03-14'),
-    new = c('1962', '3', '1962-01-15')
-  ) |>
-  group_dimension_instances(name = "When")
-f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+  role_playing_dimension(rpd = "When",
+                         roles = c("When Available", "When Received"))
+f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
+                                           ft_cause_rpd$WEEK != '2',])
+f2 <- f2 |>
   update_according_to(f1)
 fact_instances <- f2 |>
   get_existing_fact_instances()
