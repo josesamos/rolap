@@ -41,6 +41,7 @@ fact_instances <- f2 |>
 \seealso{
 Other star database refresh functions: 
 \code{\link{get_new_dimension_instances}()},
+\code{\link{get_star_database}()},
 \code{\link{get_transformation_code}()},
 \code{\link{get_transformation_file}()},
 \code{\link{incremental_refresh}()},

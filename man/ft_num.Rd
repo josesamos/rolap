@@ -39,6 +39,7 @@ Other mrs example data:
 \code{\link{ft_age}},
 \code{\link{ft_cause_rpd}},
 \code{\link{ft}},
+\code{\link{mrs_db}},
 \code{\link{mrs_ft}}
 }
 \concept{mrs example data}

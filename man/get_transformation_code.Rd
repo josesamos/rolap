@@ -39,6 +39,7 @@ code <- f2 |>
 Other star database refresh functions: 
 \code{\link{get_existing_fact_instances}()},
 \code{\link{get_new_dimension_instances}()},
+\code{\link{get_star_database}()},
 \code{\link{get_transformation_file}()},
 \code{\link{incremental_refresh}()},
 \code{\link{update_according_to}()}

@@ -68,6 +68,9 @@ incremental_refresh.star_database <-
       db$lookup_tables[[star]] <- sdbu$star_database$lookup_tables[[star]]
       db$schemas[[star]] <- sdbu$star_database$schemas[[star]]
     }
+    # in case two star databases of the constellation are being modified
+    sdbu$combination <- check_refesh(db, sdbu$star_database)
+
     new_dim <- get_new_dimension_instances(sdbu)
     new_rows <- list()
     for (d in names(new_dim)) {
@@ -384,3 +387,38 @@ get_transformation_file.star_database_update <- function(sdbu, file = NULL) {
 }
 
 
+
+#' Get star database
+#'
+#' From the planned update, it obtains the star database defined from the data.
+#'
+#' @param sdbu A `star_database_update` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd) |>
+#'   replace_attribute_values(
+#'     name = "When Available",
+#'     old = c('1962', '11', '1962-03-14'),
+#'     new = c('1962', '3', '1962-01-15')
+#'   ) |>
+#'   group_dimension_instances(name = "When")
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' st <- f2 |>
+#'   get_star_database()
+#'
+#' @export
+get_star_database <- function(sdbu) UseMethod("get_star_database")
+
+#' @rdname get_star_database
+#'
+#' @export
+get_star_database.star_database_update <- function(sdbu) {
+  sdbu$star_database
+}

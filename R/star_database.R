@@ -476,6 +476,34 @@ get_dimension_names.star_database <- function(db) {
 }
 
 
+#' Get the names of the facts of a star database
+#'
+#' Obtain the names of the facts of a star database.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A vector of strings, fact names.
+#'
+#' @family star database definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_fact_names()
+#'
+#' @export
+get_fact_names <- function(db)
+  UseMethod("get_fact_names")
+
+#' @rdname get_fact_names
+#'
+#' @export
+get_fact_names.star_database <- function(db) {
+  sort(names(db$facts))
+}
+
+
 #' Get the names of the tables of a star database
 #'
 #' Obtain the names of the tables of a star database.

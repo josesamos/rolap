@@ -327,10 +327,11 @@
 #' random.
 #'
 #' From these data the constellation in the vignette titled 'Obtaining and
-#' transforming flat tables' has been generated.
+#' transforming flat tables' has been generated. This variable contains the defined
+#' constellation.
 #'
 #' @family mrs example data
 #'
 #' @format A `star_database`.
 #' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
-"mrs_ft"
+"mrs_db"
