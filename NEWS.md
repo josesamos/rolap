@@ -1,3 +1,5 @@
+# rolap (development version)
+
 # rolap 2.3.0
 * Change star database list as parameter in `constellation()` function.
 * Fix `replace_empty_values()` with spaces at the beginning or end of non-empty strings.
