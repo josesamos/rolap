@@ -202,7 +202,11 @@ check_refesh <- function(db, refresh_db) {
 #' From the planned update, it obtains the instances of the update facts that
 #' are already included in the star database facts to be updated.
 #'
-#' When the update occurs, we need to determine what happens to these instances.
+#' The most common thing is that refresh operations only include new instances
+#' in fact tables, but it may be the case that repeated instances appear: They
+#' may have different values in the measures, but the same values in the dimension
+#' foreign keys. When the update occurs, we need to determine what happens to
+#' these instances.
 #'
 #' @param sdbu A `star_database_update` object.
 #'
