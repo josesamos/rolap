@@ -35,6 +35,7 @@ Other mrs example data:
 \code{\link{ft_num}},
 \code{\link{ft}},
 \code{\link{mrs_db}},
+\code{\link{mrs_ft_new}},
 \code{\link{mrs_ft}}
 }
 \concept{mrs example data}

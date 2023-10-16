@@ -51,7 +51,12 @@ From the original data source (the [Deaths in 122 U.S. cities - 1962-2016. 122 C
 
 We have stored it in the package, in a file with the same format as the original file which only contains a small portion of the original data. We have made sure that there is data that was already included in the data set considered to obtain the content of the `mrs_db` constellation and also new data. It is accessed below.
 
-```{r}
+```{r, echo=FALSE}
+#  mrs_ft_new: Declared as a variable instead of reading from the file due to problem building macos-latest (release)
+```
+
+
+```{r, eval=FALSE}
 file <-
   system.file(
     "extdata",
