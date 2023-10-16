@@ -28,6 +28,9 @@
     <loc>https://josesamos.github.io/rolap/articles/v30-dim-instances.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/articles/v40-refresh.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/authors.html</loc>
   </url>
   <url>
@@ -38,6 +41,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/add_custom_column.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/add_dimension_instances.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/add_dput_column.html</loc>
@@ -62,6 +68,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/check_lookup_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/check_refesh.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/conform_dimensions.html</loc>
@@ -136,7 +145,16 @@
     <loc>https://josesamos.github.io/rolap/reference/get_dimension_names.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_existing_fact_instances.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_fact_name.fact_schema.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_fact_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_lookup_tables.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_measure_names.html</loc>
@@ -146,6 +164,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_measure_names_schema.star_schema.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_new_dimension_instances.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_next_operation.star_operation.html</loc>
@@ -172,6 +193,12 @@
     <loc>https://josesamos.github.io/rolap/reference/get_similar_values_table.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_star_database.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_star_schema.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_surrogate_key.dimension_table.html</loc>
   </url>
   <url>
@@ -179,6 +206,12 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_table_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_transformation_code.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_transformation_file.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_unique_attribute_values.html</loc>
@@ -199,7 +232,85 @@
     <loc>https://josesamos.github.io/rolap/reference/group_dimension_instances.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/incremental_refresh.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_add_custom_column.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_flat_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_group_dimension_instances.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_join_lookup_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_lookup_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_remove_instances_without_measures.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_replace_attribute_values.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_replace_empty_values.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_replace_string.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_replace_unknown_values.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_role_playing_dimension.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_select_attributes.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_select_instances.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_select_instances_by_comparison.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_select_measures.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_separate_measures.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_set_attribute_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_set_measure_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_snake_case.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_star_database.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_transform_attribute_format.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_transform_from_values.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_transform_to_attribute.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_transform_to_measure.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/interpret_operation_transform_to_values.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/is_empty_string.html</loc>
@@ -209,6 +320,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/join_lookup_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/line_last_op.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/lookup_table.html</loc>
@@ -226,7 +340,13 @@
     <loc>https://josesamos.github.io/rolap/reference/mrs_cause_schema_rpd.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/mrs_db.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/mrs_ft.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/mrs_ft_new.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/prepare_to_join.html</loc>
@@ -236,6 +356,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/read_flat_table_folder.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/reformat_file.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/remove_all_measures_na.html</loc>
@@ -295,6 +418,9 @@
     <loc>https://josesamos.github.io/rolap/reference/share_dimensions.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/simplify_rpd_dimensions.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/snake_case.html</loc>
   </url>
   <url>
@@ -316,7 +442,13 @@
     <loc>https://josesamos.github.io/rolap/reference/star_schema.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/string_or_null.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/string_to_vector.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/transactions_db.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/transform_attribute_format.html</loc>
@@ -340,6 +472,9 @@
     <loc>https://josesamos.github.io/rolap/reference/unify_rpd.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/update_according_to.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_attributes.html</loc>
   </url>
   <url>
@@ -350,6 +485,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_measures.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/vector_presentation.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/vector_to_string.html</loc>

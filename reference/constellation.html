@@ -35,6 +35,7 @@ dimensions with the same name in the star schemas have to be conformable
     <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of role-playing and role dimensions</a>
     <a class="dropdown-item" href="../articles/v20-rdbms-dm.html">Star databases and RDBMS through the dm and rolap packages</a>
     <a class="dropdown-item" href="../articles/v30-dim-instances.html">Integration of dimension instances</a>
+    <a class="dropdown-item" href="../articles/v40-refresh.html">Incremental refresh of star databases</a>
   </div>
 </li>
 <li class="nav-item">
@@ -69,7 +70,7 @@ dimensions with the same name in the star schemas have to be conformable
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">constellation</span><span class="op">(</span>name <span class="op">=</span> <span class="cn">NULL</span>, stars <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">constellation</span><span class="op">(</span>name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -78,8 +79,8 @@ dimensions with the same name in the star schemas have to be conformable
 <dd><p>A string.</p></dd>
 
 
-<dt>stars</dt>
-<dd><p>A list of <code>star_database</code> objects.</p></dd>
+<dt>...</dt>
+<dd><p><code>star_database</code> objects.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -102,7 +103,7 @@ dimensions with the same name in the star schemas have to be conformable
 <span class="r-in"><span>  <span class="fu"><a href="snake_case.html">snake_case</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">db2</span> <span class="op">&lt;-</span> <span class="fu"><a href="star_database.html">star_database</a></span><span class="op">(</span><span class="va">mrs_age_schema</span>, <span class="va">ft_age</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="snake_case.html">snake_case</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ct1</span> <span class="op">&lt;-</span> <span class="fu">constellation</span><span class="op">(</span><span class="st">"MRS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">db1</span>, <span class="va">db2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ct1</span> <span class="op">&lt;-</span> <span class="fu">constellation</span><span class="op">(</span><span class="st">"MRS"</span>, <span class="va">db1</span>, <span class="va">db2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">db3</span> <span class="op">&lt;-</span> <span class="fu"><a href="star_database.html">star_database</a></span><span class="op">(</span><span class="va">mrs_cause_schema_rpd</span>, <span class="va">ft_cause_rpd</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
@@ -116,7 +117,7 @@ dimensions with the same name in the star schemas have to be conformable
 <span class="r-in"><span>    rpd <span class="op">=</span> <span class="st">"When Arrived"</span>,</span></span>
 <span class="r-in"><span>    roles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"When Available"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ct2</span> <span class="op">&lt;-</span> <span class="fu">constellation</span><span class="op">(</span><span class="st">"MRS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">db3</span>, <span class="va">db4</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ct2</span> <span class="op">&lt;-</span> <span class="fu">constellation</span><span class="op">(</span><span class="st">"MRS"</span>, <span class="va">db3</span>, <span class="va">db4</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

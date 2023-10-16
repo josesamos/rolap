@@ -55,6 +55,7 @@
     <a class="dropdown-item" href="../articles/v10-rpd.html">Definition of role-playing and role dimensions</a>
     <a class="dropdown-item" href="../articles/v20-rdbms-dm.html">Star databases and RDBMS through the dm and rolap packages</a>
     <a class="dropdown-item" href="../articles/v30-dim-instances.html">Integration of dimension instances</a>
+    <a class="dropdown-item" href="../articles/v40-refresh.html">Incremental refresh of star databases</a>
   </div>
 </li>
 <li class="nav-item">
@@ -454,7 +455,15 @@ simplification: The one shown below.</p>
 <span>            <span class="st">'Provoz.nápl.'</span>, <span class="st">'Umývanie voz'</span>, <span class="st">'Zboží nesp.'</span>, <span class="st">'Zpr.nakupu'</span><span class="op">)</span>,</span>
 <span>    new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Other'</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/group_dimension_instances.html">group_dimension_instances</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">'what'</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/group_dimension_instances.html">group_dimension_instances</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">'what'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in res$name == name: longer object length is not a multiple of shorter</span></span>
+<span><span class="co">#&gt; object length</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in res$name == name: longer object length is not a multiple of shorter</span></span>
+<span><span class="co">#&gt; object length</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in res$name == name: longer object length is not a multiple of shorter</span></span>
+<span><span class="co">#&gt; object length</span></span></code></pre></div>
 <p>We change the name of some products because there seems to be an
 error or they were spelled two different ways; in others cases we group
 several products into a new one, the largest grouping is for products
@@ -579,7 +588,15 @@ dimensions <em>When</em>.</p>
 <span>    old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'21'</span>, <span class="st">'22'</span>, <span class="st">'23'</span>, <span class="st">'00'</span>, <span class="st">'01'</span>, <span class="st">'02'</span>, <span class="st">'03'</span>, <span class="st">'04'</span><span class="op">)</span>,</span>
 <span>    new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Night'</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/group_dimension_instances.html">group_dimension_instances</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">'when'</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/group_dimension_instances.html">group_dimension_instances</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">'when'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in res$name == name: longer object length is not a multiple of shorter</span></span>
+<span><span class="co">#&gt; object length</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in res$name == name: longer object length is not a multiple of shorter</span></span>
+<span><span class="co">#&gt; object length</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in res$name == name: longer object length is not a multiple of shorter</span></span>
+<span><span class="co">#&gt; object length</span></span></code></pre></div>
 <p>The result obtained in both dimensions is shown below. That is, the
 modifications have been propagated to the equivalent dimension.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -706,7 +723,7 @@ below.</p>
 <p>We define the constellation and as a result the dimensions are
 integrated.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ct</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/constellation.html">constellation</a></span><span class="op">(</span><span class="st">"CSS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">db_summary4</span>, <span class="va">db_finest2</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ct</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/constellation.html">constellation</a></span><span class="op">(</span><span class="st">"CSS"</span>, <span class="va">db_summary4</span>, <span class="va">db_finest2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">ct</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "star_database"</span></span>
@@ -721,13 +738,13 @@ integrated.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"name: %s, %d rows\n"</span>, <span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">db_tl</span><span class="op">[[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; name: transaction, 921 rows</span></span>
-<span><span class="co">#&gt; name: transaction_line, 989 rows</span></span>
-<span><span class="co">#&gt; name: transaction_summary, 481 rows</span></span>
-<span><span class="co">#&gt; name: what, 8 rows</span></span>
-<span><span class="co">#&gt; name: when, 22 rows</span></span>
+<span><span class="co">#&gt; name: transaction_line, 1000 rows</span></span>
+<span><span class="co">#&gt; name: transaction_summary, 486 rows</span></span>
+<span><span class="co">#&gt; name: what, 29 rows</span></span>
+<span><span class="co">#&gt; name: when, 124 rows</span></span>
 <span><span class="co">#&gt; name: when_moment, 599 rows</span></span>
-<span><span class="co">#&gt; name: when_paid, 22 rows</span></span>
-<span><span class="co">#&gt; name: when_processed, 22 rows</span></span>
+<span><span class="co">#&gt; name: when_paid, 124 rows</span></span>
+<span><span class="co">#&gt; name: when_processed, 124 rows</span></span>
 <span><span class="co">#&gt; name: where, 437 rows</span></span>
 <span><span class="co">#&gt; name: where_chain, 33 rows</span></span>
 <span><span class="co">#&gt; name: who, 902 rows</span></span>
@@ -747,20 +764,20 @@ carried over from one star database to the other.</p>
 <span></span>
 <span><span class="va">ct</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_unique_attribute_values.html">get_unique_attribute_values</a></span><span class="op">(</span><span class="st">'when_processed'</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 22 × 2</span></span></span>
-<span><span class="co">#&gt;    date       hour     </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23 Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23 Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23 Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-24 Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-24 Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-24 Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-24 Night    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-25 Afternoon</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-25 Evening  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-25 Morning  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 124 × 2</span></span></span>
+<span><span class="co">#&gt;    date       hour   </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2012-08-23 09     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2012-08-23 20     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2012-08-23 21     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2012-08-23 22     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2012-08-23 23     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2012-08-23 Evening</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2012-08-23 Morning</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2012-08-23 Night  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2012-08-24 00     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2012-08-24 03     </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 114 more rows</span></span></span></code></pre></div>
 <p>The result is shown for dimension <em>when_processed</em>, which is
 not part of the star database on which the modifications were defined
 but it is modified.</p>
@@ -774,17 +791,20 @@ operations from one database to another.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ct</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_unique_attribute_values.html">get_unique_attribute_values</a></span><span class="op">(</span><span class="st">'what'</span>, col_as_vector <span class="op">=</span> <span class="st">"As a vector"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 2</span></span></span>
-<span><span class="co">#&gt;   product      `As a vector`    </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Autokozmetik c('Autokozmetik')</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Diesel       c('Diesel')      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Diesel +     c('Diesel +')    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Nafta        c('Nafta')       </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Nafta +      c('Nafta +')     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Natural      c('Natural')     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> Natural +    c('Natural +')   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> Other        c('Other')</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 29 × 2</span></span></span>
+<span><span class="co">#&gt;    product       `As a vector`     </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Additivum     c('Additivum')    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Autokosmet.   c('Autokosmet.')  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Autokozmetik  c('Autokozmetik') </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Autoprísluš.  c('Autoprísluš.') </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Dalnic.popl.  c('Dalnic.popl.') </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Diesel        c('Diesel')       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Diesel +      c('Diesel +')     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Diesel aditiv c('Diesel aditiv')</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Knihy,nov.    c('Knihy,nov.')   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> LPG           c('LPG')          </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 19 more rows</span></span></span></code></pre></div>
 <p>The result obtained is explained because in star database
 <em>db_summary</em> the new operations of star database
 <em>db_finest</em> have been applied and vice versa. In the star
@@ -804,19 +824,25 @@ can continue to make changes to the constellation, as shown below.</p>
 <span>    new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Other'</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/group_dimension_instances.html">group_dimension_instances</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">'what'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in res$name == name: longer object length is not a multiple of shorter</span></span>
+<span><span class="co">#&gt; object length</span></span>
 <span></span>
 <span><span class="va">ct2</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_unique_attribute_values.html">get_unique_attribute_values</a></span><span class="op">(</span><span class="st">'what'</span>, col_as_vector <span class="op">=</span> <span class="st">"As a vector"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 2</span></span></span>
-<span><span class="co">#&gt;   product   `As a vector` </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Diesel    c('Diesel')   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Diesel +  c('Diesel +') </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Nafta     c('Nafta')    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Nafta +   c('Nafta +')  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Natural   c('Natural')  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Natural + c('Natural +')</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> Other     c('Other')</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 28 × 2</span></span></span>
+<span><span class="co">#&gt;    product       `As a vector`     </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Additivum     c('Additivum')    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Autokosmet.   c('Autokosmet.')  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Autoprísluš.  c('Autoprísluš.') </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Dalnic.popl.  c('Dalnic.popl.') </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Diesel        c('Diesel')       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Diesel +      c('Diesel +')     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Diesel aditiv c('Diesel aditiv')</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Knihy,nov.    c('Knihy,nov.')   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> LPG           c('LPG')          </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Mytí vozidel  c('Mytí vozidel') </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 18 more rows</span></span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
