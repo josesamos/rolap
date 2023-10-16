@@ -422,3 +422,64 @@ get_star_database <- function(sdbu) UseMethod("get_star_database")
 get_star_database.star_database_update <- function(sdbu) {
   sdbu$star_database
 }
+
+
+#' Get lookup tables
+#'
+#' From the planned update, it obtains the lookup tables used to define the data.
+#'
+#' @param sdbu A `star_database_update` object.
+#'
+#' @return A list of `flat_table` objects.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd)
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' ft <- f2 |>
+#'   get_lookup_tables()
+#'
+#' @export
+get_lookup_tables <- function(sdbu) UseMethod("get_lookup_tables")
+
+#' @rdname get_lookup_tables
+#'
+#' @export
+get_lookup_tables.star_database_update <- function(sdbu) {
+  sdbu$star_database$lookup_tables[[1]]
+}
+
+
+
+#' Get star schema
+#'
+#' From the planned update, it obtains the star schema used to define the data.
+#'
+#' @param sdbu A `star_database_update` object.
+#'
+#' @return A `star_schema` object.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd)
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' st <- f2 |>
+#'   get_star_schema()
+#'
+#' @export
+get_star_schema <- function(sdbu) UseMethod("get_star_schema")
+
+#' @rdname get_star_schema
+#'
+#' @export
+get_star_schema.star_database_update <- function(sdbu) {
+  sdbu$star_database$schemas[[1]]
+}

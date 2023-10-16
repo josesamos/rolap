@@ -921,7 +921,7 @@ test_that("join_lookup_table() ", {
         )
       ), class = "star_operation"),
       pk_attributes = "Species",
-      lookup_tables = list(structure(
+      lookup_tables = list(iris = structure(
         list(
           name = "iris",
           table = structure(
@@ -983,6 +983,7 @@ test_that("join_lookup_table() ", {
     class = "flat_table"
   ))
 })
+
 
 test_that("check_lookup_table() ", {
   expect_equal({

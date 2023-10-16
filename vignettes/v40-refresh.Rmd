@@ -26,7 +26,7 @@ Suppose we need to jointly analyse all the data available at the moment: We must
 
 This document shows by means of an example the possibilities offered by the package in this context. First,  , then  . Finally, the conclusions are presented.
 
-# Starting data set
+# Starting data sets
 
 The starting data set is the content in the variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`. It contains the constellation, formed by two star databases. Next we get their names.
 
@@ -169,7 +169,7 @@ In each case it may be interesting to perform a different operation on these pre
 
 ## Incremental refresh operation
 
-To better appreciate the modification made, we are going to perform the same query before and after the incremental refresh operation: 
+To better appreciate the update made, we are going to perform the same query before and after the incremental refresh operation: We obtain the design tables, along with the number of instances of each one; For the *where* dimension table, we get the names of the first cities to check that *Baltimore* and *Boston* were not included.
 
 ```{r}
 l_db <- mrs_db |>
@@ -183,6 +183,7 @@ for (i in seq_along(l_db)){
 head(sort(l_db[['where']]$city), 15)
 ```
 
+Next, we perform the incremental refresh for each of the star databases in the original constellation. For one of the star databases, through the `existing_instances` parameter, it has been indicated that the instances of previously existing facts are grouped with the new ones. For the other design, the default option is considered: Not to treat fact table previously existing instances.
 
 ```{r}
 mrs_db <- mrs_db |>
@@ -190,6 +191,7 @@ mrs_db <- mrs_db |>
   incremental_refresh(mrs_db_cause_refresh, existing_instances = "group")
 ```
 
+Finally, we consult the same data as before again.
 
 ```{r}
 l_db <- mrs_db |>
@@ -202,6 +204,14 @@ for (i in seq_along(l_db)){
 
 head(sort(l_db[['where']]$city), 15)
 ```
+
+We observe how the number of instances has increased in the facts and in the dimensions and the *where* dimension already contains the names of the cities that appeared as new in the update operation.
+
+# Changes in transformation operations
+
+In this case no problem has been detected in the new dimension data. But let's assume that we wanted to make some change to the modify operations before doing the update to show how it would be done.
+
+## Get the transformation function
 
 
 # Conclusions
