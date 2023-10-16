@@ -1,0 +1,502 @@
+---
+title: "Incremental refresh of star databases"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Incremental refresh of star databases}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, message=FALSE}
+library(rolap)
+```
+
+# Introduction
+
+Once we have star databases built with the data available at the moment, periodically we may obtain additional data, with the same structure as the initial data but from a later time or from another place. Sometimes the new data also contains instances which are already included in the star database to operate on them.
+
+Suppose we need to jointly analyse all the data available at the moment: We must include them in the star database. One possibility is to integrate all available data into a flat table and build the star database again. Another possibility is to use the *incremental refresh* mechanism described in this document.
+
+This document shows by means of an example the possibilities offered by the package in this context. First, the starting data sets are presented. The next section shows how to generate the refresh structures. The following section shows how to perform the incremental refresh. Finally, we present how to make changes to the transformation functions and add these changes for future refresh operations. Finish with the conclusions.
+
+# Starting data sets
+
+The starting data set is the content in the variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`. It contains the constellation, formed by two star databases. Next we get their names.
+
+```{r}
+library(rolap)
+
+mrs_db |> 
+  get_fact_names()
+```
+
+The code to generate the constellation from the initial data is available in the vignette. Below is a graphic representation of the tables that make it up.
+
+```{r}
+db_dm <- mrs_db |>
+  as_dm_class(pk_facts = FALSE)
+db_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+
+From the original data source (the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) dataset), suppose **we obtain a set of data that we want to integrate with the previous data to analyse them together**. 
+
+We have stored it in the package, in a file with the same format as the original file which only contains a small portion of the original data. We have made sure that there is data that was already included in the data set considered to obtain the content of the `mrs_db` constellation and also new data. It is accessed below.
+
+```{r, echo=FALSE}
+#  mrs_ft_new: Declared as a variable instead of reading from the file due to problem building macos-latest (release)
+```
+
+
+```{r, eval=FALSE}
+file <-
+  system.file(
+    "extdata",
+    "mrs_122_us_cities_1962_2016_new.csv",
+    package = "rolap"
+  )
+
+mrs_ft_new <-
+  read_flat_table_file(name = 'mrs new', file)
+```
+
+Using the `read_flat_table_file()` function we read a table stored in a text file and create a `flat_table` object with a name. Below are the first records of the table. We access the table using the `get_table()` function for the object of the `flat_table` class.
+
+```{r, results = "asis"}
+ft <- mrs_ft_new |> 
+  get_table()
+
+pander::pandoc.table(head(ft), split.table = Inf)
+```
+
+# Generation of star database refresh structures
+
+From the table that we have read, with the information contained in the constellation variable, we can automatically generate refresh structures for the star databases that make up the constellation.
+
+## Refresh structures
+
+From the data read in the form of a `flat_table` object, using the `update_according_to()` function, we generate a refresh structure of the star database of the `mrs_db` constellation whose name is indicated.
+
+```{r}
+mrs_db_age_refresh <- mrs_ft_new |>
+  update_according_to(mrs_db, star = "mrs_age")
+```
+
+The modification structure contains a star database generated from the read data. We can see its graphical representation below.
+
+```{r}
+db_dm <- mrs_db_age_refresh |>
+  get_star_database() |>
+  as_dm_class(pk_facts = FALSE)
+db_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+In exactly the same way, we generate the refresh structure for the other star database.
+
+```{r}
+mrs_db_cause_refresh <- mrs_ft_new |>
+  update_according_to(mrs_db, star = "mrs_cause")
+```
+
+Below is its graphical representation.
+
+```{r}
+db_dm <- mrs_db_cause_refresh |>
+  get_star_database() |>
+  as_dm_class(pk_facts = FALSE)
+db_dm |> 
+  dm::dm_draw(rankdir = "LR", view_type = "all")
+```
+
+## Transformation code
+
+The transformation code to generate the variable `mrs_db` can be obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`.
+
+It is also included in the refresh structure for each of the star databases obtained. It can be obtained using the `get_transformation_code()` and `get_transformation_file()` functions, in the form of a vector of strings and a file respectively.
+
+```{r}
+mrs_db_age_refresh |>
+  get_transformation_code()
+```
+
+If additional transformations are needed, it can be modified to our convenience. In the same way we consult it for the other star database, although we don't show the result here.
+
+```{r}
+code <- mrs_db_cause_refresh |>
+  get_transformation_code()
+```
+
+We can see that the selection of the star database is done using the `magrittr::extract2()` function, which was not used in the original vignette to select the elements of a list. It has been included here to preserve the pipe syntax throughout the transformation.
+
+This code only needs to be used if we want to perform additional transformations. If the previously defined transformations are sufficient, they have already been automatically applied to the data in order to integrate them.
+
+## Instances included in the structure
+
+Seeing the new instances that are going to be added to the dimensions can help us determine whether or not we need to modify the transformation code. We can do this using the `get_new_dimension_instances()` function, as shown below.
+
+```{r}
+mrs_db_age_refresh |>
+  get_new_dimension_instances()
+```
+
+If necessary, starting from the code that we have obtained, we can perform transformations on the starting `flat_table` structure or on the `star_database` object obtained.
+
+We can see that there are two new cities that were not included in the *where* dimension of the initial star databases: *Baltimore* and *Boston*.
+
+# Incremental refresh
+
+The most common thing is that refresh operations only include new instances in fact tables, but it may be the case that repeated instances appear: They may have different values in the measures, but the same values in the dimension foreign keys.
+
+## Existing fact instances
+
+To perform the incremental refresh operation, we must determine what happens to the fact table instances that were already included in the original star database. We can query existing fact instances using the `get_existing_fact_instances()` function, as can be seen below for each of the star databases.
+
+```{r}
+mrs_db_age_refresh |>
+  get_existing_fact_instances()
+
+mrs_db_cause_refresh |>
+  get_existing_fact_instances()
+```
+
+In each case it may be interesting to perform a different operation on these previously existing instances. By default, what is done is to ignore them but we can indicate that they are grouped, replaced or deleted, using the `existing_instances` parameter.
+
+## Incremental refresh operation
+
+To better appreciate the update made, we are going to perform the same query before and after the incremental refresh operation: We obtain the design tables, along with the number of instances of each one. For the *where* dimension table, we get the names of the first cities to check that *Baltimore* and *Boston* were not included.
+
+```{r}
+l_db <- mrs_db |>
+  as_tibble_list()
+
+names <- names(l_db)
+for (i in seq_along(l_db)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(l_db[[i]])))
+}
+
+head(sort(l_db[['where']]$city), 15)
+```
+
+Next, we perform the incremental refresh for each of the star databases in the original constellation. For one of the star databases, through the `existing_instances` parameter, it has been indicated that the instances of previously existing facts are grouped with the new ones. For the other design, the default option is considered: Ignore fact table previously existing instances. 
+
+We will make a copy of the constellation to perform an operation later.
+
+```{r}
+mrs_db_seg <- mrs_db
+
+mrs_db <- mrs_db |>
+  incremental_refresh(mrs_db_age_refresh) |>
+  incremental_refresh(mrs_db_cause_refresh, existing_instances = "group")
+```
+
+Finally, we consult the same data as before again.
+
+```{r}
+l_db <- mrs_db |>
+  as_tibble_list()
+
+names <- names(l_db)
+for (i in seq_along(l_db)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(l_db[[i]])))
+}
+
+head(sort(l_db[['where']]$city), 15)
+```
+
+We observe how the number of instances has increased in the facts and in the dimensions and the *where* dimension already contains the names of the cities that appeared as new in the update operation.
+
+# Changes in transformation operations
+
+In this case no problem has been detected in the new dimension data. But let's assume that we wanted to make some change to the modify operations before doing the update to show how it would be done.
+
+## New transformation function
+
+First of all, we obtain the transformation function. In this case we have stored it in a temporary file using the `get_transformation_file()` function and we have copied it here.
+
+Starting from the `tibble` of the initial `flat_table`, the `star_schema` to define the `star_database`, the lookup tables and field definition functions that we have used, we can reproduce all the transformations and adapt them to the new situations that hypothetically have arisen.
+
+```{r}
+transform_instance_table <-
+  function(instance_df,
+           lookup_ft,
+           definition_fun,
+           star_sch) {
+    ft <-
+      flat_table(name = 'mrs',
+                 instances = instance_df,
+                 unknown_value = 'Not available') |>
+      transform_to_measure(
+        attributes = c(
+          'Pneumonia and Influenza Deaths',
+          'All Deaths',
+          '<1 year (all cause deaths)',
+          '1-24 years (all cause deaths)',
+          '25-44 years',
+          '45-64 years (all cause deaths)',
+          '65+ years (all cause deaths)'
+        ),
+        k_sep = NULL,
+        decimal_sep = NULL
+      ) |>
+      transform_attribute_format(
+        attributes = 'WEEK',
+        width = 2,
+        decimal_places = 0,
+        k_sep = ',',
+        decimal_sep = '.'
+      ) |>
+      replace_empty_values(
+        attributes = c('Year', 'WEEK', 'Week Ending Date', 'REGION', 'State', 'City'),
+        empty_values = NULL
+      ) |>
+      add_custom_column(name = 'city_state',
+                        definition = definition_fun) |>
+      replace_attribute_values(
+        attributes = c('City', 'city_state'),
+        old = c('Wilimington', 'Wilimington DE'),
+        new = c('Wilmington', 'Wilmington DE')
+      ) |>
+      join_lookup_table(fk_attributes = 'city_state',
+                        lookup = lookup_ft) |>
+      select_attributes(
+        attributes = c(
+          'Year',
+          'WEEK',
+          'Week Ending Date',
+          'REGION',
+          'State',
+          'City',
+          'city_state',
+          'status',
+          'pop',
+          'lat',
+          'long'
+        )
+      ) |>
+      separate_measures(
+        measures = list(
+          c('Pneumonia and Influenza Deaths', 'All Deaths'),
+          c(
+            '<1 year (all cause deaths)',
+            '1-24 years (all cause deaths)',
+            '25-44 years',
+            '45-64 years (all cause deaths)',
+            '65+ years (all cause deaths)'
+          )
+        ),
+        names = c('mrs_cause', 'mrs_age'),
+        na_rm = TRUE
+      ) |>
+      magrittr::extract2('mrs_cause') |>
+      snake_case() |>
+      as_star_database(schema = star_sch)
+    
+    ft
+  }
+```
+
+We can get these parameters from the initial definition (in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`) or by consulting the refresh structure with the functions available for this purpose.
+
+```{r}
+instance_df <- mrs_ft_new |> 
+  get_table()
+  
+lookup_list <- mrs_db_cause_refresh |> 
+  get_lookup_tables()
+
+star_sch <- mrs_db_cause_refresh |> 
+  get_star_schema()
+
+# function to define a derived column
+city_state <- function(table) {
+  paste0(table$City, ' ', table$State)
+}
+
+mrs_db_cause_transf <-
+  transform_instance_table(
+    instance_df = instance_df,
+    lookup_ft = lookup_list[['us_cities']],
+    definition_fun = city_state,
+    star_sch = star_sch
+  )
+```
+
+We perform the same operation for the other star database.
+
+```{r}
+transform_instance_table_2 <-
+  function(instance_df,
+           lookup_ft,
+           definition_fun,
+           star_sch) {
+    ft <-
+      flat_table(name = 'mrs',
+                 instances = instance_df,
+                 unknown_value = 'Not available') |>
+      transform_to_measure(
+        attributes = c(
+          'Pneumonia and Influenza Deaths',
+          'All Deaths',
+          '<1 year (all cause deaths)',
+          '1-24 years (all cause deaths)',
+          '25-44 years',
+          '45-64 years (all cause deaths)',
+          '65+ years (all cause deaths)'
+        ),
+        k_sep = NULL,
+        decimal_sep = NULL
+      ) |>
+      transform_attribute_format(
+        attributes = 'WEEK',
+        width = 2,
+        decimal_places = 0,
+        k_sep = ',',
+        decimal_sep = '.'
+      ) |>
+      replace_empty_values(
+        attributes = c('Year', 'WEEK', 'Week Ending Date', 'REGION', 'State', 'City'),
+        empty_values = NULL
+      ) |>
+      add_custom_column(name = 'city_state',
+                        definition = definition_fun) |>
+      replace_attribute_values(
+        attributes = c('City', 'city_state'),
+        old = c('Wilimington', 'Wilimington DE'),
+        new = c('Wilmington', 'Wilmington DE')
+      ) |>
+      join_lookup_table(fk_attributes = 'city_state',
+                        lookup = lookup_ft) |>
+      select_attributes(
+        attributes = c(
+          'Year',
+          'WEEK',
+          'Week Ending Date',
+          'REGION',
+          'State',
+          'City',
+          'city_state',
+          'status',
+          'pop',
+          'lat',
+          'long'
+        )
+      ) |>
+      separate_measures(
+        measures = list(
+          c('Pneumonia and Influenza Deaths', 'All Deaths'),
+          c(
+            '<1 year (all cause deaths)',
+            '1-24 years (all cause deaths)',
+            '25-44 years',
+            '45-64 years (all cause deaths)',
+            '65+ years (all cause deaths)'
+          )
+        ),
+        names = c('mrs_cause', 'mrs_age'),
+        na_rm = TRUE
+      ) |>
+      magrittr::extract2('mrs_age') |>
+      transform_to_values(
+        attribute = 'age',
+        measure = 'all_deaths',
+        id_reverse = NULL,
+        na_rm = TRUE
+      ) |>
+      snake_case() |>
+      replace_string(attributes = 'age',
+                     string = ' (all cause deaths)',
+                     replacement = NULL) |>
+      as_star_database(schema = star_sch)
+    
+    ft
+  }
+
+star_sch <- mrs_db_age_refresh |>
+  get_star_schema()
+
+mrs_db_age_transf <-
+  transform_instance_table_2(
+    instance_df = instance_df,
+    lookup_ft = lookup_list[['us_cities']],
+    definition_fun = city_state,
+    star_sch = star_sch
+  )
+```
+
+The result of these functions, in each case, is a `star_database` containing the new transformations.
+
+## Refresh structures
+
+Now we have to create the refresh structure for each star database, considering the original constellation (we have made a copy before updating it in `mrs_db_seg`). To create the refresh structures, we now indicate that the operations are considered from the star database of the `sdb_operations` parameter.
+
+```{r}
+mrs_db_cause_transf_refresh <- mrs_ft_new |>
+  update_according_to(mrs_db_seg, star = "mrs_cause", sdb_operations = mrs_db_cause_transf)
+
+mrs_db_age_transf_refresh <- mrs_ft_new |>
+  update_according_to(mrs_db_seg, star = "mrs_age", sdb_operations = mrs_db_age_transf)
+```
+
+That is, with the `sdb_operations` parameter, it takes the data to be refreshed from the constellation, but the modification operations are taken from this star database (where we have defined the new operations that have been considered necessary).
+
+## Incremental refresh operation
+
+To show the result of the incremental refresh operations, we are going to repeat the process carried out previously: We show the name and number of instances of the tables before and after the transformation, as well as the names of the first cities of the *where* dimension.
+
+```{r}
+l_db <- mrs_db_seg |>
+  as_tibble_list()
+
+names <- names(l_db)
+for (i in seq_along(l_db)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(l_db[[i]])))
+}
+
+head(sort(l_db[['where']]$city), 15)
+```
+
+To perform the incremental refresh, as the refresh structure has new transformation operations, we can indicate that these become the transformation operations of the constellation. Thus, in future updates, they will be taken into account automatically. This is indicated by the boolean parameter `replace_transformations`.
+
+```{r}
+mrs_db_seg <- mrs_db_seg |>
+  incremental_refresh(mrs_db_age_transf_refresh, replace_transformations = TRUE) |>
+  incremental_refresh(
+    mrs_db_cause_transf_refresh,
+    existing_instances = "group",
+    replace_transformations = TRUE
+  )
+```
+
+Finally, we consult the same data as before again.
+
+```{r}
+l_db <- mrs_db_seg |>
+  as_tibble_list()
+
+names <- names(l_db)
+for (i in seq_along(l_db)){
+  cat(sprintf("name: %s, %d rows\n", names[i], nrow(l_db[[i]])))
+}
+
+head(sort(l_db[['where']]$city), 15)
+```
+
+It can be seen that we have obtained the same results as before.
+
+
+# Conclusions
+
+This document shows the functions supporting incremental refreshing of star databases offered by the `rolap` package.
+
+Starting from a flat table, the transformation operations through which a star database has been defined are automatically applied. These operations can be obtained and enriched to adapt to new situations that arise. Once the data has been conveniently updated, it can be integrated with the original star database indicating the operation that is considered most appropriate to integrate the data previously existing in the fact table.
+
+This incremental refresh mechanism, although not trivial, facilitates this generally difficult process. It lays the foundations to continue simplifying it and offering new functionalities.

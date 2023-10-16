@@ -29,7 +29,7 @@ tl1 <- db1 |>
 db2 <- star_database(mrs_age_schema, ft_age) |>
   snake_case()
 
-ct <- constellation("MRS", list(db1, db2))
+ct <- constellation("MRS", db1, db2)
 tl <- ct |>
   as_tibble_list()
 

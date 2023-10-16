@@ -243,7 +243,7 @@ It can be seen that the When dimension is independent, it does not have the same
 The definition of the constellation is shown below.
 
 ```{r}
-ct <- constellation("MRS", list(db_2, db_3))
+ct <- constellation("MRS", db_2, db_3)
 ```
 
 Below we can see the graphic representation of the tables that compose it.

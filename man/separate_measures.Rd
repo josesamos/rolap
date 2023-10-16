@@ -22,9 +22,9 @@ separate_measures(ft, measures, names, na_rm)
 A list of \code{flat_table} objects.
 }
 \description{
-Separate measures listed as list items into flat tables. Each item in the
-list is a vector of measures that is uniquely included along with the
-attributes in a new flat table.
+Separate groups of measures into different flat tables. For each group we
+must indicate a name. If we indicate more names than groups of measures, the
+measures not included in other groups are also included in a new group.
 }
 \details{
 A list of flat tables is returned. It assign the names to the result list.
@@ -36,8 +36,7 @@ lft <- flat_table('iris', iris) |>
     measures = list(
       c('Petal.Length'),
       c('Petal.Width'),
-      c('Sepal.Length'),
-      c('Sepal.Width')
+      c('Sepal.Length')
     ),
     names = c('PL', 'PW', 'SL', 'SW')
   )

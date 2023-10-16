@@ -143,7 +143,7 @@ vector_to_string <- function(vector) {
 #' @keywords internal
 string_to_vector <- function(str) {
   if (str == "") {
-    res <- str
+    res <- NULL
   } else {
     res <- unlist(strsplit(str, "<|>", fixed = TRUE))
   }

@@ -92,6 +92,7 @@ db <- star_database(s, ft_cause_rpd) |>
 
 Other star database definition functions: 
 \code{\link{get_dimension_names}()},
+\code{\link{get_fact_names}()},
 \code{\link{get_table_names}()},
 \code{\link{group_dimension_instances}()},
 \code{\link{star_database}()}

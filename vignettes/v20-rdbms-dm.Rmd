@@ -14,6 +14,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, echo=FALSE}
+library(rolap)
+#  transactions_db: Declared as variable instead of reading from the DB due to problem building macos-latest (release) with dm::dm_from_con(ccs_db, learn_keys = TRUE) function call.
+ccs_sel_dm <- transactions_db
+```
 
 # Introduction
 
@@ -27,11 +32,9 @@ First, the initial transactional data is presented. The following shows the impl
 
 We will build on a dataset with transactional data from Czech debit card company specialising on payments at gas stations called [CCS](https://relational.fit.cvut.cz/dataset/CCS), publicly available in a RDBMS.
 
-First, we make a connection by following the instructions they offer, as shown below^[In the R code that is included, although with the use of `library` it is not necessary, for each function it is indicated by the prefix the package where it is defined.].
+First, we make a connection by following the instructions they offer, as shown below^[In the R code that is included, for each function it is indicated by the prefix the package where it is defined.].
 
-```{r}
-library(RMariaDB)
-
+```{r, eval=FALSE}
 ccs_db <- RMariaDB::dbConnect(
   RMariaDB::MariaDB(),
   username = "guest",
@@ -43,30 +46,17 @@ ccs_db <- RMariaDB::dbConnect(
 
 Next, from the connection, we can obtain a `dm` object, taking the definition of the keys from the database.
 
-```{r, message=FALSE}
-library(dm)
-
+```{r, message=FALSE, eval=FALSE}
 ccs_dm <- dm::dm_from_con(ccs_db, learn_keys = TRUE)
 ```
 
-Using the following function we can display the database tables with all their fields.
+Using the `dm::dm_draw(view_type = "all")` function we can display the database tables with all their fields.
 
-```{r}
-ccs_dm |>
-  dm::dm_draw(view_type = "all")
-```
-
-We can access tables as if they were part of a list. If we access the *transactions* table we can see that it has no data, the data is in the *transactions_1k* table hat is not related to the other tables.
-
-```{r}
-ccs_dm$transactions
-```
-
-On the other hand, the *yearmonth* table contains historical customer data, which we will not use in this example.
+We can access tables as if they were part of a list. If we access the *transactions* table we can see that it has no data, the data is in the *transactions_1k* table hat is not related to the other tables. 
 
 Therefore, what we do is generate a new `dm` object by selecting the tables that we are going to use and relating table *transactions_1k* to the rest of the tables. These operations are performed below.
 
-```{r}
+```{r, eval=FALSE}
 ccs_sel_dm <-
   ccs_dm[c('transactions_1k', 'customers', 'gasstations', 'products')] |>
   dm::dm_add_fk(transactions_1k, CustomerID, customers) |>
@@ -93,11 +83,12 @@ nrow(transactions_ft)
 dput(colnames(transactions_ft))
 ```
 
+
 With this we already have in the `transactions_ft` variable the flat table with the transactional data that we are going to use. In the list of fields of this table, we can see that the fields with the same name that were in several tables are now postfixed with the name of the table they came from (*Segment.customers* and *Segment.gasstations*).
 
 Since we already have the result we need, we can disconnect from the database.
 
-```{r}
+```{r, eval=FALSE}
 DBI::dbDisconnect(ccs_db)
 ```
 
@@ -145,7 +136,7 @@ We are going to add an *Hour* field obtained from the *Time* field. We also add 
 
 ```{r}
 transactions_ft <- transactions_ft |>
-  dplyr::mutate(Hour = format(as.POSIXct(Time), format = "%H"))  |>
+  dplyr::mutate(Hour = format(Time, format = "%H"))  |>
   dplyr::mutate(`Processing Date` = format(as.POSIXct(Date) + 
     lubridate::days(2), format = "%Y-%m-%d"))
 ```
@@ -415,7 +406,7 @@ Tables can be stored directly in any RDBMS, just as we have done before.
 We can work with the star databases separately or in an integrated way by defining a constellation from them. On the constellation we can carry out the same operations that we perform on a star database.
 
 ```{r}
-ct <- rolap::constellation("CSS", list(db_finest, db_summary))
+ct <- rolap::constellation("CSS", db_finest, db_summary)
 
 db_tl <- ct |>
   rolap::as_tibble_list()

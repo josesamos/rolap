@@ -32,10 +32,10 @@ This section describes the data sets used in the example.
 
 To illustrate how the package works we will use a small part of the [Deaths in 122 U.S. cities - 1962-2016. 122 Cities Mortality Reporting System](https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system) dataset. 
 
-We have developed the examples in this document using the dataset downloaded from the source. To reproduce them more easily, from the original file, we have stored in the package a file with the same format as the original file but that includes only 1% of its data, selected at random, which is accessed below.
+We have developed the examples in this document using the dataset downloaded from the source. To reproduce them more easily, from the original file, we have stored in the package a file with the same format as the original file but that includes only 1% of its data, selected at random^[Additionally, data from Boston and Baltimore have been excluded to show the incremental data refresh.], which is accessed below.
 ```{r, echo=FALSE}
 library(rolap)
-#  Declared as a variable instead of reading from the file due to problem building macos-latest (release)
+#  mrs_ft: Declared as a variable instead of reading from the file due to problem building macos-latest (release)
 ```
 
 ```{r, eval=FALSE}
@@ -138,7 +138,7 @@ Since the data comes from a text file, all fields have been defined as attribute
 
 #### Measures
 
-This is a starting point, next we will see how to change the initial classification. Using the `transform_to_measure()` function, we transform attributes into measurements. In some cases it is required to previously transform the data (remove the thousands separator or change the decimal separator), this can be indicated by the function parameters, although it is not necessary in this case. 
+This is a starting point, next we will see how to change the initial classification. Using the `transform_to_measure()` function, we transform attributes into measures. In some cases it is required to previously transform the data (remove the thousands separator or change the decimal separator), this can be indicated by the function parameters, although it is not necessary in this case. 
 
 ```{r}
 mrs_ft <- mrs_ft |>
@@ -387,7 +387,7 @@ We have made some transformations on the `flat_table` objects in the previous se
 
 The original Mortality Reporting System data includes details related to the cause of death and others to the age group of the people, but without including the cause. That is, we have data at two different granularities or levels of detail. Let's separate them into different tables.
 
-The separation is carried out by means of the `separate_measures()` function, in which we can indicate lists of measurements and the name of each new flat table that will form the result.
+The separation is carried out by means of the `separate_measures()` function, in which we can indicate lists of measures and the name^[If we indicate more names than groups of measures, the measures not included in other groups are also included in a new group.] of each new flat table that will form the result. 
 
 ```{r}
 l_mrs_ft <- mrs_ft |>
@@ -436,7 +436,7 @@ cat(sprintf("Number of rows in the table: %d", nrow(ft)))
 
 Additionally, the number of rows in the table is shown.
 
-The names of the measures can be considered values of a new attribute called *age*. The numerical values would correspond to a new measurement that we can call *all_deaths*.
+The names of the measures can be considered values of a new attribute called *age*. The numerical values would correspond to a new measure that we can call *all_deaths*.
 
 This is precisely the transformation carried out by the `transform_to_values()` function. It is not necessary to indicate more parameters apart from the new names of the attribute and the measure because it considers all the available measures to carry out the described transformation.
 
@@ -453,7 +453,7 @@ mrs_age_ft <- mrs_age_ft |>
   snake_case()
 ```
 
-Finally, we can eliminate from the literals that describe the age, the part that is now described by the new measurement. To do this, we use the `replace_string()` function that allows us to replace a string with the value indicated for the selected attributes. This function, unlike function `replace_attribute_values()`, does not look for the instances to be equal to the indicated value but rather to contain it.
+Finally, we can eliminate from the literals that describe the age, the part that is now described by the new measure. To do this, we use the `replace_string()` function that allows us to replace a string with the value indicated for the selected attributes. This function, unlike function `replace_attribute_values()`, does not look for the instances to be equal to the indicated value but rather to contain it.
 
 ```{r}
 mrs_age_ft <- mrs_age_ft |>
@@ -607,7 +607,7 @@ db_dm |>
 From the two star databases we define a constellation that shares common dimensions.
 
 ```{r example5}
-mrs_db <- constellation("mrs", list(mrs_cause_db, mrs_age_db))
+mrs_db <- constellation("mrs", mrs_cause_db, mrs_age_db)
 ```
 
 And we show the graphic representation of the tables.

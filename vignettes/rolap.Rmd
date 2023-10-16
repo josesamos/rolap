@@ -378,7 +378,7 @@ As we have filtered the data, it can be seen that the dimension tables only cont
 Next we define a constellation formed by the two star databases.
 
 ```{r example5}
-ct <- constellation("MRS", list(db_cause, db_age))
+ct <- constellation("MRS", db_cause, db_age)
 ```
 
 Constellation tables can also be exported as a tibble list.
@@ -417,7 +417,7 @@ db_age2 <- star_database(s_age2, ft_age) |>
 Next we define a constellation, it is made up of the previously defined constellation and the new star database.
 
 ```{r}
-ct2 <- constellation("MRS2", list(ct, db_age2))
+ct2 <- constellation("MRS2", ct, db_age2)
 ```
 
 

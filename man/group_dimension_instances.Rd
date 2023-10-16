@@ -32,6 +32,7 @@ db <- star_database(mrs_cause_schema, ft_num) |>
 
 Other star database definition functions: 
 \code{\link{get_dimension_names}()},
+\code{\link{get_fact_names}()},
 \code{\link{get_table_names}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{star_database}()}

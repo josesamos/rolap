@@ -7,7 +7,7 @@
 \usage{
 select_measures(ft, measures, na_rm)
 
-\method{select_measures}{flat_table}(ft, measures, na_rm = TRUE)
+\method{select_measures}{flat_table}(ft, measures = NULL, na_rm = TRUE)
 }
 \arguments{
 \item{ft}{A \code{flat_table} object.}

@@ -277,6 +277,78 @@
 "mrs_age_schema_rpd"
 
 
+#' Flat table generated from MRS file
+#'
+#' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
+#' from the original file, we have stored in the package a file with the same
+#' format as the original file but that includes only 1% of its data, selected at
+#' random.
+#' @examples
+#' # Defined by:
+#' file <-
+#'   system.file(
+#'     "extdata",
+#'     "mrs_122_us_cities_1962_2016.csv",
+#'     package = "rolap"
+#'   )
+#'
+#' \donttest{
+#' mrs_ft <-
+#'   read_flat_table_file(name = 'mrs', file, unknown_value = "Not available")
+#' }
+#'
+#' @family mrs example data
+#'
+#' @format A `flat_table`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"mrs_ft"
+
+
+#' Flat table generated from MRS file
+#'
+#' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
+#' from the original file, we have stored in the package a file with the same
+#' format as the original file but that includes only 0,1% of its data, selected at
+#' random to test the incremental refresh.
+#' @examples
+#' # Defined by:
+#' file <-
+#'   system.file(
+#'     "extdata",
+#'     "mrs_122_us_cities_1962_2016_new.csv",
+#'     package = "rolap"
+#'   )
+#'
+#' \donttest{
+#' mrs_ft_new <-
+#'   read_flat_table_file(name = 'mrs', file, unknown_value = "Not available")
+#' }
+#'
+#' @family mrs example data
+#'
+#' @format A `flat_table`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"mrs_ft_new"
+
+
+#' Constellation generated from MRS file
+#'
+#' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
+#' from the original file, we have stored in the package a file with the same
+#' format as the original file but that includes only 1% of its data, selected at
+#' random.
+#'
+#' From these data the constellation in the vignette titled 'Obtaining and
+#' transforming flat tables' has been generated. This variable contains the defined
+#' constellation.
+#'
+#' @family mrs example data
+#'
+#' @format A `star_database`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"mrs_db"
+
+
 #' Czech debit card company specialising on payments at gas stations (finest detail)
 #'
 #' Multidimensional design with finest detail from the data available at the source.
@@ -284,7 +356,6 @@
 #' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
 #' @family database example data
-#' @seealso \code{\link{mrs_cause_schema}}
 #'
 #' @format A `star_database`.
 #' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
@@ -298,22 +369,42 @@
 #' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
 #' @family database example data
-#' @seealso \code{\link{mrs_cause_schema}}
 #'
 #' @format A `star_database`.
 #' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
 "db_summary"
 
+#' Czech debit card company specialising on payments at gas stations (tables)
+#'
+#' Data base in `dm` format with a summary from the data available at the source.
+#'
+#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
+#'
+#' @examples
+#' # Defined by:
+#' \donttest{
+#' ccs_db <- RMariaDB::dbConnect(
+#'   RMariaDB::MariaDB(),
+#'   username = "guest",
+#'   password = "relational",
+#'   dbname = "ccs",
+#'   host = "relational.fit.cvut.cz"
+#' )
+#' ccs_dm <- dm::dm_from_con(ccs_db, learn_keys = TRUE)
+#' ccs_sel_dm <-
+#'   ccs_dm[c('transactions_1k', 'customers', 'gasstations', 'products')] |>
+#'   dm::dm_add_fk(transactions_1k, CustomerID, customers) |>
+#'   dm::dm_add_fk(transactions_1k, GasStationID, gasstations) |>
+#'   dm::dm_add_fk(transactions_1k, ProductID, products)
+#' transactions_db <- ccs_sel_dm |>
+#'   dm::collect()
+#' DBI::dbDisconnect(ccs_db)
+#' }
+#'
+#' @family database example data
+#'
+#' @format A `star_database`.
+#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
+"transactions_db"
 
-#' Flat table generated from MRS file
-#'
-#' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
-#' from the original file, we have stored in the package a file with the same
-#' format as the original file but that includes only 1% of its data, selected at
-#' random.
-#'
-#' @family mrs example data
-#'
-#' @format A `flat_table`.
-#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
-"mrs_ft"
+

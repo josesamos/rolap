@@ -150,9 +150,37 @@ get_rpd_dimensions <- function(db, name) {
   for (i in seq_along(db$rpd)) {
     if (name %in% db$rpd[[i]]) {
       res <- db$rpd[[i]]
+      break
     }
   }
   res
+}
+
+
+#' From a vector of dimensions, leave only one of each rpd.
+#'
+#' @param db A `star_database` object.
+#' @param names A vector of strings, dimension names.
+#'
+#' @return A vector of dimension names.
+#'
+#' @keywords internal
+simplify_rpd_dimensions <- function(db, names) {
+  res <- NULL
+  for (n in names) {
+    included <- FALSE
+    for (i in seq_along(db$rpd)) {
+      if (n %in% db$rpd[[i]]) {
+        res <- c(res, db$rpd[[i]][1])
+        included <- TRUE
+        break
+      }
+    }
+    if (!included) {
+      res <- c(res, n)
+    }
+  }
+  unique(res)
 }
 
 

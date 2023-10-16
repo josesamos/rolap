@@ -28,6 +28,7 @@ names <- star_database(mrs_cause_schema, ft_num) |>
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
 
 Other star database definition functions: 
+\code{\link{get_fact_names}()},
 \code{\link{get_table_names}()},
 \code{\link{group_dimension_instances}()},
 \code{\link{role_playing_dimension}()},

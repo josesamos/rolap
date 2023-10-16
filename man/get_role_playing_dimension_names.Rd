@@ -33,7 +33,7 @@ db2 <- star_database(mrs_age_schema_rpd, ft_age_rpd) |>
     rpd = "When Arrived",
     roles = c("When Available")
   )
-rpd <- constellation("MRS", list(db1, db2)) |>
+rpd <- constellation("MRS", db1, db2) |>
   get_role_playing_dimension_names()
 
 }

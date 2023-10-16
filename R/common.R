@@ -57,7 +57,7 @@ validate_attributes <- function(defined_attributes, attributes, repeated = FALSE
 #'
 #' @keywords internal
 validate_measures <- function(defined_measures, measures) {
-  if (is.null(measures)) {
+  if (length(measures) == 0) {
     measures <- defined_measures
   } else {
     stopifnot("There are repeated measures." = length(measures) == length(unique(measures)))

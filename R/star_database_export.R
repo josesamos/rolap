@@ -22,7 +22,7 @@
 #' db2 <- star_database(mrs_age_schema, ft_age) |>
 #'   snake_case()
 #'
-#' ct <- constellation("MRS", list(db1, db2))
+#' ct <- constellation("MRS", db1, db2)
 #' tl <- ct |>
 #'   as_tibble_list()
 #'
@@ -73,7 +73,7 @@ as_tibble_list.star_database <- function(db) {
 #' db2 <- star_database(mrs_age_schema, ft_age) |>
 #'   snake_case()
 #'
-#' ct <- constellation("MRS", list(db1, db2))
+#' ct <- constellation("MRS", db1, db2)
 #' dm <- ct |>
 #'   as_dm_class()
 #'
@@ -133,7 +133,7 @@ as_dm_class.star_database <- function(db, pk_facts = TRUE) {
 #' db2 <- star_database(mrs_age_schema, ft_age) |>
 #'   snake_case()
 #'
-#' ct <- constellation("MRS", list(db1, db2))
+#' ct <- constellation("MRS", db1, db2)
 #' tl <- ct |>
 #'   as_single_tibble_list()
 #'

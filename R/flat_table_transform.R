@@ -58,11 +58,15 @@ select_measures <- function(ft, measures, na_rm) UseMethod("select_measures")
 #' @rdname select_measures
 #'
 #' @export
-select_measures.flat_table <- function(ft, measures, na_rm = TRUE) {
-  measures <- validate_measures(ft$measures, measures)
+select_measures.flat_table <- function(ft, measures = NULL, na_rm = TRUE) {
+  if (length(measures) == 0) {
+    measures <- NULL
+  } else {
+    measures <- validate_measures(ft$measures, measures)
+  }
   ft$table <- ft$table[, c(ft$attributes, measures)]
   ft$measures <- measures
-  if (na_rm) {
+  if (na_rm & !is.null(measures)) {
     ft$table <- remove_all_measures_na(ft$table, ft$measures)
   }
   ft$operations <- add_operation(ft$operations, "select_measures", measures, na_rm)
@@ -760,9 +764,9 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
 
 #' Separate measures in flat tables
 #'
-#' Separate measures listed as list items into flat tables. Each item in the
-#' list is a vector of measures that is uniquely included along with the
-#' attributes in a new flat table.
+#' Separate groups of measures into different flat tables. For each group we
+#' must indicate a name. If we indicate more names than groups of measures, the
+#' measures not included in other groups are also included in a new group.
 #'
 #' A list of flat tables is returned. It assign the names to the result list.
 #'
@@ -783,8 +787,7 @@ transform_from_values.flat_table <- function(ft, attribute = NULL) {
 #'     measures = list(
 #'       c('Petal.Length'),
 #'       c('Petal.Width'),
-#'       c('Sepal.Length'),
-#'       c('Sepal.Width')
+#'       c('Sepal.Length')
 #'     ),
 #'     names = c('PL', 'PW', 'SL', 'SW')
 #'   )
@@ -796,26 +799,44 @@ separate_measures <- function(ft, measures, names, na_rm) UseMethod("separate_me
 #'
 #' @export
 separate_measures.flat_table <- function(ft, measures = NULL, names = NULL, na_rm = TRUE) {
-  stopifnot("Missing measure names." = !is.null(measures))
+  stopifnot("Missing measure groups." = !is.null(measures))
   stopifnot("Missing measure group names." = !is.null(names))
-  stopifnot("Missing measure group names." = length(measures) == length(unique(names)))
-  lft <- vector("list", length = length(measures))
+  names <- unique(names)
+  if (!is.list(measures)) {
+    measures <- list(measures)
+  }
+  stopifnot("Missing measure group names." = length(measures) == length(names) |
+              length(measures) + 1 == length(names))
+  lft <- vector("list", length = length(names))
   names(lft) <- names
-  for (i in seq_along(measures)) {
-    measures[[i]] <- validate_measures(ft$measures, measures[[i]])
+  if (length(names) > length(measures)) {
+    m <- unique(unlist(measures))
+    rest <- setdiff(ft$measures, m)
+    if (length(rest) == 0) {
+      rest <- NULL
+    }
+    measures <- c(measures, list(rest))
+  }
+  for (i in seq_along(names)) {
+    if (length(measures[[i]]) == 0) {
+      sel_m <- NULL
+    } else {
+      sel_m <- validate_measures(ft$measures, measures[[i]])
+    }
     lft[[i]] <-
-      flat_table(name = names[i], instances = ft$table[, c(ft$attributes, measures[[i]])],
+      flat_table(name = names[i], instances = ft$table[, c(ft$attributes, sel_m)],
                  unknown_value = ft$unknown_value)
-    if (na_rm) {
-      lft[[i]]$table <- remove_all_measures_na(lft[[i]]$table, measures[[i]])
+    if (na_rm & !is.null(sel_m)) {
+      lft[[i]]$table <- remove_all_measures_na(lft[[i]]$table, sel_m)
     }
     lft[[i]]$pk_attributes <- ft$pk_attributes
     lft[[i]]$lookup_tables <- ft$lookup_tables
     lft[[i]]$operations <-
-      add_operation(ft$operations, "separate_measures", measures[[i]], names[i], na_rm)
+      add_operation(ft$operations, "separate_measures", measures, c(names[i], names), na_rm)
   }
   lft
 }
+
 
 #' Replace empty values with the unknown value
 #'
@@ -889,6 +910,8 @@ replace_unknown_values.flat_table <- function(ft, attributes = NULL, value) {
   ft$table[, attributes] <-
     apply(ft$table[, attributes, drop = FALSE], 2, function(x)
       gsub(ft$unknown_value, value, x))
+  ft$operations <-
+    add_operation(ft$operations, "replace_unknown_values", attributes, value)
   ft
 }
 
@@ -966,6 +989,7 @@ remove_instances_without_measures <- function(ft) UseMethod("remove_instances_wi
 #' @export
 remove_instances_without_measures.flat_table <- function(ft) {
   ft$table <- remove_all_measures_na(ft$table, ft$measures)
+  ft$operations <- add_operation(ft$operations, "remove_instances_without_measures")
   ft
 }
 

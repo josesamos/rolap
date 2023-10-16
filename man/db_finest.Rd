@@ -20,10 +20,9 @@ Multidimensional design with finest detail from the data available at the source
 The development has been done in the vignette \code{vignette("v20-rdbms-dm")}.
 }
 \seealso{
-\code{\link{mrs_cause_schema}}
-
 Other database example data: 
-\code{\link{db_summary}}
+\code{\link{db_summary}},
+\code{\link{transactions_db}}
 }
 \concept{database example data}
 \keyword{datasets}

@@ -5,7 +5,7 @@
 #' (share the same structure, even though they have different instances).
 #'
 #' @param name A string.
-#' @param stars A list of `star_database` objects.
+#' @param ... `star_database` objects.
 #'
 #' @return A `star_database` object.
 #'
@@ -18,7 +18,7 @@
 #'   snake_case()
 #' db2 <- star_database(mrs_age_schema, ft_age) |>
 #'   snake_case()
-#' ct1 <- constellation("MRS", list(db1, db2))
+#' ct1 <- constellation("MRS", db1, db2)
 #'
 #'
 #' db3 <- star_database(mrs_cause_schema_rpd, ft_cause_rpd) |>
@@ -32,10 +32,11 @@
 #'     rpd = "When Arrived",
 #'     roles = c("When Available")
 #'   )
-#' ct2 <- constellation("MRS", list(db3, db4))
+#' ct2 <- constellation("MRS", db3, db4)
 #'
 #' @export
-constellation <- function(name = NULL, stars = NULL) {
+constellation <- function(name = NULL, ...) {
+  stars <- list(...)
   stopifnot("Missing constellation name." = !is.null(name))
   stopifnot("A constellation must be made up of more than one star." = length(stars) > 1)
   fct_names <- c()
@@ -57,10 +58,14 @@ constellation <- function(name = NULL, stars = NULL) {
   # prepare structures
   facts <- vector("list", length = num_stars)
   operations <- vector("list", length = num_stars)
+  lookup_tables <- vector("list", length = num_stars)
+  schemas <- vector("list", length = num_stars)
   dimensions = vector("list", length = length(dim_freq))
   rpd <- list()
   names(facts) <- fct_names
   names(operations) <- fct_names
+  names(lookup_tables) <- fct_names
+  names(schemas) <- fct_names
   names(dimensions) <- names(dim_freq)
 
   # facts, operations and rpd
@@ -69,6 +74,8 @@ constellation <- function(name = NULL, stars = NULL) {
     for (f in seq_along(stars[[s]]$facts)) {
       sfn <- names(stars[[s]]$facts[f])
       operations[sfn] <- stars[[s]]$operations[f]
+      lookup_tables[sfn] <- stars[[s]]$lookup_tables[f]
+      schemas[sfn] <- stars[[s]]$schemas[f]
       facts[sfn] <- stars[[s]]$facts[f]
     }
   }
@@ -138,6 +145,8 @@ constellation <- function(name = NULL, stars = NULL) {
   c <- structure(list(
     name = name,
     operations = operations,
+    lookup_tables = lookup_tables,
+    schemas = schemas,
     facts = facts,
     dimensions = dimensions,
     rpd = rpd
@@ -333,7 +342,7 @@ rpd_in_constellation <- function(db) {
 #'     rpd = "When Arrived",
 #'     roles = c("When Available")
 #'   )
-#' rpd <- constellation("MRS", list(db1, db2)) |>
+#' rpd <- constellation("MRS", db1, db2) |>
 #'   get_role_playing_dimension_names()
 #'
 #' @export

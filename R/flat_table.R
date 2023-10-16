@@ -377,6 +377,7 @@ as_star_database.flat_table <-
       schema,
       instances = ft$table,
       unknown_value = ft$unknown_value,
-      operations = ft$operations
+      operations = ft$operations,
+      lookup_tables = ft$lookup_tables
     )
   }

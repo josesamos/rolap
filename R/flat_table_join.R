@@ -213,7 +213,9 @@ join_lookup_table.flat_table <-
     }
     ft$table <- ft$table[, c(ft$attributes, ft$measures)]
     pos <- length(ft$lookup_tables) + 1
+    names <- names(ft$lookup_tables)
     ft$lookup_tables[[pos]] <- lookup
+    names(ft$lookup_tables) <- c(names, lookup$name)
     ft$operations <-
       add_operation(ft$operations, "join_lookup_table", fk_attributes, pos)
     ft
