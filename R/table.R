@@ -93,9 +93,11 @@ remove_all_measures_na <- function(table, measures) {
 #' @keywords internal
 replace_empty_values_table <- function(table, attributes = NULL, empty_values = NULL, unknown_value) {
   # replace empty and NA with unknown_value (for join)
-  table[, attributes] <-
-    apply(table[, attributes, drop = FALSE], 2, function(x)
-      gsub("\\s+", " ", trimws(x)))
+  for (at in attributes) {
+    table[grepl("^\\s*$", table[, at, drop = TRUE]), at] <-
+      apply(table[grepl("^\\s*$", table[, at, drop = TRUE]), at, drop = FALSE], 2, function(x)
+        gsub("\\s+", " ", trimws(x)))
+  }
   table[, attributes] <-
     apply(table[, attributes, drop = FALSE], 2, function(x)
       dplyr::na_if(x, ""))

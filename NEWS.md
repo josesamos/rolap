@@ -1,5 +1,6 @@
 # rolap (development version)
 * Change star database list as parameter in `constellation()` function.
+* Fix `replace_empty_values()` with spaces at the beginning or end of non-empty strings.
 * Star databases data incremental refresh functionality: `update_according_to()`, `get_transformation_code()`, `get_new_dimension_instances()` and `incremental_refresh()` among other functions.
 * Vignette about star databases incremental refresh.
 
