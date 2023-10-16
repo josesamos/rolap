@@ -277,34 +277,6 @@
 "mrs_age_schema_rpd"
 
 
-#' Czech debit card company specialising on payments at gas stations (finest detail)
-#'
-#' Multidimensional design with finest detail from the data available at the source.
-#'
-#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
-#'
-#' @family database example data
-#' @seealso \code{\link{mrs_cause_schema}}
-#'
-#' @format A `star_database`.
-#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
-"db_finest"
-
-
-#' Czech debit card company specialising on payments at gas stations (summary)
-#'
-#' Multidimensional design with a summary from the data available at the source.
-#'
-#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
-#'
-#' @family database example data
-#' @seealso \code{\link{mrs_cause_schema}}
-#'
-#' @format A `star_database`.
-#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
-"db_summary"
-
-
 #' Flat table generated from MRS file
 #'
 #' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
@@ -375,3 +347,64 @@
 #' @format A `star_database`.
 #' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
 "mrs_db"
+
+
+#' Czech debit card company specialising on payments at gas stations (finest detail)
+#'
+#' Multidimensional design with finest detail from the data available at the source.
+#'
+#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
+#'
+#' @family database example data
+#'
+#' @format A `star_database`.
+#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
+"db_finest"
+
+
+#' Czech debit card company specialising on payments at gas stations (summary)
+#'
+#' Multidimensional design with a summary from the data available at the source.
+#'
+#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
+#'
+#' @family database example data
+#'
+#' @format A `star_database`.
+#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
+"db_summary"
+
+#' Czech debit card company specialising on payments at gas stations (tables)
+#'
+#' Data base in `dm` format with a summary from the data available at the source.
+#'
+#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
+#'
+#' @examples
+#' # Defined by:
+#' \donttest{
+#' ccs_db <- RMariaDB::dbConnect(
+#'   RMariaDB::MariaDB(),
+#'   username = "guest",
+#'   password = "relational",
+#'   dbname = "ccs",
+#'   host = "relational.fit.cvut.cz"
+#' )
+#' ccs_dm <- dm::dm_from_con(ccs_db, learn_keys = TRUE)
+#' ccs_sel_dm <-
+#'   ccs_dm[c('transactions_1k', 'customers', 'gasstations', 'products')] |>
+#'   dm::dm_add_fk(transactions_1k, CustomerID, customers) |>
+#'   dm::dm_add_fk(transactions_1k, GasStationID, gasstations) |>
+#'   dm::dm_add_fk(transactions_1k, ProductID, products)
+#' transactions_db <- ccs_sel_dm |>
+#'   dm::collect()
+#' DBI::dbDisconnect(ccs_db)
+#' }
+#'
+#' @family database example data
+#'
+#' @format A `star_database`.
+#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
+"transactions_db"
+
+
