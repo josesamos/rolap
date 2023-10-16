@@ -1,6 +1,7 @@
 # rolap (development version)
 * Change star database list as parameter in `constellation()` function.
-* Star databases data refresh functionality.
+* Star databases data incremental refresh functionality: `update_according_to()`, `get_transformation_code()`, `get_new_dimension_instances()` and `incremental_refresh()` among other functions.
+* Vignette about star databases incremental refresh.
 
 # rolap 2.2.0
 * Vignette about obtaining and transforming flat tables.

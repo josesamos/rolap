@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/rolap)](https://CRAN.R-project.org/package=rolap)
 [![R-CMD-check](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josesamos/rolap/actions/workflows/R-CMD-check.yaml)
-[![Downloads](http://cranlogs.r-pkg.org/badges/rolap?color=brightgreen)](http://www.r-pkg.org/pkg/rolap)
+[![Downloads](http://cranlogs.r-pkg.org/badges/rolap?color=brightgreen)](https://www.r-pkg.org:443/pkg/rolap)
 <!-- badges: end -->
 
 <!-- [![Codecov test coverage](https://codecov.io/gh/josesamos/rolap/branch/master/graph/badge.svg)](https://app.codecov.io/gh/josesamos/rolap?branch=master) -->
