@@ -4,7 +4,7 @@
 #' constellations, the one indicated by the parameter.
 #'
 #' @param db A `star_database_update` object.
-#' @param star A string or integer, star database name or index in constellation.
+#' @param name A string, star database name (fact name).
 #'
 #' @return A `star_database` object.
 #'
@@ -25,12 +25,12 @@
 #'   snake_case()
 #' ct <- constellation("MRS", db1, db2)
 #' names <- ct |>
-#'   get_star_names()
+#'   get_fact_names()
 #' st <- ct |>
 #'   get_star_database(names[1])
 #'
 #' @export
-get_star_database <- function(db, star) UseMethod("get_star_database")
+get_star_database <- function(db, name) UseMethod("get_star_database")
 
 #' Transform names according to the snake case style
 #'

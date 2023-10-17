@@ -394,7 +394,7 @@ get_transformation_file.star_database_update <- function(sdbu, file = NULL) {
 #' @rdname get_star_database
 #'
 #' @export
-get_star_database.star_database_update <- function(db, star = NULL) {
+get_star_database.star_database_update <- function(db, name = NULL) {
   db$star_database
 }
 

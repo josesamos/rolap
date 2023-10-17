@@ -83,12 +83,12 @@ validate_measures <- function(defined_measures, measures) {
 #'
 #' @keywords internal
 validate_facts <- function(defined_facts, facts) {
-  stopifnot("Some star name must be indicated." = length(facts) > 0)
+  stopifnot("Some fact name must be indicated." = length(facts) > 0)
   facts <- snakecase::to_snake_case(facts)
-  stopifnot("There are repeated facts" = length(facts) == length(unique(facts)))
+  stopifnot("There are repeated fact names." = length(facts) == length(unique(facts)))
   for (f in facts) {
     if (!(f %in% defined_facts)) {
-      stop(sprintf("'%s' is not defined as star or fact.", f))
+      stop(sprintf("'%s' is not defined as fact name.", f))
     }
   }
   facts

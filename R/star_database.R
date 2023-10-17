@@ -178,15 +178,22 @@ star_database_with_previous_operations <-
 #' @rdname get_star_database
 #'
 #' @export
-get_star_database.star_database <- function(db, star) {
-  star <- validate_facts(names(db$facts), star)
-  db$operations <- db$operations[star]
-  db$lookup_tables <- db$lookup_tables[star]
-  db$schemas <- db$schemas[star]
-  db$refresh <- db$refresh[star]
-  db$facts <- db$facts[star]
-
-
+get_star_database.star_database <- function(db, name) {
+  if (!is.null(name)) {
+    star <- validate_facts(names(db$facts), name)
+    db$operations <- db$operations[star]
+    db$lookup_tables <- db$lookup_tables[star]
+    db$schemas <- db$schemas[star]
+    db$refresh <- db$refresh[star]
+    db$facts <- db$facts[star]
+    dim <- NULL
+    for (f in names(db$facts)) {
+      dim <- c(dim, db$facts[[f]]$dim_int_names)
+    }
+    dim <- unique(dim)
+    db$dimensions <- db$dimensions[dim]
+    db$rpd <- filter_rpd_dimensions(db, dim)
+  }
   db
 }
 
@@ -537,35 +544,6 @@ get_fact_names.star_database <- function(db) {
 }
 
 
-#' Get the names of the stars (facts) of a star database
-#'
-#' Obtain the names of the stars of a star database, they are the names of the
-#' facts.
-#'
-#' @param db A `star_database` object.
-#'
-#' @return A vector of strings, fact names.
-#'
-#' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-#'
-#' @examples
-#'
-#' names <- star_database(mrs_cause_schema, ft_num) |>
-#'   get_star_names()
-#'
-#' @export
-get_star_names <- function(db)
-  UseMethod("get_star_names")
-
-#' @rdname get_star_names
-#'
-#' @export
-get_star_names.star_database <- function(db) {
-  sort(names(db$facts))
-}
-
-
 #' Get the names of the tables of a star database
 #'
 #' Obtain the names of the tables of a star database.
@@ -652,6 +630,51 @@ group_dimension_instances.star_database <- function(db, name) {
         break
       }
     }
+  }
+  db
+}
+
+
+#' Purge instances of dimensions
+#'
+#' Delete instances of dimensions that are not referenced in the facts.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database definition functions
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   purge_dimension_instances()
+#'
+#' @export
+purge_dimension_instances <- function(db)
+  UseMethod("purge_dimension_instances")
+
+#' @rdname purge_dimension_instances
+#'
+#' @export
+purge_dimension_instances.star_database <- function(db) {
+  for (d in names(db$dimensions)) {
+    surrogate_key <- db$dimensions[[d]]$surrogate_key
+    t <- NULL
+    for (f in seq_along(db$facts)) {
+      if (d %in% db$facts[[f]]$dim_int_names) {
+        t <-
+          dplyr::bind_rows(t,
+                           dplyr::select(db$facts[[f]]$table,
+                                         tidyselect::all_of(surrogate_key)))
+      }
+    }
+    t <- dplyr::summarise(dplyr::group_by_at(t, surrogate_key))
+    db$dimensions[[d]]$table <-
+      dplyr::inner_join(db$dimensions[[d]]$table, t, by = surrogate_key)
+  }
+  for (i in seq_along(db$rpd)) {
+    db <- share_dimensions(db, db$rpd[[i]])
   }
   db
 }

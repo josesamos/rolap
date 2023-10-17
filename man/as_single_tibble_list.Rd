@@ -39,6 +39,7 @@ tl <- ct |>
 
 Other star database exportation functions: 
 \code{\link{as_dm_class}()},
+\code{\link{as_rdb}()},
 \code{\link{as_tibble_list}()}
 }
 \concept{star database exportation functions}

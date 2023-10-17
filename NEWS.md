@@ -1,5 +1,5 @@
 # rolap (development version)
-* `get_star_names()`, `get_star_database()`
+* `get_star_database()`, `purge_dimension_instances()`, `as_rdb()`
 * Fix `snake_case()` for constellation case.
 
 # rolap 2.3.0

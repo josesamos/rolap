@@ -5,12 +5,14 @@
 \alias{get_dimension_names.star_database}
 \title{Get the names of the dimensions of a star database}
 \usage{
-get_dimension_names(db)
+get_dimension_names(db, star)
 
-\method{get_dimension_names}{star_database}(db)
+\method{get_dimension_names}{star_database}(db, star = NULL)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
+
+\item{star}{A string or integer, star database name or index in constellation.}
 }
 \value{
 A vector of strings, dimension names.
@@ -31,6 +33,7 @@ Other star database definition functions:
 \code{\link{get_fact_names}()},
 \code{\link{get_table_names}()},
 \code{\link{group_dimension_instances}()},
+\code{\link{purge_dimension_instances}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{star_database}()}
 }

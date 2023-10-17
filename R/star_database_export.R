@@ -57,6 +57,7 @@ as_tibble_list.star_database <- function(db) {
 #'
 #' @param db A `star_database` object.
 #' @param pk_facts A boolean, include primary key in fact tables.
+#' @param fk A boolean, include foreign key in fact tables.
 #'
 #' @return A `dm` object.
 #'
@@ -78,12 +79,12 @@ as_tibble_list.star_database <- function(db) {
 #'   as_dm_class()
 #'
 #' @export
-as_dm_class <- function(db, pk_facts) UseMethod("as_dm_class")
+as_dm_class <- function(db, pk_facts, fk) UseMethod("as_dm_class")
 
 #' @rdname as_dm_class
 #'
 #' @export
-as_dm_class.star_database <- function(db, pk_facts = TRUE) {
+as_dm_class.star_database <- function(db, pk_facts = TRUE, fk = TRUE) {
   c <- dm::dm()
   for (d in names(db$dimensions)) {
     c <- c |>
@@ -95,10 +96,12 @@ as_dm_class.star_database <- function(db, pk_facts = TRUE) {
     c <- c |>
       dm::dm(!!f := db$facts[[f]]$table) |>
       dm::dm_set_colors(darkblue = !!f)
-    for (s in db$facts[[f]]$surrogate_keys) {
-      t <- gsub("_key", "", s)
-      c <- c |>
-        dm::dm_add_fk(!!f, !!s, !!t)
+    if (fk) {
+      for (s in db$facts[[f]]$surrogate_keys) {
+        t <- gsub("_key", "", s)
+        c <- c |>
+          dm::dm_add_fk(!!f, !!s, !!t)
+      }
     }
     if (pk_facts) {
       c <- c |>
@@ -180,36 +183,24 @@ as_single_tibble_list.star_database <- function(db) {
 #'
 #' @examples
 #'
-#' db1 <- star_database(mrs_cause_schema, ft_num) |>
-#'   snake_case()
-#' tl1 <- db1 |>
-#'   as_rdb()
+#' my_db <- DBI::dbConnect(RSQLite::SQLite())
 #'
-#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#' db <- star_database(mrs_cause_schema, ft_num) |>
 #'   snake_case()
+#' db <- db |>
+#'   as_rdb(my_db)
 #'
-#' ct <- constellation("MRS", db1, db2)
-#' tl <- ct |>
-#'   as_rdb()
+#' DBI::dbDisconnect(my_db)
 #'
 #' @export
-as_rdb <- function(db) UseMethod("as_rdb")
+as_rdb <- function(db, con) UseMethod("as_rdb")
 
 #' @rdname as_rdb
 #'
 #' @export
-as_rdb.star_database <- function(db) {
-  l <- NULL
-  lnames <- NULL
-  for (d in names(db$dimensions)) {
-    l <- c(l, list(db$dimensions[[d]]$table))
-    lnames <- c(lnames, d)
-  }
-  for (f in names(db$facts)) {
-    l <- c(l, list(db$facts[[f]]$table))
-    lnames <- c(lnames, f)
-  }
-  names(l) <- lnames
-  l
+as_rdb.star_database <- function(db, con) {
+  db_dm <- as_dm_class(db)
+  dm::copy_dm_to(con, db_dm, temporary = FALSE)
+  db
 }
 
