@@ -160,3 +160,56 @@ as_single_tibble_list.star_database <- function(db) {
   res
 }
 
+
+#' Generate tables in a relational database
+#'
+#' Given a connection to a relational database, it stores the facts and
+#' dimensions in the form of tables.
+#'
+#' If the name of a fact table is given, we only get that table and all
+#' dimensions related to it.
+#'
+#'
+#' @param db A `star_database` object.
+#' @param con A `DBI::DBIConnection` object.
+#'
+#' @return A list of `tibble`
+#'
+#' @family star database exportation functions
+#' @seealso \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' tl1 <- db1 |>
+#'   as_rdb()
+#'
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#'
+#' ct <- constellation("MRS", db1, db2)
+#' tl <- ct |>
+#'   as_rdb()
+#'
+#' @export
+as_rdb <- function(db) UseMethod("as_rdb")
+
+#' @rdname as_rdb
+#'
+#' @export
+as_rdb.star_database <- function(db) {
+  l <- NULL
+  lnames <- NULL
+  for (d in names(db$dimensions)) {
+    l <- c(l, list(db$dimensions[[d]]$table))
+    lnames <- c(lnames, d)
+  }
+  for (f in names(db$facts)) {
+    l <- c(l, list(db$facts[[f]]$table))
+    lnames <- c(lnames, f)
+  }
+  names(l) <- lnames
+  l
+}
+

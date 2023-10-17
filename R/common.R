@@ -74,6 +74,27 @@ validate_measures <- function(defined_measures, measures) {
 }
 
 
+#' Validate fact names
+#'
+#' @param defined_facts A vector of strings, defined fact names.
+#' @param measures A vector of strings, fact names.
+#'
+#' @return A vector of strings, fact names.
+#'
+#' @keywords internal
+validate_facts <- function(defined_facts, facts) {
+  stopifnot("Some star name must be indicated." = length(facts) > 0)
+  facts <- snakecase::to_snake_case(facts)
+  stopifnot("There are repeated facts" = length(facts) == length(unique(facts)))
+  for (f in facts) {
+    if (!(f %in% defined_facts)) {
+      stop(sprintf("'%s' is not defined as star or fact.", f))
+    }
+  }
+  facts
+}
+
+
 #' Replace names
 #'
 #' @param original A string, original names.

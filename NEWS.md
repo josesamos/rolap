@@ -1,4 +1,6 @@
 # rolap (development version)
+* `get_star_names()`, `get_star_database()`
+* Fix `snake_case()` for constellation case.
 
 # rolap 2.3.0
 * Change star database list as parameter in `constellation()` function.

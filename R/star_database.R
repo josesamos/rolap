@@ -175,6 +175,37 @@ star_database_with_previous_operations <-
   }
 
 
+#' @rdname get_star_database
+#'
+#' @export
+get_star_database.star_database <- function(db, star) {
+  star <- validate_facts(names(db$facts), star)
+  db$operations <- db$operations[star]
+  db$lookup_tables <- db$lookup_tables[star]
+  db$schemas <- db$schemas[star]
+  db$refresh <- db$refresh[star]
+  db$facts <- db$facts[star]
+
+
+  db
+}
+
+
+# structure(
+#   list(
+#     name = names(schema$facts)[1],
+#     operations = vector("list", length = length(schema$facts)),
+#     lookup_tables = vector("list", length = length(schema$facts)),
+#     schemas = vector("list", length = length(schema$facts)),
+#     refresh = vector("list", length = length(schema$facts)),
+#     facts = vector("list", length = length(schema$facts)),
+#     dimensions =  vector("list", length = length(schema$dimensions)),
+#     rpd = list()
+#   ),
+#   class = "star_database"
+# )
+
+
 #' @rdname snake_case
 #'
 #' @export
@@ -185,9 +216,10 @@ snake_case.star_database <- function(db) {
   for (d in names(db$dimensions)) {
     db$dimensions[[d]] <- snake_case_table(db$dimensions[[d]])
   }
-  db$operations[[1]] <-
-    add_operation(db$operations[[1]], "snake_case")
-
+  for (f in names(db$facts)) {
+    db$operations[[f]] <-
+      add_operation(db$operations[[f]], "snake_case")
+  }
   db
 }
 
@@ -453,6 +485,7 @@ replace_attribute_values.star_database <-
 #' Obtain the names of the dimensions of a star database.
 #'
 #' @param db A `star_database` object.
+#' @param star A string or integer, star database name or index in constellation.
 #'
 #' @return A vector of strings, dimension names.
 #'
@@ -465,13 +498,13 @@ replace_attribute_values.star_database <-
 #'   get_dimension_names()
 #'
 #' @export
-get_dimension_names <- function(db)
+get_dimension_names <- function(db, star)
   UseMethod("get_dimension_names")
 
 #' @rdname get_dimension_names
 #'
 #' @export
-get_dimension_names.star_database <- function(db) {
+get_dimension_names.star_database <- function(db, star = NULL) {
   sort(names(db$dimensions))
 }
 
@@ -500,6 +533,35 @@ get_fact_names <- function(db)
 #'
 #' @export
 get_fact_names.star_database <- function(db) {
+  sort(names(db$facts))
+}
+
+
+#' Get the names of the stars (facts) of a star database
+#'
+#' Obtain the names of the stars of a star database, they are the names of the
+#' facts.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A vector of strings, fact names.
+#'
+#' @family star database definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#' names <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_star_names()
+#'
+#' @export
+get_star_names <- function(db)
+  UseMethod("get_star_names")
+
+#' @rdname get_star_names
+#'
+#' @export
+get_star_names.star_database <- function(db) {
   sort(names(db$facts))
 }
 

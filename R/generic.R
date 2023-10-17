@@ -1,3 +1,36 @@
+#' Get star database
+#'
+#' It obtains the star database: For updates, the one defined from the data; for
+#' constellations, the one indicated by the parameter.
+#'
+#' @param db A `star_database_update` object.
+#' @param star A string or integer, star database name or index in constellation.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database refresh functions
+#'
+#' @examples
+#'
+#' f1 <- flat_table('ft_num', ft_cause_rpd) |>
+#'   as_star_database(mrs_cause_schema_rpd)
+#' f2 <- flat_table('ft_num2', ft_cause_rpd) |>
+#'   update_according_to(f1)
+#' st <- f2 |>
+#'   get_star_database()
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#' ct <- constellation("MRS", db1, db2)
+#' names <- ct |>
+#'   get_star_names()
+#' st <- ct |>
+#'   get_star_database(names[1])
+#'
+#' @export
+get_star_database <- function(db, star) UseMethod("get_star_database")
 
 #' Transform names according to the snake case style
 #'
