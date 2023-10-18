@@ -2,12 +2,9 @@
 % Please edit documentation in R/star_database.R
 \name{purge_dimension_instances}
 \alias{purge_dimension_instances}
-\alias{purge_dimension_instances.star_database}
 \title{Purge instances of dimensions}
 \usage{
 purge_dimension_instances(db)
-
-\method{purge_dimension_instances}{star_database}(db)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
@@ -18,19 +15,4 @@ A \code{star_database} object.
 \description{
 Delete instances of dimensions that are not referenced in the facts.
 }
-\examples{
-
-db <- star_database(mrs_cause_schema, ft_num) |>
-  purge_dimension_instances()
-
-}
-\seealso{
-Other star database definition functions: 
-\code{\link{get_dimension_names}()},
-\code{\link{get_fact_names}()},
-\code{\link{get_table_names}()},
-\code{\link{group_dimension_instances}()},
-\code{\link{role_playing_dimension}()},
-\code{\link{star_database}()}
-}
-\concept{star database definition functions}
+\keyword{internal}

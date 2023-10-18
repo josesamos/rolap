@@ -135,8 +135,12 @@ incremental_refresh.star_database <-
         db$refresh[[star]][['replace']] <- facts_exist
       } else if (existing_instances == 'delete') {
         db$facts[[star]]$table <- db$facts[[star]]$table[!(t$existing_fact), ]
-        db$refresh[[star]][['delete']] <- facts_exist |>
-          dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
+        purged_dim <- get_purged_dimension_instances(db)
+        db <- purged_dim[[1]]
+        purged_dim <- purged_dim[-1]
+        facts_exist <- list(facts_exist |>
+          dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)))
+        db$refresh[[star]][['delete']] <- c(facts_exist, purged_dim)
       }
     }
     db

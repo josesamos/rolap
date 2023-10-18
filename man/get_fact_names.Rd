@@ -31,7 +31,6 @@ Other star database definition functions:
 \code{\link{get_dimension_names}()},
 \code{\link{get_table_names}()},
 \code{\link{group_dimension_instances}()},
-\code{\link{purge_dimension_instances}()},
 \code{\link{role_playing_dimension}()},
 \code{\link{star_database}()}
 }

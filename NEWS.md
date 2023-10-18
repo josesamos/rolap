@@ -1,6 +1,6 @@
 # rolap (development version)
-* `get_star_database()`, `purge_dimension_instances()`, `as_rdb()`
-* Fix `snake_case()` for constellation case.
+* `get_star_database()`, `as_rdb()`
+* Fix `snake_case()` register refresh operation for constellation case.
 
 # rolap 2.3.0
 * Change star database list as parameter in `constellation()` function.

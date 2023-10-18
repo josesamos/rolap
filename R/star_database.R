@@ -193,6 +193,7 @@ get_star_database.star_database <- function(db, name) {
     dim <- unique(dim)
     db$dimensions <- db$dimensions[dim]
     db$rpd <- filter_rpd_dimensions(db, dim)
+    db <- purge_dimension_instances(db)
   }
   db
 }
@@ -635,51 +636,6 @@ group_dimension_instances.star_database <- function(db, name) {
 }
 
 
-#' Purge instances of dimensions
-#'
-#' Delete instances of dimensions that are not referenced in the facts.
-#'
-#' @param db A `star_database` object.
-#'
-#' @return A `star_database` object.
-#'
-#' @family star database definition functions
-#'
-#' @examples
-#'
-#' db <- star_database(mrs_cause_schema, ft_num) |>
-#'   purge_dimension_instances()
-#'
-#' @export
-purge_dimension_instances <- function(db)
-  UseMethod("purge_dimension_instances")
-
-#' @rdname purge_dimension_instances
-#'
-#' @export
-purge_dimension_instances.star_database <- function(db) {
-  for (d in names(db$dimensions)) {
-    surrogate_key <- db$dimensions[[d]]$surrogate_key
-    t <- NULL
-    for (f in seq_along(db$facts)) {
-      if (d %in% db$facts[[f]]$dim_int_names) {
-        t <-
-          dplyr::bind_rows(t,
-                           dplyr::select(db$facts[[f]]$table,
-                                         tidyselect::all_of(surrogate_key)))
-      }
-    }
-    t <- dplyr::summarise(dplyr::group_by_at(t, surrogate_key))
-    db$dimensions[[d]]$table <-
-      dplyr::inner_join(db$dimensions[[d]]$table, t, by = surrogate_key)
-  }
-  for (i in seq_along(db$rpd)) {
-    db <- share_dimensions(db, db$rpd[[i]])
-  }
-  db
-}
-
-
 # Internal ---------------------------------------------------------------------
 
 #' Validate dimension names
@@ -718,7 +674,7 @@ validate_dimension_names <- function(db, name) {
 #' @param name A string, dimension name.
 #' @param table A table of new instances.
 #'
-#' @return A `star_database` object.
+#' @return A list of `star_database` object and tables with new instances.
 #'
 #' @keywords internal
 add_dimension_instances <- function(db, name, table) {
@@ -735,5 +691,78 @@ add_dimension_instances <- function(db, name, table) {
     db$dimensions[[d]]$table <- rbind(dim$table, table)
     res[[d]] <- table
   }
+  c(list(db), res)
+}
+
+#' Purge instances of a dimension
+#'
+#' Delete instances of a dimension that are not referenced in the facts.
+#'
+#' @param db A `star_database` object.
+#' @param dim A string, dimension name.
+#'
+#' @return A `tibble`, dimension table.
+#'
+#' @keywords internal
+purge_dimension <- function(db, dim) {
+  surrogate_key <- db$dimensions[[dim]]$surrogate_key
+  rpd <- get_rpd_dimensions(db, dim)
+  used <- NULL
+  for (d in rpd) {
+    for (f in seq_along(db$facts)) {
+      if (d %in% db$facts[[f]]$dim_int_names) {
+        col_f <- dplyr::select(db$facts[[f]]$table,
+                               tidyselect::all_of(db$dimensions[[d]]$surrogate_key))
+        names(col_f) <- surrogate_key
+        used <- dplyr::bind_rows(used, col_f)
+      }
+    }
+  }
+  used <- dplyr::summarise(dplyr::group_by_at(used, surrogate_key))
+
+  dplyr::inner_join(db$dimensions[[dim]]$table, used, by = surrogate_key)
+}
+
+
+#' Purge instances of dimensions
+#'
+#' Delete instances of dimensions that are not referenced in the facts.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @keywords internal
+purge_dimension_instances <- function(db) {
+  for (dim in names(db$dimensions)) {
+    db$dimensions[[dim]]$table <- purge_dimension(db, dim)
+  }
+  db
+}
+
+
+#' Get purged instances of dimensions
+#'
+#' Get instances deleted from dimensions that are not referenced in the facts.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A list of a `star_database` object and tables of deleted instances of
+#' dimensions.
+#'
+#' @keywords internal
+get_purged_dimension_instances <- function(db) {
+  res <- list()
+  res_names <- NULL
+  for (dim in names(db$dimensions)) {
+    original <- db$dimensions[[dim]]$table
+    db$dimensions[[dim]]$table <- purge_dimension(db, dim)
+    deleted <- dplyr::setdiff(original, db$dimensions[[dim]]$table)
+    if (nrow(deleted) > 0) {
+      res <- c(res, list(deleted))
+      res_names <- c(res_names, dim)
+    }
+  }
+  names(res) <- res_names
   c(list(db), res)
 }
