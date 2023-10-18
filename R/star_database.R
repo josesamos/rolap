@@ -102,7 +102,7 @@ star_database_with_previous_operations <-
           operations = vector("list", length = length(schema$facts)),
           lookup_tables = vector("list", length = length(schema$facts)),
           schemas = vector("list", length = length(schema$facts)),
-          refresh = vector("list", length = length(schema$facts)),
+          refresh = list(),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
           rpd = list()
@@ -113,7 +113,6 @@ star_database_with_previous_operations <-
     names(db$operations) <- names(schema$facts)
     names(db$lookup_tables) <- names(schema$facts)
     names(db$schemas) <- names(schema$facts)
-    names(db$refresh) <- names(schema$facts)
     names(db$facts) <- names(schema$facts)
     names(db$dimensions) <- names(schema$dimensions)
 
@@ -187,7 +186,7 @@ get_star_database.star_database <- function(db, name) {
     db$operations <- db$operations[star]
     db$lookup_tables <- db$lookup_tables[star]
     db$schemas <- db$schemas[star]
-    db$refresh <- db$refresh[star]
+    db$refresh <- list()
     db$facts <- db$facts[star]
     dim <- NULL
     for (f in names(db$facts)) {
@@ -196,25 +195,11 @@ get_star_database.star_database <- function(db, name) {
     dim <- unique(dim)
     db$dimensions <- db$dimensions[dim]
     db$rpd <- filter_rpd_dimensions(db, dim)
-    db <- purge_dimension_instances(db)
+    db <- purge_dimension_instances_star_database(db)
   }
   db
 }
 
-
-# structure(
-#   list(
-#     name = names(schema$facts)[1],
-#     operations = vector("list", length = length(schema$facts)),
-#     lookup_tables = vector("list", length = length(schema$facts)),
-#     schemas = vector("list", length = length(schema$facts)),
-#     refresh = vector("list", length = length(schema$facts)),
-#     facts = vector("list", length = length(schema$facts)),
-#     dimensions =  vector("list", length = length(schema$dimensions)),
-#     rpd = list()
-#   ),
-#   class = "star_database"
-# )
 
 
 #' @rdname snake_case
@@ -677,7 +662,7 @@ validate_dimension_names <- function(db, name) {
 #' @param name A string, dimension name.
 #' @param table A table of new instances.
 #'
-#' @return A list of `star_database` object and tables with new instances.
+#' @return A `star_database` object.
 #'
 #' @keywords internal
 add_dimension_instances <- function(db, name, table) {
@@ -686,15 +671,18 @@ add_dimension_instances <- function(db, name, table) {
   table <-
     tibble::add_column(table,!!dim$surrogate_key := (last + 1:nrow(table)), .before = 1)
   rpd <- get_rpd_dimensions(db, name)
-  res <- vector("list", length = length(rpd))
-  names(res) <- rpd
+  res <- list()
+  names_res <- NULL
   for (d in rpd) {
     dim <- db$dimensions[[d]]
     names(table) <- names(dim$table)
     db$dimensions[[d]]$table <- rbind(dim$table, table)
-    res[[d]] <- table
+    res <- c(res, list(table))
+    names_res <- c(names_res, d)
   }
-  c(list(db), res)
+  names(res) <- names_res
+  db$refresh[['insert']] <- c(db$refresh[['insert']], res)
+  db
 }
 
 #' Purge instances of a dimension
@@ -736,7 +724,7 @@ purge_dimension <- function(db, dim) {
 #' @return A `star_database` object.
 #'
 #' @keywords internal
-purge_dimension_instances <- function(db) {
+purge_dimension_instances_star_database <- function(db) {
   for (dim in names(db$dimensions)) {
     db$dimensions[[dim]]$table <- purge_dimension(db, dim)
   }
@@ -744,17 +732,16 @@ purge_dimension_instances <- function(db) {
 }
 
 
-#' Get purged instances of dimensions
+#' Purge instances of dimensions
 #'
-#' Get instances deleted from dimensions that are not referenced in the facts.
+#' Delete instances of dimensions that are not referenced in the facts.
 #'
 #' @param db A `star_database` object.
 #'
-#' @return A list of a `star_database` object and tables of deleted instances of
-#' dimensions.
+#' @return A `star_database` object.
 #'
 #' @keywords internal
-get_purged_dimension_instances <- function(db) {
+purge_dimension_instances <- function(db) {
   res <- list()
   res_names <- NULL
   for (dim in names(db$dimensions)) {
@@ -767,5 +754,6 @@ get_purged_dimension_instances <- function(db) {
     }
   }
   names(res) <- res_names
-  c(list(db), res)
+  db$refresh$delete <- c(db$refresh$delete, res)
+  db
 }

@@ -14,7 +14,7 @@ add_dimension_instances(db, name, table)
 \item{table}{A table of new instances.}
 }
 \value{
-A list of \code{star_database} object and tables with new instances.
+A \code{star_database} object.
 }
 \description{
 Add dimension instances

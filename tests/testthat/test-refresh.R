@@ -195,13 +195,13 @@ test_that("incremental_refresh() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4', ]) |>
+                                          ft_cause_rpd$WEEK != '4',]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     f2 <-
       flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2', ])
+                                           ft_cause_rpd$WEEK != '2',])
     f2 <- f2 |>
       update_according_to(f1)
 
@@ -209,26 +209,27 @@ test_that("incremental_refresh() update_according_to", {
       incremental_refresh(f2)
     f1$refresh
   }, {
-    list(mrs_cause = list(
+    list(
       insert = list(
         when = structure(
           list(
             when_key = 11:14,
-            Year = c("1962", "1962", "1962", "1962"),
-            WEEK = c("4", "5",
-                     "5", "6"),
-            `Week Ending Date` = c("1962-01-27", "1962-01-29",
-                                   "1962-02-01", "1962-02-07")
+            Year = c("1962",
+                     "1962", "1962", "1962"),
+            WEEK = c("4", "5", "5", "6"),
+            `Week Ending Date` = c("1962-01-27",
+                                   "1962-01-29", "1962-02-01", "1962-02-07")
           ),
           row.names = c(NA,-4L),
-          class = c("tbl_df",
-                    "tbl", "data.frame")
+          class = c("tbl_df", "tbl", "data.frame")
         ),
         when_available = structure(
           list(
             when_available_key = 11:14,
-            `Data Availability Year` = c("1962", "1962", "1962", "1962"),
-            `Data Availability Week` = c("4", "5", "5", "6"),
+            `Data Availability Year` = c("1962",
+                                         "1962", "1962", "1962"),
+            `Data Availability Week` = c("4",
+                                         "5", "5", "6"),
             `Data Availability Date` = c("1962-01-27",
                                          "1962-01-29", "1962-02-01", "1962-02-07")
           ),
@@ -278,7 +279,7 @@ test_that("incremental_refresh() update_according_to", {
       ),
       replace = NULL,
       delete = NULL
-    ))
+    )
   })
 })
 
