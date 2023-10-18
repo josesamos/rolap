@@ -1,4 +1,4 @@
-test_that("geolevel()", {
+test_that("flat table operations", {
   ## ---------------------------------------------------------------------------------------
   usc_ft <-
     flat_table(name = 'us_cities', instances = maps::us.cities)
@@ -214,7 +214,7 @@ test_that("geolevel()", {
     as_star_database(s_age)
 
   ## ----example5---------------------------------------------------------------------------
-  mrs_db <- constellation("mrs", mrs_cause_db, mrs_age_db)
+  mrs_db_2 <- constellation("mrs", mrs_cause_db, mrs_age_db)
 
   #############################################################
   expect_equal(cs_ft,
@@ -257,7 +257,7 @@ test_that("geolevel()", {
 
   #############################################################
   expect_equal({
-    head(unique(sort(mrs_db$dimensions$when$table$week)), 12)
+    head(unique(sort(mrs_db_2$dimensions$when$table$week)), 12)
   },
   {
     c(" 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10",
@@ -266,7 +266,7 @@ test_that("geolevel()", {
 
   #############################################################
   expect_equal({
-    mrs_db |>
+    mrs_db_2 |>
       get_star_database("mrs_age")
   },
   {
@@ -275,7 +275,7 @@ test_that("geolevel()", {
 
   #############################################################
   expect_equal({
-    mrs_db |>
+    mrs_db_2 |>
       get_star_database("mrs_cause")
   },
   {
@@ -284,10 +284,10 @@ test_that("geolevel()", {
 
   #############################################################
   expect_equal({
-    facts <- names(mrs_db$facts)
+    facts <- names(mrs_db_2$facts)
     names <- NULL
     for (f in facts) {
-      names <- c(names, names(mrs_db$facts[[f]]$table))
+      names <- c(names, names(mrs_db_2$facts[[f]]$table))
     }
     names
   },
@@ -298,5 +298,13 @@ test_that("geolevel()", {
   }
   )
 
+  #############################################################
+  expect_equal({
+    mrs_db_2
+  },
+  {
+    mrs_db
+  }
+  )
   #############################################################
 })
