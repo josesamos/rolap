@@ -169,9 +169,8 @@ as_single_tibble_list.star_database <- function(db) {
 #' Given a connection to a relational database, it stores the facts and
 #' dimensions in the form of tables.
 #'
-#' If the name of a fact table is given, we only get that table and all
-#' dimensions related to it.
-#'
+#' Tables cannot be overwritten. If they exist, it produces an error.
+#' PERMITIR QUE SE BORREN
 #'
 #' @param db A `star_database` object.
 #' @param con A `DBI::DBIConnection` object.
