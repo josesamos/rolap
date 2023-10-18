@@ -181,6 +181,9 @@ star_database_with_previous_operations <-
 get_star_database.star_database <- function(db, name) {
   if (!is.null(name)) {
     star <- validate_facts(names(db$facts), name)
+    if (length(star) == 1) {
+      db$name <- star
+    }
     db$operations <- db$operations[star]
     db$lookup_tables <- db$lookup_tables[star]
     db$schemas <- db$schemas[star]

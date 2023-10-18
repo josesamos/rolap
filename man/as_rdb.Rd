@@ -5,25 +5,23 @@
 \alias{as_rdb.star_database}
 \title{Generate tables in a relational database}
 \usage{
-as_rdb(db, con)
+as_rdb(db, con, overwrite)
 
-\method{as_rdb}{star_database}(db, con)
+\method{as_rdb}{star_database}(db, con, overwrite = FALSE)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
 
 \item{con}{A \code{DBI::DBIConnection} object.}
+
+\item{overwrite}{A boolean, allow overwriting tables in the database.}
 }
 \value{
 A list of \code{tibble}
 }
 \description{
 Given a connection to a relational database, it stores the facts and
-dimensions in the form of tables.
-}
-\details{
-If the name of a fact table is given, we only get that table and all
-dimensions related to it.
+dimensions in the form of tables. Tables can be overwritten.
 }
 \examples{
 

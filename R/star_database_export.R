@@ -167,13 +167,11 @@ as_single_tibble_list.star_database <- function(db) {
 #' Generate tables in a relational database
 #'
 #' Given a connection to a relational database, it stores the facts and
-#' dimensions in the form of tables.
-#'
-#' Tables cannot be overwritten. If they exist, it produces an error.
-#' PERMITIR QUE SE BORREN
+#' dimensions in the form of tables. Tables can be overwritten.
 #'
 #' @param db A `star_database` object.
 #' @param con A `DBI::DBIConnection` object.
+#' @param overwrite A boolean, allow overwriting tables in the database.
 #'
 #' @return A list of `tibble`
 #'
@@ -192,14 +190,63 @@ as_single_tibble_list.star_database <- function(db) {
 #' DBI::dbDisconnect(my_db)
 #'
 #' @export
-as_rdb <- function(db, con) UseMethod("as_rdb")
+as_rdb <- function(db, con, overwrite) UseMethod("as_rdb")
 
 #' @rdname as_rdb
 #'
 #' @export
-as_rdb.star_database <- function(db, con) {
+as_rdb.star_database <- function(db, con, overwrite = FALSE) {
+  if (overwrite) {
+    tables <- DBI::dbListTables(con)
+    dimensions <- get_dimension_names(db)
+    facts <- get_fact_names(db)
+    dimensions <- intersect(tables, dimensions)
+    facts <- intersect(tables, facts)
+    for (f in facts) {
+      DBI::dbRemoveTable(con, f)
+    }
+    for (d in dimensions) {
+      DBI::dbRemoveTable(con, d)
+    }
+  }
   db_dm <- as_dm_class(db)
   dm::copy_dm_to(con, db_dm, temporary = FALSE)
+  db
+}
+
+
+
+#' Draw tables
+#'
+#' Draw the tables of the ROLAP star diagrams.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database exportation functions
+#' @seealso \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' \donttest{
+#' db <- db |>
+#'   draw_tables()
+#' }
+#'
+#' @export
+draw_tables <- function(db) UseMethod("draw_tables")
+
+#' @rdname draw_tables
+#'
+#' @export
+draw_tables.star_database <- function(db) {
+  db_dm <- db |>
+    as_dm_class(pk_facts = FALSE)
+  db_dm |>
+    dm::dm_draw(rankdir = "LR", view_type = "all")
   db
 }
 

@@ -1066,3 +1066,40 @@ test_that("as_single_tibble_list()", {
     )
   })
 })
+
+test_that("get_star_database()", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema, ft_num) |>
+      snake_case()
+    db2 <- star_database(mrs_age_schema, ft_age) |>
+      snake_case()
+    ct <- constellation("MRS", db1, db2)
+    names <- ct |>
+      get_fact_names()
+    st <- ct |>
+      get_star_database(names[1])
+  }, {
+    db2 <- star_database(mrs_age_schema, ft_age) |>
+      snake_case()
+  })
+})
+
+test_that("get_star_database()", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema, ft_num) |>
+      snake_case()
+    db2 <- star_database(mrs_age_schema, ft_age) |>
+      snake_case()
+    ct <- constellation("MRS", db1, db2)
+    names <- ct |>
+      get_fact_names()
+    st <- ct |>
+      get_star_database(names[2])
+  }, {
+    db1 <- star_database(mrs_cause_schema, ft_num) |>
+      snake_case()
+  })
+})
+
+
+

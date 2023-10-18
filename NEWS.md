@@ -1,6 +1,7 @@
 # rolap (development version)
-* `get_star_database()`, `as_rdb()`
+* New functions: `get_star_database()`, `as_rdb()`, `draw_tables()`.
 * Fix `snake_case()` register refresh operation for constellation case.
+* Fix `constellation()` refresh structure integration.
 
 # rolap 2.3.0
 * Change star database list as parameter in `constellation()` function.
