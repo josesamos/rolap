@@ -1079,8 +1079,7 @@ test_that("get_star_database()", {
     st <- ct |>
       get_star_database(names[1])
   }, {
-    db2 <- star_database(mrs_age_schema, ft_age) |>
-      snake_case()
+    db2
   })
 })
 
@@ -1096,10 +1095,35 @@ test_that("get_star_database()", {
     st <- ct |>
       get_star_database(names[2])
   }, {
-    db1 <- star_database(mrs_cause_schema, ft_num) |>
-      snake_case()
+    db1
   })
 })
 
+test_that("get_dimension_names()", {
+  db1 <- star_database(mrs_cause_schema, ft_num) |>
+    snake_case()
+  db2 <- star_database(mrs_age_schema, ft_age) |>
+    snake_case()
+  ct <- constellation("MRS", db1, db2)
 
+  expect_equal({
+    ct |>
+      get_dimension_names()
+  }, {
+    c("when", "where", "who")
+  })
 
+  expect_equal({
+    ct |>
+      get_fact_names()
+  }, {
+    c("mrs_age", "mrs_cause")
+  })
+
+  expect_equal({
+    ct |>
+      get_table_names()
+  }, {
+    c("mrs_age", "mrs_cause", "when", "where", "who")
+  })
+})
