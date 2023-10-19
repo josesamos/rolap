@@ -19,21 +19,6 @@ from the original file, we have stored in the package a file with the same
 format as the original file but that includes only 1\% of its data, selected at
 random.
 }
-\examples{
-# Defined by:
-file <-
-  system.file(
-    "extdata",
-    "mrs_122_us_cities_1962_2016.csv",
-    package = "rolap"
-  )
-
-\donttest{
-mrs_ft <-
-  read_flat_table_file(name = 'mrs', file, unknown_value = "Not available")
-}
-
-}
 \seealso{
 Other mrs example data: 
 \code{\link{ft_age_rpd}},
