@@ -1,15 +1,16 @@
 
 
+
 test_that("get_existing_fact_instances() update_according_to",
           {
             expect_equal({
               f1 <-
                 flat_table('ft_num', ft_num[ft_num$City != 'Cambridge' &
-                                              ft_num$Year != '1963',]) |>
+                                              ft_num$Year != '1963', ]) |>
                 as_star_database(mrs_cause_schema)
 
               r <- c(15L, 1L, 5L, 2L, 12L, 14L, 3L, 7L, 10L, 12L)
-              f2 <- flat_table('ft_num2', ft_num[r,])
+              f2 <- flat_table('ft_num2', ft_num[r, ])
               f2 <- f2 |>
                 update_according_to(f1)
               f2 |> get_existing_fact_instances()
@@ -27,7 +28,7 @@ test_that("get_existing_fact_instances() update_according_to",
                   `All Deaths` = c(46L, 47L, 555L, 45L, 244L),
                   nrow_agg = c(1L, 1L, 2L, 1L, 1L)
                 ),
-                row.names = c(NA,-5L),
+                row.names = c(NA, -5L),
                 class = c("tbl_df",
                           "tbl", "data.frame")
               )
@@ -40,11 +41,11 @@ test_that("get_new_dimension_instances() update_according_to",
             expect_equal({
               f1 <-
                 flat_table('ft_num', ft_num[ft_num$City != 'Cambridge' &
-                                              ft_num$Year != '1963', ]) |>
+                                              ft_num$Year != '1963',]) |>
                 as_star_database(mrs_cause_schema)
 
               r <- c(15L, 1L, 5L, 2L, 12L, 14L, 3L, 7L, 10L, 12L)
-              f2 <- flat_table('ft_num2', ft_num[r, ])
+              f2 <- flat_table('ft_num2', ft_num[r,])
               f2 <- f2 |>
                 update_according_to(f1)
               f2 |> get_new_dimension_instances()
@@ -52,7 +53,7 @@ test_that("get_new_dimension_instances() update_according_to",
               list(
                 when = structure(
                   list(Year = "1963"),
-                  row.names = c(NA,-1L),
+                  row.names = c(NA, -1L),
                   class = c("tbl_df", "tbl", "data.frame")
                 ),
                 where = structure(
@@ -61,7 +62,7 @@ test_that("get_new_dimension_instances() update_according_to",
                     State = "MA",
                     City = "Cambridge"
                   ),
-                  row.names = c(NA,-1L),
+                  row.names = c(NA, -1L),
                   class = c("tbl_df", "tbl", "data.frame")
                 )
               )
@@ -73,12 +74,12 @@ test_that("get_new_dimension_instances() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4',]) |>
+                                          ft_cause_rpd$WEEK != '4', ]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     r <- c(5L, 1L, 5L, 2L, 2L, 4L, 3L, 7L, 10L, 2L)
-    f2 <- flat_table('ft_num2', ft_cause_rpd[r,])
+    f2 <- flat_table('ft_num2', ft_cause_rpd[r, ])
     f2 <- f2 |>
       update_according_to(f1)
     f2 |> get_new_dimension_instances()
@@ -91,7 +92,7 @@ test_that("get_new_dimension_instances() update_according_to", {
           `Week Ending Date` = c("1962-01-27",
                                  "1962-02-01", "1962-02-07")
         ),
-        row.names = c(NA,-3L),
+        row.names = c(NA, -3L),
         class = c("tbl_df",
                   "tbl", "data.frame")
       ),
@@ -101,7 +102,7 @@ test_that("get_new_dimension_instances() update_according_to", {
           State = "MA",
           City = "Cambridge"
         ),
-        row.names = c(NA,-1L),
+        row.names = c(NA, -1L),
         class = c("tbl_df",
                   "tbl", "data.frame")
       )
@@ -114,12 +115,12 @@ test_that("get_transformation_code() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4', ]) |>
+                                          ft_cause_rpd$WEEK != '4',]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     r <- c(5L, 1L, 5L, 2L, 2L, 4L, 3L, 7L, 10L, 2L)
-    f2 <- flat_table('ft_num2', ft_cause_rpd[r, ])
+    f2 <- flat_table('ft_num2', ft_cause_rpd[r,])
     f2 <- f2 |>
       update_according_to(f1)
     f2 |> get_transformation_code()
@@ -154,12 +155,12 @@ test_that("get_transformation_code() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4', ]) |>
+                                          ft_cause_rpd$WEEK != '4',]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     r <- c(5L, 1L, 5L, 2L, 2L, 4L, 3L, 7L, 10L, 2L)
-    f2 <- flat_table('ft_num2', ft_cause_rpd[r, ])
+    f2 <- flat_table('ft_num2', ft_cause_rpd[r,])
     f2 <- f2 |>
       update_according_to(f1)
     f <- f2 |> get_transformation_file()
@@ -209,30 +210,31 @@ test_that("incremental_refresh() update_according_to", {
       incremental_refresh(f2)
     f1$refresh
   }, {
-    list(mrs_cause = list(
+    list(
       insert = list(
         when = structure(
           list(
             when_key = 11:14,
-            Year = c("1962", "1962", "1962", "1962"),
-            WEEK = c("4", "5",
-                     "5", "6"),
-            `Week Ending Date` = c("1962-01-27", "1962-01-29",
-                                   "1962-02-01", "1962-02-07")
+            Year = c("1962",
+                     "1962", "1962", "1962"),
+            WEEK = c("4", "5", "5", "6"),
+            `Week Ending Date` = c("1962-01-27",
+                                   "1962-01-29", "1962-02-01", "1962-02-07")
           ),
-          row.names = c(NA,-4L),
-          class = c("tbl_df",
-                    "tbl", "data.frame")
+          row.names = c(NA, -4L),
+          class = c("tbl_df", "tbl", "data.frame")
         ),
         when_available = structure(
           list(
             when_available_key = 11:14,
-            `Data Availability Year` = c("1962", "1962", "1962", "1962"),
-            `Data Availability Week` = c("4", "5", "5", "6"),
+            `Data Availability Year` = c("1962",
+                                         "1962", "1962", "1962"),
+            `Data Availability Week` = c("4",
+                                         "5", "5", "6"),
             `Data Availability Date` = c("1962-01-27",
                                          "1962-01-29", "1962-02-01", "1962-02-07")
           ),
-          row.names = c(NA,-4L),
+          row.names = c(NA, -4L),
           class = c("tbl_df", "tbl", "data.frame")
         ),
         when_received = structure(
@@ -244,7 +246,7 @@ test_that("incremental_refresh() update_according_to", {
             `Reception Date` = c("1962-01-27", "1962-01-29", "1962-02-01",
                                  "1962-02-07")
           ),
-          row.names = c(NA,-4L),
+          row.names = c(NA, -4L),
           class = c("tbl_df",
                     "tbl", "data.frame")
         ),
@@ -255,7 +257,7 @@ test_that("incremental_refresh() update_according_to", {
             State = "MA",
             City = "Cambridge"
           ),
-          row.names = c(NA,-1L),
+          row.names = c(NA, -1L),
           class = c("tbl_df", "tbl", "data.frame")
         ),
         mrs_cause = structure(
@@ -271,14 +273,14 @@ test_that("incremental_refresh() update_according_to", {
             nrow_agg = c(1L, 1L,
                          1L)
           ),
-          row.names = c(NA,-3L),
+          row.names = c(NA, -3L),
           class = c("tbl_df", "tbl",
                     "data.frame")
         )
       ),
       replace = NULL,
       delete = NULL
-    ))
+    )
   })
 })
 
@@ -287,13 +289,13 @@ test_that("incremental_refresh() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4',]) |>
+                                          ft_cause_rpd$WEEK != '4', ]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     f2 <-
       flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2',])
+                                           ft_cause_rpd$WEEK != '2', ])
     f2 <- f2 |>
       update_according_to(f1)
 
@@ -333,7 +335,7 @@ test_that("incremental_refresh() update_according_to", {
             nrow_agg = c(1L, 1L, 1L,
                          1L, 1L, 1L, 1L, 1L)
           ),
-          row.names = c(NA,-8L),
+          row.names = c(NA, -8L),
           class = c("tbl_df",
                     "tbl", "data.frame")
         )
@@ -348,13 +350,13 @@ test_that("incremental_refresh() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4', ]) |>
+                                          ft_cause_rpd$WEEK != '4',]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     f2 <-
       flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2', ])
+                                           ft_cause_rpd$WEEK != '2',])
     f2 <- f2 |>
       update_according_to(f1)
 
@@ -419,7 +421,7 @@ test_that("incremental_refresh() update_according_to", {
                 "1962-02-07"
               )
             ),
-            row.names = c(NA,-14L),
+            row.names = c(NA, -14L),
             class = c("tbl_df",
                       "tbl", "data.frame")
           )
@@ -482,7 +484,7 @@ test_that("incremental_refresh() update_according_to", {
                 "1962-02-07"
               )
             ),
-            row.names = c(NA,-14L),
+            row.names = c(NA, -14L),
             class = c("tbl_df",
                       "tbl", "data.frame")
           )
@@ -545,7 +547,7 @@ test_that("incremental_refresh() update_according_to", {
                 "1962-02-07"
               )
             ),
-            row.names = c(NA,-14L),
+            row.names = c(NA, -14L),
             class = c("tbl_df",
                       "tbl", "data.frame")
           )
@@ -565,7 +567,7 @@ test_that("incremental_refresh() update_according_to", {
               City = c("Bridgeport", "Hartford",
                        "Boston", "Cambridge")
             ),
-            row.names = c(NA,-4L),
+            row.names = c(NA, -4L),
             class = c("tbl_df",
                       "tbl", "data.frame")
           )
@@ -577,76 +579,206 @@ test_that("incremental_refresh() update_according_to", {
 })
 
 
+test_that("incremental_refresh() update_according_to",
+          {
+            f1 <-
+              flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
+                                                  ft_cause_rpd$WEEK != '4', ]) |>
+              as_star_database(mrs_cause_schema_rpd) |>
+              role_playing_dimension(rpd = "When",
+                                     roles = c("When Available", "When Received"))
+            f2 <-
+              flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
+                                                   ft_cause_rpd$WEEK != '2', ])
+            f2 <- f2 |>
+              update_according_to(f1)
+
+            f1 <- f1 |>
+              incremental_refresh(f2, existing_instances = "delete")
+
+            expect_equal({
+              f1$facts
+            }, {
+              list(mrs_cause = structure(
+                list(
+                  name = "mrs_cause",
+                  surrogate_keys = c(
+                    "when_key",
+                    "when_available_key",
+                    "when_received_key",
+                    "where_key"
+                  ),
+                  agg = c(
+                    `Pneumonia and Influenza Deaths` = "SUM",
+                    `All Deaths` = "SUM",
+                    nrow_agg = "SUM"
+                  ),
+                  dim_int_names = c("when",
+                                    "when_available", "when_received", "where"),
+                  table = structure(
+                    list(
+                      when_key = c(1L, 5L, 5L, 5L, 11L, 11L, 11L),
+                      when_available_key = c(6L,
+                                             5L, 8L, 9L, 13L, 13L, 14L),
+                      when_received_key = c(4L, 5L,
+                                            6L, 7L, 11L, 12L, 11L),
+                      where_key = c(1L, 2L, 1L, 3L, 4L,
+                                    2L, 3L),
+                      `Pneumonia and Influenza Deaths` = c(3L, 2L, 2L,
+                                                           11L, 1L, 1L, 12L),
+                      `All Deaths` = c(46L, 54L, 43L, 270L,
+                                       40L, 47L, 285L),
+                      nrow_agg = c(1L, 1L, 1L, 1L, 1L, 1L, 1L)
+                    ),
+                    row.names = c(NA,-7L),
+                    class = c("tbl_df", "tbl", "data.frame")
+                  )
+                ),
+                class = "fact_table"
+              ))
+            })
+
+            expect_equal({
+              f1$refresh
+            }, {
+              list(
+                insert = list(
+                  when = structure(
+                    list(
+                      when_key = 11:14,
+                      Year = c("1962",
+                               "1962", "1962", "1962"),
+                      WEEK = c("4", "5", "5", "6"),
+                      `Week Ending Date` = c("1962-01-27",
+                                             "1962-01-29", "1962-02-01", "1962-02-07")
+                    ),
+                    row.names = c(NA,-4L),
+                    class = c("tbl_df", "tbl", "data.frame")
+                  ),
+                  when_available = structure(
+                    list(
+                      when_available_key = 11:14,
+                      `Data Availability Year` = c("1962",
+                                                   "1962", "1962", "1962"),
+                      `Data Availability Week` = c("4",
+                                                   "5", "5", "6"),
+                      `Data Availability Date` = c("1962-01-27",
+                                                   "1962-01-29", "1962-02-01", "1962-02-07")
+                    ),
+                    row.names = c(NA,-4L),
+                    class = c("tbl_df", "tbl", "data.frame")
+                  ),
+                  when_received = structure(
+                    list(
+                      when_received_key = 11:14,
+                      `Reception Year` = c("1962", "1962",
+                                           "1962", "1962"),
+                      `Reception Week` = c("4", "5", "5", "6"),
+                      `Reception Date` = c("1962-01-27", "1962-01-29", "1962-02-01",
+                                           "1962-02-07")
+                    ),
+                    row.names = c(NA,-4L),
+                    class = c("tbl_df",
+                              "tbl", "data.frame")
+                  ),
+                  where = structure(
+                    list(
+                      where_key = 4L,
+                      REGION = "1",
+                      State = "MA",
+                      City = "Cambridge"
+                    ),
+                    row.names = c(NA,-1L),
+                    class = c("tbl_df", "tbl", "data.frame")
+                  ),
+                  mrs_cause = structure(
+                    list(
+                      when_key = c(11L, 11L, 11L),
+                      when_available_key = c(13L,
+                                             13L, 14L),
+                      when_received_key = c(11L, 12L, 11L),
+                      where_key = c(4L,
+                                    2L, 3L),
+                      `Pneumonia and Influenza Deaths` = c(1L, 1L, 12L),
+                      `All Deaths` = c(40L, 47L, 285L),
+                      nrow_agg = c(1L, 1L,
+                                   1L)
+                    ),
+                    row.names = c(NA,-3L),
+                    class = c("tbl_df", "tbl",
+                              "data.frame")
+                  )
+                ),
+                replace = NULL,
+                delete = list(
+                  mrs_cause = structure(
+                    list(
+                      when_key = 10L,
+                      when_available_key = 3L,
+                      when_received_key = 2L,
+                      where_key = 2L
+                    ),
+                    row.names = c(NA,-1L),
+                    class = c("tbl_df",
+                              "tbl", "data.frame")
+                  ),
+                  when = structure(
+                    list(
+                      when_key = c(2L,
+                                   3L, 10L),
+                      Year = c("1962", "1962", "1962"),
+                      WEEK = c("11", "11",
+                               "9"),
+                      `Week Ending Date` = c("1962-03-14", "1962-03-15", "1962-03-03")
+                    ),
+                    row.names = c(NA,-3L),
+                    class = c("tbl_df", "tbl", "data.frame")
+                  ),
+                  when_available = structure(
+                    list(
+                      when_available_key = c(2L,
+                                             3L, 10L),
+                      `Data Availability Year` = c("1962", "1962", "1962"),
+                      `Data Availability Week` = c("11", "11", "9"),
+                      `Data Availability Date` = c("1962-03-14",
+                                                   "1962-03-15", "1962-03-03")
+                    ),
+                    row.names = c(NA,-3L),
+                    class = c("tbl_df",
+                              "tbl", "data.frame")
+                  ),
+                  when_received = structure(
+                    list(
+                      when_received_key = c(2L,
+                                            3L, 10L),
+                      `Reception Year` = c("1962", "1962", "1962"),
+                      `Reception Week` = c("11",
+                                           "11", "9"),
+                      `Reception Date` = c("1962-03-14", "1962-03-15",
+                                           "1962-03-03")
+                    ),
+                    row.names = c(NA,-3L),
+                    class = c("tbl_df", "tbl",
+                              "data.frame")
+                  )
+                )
+              )
+            })
+
+          })
+
+
 test_that("incremental_refresh() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4', ]) |>
+                                          ft_cause_rpd$WEEK != '4',]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     f2 <-
       flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2', ])
-    f2 <- f2 |>
-      update_according_to(f1)
-
-    f1 <- f1 |>
-      incremental_refresh(f2, existing_instances = "delete")
-    f1$facts
-  }, {
-    list(mrs_cause = structure(
-      list(
-        name = "mrs_cause",
-        surrogate_keys = c(
-          "when_key",
-          "when_available_key",
-          "when_received_key",
-          "where_key"
-        ),
-        agg = c(
-          `Pneumonia and Influenza Deaths` = "SUM",
-          `All Deaths` = "SUM",
-          nrow_agg = "SUM"
-        ),
-        dim_int_names = c("when",
-                          "when_available", "when_received", "where"),
-        table = structure(
-          list(
-            when_key = c(1L, 5L, 5L, 5L, 11L, 11L, 11L),
-            when_available_key = c(6L,
-                                   5L, 8L, 9L, 13L, 13L, 14L),
-            when_received_key = c(4L, 5L,
-                                  6L, 7L, 11L, 12L, 11L),
-            where_key = c(1L, 2L, 1L, 3L, 4L,
-                          2L, 3L),
-            `Pneumonia and Influenza Deaths` = c(3L, 2L, 2L,
-                                                 11L, 1L, 1L, 12L),
-            `All Deaths` = c(46L, 54L, 43L, 270L,
-                             40L, 47L, 285L),
-            nrow_agg = c(1L, 1L, 1L, 1L, 1L, 1L, 1L)
-          ),
-          row.names = c(NA,-7L),
-          class = c("tbl_df", "tbl", "data.frame")
-        )
-      ),
-      class = "fact_table"
-    ))
-  })
-})
-
-
-test_that("incremental_refresh() update_according_to", {
-  expect_equal({
-    f1 <-
-      flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4', ]) |>
-      as_star_database(mrs_cause_schema_rpd) |>
-      role_playing_dimension(rpd = "When",
-                             roles = c("When Available", "When Received"))
-    f2 <-
-      flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2', ])
+                                           ft_cause_rpd$WEEK != '2',])
     f2 <- f2 |>
       update_according_to(f1)
 
@@ -656,13 +788,13 @@ test_that("incremental_refresh() update_according_to", {
   }, {
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4', ]) |>
+                                          ft_cause_rpd$WEEK != '4',]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     f2 <-
       flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2', ])
+                                           ft_cause_rpd$WEEK != '2',])
     f2 <- f2 |>
       update_according_to(f1)
 
@@ -677,13 +809,13 @@ test_that("incremental_refresh() update_according_to", {
   expect_equal({
     f1 <-
       flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                          ft_cause_rpd$WEEK != '4',]) |>
+                                          ft_cause_rpd$WEEK != '4', ]) |>
       as_star_database(mrs_cause_schema_rpd) |>
       role_playing_dimension(rpd = "When",
                              roles = c("When Available", "When Received"))
     f2 <-
       flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2',])
+                                           ft_cause_rpd$WEEK != '2', ])
     f2 <- f2 |>
       update_according_to(f1)
 
@@ -724,7 +856,7 @@ test_that("incremental_refresh() update_according_to", {
                          1L, 2L, 1L, 1L, 1L)
           ),
           class = c("tbl_df", "tbl", "data.frame"),
-          row.names = c(NA,-8L)
+          row.names = c(NA, -8L)
         )
       ),
       class = "fact_table"

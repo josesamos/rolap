@@ -5,14 +5,16 @@
 \alias{as_dm_class.star_database}
 \title{Generate a \code{dm} class with fact and dimension tables}
 \usage{
-as_dm_class(db, pk_facts)
+as_dm_class(db, pk_facts, fk)
 
-\method{as_dm_class}{star_database}(db, pk_facts = TRUE)
+\method{as_dm_class}{star_database}(db, pk_facts = TRUE, fk = TRUE)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
 
 \item{pk_facts}{A boolean, include primary key in fact tables.}
+
+\item{fk}{A boolean, include foreign key in fact tables.}
 }
 \value{
 A \code{dm} object.
@@ -41,7 +43,9 @@ dm <- ct |>
 \code{\link{star_database}}
 
 Other star database exportation functions: 
+\code{\link{as_rdb}()},
 \code{\link{as_single_tibble_list}()},
-\code{\link{as_tibble_list}()}
+\code{\link{as_tibble_list}()},
+\code{\link{draw_tables}()}
 }
 \concept{star database exportation functions}

@@ -58,7 +58,7 @@ test_that("star_database() define a a star database", {
           )
         ), class = "star_schema"
       )),
-      refresh = list(mrs_cause = NULL),
+      refresh = list(),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
@@ -181,7 +181,7 @@ test_that("star_database() define a a star database", {
           )
         ), class = "star_schema"
       )),
-      refresh = list(mrs_cause = NULL),
+      refresh = list(),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
@@ -306,7 +306,7 @@ test_that("snake_case() transform a a star database in snake case", {
           )
         ), class = "star_schema"
       )),
-      refresh = list(mrs_cause = NULL),
+      refresh = list(),
       facts = list(mrs_cause = structure(
         list(
           name = "mrs_cause",
@@ -1064,5 +1064,66 @@ test_that("as_single_tibble_list()", {
       "all_deaths",
       "nrow_agg"
     )
+  })
+})
+
+test_that("get_star_database()", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema, ft_num) |>
+      snake_case()
+    db2 <- star_database(mrs_age_schema, ft_age) |>
+      snake_case()
+    ct <- constellation("MRS", db1, db2)
+    names <- ct |>
+      get_fact_names()
+    st <- ct |>
+      get_star_database(names[1])
+  }, {
+    db2
+  })
+})
+
+test_that("get_star_database()", {
+  expect_equal({
+    db1 <- star_database(mrs_cause_schema, ft_num) |>
+      snake_case()
+    db2 <- star_database(mrs_age_schema, ft_age) |>
+      snake_case()
+    ct <- constellation("MRS", db1, db2)
+    names <- ct |>
+      get_fact_names()
+    st <- ct |>
+      get_star_database(names[2])
+  }, {
+    db1
+  })
+})
+
+test_that("get_dimension_names()", {
+  db1 <- star_database(mrs_cause_schema, ft_num) |>
+    snake_case()
+  db2 <- star_database(mrs_age_schema, ft_age) |>
+    snake_case()
+  ct <- constellation("MRS", db1, db2)
+
+  expect_equal({
+    ct |>
+      get_dimension_names()
+  }, {
+    c("when", "where", "who")
+  })
+
+  expect_equal({
+    ct |>
+      get_fact_names()
+  }, {
+    c("mrs_age", "mrs_cause")
+  })
+
+  expect_equal({
+    ct |>
+      get_table_names()
+  }, {
+    c("mrs_age", "mrs_cause", "when", "where", "who")
   })
 })

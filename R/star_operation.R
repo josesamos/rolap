@@ -80,6 +80,7 @@ add_operation.star_operation <- function(op, op_name, name = NULL, details = NUL
 #' @return A boolean.
 #' @keywords internal
 is_new_operation.star_operation <- function(op, op_name, name = NULL, details = NULL, details2 = NULL) {
+  name <- vector_to_string(name)
   details <- vector_to_string(details)
   details2 <- vector_to_string(details2)
   res <- op$operations[op$operations$operation == op_name,]

@@ -57,6 +57,7 @@ as_tibble_list.star_database <- function(db) {
 #'
 #' @param db A `star_database` object.
 #' @param pk_facts A boolean, include primary key in fact tables.
+#' @param fk A boolean, include foreign key in fact tables.
 #'
 #' @return A `dm` object.
 #'
@@ -78,12 +79,12 @@ as_tibble_list.star_database <- function(db) {
 #'   as_dm_class()
 #'
 #' @export
-as_dm_class <- function(db, pk_facts) UseMethod("as_dm_class")
+as_dm_class <- function(db, pk_facts, fk) UseMethod("as_dm_class")
 
 #' @rdname as_dm_class
 #'
 #' @export
-as_dm_class.star_database <- function(db, pk_facts = TRUE) {
+as_dm_class.star_database <- function(db, pk_facts = TRUE, fk = TRUE) {
   c <- dm::dm()
   for (d in names(db$dimensions)) {
     c <- c |>
@@ -95,10 +96,12 @@ as_dm_class.star_database <- function(db, pk_facts = TRUE) {
     c <- c |>
       dm::dm(!!f := db$facts[[f]]$table) |>
       dm::dm_set_colors(darkblue = !!f)
-    for (s in db$facts[[f]]$surrogate_keys) {
-      t <- gsub("_key", "", s)
-      c <- c |>
-        dm::dm_add_fk(!!f, !!s, !!t)
+    if (fk) {
+      for (s in db$facts[[f]]$surrogate_keys) {
+        t <- gsub("_key", "", s)
+        c <- c |>
+          dm::dm_add_fk(!!f, !!s, !!t)
+      }
     }
     if (pk_facts) {
       c <- c |>
@@ -158,5 +161,92 @@ as_single_tibble_list.star_database <- function(db) {
     res[[f]] <- res[[f]][, c(attributes, measures)]
   }
   res
+}
+
+
+#' Generate tables in a relational database
+#'
+#' Given a connection to a relational database, it stores the facts and
+#' dimensions in the form of tables. Tables can be overwritten.
+#'
+#' @param db A `star_database` object.
+#' @param con A `DBI::DBIConnection` object.
+#' @param overwrite A boolean, allow overwriting tables in the database.
+#'
+#' @return A list of `tibble`
+#'
+#' @family star database exportation functions
+#' @seealso \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' my_db <- DBI::dbConnect(RSQLite::SQLite())
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' db <- db |>
+#'   as_rdb(my_db)
+#'
+#' DBI::dbDisconnect(my_db)
+#'
+#' @export
+as_rdb <- function(db, con, overwrite) UseMethod("as_rdb")
+
+#' @rdname as_rdb
+#'
+#' @export
+as_rdb.star_database <- function(db, con, overwrite = FALSE) {
+  if (overwrite) {
+    tables <- DBI::dbListTables(con)
+    dimensions <- get_dimension_names(db)
+    facts <- get_fact_names(db)
+    dimensions <- intersect(tables, dimensions)
+    facts <- intersect(tables, facts)
+    for (f in facts) {
+      DBI::dbRemoveTable(con, f)
+    }
+    for (d in dimensions) {
+      DBI::dbRemoveTable(con, d)
+    }
+  }
+  db_dm <- as_dm_class(db)
+  dm::copy_dm_to(con, db_dm, temporary = FALSE)
+  db
+}
+
+
+
+#' Draw tables
+#'
+#' Draw the tables of the ROLAP star diagrams.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @family star database exportation functions
+#' @seealso \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' \donttest{
+#' db <- db |>
+#'   draw_tables()
+#' }
+#'
+#' @export
+draw_tables <- function(db) UseMethod("draw_tables")
+
+#' @rdname draw_tables
+#'
+#' @export
+draw_tables.star_database <- function(db) {
+  db_dm <- db |>
+    as_dm_class(pk_facts = FALSE)
+  db_dm |>
+    dm::dm_draw(rankdir = "LR", view_type = "all")
+  db
 }
 

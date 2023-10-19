@@ -5,12 +5,14 @@
 \alias{get_dimension_names.star_database}
 \title{Get the names of the dimensions of a star database}
 \usage{
-get_dimension_names(db)
+get_dimension_names(db, star)
 
-\method{get_dimension_names}{star_database}(db)
+\method{get_dimension_names}{star_database}(db, star = NULL)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
+
+\item{star}{A string or integer, star database name or index in constellation.}
 }
 \value{
 A vector of strings, dimension names.

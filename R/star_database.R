@@ -102,7 +102,7 @@ star_database_with_previous_operations <-
           operations = vector("list", length = length(schema$facts)),
           lookup_tables = vector("list", length = length(schema$facts)),
           schemas = vector("list", length = length(schema$facts)),
-          refresh = vector("list", length = length(schema$facts)),
+          refresh = list(),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
           rpd = list()
@@ -113,7 +113,6 @@ star_database_with_previous_operations <-
     names(db$operations) <- names(schema$facts)
     names(db$lookup_tables) <- names(schema$facts)
     names(db$schemas) <- names(schema$facts)
-    names(db$refresh) <- names(schema$facts)
     names(db$facts) <- names(schema$facts)
     names(db$dimensions) <- names(schema$dimensions)
 
@@ -175,6 +174,34 @@ star_database_with_previous_operations <-
   }
 
 
+#' @rdname get_star_database
+#'
+#' @export
+get_star_database.star_database <- function(db, name) {
+  if (!is.null(name)) {
+    star <- validate_facts(names(db$facts), name)
+    if (length(star) == 1) {
+      db$name <- star
+    }
+    db$operations <- db$operations[star]
+    db$lookup_tables <- db$lookup_tables[star]
+    db$schemas <- db$schemas[star]
+    db$refresh <- list()
+    db$facts <- db$facts[star]
+    dim <- NULL
+    for (f in names(db$facts)) {
+      dim <- c(dim, db$facts[[f]]$dim_int_names)
+    }
+    dim <- unique(dim)
+    db$dimensions <- db$dimensions[dim]
+    db$rpd <- filter_rpd_dimensions(db, dim)
+    db <- purge_dimension_instances_star_database(db)
+  }
+  db
+}
+
+
+
 #' @rdname snake_case
 #'
 #' @export
@@ -185,9 +212,10 @@ snake_case.star_database <- function(db) {
   for (d in names(db$dimensions)) {
     db$dimensions[[d]] <- snake_case_table(db$dimensions[[d]])
   }
-  db$operations[[1]] <-
-    add_operation(db$operations[[1]], "snake_case")
-
+  for (f in names(db$facts)) {
+    db$operations[[f]] <-
+      add_operation(db$operations[[f]], "snake_case")
+  }
   db
 }
 
@@ -453,6 +481,7 @@ replace_attribute_values.star_database <-
 #' Obtain the names of the dimensions of a star database.
 #'
 #' @param db A `star_database` object.
+#' @param star A string or integer, star database name or index in constellation.
 #'
 #' @return A vector of strings, dimension names.
 #'
@@ -465,13 +494,13 @@ replace_attribute_values.star_database <-
 #'   get_dimension_names()
 #'
 #' @export
-get_dimension_names <- function(db)
+get_dimension_names <- function(db, star)
   UseMethod("get_dimension_names")
 
 #' @rdname get_dimension_names
 #'
 #' @export
-get_dimension_names.star_database <- function(db) {
+get_dimension_names.star_database <- function(db, star = NULL) {
   sort(names(db$dimensions))
 }
 
@@ -642,13 +671,89 @@ add_dimension_instances <- function(db, name, table) {
   table <-
     tibble::add_column(table,!!dim$surrogate_key := (last + 1:nrow(table)), .before = 1)
   rpd <- get_rpd_dimensions(db, name)
-  res <- vector("list", length = length(rpd))
-  names(res) <- rpd
+  res <- list()
+  names_res <- NULL
   for (d in rpd) {
     dim <- db$dimensions[[d]]
     names(table) <- names(dim$table)
     db$dimensions[[d]]$table <- rbind(dim$table, table)
-    res[[d]] <- table
+    res <- c(res, list(table))
+    names_res <- c(names_res, d)
   }
-  c(list(db), res)
+  names(res) <- names_res
+  db$refresh[['insert']] <- c(db$refresh[['insert']], res)
+  db
+}
+
+#' Purge instances of a dimension
+#'
+#' Delete instances of a dimension that are not referenced in the facts.
+#'
+#' @param db A `star_database` object.
+#' @param dim A string, dimension name.
+#'
+#' @return A `tibble`, dimension table.
+#'
+#' @keywords internal
+purge_dimension <- function(db, dim) {
+  surrogate_key <- db$dimensions[[dim]]$surrogate_key
+  rpd <- get_rpd_dimensions(db, dim)
+  used <- NULL
+  for (d in rpd) {
+    for (f in seq_along(db$facts)) {
+      if (d %in% db$facts[[f]]$dim_int_names) {
+        col_f <- dplyr::select(db$facts[[f]]$table,
+                               tidyselect::all_of(db$dimensions[[d]]$surrogate_key))
+        names(col_f) <- surrogate_key
+        used <- dplyr::bind_rows(used, col_f)
+      }
+    }
+  }
+  used <- dplyr::summarise(dplyr::group_by_at(used, surrogate_key))
+
+  dplyr::inner_join(db$dimensions[[dim]]$table, used, by = surrogate_key)
+}
+
+
+#' Purge instances of dimensions
+#'
+#' Delete instances of dimensions that are not referenced in the facts.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @keywords internal
+purge_dimension_instances_star_database <- function(db) {
+  for (dim in names(db$dimensions)) {
+    db$dimensions[[dim]]$table <- purge_dimension(db, dim)
+  }
+  db
+}
+
+
+#' Purge instances of dimensions
+#'
+#' Delete instances of dimensions that are not referenced in the facts.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `star_database` object.
+#'
+#' @keywords internal
+purge_dimension_instances <- function(db) {
+  res <- list()
+  res_names <- NULL
+  for (dim in names(db$dimensions)) {
+    original <- db$dimensions[[dim]]$table
+    db$dimensions[[dim]]$table <- purge_dimension(db, dim)
+    deleted <- dplyr::setdiff(original, db$dimensions[[dim]]$table)
+    if (nrow(deleted) > 0) {
+      res <- c(res, list(deleted))
+      res_names <- c(res_names, dim)
+    }
+  }
+  names(res) <- res_names
+  db$refresh$delete <- c(db$refresh$delete, res)
+  db
 }

@@ -147,11 +147,13 @@ constellation <- function(name = NULL, ...) {
     operations = operations,
     lookup_tables = lookup_tables,
     schemas = schemas,
+    refresh = list(),
     facts = facts,
     dimensions = dimensions,
     rpd = rpd
   ), class = "star_database")
-  rpd_in_constellation(c)
+  c <- rpd_in_constellation(c)
+  purge_dimension_instances_star_database(c)
 }
 
 #' Share dimension instance operations between all `star_database` objects
