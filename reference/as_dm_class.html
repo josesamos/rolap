@@ -70,10 +70,10 @@ saved directly in a DBMS.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">as_dm_class</span><span class="op">(</span><span class="va">db</span>, <span class="va">pk_facts</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">as_dm_class</span><span class="op">(</span><span class="va">db</span>, <span class="va">pk_facts</span>, <span class="va">fk</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for star_database</span></span>
-<span><span class="fu">as_dm_class</span><span class="op">(</span><span class="va">db</span>, pk_facts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">as_dm_class</span><span class="op">(</span><span class="va">db</span>, pk_facts <span class="op">=</span> <span class="cn">TRUE</span>, fk <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -84,6 +84,10 @@ saved directly in a DBMS.</p>
 
 <dt>pk_facts</dt>
 <dd><p>A boolean, include primary key in fact tables.</p></dd>
+
+
+<dt>fk</dt>
+<dd><p>A boolean, include foreign key in fact tables.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -96,8 +100,10 @@ saved directly in a DBMS.</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="star_database.html">star_database</a></code></p>
 <p>Other star database exportation functions: 
+<code><a href="as_rdb.html">as_rdb</a>()</code>,
 <code><a href="as_single_tibble_list.html">as_single_tibble_list</a>()</code>,
-<code><a href="as_tibble_list.html">as_tibble_list</a>()</code></p></div>
+<code><a href="as_tibble_list.html">as_tibble_list</a>()</code>,
+<code><a href="draw_tables.html">draw_tables</a>()</code></p></div>
     </div>
 
     <div class="section level2">

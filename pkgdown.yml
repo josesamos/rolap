@@ -8,7 +8,7 @@ articles:
   v20-rdbms-dm: v20-rdbms-dm.html
   v30-dim-instances: v30-dim-instances.html
   v40-refresh: v40-refresh.html
-last_built: 2023-10-16T16:43Z
+last_built: 2023-10-19T17:23Z
 urls:
   reference: https://josesamos.github.io/rolap/reference
   article: https://josesamos.github.io/rolap/articles

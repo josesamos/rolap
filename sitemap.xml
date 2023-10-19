@@ -58,6 +58,9 @@
     <loc>https://josesamos.github.io/rolap/reference/as_dm_class.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/as_rdb.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/as_single_tibble_list.html</loc>
   </url>
   <url>
@@ -97,10 +100,16 @@
     <loc>https://josesamos.github.io/rolap/reference/dimension_table.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/draw_tables.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/fact_schema.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/fact_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/filter_rpd_dimensions.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/flat_table.html</loc>
@@ -352,6 +361,15 @@
     <loc>https://josesamos.github.io/rolap/reference/prepare_to_join.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/purge_dimension.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/purge_dimension_instances.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/purge_dimension_instances_star_database.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/read_flat_table_file.html</loc>
   </url>
   <url>
@@ -479,6 +497,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_dimension_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/validate_facts.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_lookup_parameters.html</loc>
