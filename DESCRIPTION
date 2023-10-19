@@ -29,7 +29,10 @@ Imports:
     snakecase,
     tibble,
     tidyr,
-    tidyselect
+    tidyselect,
+    tools,
+    utils,
+    xlsx
 Suggests: 
     DBI,
     dbplyr,

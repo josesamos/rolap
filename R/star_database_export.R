@@ -357,9 +357,9 @@ as_csv_files.star_database <- function(db, dir = NULL, type = 1) {
   for (i in seq_along(l)) {
     file <- paste0(dir, '/', names[i], '.csv')
     if (type == 1) {
-      write.csv(l[[i]], file = file, row.names = FALSE)
+      utils::write.csv(l[[i]], file = file, row.names = FALSE)
     } else {
-      write.csv2(l[[i]], file = file, row.names = FALSE)
+      utils::write.csv2(l[[i]], file = file, row.names = FALSE)
     }
   }
   dir
