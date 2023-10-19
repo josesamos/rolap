@@ -354,27 +354,6 @@
 #'
 #' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
-#' @examples
-#' # Defined by:
-#' \donttest{
-#' ccs_db <- RMariaDB::dbConnect(
-#'   RMariaDB::MariaDB(),
-#'   username = "guest",
-#'   password = "relational",
-#'   dbname = "ccs",
-#'   host = "relational.fit.cvut.cz"
-#' )
-#' ccs_dm <- dm::dm_from_con(ccs_db, learn_keys = TRUE)
-#' ccs_sel_dm <-
-#'   ccs_dm[c('transactions_1k', 'customers', 'gasstations', 'products')] |>
-#'   dm::dm_add_fk(transactions_1k, CustomerID, customers) |>
-#'   dm::dm_add_fk(transactions_1k, GasStationID, gasstations) |>
-#'   dm::dm_add_fk(transactions_1k, ProductID, products)
-#' transactions_db <- ccs_sel_dm |>
-#'   dm::collect()
-#' DBI::dbDisconnect(ccs_db)
-#' }
-#'
 #' @family database example data
 #'
 #' @format A `star_database`.
