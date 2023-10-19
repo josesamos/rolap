@@ -184,7 +184,158 @@ test_that("dim instances", {
   })
 
 
+  #############################################################
+  expect_equal({
+    unique
+  },
+  {
+    structure(
+      list(
+        product = c(
+          "Additivum",
+          "Autokosmet.",
+          "Autoprísluš.",
+          "Dalnic.popl.",
+          "Diesel",
+          "Diesel +",
+          "Diesel aditiv",
+          "Knihy,nov.",
+          "LPG",
+          "Mytí vozidel",
+          "Nafta",
+          "Nafta +",
+          "Nafta Plus",
+          "Nat.Super",
+          "Natural",
+          "Natural +",
+          "Natural Plus",
+          "Natural Spec",
+          "Nemrz.kapal.",
+          "Obcerstvení",
+          "Oleje,tuky",
+          "Other",
+          "Potraviny",
+          "Prev.náplne",
+          "Provoz.nápl.",
+          "Umývanie voz",
+          "Zboží nesp.",
+          "Zpr.nakupu"
+        )
+      ),
+      row.names = c(NA,-28L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )
+  })
 
+
+
+  #############################################################
+  expect_equal({
+    unique_attribute_values_db_summary3
+  },
+  {
+    structure(
+      list(
+        product = c(
+          "Additivum",
+          "Autokozmetik",
+          "Diesel",
+          "Diesel +",
+          "Nafta",
+          "Nafta +",
+          "Natural",
+          "Natural +",
+          "Other"
+        )
+      ),
+      row.names = c(NA,-9L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )
+  })
+
+
+
+  #############################################################
+  expect_equal({
+    unique_attribute_values_db_summary3
+  },
+  {
+    structure(
+      list(
+        product = c(
+          "Additivum",
+          "Autokozmetik",
+          "Diesel",
+          "Diesel +",
+          "Nafta",
+          "Nafta +",
+          "Natural",
+          "Natural +",
+          "Other"
+        )
+      ),
+      row.names = c(NA,-9L),
+      class = c("tbl_df", "tbl", "data.frame")
+    )
+  })
+
+
+
+  #############################################################
+  expect_equal({
+    res_db_summary3
+  },
+  {
+    c(
+      "name: who_segment, 6 rows\n",
+      "name: where_chain, 33 rows\n",
+      "name: when, 84 rows\n",
+      "name: when_paid, 84 rows\n",
+      "name: what, 9 rows\n",
+      "name: transaction_summary, 759 rows\n",
+      "1000"
+    )
+  })
+
+
+
+  #############################################################
+  expect_equal({
+    res_db_summary4
+  },
+  {
+    c(
+      "name: who_segment, 6 rows\n",
+      "name: where_chain, 33 rows\n",
+      "name: when, 18 rows\n",
+      "name: when_paid, 18 rows\n",
+      "name: what, 9 rows\n",
+      "name: transaction_summary, 486 rows\n",
+      "1000"
+    )
+  })
+
+
+  #############################################################
+  expect_equal({
+    res_ct
+  },
+  {
+    c(
+      "name: transaction, 921 rows\n",
+      "name: transaction_line, 1000 rows\n",
+      "name: transaction_summary, 486 rows\n",
+      "name: what, 29 rows\n",
+      "name: when, 124 rows\n",
+      "name: when_moment, 599 rows\n",
+      "name: when_paid, 124 rows\n",
+      "name: when_processed, 124 rows\n",
+      "name: where, 437 rows\n",
+      "name: where_chain, 33 rows\n",
+      "name: who, 902 rows\n",
+      "name: who_segment, 6 rows\n"
+    )
+  })
 
   #############################################################
 })
