@@ -725,11 +725,7 @@ test_that("incremental_refresh() update_according_to",
                   when = structure(
                     list(
                       when_key = c(2L,
-                                   3L, 10L),
-                      Year = c("1962", "1962", "1962"),
-                      WEEK = c("11", "11",
-                               "9"),
-                      `Week Ending Date` = c("1962-03-14", "1962-03-15", "1962-03-03")
+                                   3L, 10L)
                     ),
                     row.names = c(NA,-3L),
                     class = c("tbl_df", "tbl", "data.frame")
@@ -737,11 +733,7 @@ test_that("incremental_refresh() update_according_to",
                   when_available = structure(
                     list(
                       when_available_key = c(2L,
-                                             3L, 10L),
-                      `Data Availability Year` = c("1962", "1962", "1962"),
-                      `Data Availability Week` = c("11", "11", "9"),
-                      `Data Availability Date` = c("1962-03-14",
-                                                   "1962-03-15", "1962-03-03")
+                                             3L, 10L)
                     ),
                     row.names = c(NA,-3L),
                     class = c("tbl_df",
@@ -750,12 +742,7 @@ test_that("incremental_refresh() update_according_to",
                   when_received = structure(
                     list(
                       when_received_key = c(2L,
-                                            3L, 10L),
-                      `Reception Year` = c("1962", "1962", "1962"),
-                      `Reception Week` = c("11",
-                                           "11", "9"),
-                      `Reception Date` = c("1962-03-14", "1962-03-15",
-                                           "1962-03-03")
+                                            3L, 10L)
                     ),
                     row.names = c(NA,-3L),
                     class = c("tbl_df", "tbl",

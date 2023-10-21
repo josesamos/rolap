@@ -123,6 +123,8 @@ incremental_refresh.star_database <-
       facts_exist <- facts_exist |>
         dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)) |>
         dplyr::left_join(db$facts[[star]]$table, by = db$facts[[star]]$surrogate_keys)
+      facts_exist <- list(db$facts[[star]]$surrogate_keys, facts_exist)
+      names(facts_exist) <- c('surrogate_keys', 'table')
       facts_exist <- list(facts_exist)
       names(facts_exist) <- star
       db$refresh[[length(db$refresh)]][['replace']] <-
@@ -137,6 +139,8 @@ incremental_refresh.star_database <-
 
       if (existing_instances == 'replace') {
         db$facts[[star]]$table[t$existing_fact, ] <- facts_exist
+        facts_exist <- list(db$facts[[star]]$surrogate_keys, facts_exist)
+        names(facts_exist) <- c('surrogate_keys', 'table')
         facts_exist <- list(facts_exist)
         names(facts_exist) <- star
         db$refresh[[length(db$refresh)]][['replace']] <-
@@ -153,6 +157,71 @@ incremental_refresh.star_database <-
     }
     db
   }
+
+#' Generate refresh sql
+#'
+#' Generate sql code for the first refresh operation.
+#'
+#' @param db A list of operations over tables.
+#'
+#' @return A string.
+#'
+#' @keywords internal
+generate_refresh_sql <- function(refresh) {
+  operations <- names(refresh)
+  res <- NULL
+  for (op in operations) {
+    if (length(refresh[[op]]) > 0) {
+      if (op == "insert") {
+        for (table in names(refresh[[op]])) {
+          sql <-
+            paste0("INSERT INTO `",
+                   table,
+                   "`(`",
+                   paste(names(refresh[[op]][[table]]), collapse = "`, `"),
+                   "`) VALUES ")
+          sql <- paste0(sql, generate_table_sql(refresh[[op]][[table]]))
+          res <- paste0(res, sql)
+        }
+      }
+    }
+  }
+}
+
+
+#' Generate table sql
+#'
+#' Generate sql code for a table.
+#'
+#' @param table A `tibble`.
+#'
+#' @return A string.
+#'
+#' @keywords internal
+generate_table_sql <- function(table) {
+  res <- NULL
+  n_att <- ncol(table)
+  n_ins <- nrow(table)
+  for (i in 1:n_ins) {
+    dt <- "("
+    for (j in 1:n_att) {
+      if (j == 1) {
+        sep = ""
+      } else {
+        sep = ", "
+      }
+      dt <- paste(dt, sprintf("'%s'", table[i, j]), sep = sep)
+    }
+    dt <- paste(dt, ")", sep = "")
+    if (i == n_ins) {
+      dt <- paste0(dt, "; ")
+    } else {
+      dt <- paste0(dt, ", ")
+    }
+    res <- paste0(res, dt)
+  }
+  res
+}
 
 
 

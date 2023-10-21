@@ -752,7 +752,8 @@ purge_dimension_instances <- function(db) {
     db$dimensions[[dim]]$table <- purge_dimension(db, dim)
     deleted <- dplyr::setdiff(original, db$dimensions[[dim]]$table)
     if (nrow(deleted) > 0) {
-      res <- c(res, list(deleted))
+      res <- c(res, list(deleted |>
+                           dplyr::select(tidyselect::all_of(db$dimensions[[dim]]$surrogate_key))))
       res_names <- c(res_names, dim)
     }
   }
