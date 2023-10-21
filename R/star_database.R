@@ -681,7 +681,8 @@ add_dimension_instances <- function(db, name, table) {
     names_res <- c(names_res, d)
   }
   names(res) <- names_res
-  db$refresh[['insert']] <- c(db$refresh[['insert']], res)
+  db$refresh[[length(db$refresh)]][['insert']] <-
+    c(db$refresh[[length(db$refresh)]][['insert']], res)
   db
 }
 
@@ -754,6 +755,7 @@ purge_dimension_instances <- function(db) {
     }
   }
   names(res) <- res_names
-  db$refresh$delete <- c(db$refresh$delete, res)
+  db$refresh[[length(db$refresh)]][['delete']] <-
+    c(db$refresh[[length(db$refresh)]][['delete']], res)
   db
 }

@@ -72,10 +72,13 @@ incremental_refresh.star_database <-
     sdbu$combination <- check_refesh(db, sdbu$star_database)
 
     # refresh data
-    if (length(db$refresh) == 0) {
-      db$refresh <- vector("list", length = 3)
-      names(db$refresh) <- c('insert', 'replace', 'delete')
-    }
+    refresh_name <- paste0('r', snakecase::to_snake_case(paste0(Sys.time())))
+    names_refresh <- names(db$refresh)
+    names_refresh <- c(names_refresh, refresh_name)
+    l <- length(db$refresh) + 1
+    db$refresh[[l]] <- vector("list", length = 3)
+    names(db$refresh) <- names_refresh
+    names(db$refresh[[l]]) <- c('insert', 'replace', 'delete')
 
     new_dim <- get_new_dimension_instances(sdbu)
     for (d in names(new_dim)) {
@@ -103,7 +106,8 @@ incremental_refresh.star_database <-
     db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_new)
     facts_new <- list(facts_new)
     names(facts_new) <- star
-    db$refresh[['insert']] <- c(db$refresh[['insert']], facts_new)
+    db$refresh[[length(db$refresh)]][['insert']] <-
+      c(db$refresh[[length(db$refresh)]][['insert']], facts_new)
 
     # existing facts: 'replace', 'group' or 'delete'
     if (existing_instances == 'group') {
@@ -121,7 +125,8 @@ incremental_refresh.star_database <-
         dplyr::left_join(db$facts[[star]]$table, by = db$facts[[star]]$surrogate_keys)
       facts_exist <- list(facts_exist)
       names(facts_exist) <- star
-      db$refresh[['replace']] <- c(db$refresh[['replace']], facts_exist)
+      db$refresh[[length(db$refresh)]][['replace']] <-
+        c(db$refresh[[length(db$refresh)]][['replace']], facts_exist)
     } else {
       only_key <- facts_exist |>
         dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
@@ -134,13 +139,15 @@ incremental_refresh.star_database <-
         db$facts[[star]]$table[t$existing_fact, ] <- facts_exist
         facts_exist <- list(facts_exist)
         names(facts_exist) <- star
-        db$refresh[['replace']] <- c(db$refresh[['replace']], facts_exist)
+        db$refresh[[length(db$refresh)]][['replace']] <-
+          c(db$refresh[[length(db$refresh)]][['replace']], facts_exist)
       } else if (existing_instances == 'delete') {
         db$facts[[star]]$table <- db$facts[[star]]$table[!(t$existing_fact), ]
         facts_exist <- list(facts_exist |>
                               dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)))
         names(facts_exist) <- star
-        db$refresh[['delete']] <- c(db$refresh[['delete']], facts_exist)
+        db$refresh[[length(db$refresh)]][['delete']] <-
+          c(db$refresh[[length(db$refresh)]][['delete']], facts_exist)
         db <- purge_dimension_instances(db)
       }
     }

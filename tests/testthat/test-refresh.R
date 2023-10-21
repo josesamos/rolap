@@ -208,7 +208,7 @@ test_that("incremental_refresh() update_according_to", {
 
     f1 <- f1 |>
       incremental_refresh(f2)
-    f1$refresh
+    f1$refresh[[1]]
   }, {
     list(
       insert = list(
@@ -639,7 +639,7 @@ test_that("incremental_refresh() update_according_to",
             })
 
             expect_equal({
-              f1$refresh
+              f1$refresh[[1]]
             }, {
               list(
                 insert = list(

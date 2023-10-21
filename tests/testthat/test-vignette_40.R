@@ -261,6 +261,7 @@ test_that("refresh", {
 
   #############################################################
   expect_equal({
+    names(mrs_db_seg$refresh) <- names(mrs_db$refresh)
     mrs_db_seg
   },
   {
@@ -320,7 +321,7 @@ test_that("refresh", {
 
   #############################################################
   expect_equal({
-    mrs_db2$refresh$delete$when
+    mrs_db2$refresh[[2]]$delete$when
   },
   {
     structure(
