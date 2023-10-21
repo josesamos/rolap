@@ -148,6 +148,7 @@ constellation <- function(name = NULL, ...) {
     lookup_tables = lookup_tables,
     schemas = schemas,
     refresh = list(),
+    rdb_con = list(),
     facts = facts,
     dimensions = dimensions,
     rpd = rpd
