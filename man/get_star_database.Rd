@@ -46,6 +46,7 @@ st <- ct |>
 }
 \seealso{
 Other star database refresh functions: 
+\code{\link{deploy}()},
 \code{\link{get_existing_fact_instances}()},
 \code{\link{get_lookup_tables}()},
 \code{\link{get_new_dimension_instances}()},

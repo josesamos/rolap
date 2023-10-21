@@ -103,7 +103,7 @@ star_database_with_previous_operations <-
           lookup_tables = vector("list", length = length(schema$facts)),
           schemas = vector("list", length = length(schema$facts)),
           refresh = list(),
-          rdb_con = list(),
+          deploy = list(),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
           rpd = list()
@@ -188,7 +188,7 @@ get_star_database.star_database <- function(db, name) {
     db$lookup_tables <- db$lookup_tables[star]
     db$schemas <- db$schemas[star]
     db$refresh <- list()
-    db$rdb_con <- list()
+    db$deploy <- list()
     db$facts <- db$facts[star]
     dim <- NULL
     for (f in names(db$facts)) {

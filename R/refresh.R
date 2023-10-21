@@ -164,7 +164,7 @@ incremental_refresh.star_database <-
 #'
 #' @param db A list of operations over tables.
 #'
-#' @return A string.
+#' @return A vector of strings.
 #'
 #' @keywords internal
 generate_refresh_sql <- function(refresh) {
@@ -174,34 +174,120 @@ generate_refresh_sql <- function(refresh) {
     if (length(refresh[[op]]) > 0) {
       if (op == "insert") {
         for (table in names(refresh[[op]])) {
-          sql <-
-            paste0("INSERT INTO `",
-                   table,
-                   "`(`",
-                   paste(names(refresh[[op]][[table]]), collapse = "`, `"),
-                   "`) VALUES ")
-          sql <- paste0(sql, generate_table_sql(refresh[[op]][[table]]))
-          res <- paste0(res, sql)
+          sql <- generate_table_sql_insert(table, instances = refresh[[op]][[table]])
+          res <- c(res, sql)
+        }
+      } else if (op == "replace") {
+        for (table in names(refresh[[op]])) {
+          surrogate_keys <- refresh[[op]][[table]]$surrogate_keys
+          instances <- refresh[[op]][[table]]$table
+          sql <- generate_table_sql_update(table, surrogate_keys, instances)
+          res <- c(res, sql)
+        }
+      } else if (op == "delete") {
+        for (table in names(refresh[[op]])) {
+          sql <- generate_table_sql_delete(table, instances = refresh[[op]][[table]])
+          res <- c(res, sql)
         }
       }
     }
   }
+  res
 }
 
 
-#' Generate table sql
+
+#' Generate table sql delete
 #'
-#' Generate sql code for a table.
+#' Generate sql code for deleting instances in a table.
 #'
-#' @param table A `tibble`.
+#' @param table A string, table name.
+#' @param instances A `tibble`.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+generate_table_sql_delete <- function(table, instances) {
+  surrogate_keys <- names(instances)
+  res <- NULL
+  n_ins <- nrow(instances)
+  for (i in 1:n_ins) {
+    sql <- paste0("DELETE FROM `", table, "` WHERE ")
+    for (s in surrogate_keys) {
+      if (s == surrogate_keys[1]) {
+        sep = ""
+      } else {
+        sep = " AND "
+      }
+      sql <- paste(sql, sprintf("`%s` = %s", s, instances[i, s]), sep = sep)
+    }
+    sql <- paste0(sql, ";")
+    res <- c(res, sql)
+  }
+  res
+}
+
+
+#' Generate table sql update
+#'
+#' Generate sql code for updating a table.
+#'
+#' @param table A string, table name.
+#' @param surrogate_keys A string.
+#' @param instances A `tibble`.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+generate_table_sql_update <- function(table, surrogate_keys, instances) {
+  measures <- setdiff(names(instances), surrogate_keys)
+  res <- NULL
+  n_ins <- nrow(instances)
+  for (i in 1:n_ins) {
+    sql <- paste0("UPDATE `", table, "` SET ")
+    for (m in measures) {
+      if (m == measures[1]) {
+        sep = ""
+      } else {
+        sep = ", "
+      }
+      sql <- paste(sql, sprintf("`%s` = %s", m, instances[i, m]), sep = sep)
+    }
+    sql <- paste(sql, " WHERE ", sep = "")
+    for (s in surrogate_keys) {
+      if (s == surrogate_keys[1]) {
+        sep = ""
+      } else {
+        sep = " AND "
+      }
+      sql <- paste(sql, sprintf("`%s` = %s", s, instances[i, s]), sep = sep)
+    }
+    sql <- paste0(sql, ";")
+    res <- c(res, sql)
+  }
+  res
+}
+
+
+#' Generate table sql insert
+#'
+#' Generate sql code for inserting a table.
+#'
+#' @param table A string, table name.
+#' @param instances A `tibble`.
 #'
 #' @return A string.
 #'
 #' @keywords internal
-generate_table_sql <- function(table) {
-  res <- NULL
-  n_att <- ncol(table)
-  n_ins <- nrow(table)
+generate_table_sql_insert <- function(table, instances) {
+  res <-
+    paste0("INSERT INTO `",
+           table,
+           "`(`",
+           paste(names(instances), collapse = "`, `"),
+           "`) VALUES ")
+  n_att <- ncol(instances)
+  n_ins <- nrow(instances)
   for (i in 1:n_ins) {
     dt <- "("
     for (j in 1:n_att) {
@@ -210,11 +296,11 @@ generate_table_sql <- function(table) {
       } else {
         sep = ", "
       }
-      dt <- paste(dt, sprintf("'%s'", table[i, j]), sep = sep)
+      dt <- paste(dt, sprintf("'%s'", instances[i, j]), sep = sep)
     }
     dt <- paste(dt, ")", sep = "")
     if (i == n_ins) {
-      dt <- paste0(dt, "; ")
+      dt <- paste0(dt, ";")
     } else {
       dt <- paste0(dt, ", ")
     }

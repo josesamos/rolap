@@ -10,7 +10,7 @@ generate_refresh_sql(refresh)
 \item{db}{A list of operations over tables.}
 }
 \value{
-A string.
+A vector of strings.
 }
 \description{
 Generate sql code for the first refresh operation.
