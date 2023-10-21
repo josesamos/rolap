@@ -265,9 +265,12 @@ set_attribute_names.star_database <-
     stopifnot("Missing dimension name." = !is.null(name))
     name <- snakecase::to_snake_case(name)
     stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+    stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
+    if (is.null(old)) {
+      old <- names(new)
+    }
     att_names <- names(db$dimensions[[name]]$table)
     old <- validate_attributes(att_names[-1], old)
-    stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
     stopifnot(
       "The number of new names must be equal to the number of names to replace." = length(old) == length(new)
     )
@@ -292,10 +295,13 @@ set_measure_names.star_database <-
     }
     name <- snakecase::to_snake_case(name)
     stopifnot("It is not a fact name." = name %in% names(db$facts))
+    stopifnot("There are repeated measures." = length(new) == length(unique(new)))
+    if (is.null(old)) {
+      old <- names(new)
+    }
     measure_names <-
       setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
     old <- validate_measures(measure_names, old)
-    stopifnot("There are repeated measures." = length(new) == length(unique(new)))
     stopifnot(
       "The number of new names must be equal to the number of names to replace." = length(old) == length(new)
     )
