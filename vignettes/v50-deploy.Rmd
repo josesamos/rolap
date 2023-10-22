@@ -104,6 +104,22 @@ mrs_sqlite_dm |>
 ```
 
 
+To better appreciate the update made, we are going to perform the same query before and after the incremental refresh operation: We obtain the design tables, along with the number of instances of each one. For the *where* dimension table, we get the names of the first cities to check that *Baltimore* and *Boston* were not included.
+
+```{r}
+l_db <- mrs_db |>
+  as_tibble_list()
+
+names <- sort(names(l_db))
+for (name in names){
+  cat(sprintf("name: %s, %d rows\n", name, nrow(l_db[[name]])))
+}
+
+cat(paste0(head(sort(l_db[['where']]$city), 15), '\n'))
+```
+
+
+
 
 ```{r}
 tables <- DBI::dbListTables(mrs_con)
@@ -179,6 +195,19 @@ mrs_db <- mrs_db |>
 ```
 
 
+Finally, we consult the same data as before again.
+
+```{r}
+l_db <- mrs_db |>
+  as_tibble_list()
+
+names <- sort(names(l_db))
+for (name in names){
+  cat(sprintf("name: %s, %d rows\n", name, nrow(l_db[[name]])))
+}
+
+cat(paste0(head(sort(l_db[['where']]$city), 15), '\n'))
+```
 
 
 
