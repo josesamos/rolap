@@ -22,16 +22,21 @@ library(rolap)
 
 Once we developed a star database in R, we would like to exploit it directly in R to develop multidimensional queries, but that is part of a future project. Currently we may be interested in deploying it in a RDBMS (*Relational Database Management Systems*) to use it with OLAP (*On-Line Analytical Processing*) query tools.
 
-The deployment process consists of exporting the tables that make up the star database to the RDBMS and also **keeping them updated**. 
+The **deployment process** consists of **exporting the tables** that make up the star database to the RDBMS and also **keeping them updated**. 
 
 The vignette titled *Incremental refresh of star databases*, `vignette("v40-refresh")`, describes how star databases can be periodically updated based on the new data obtained. These updates are transmitted to the RDBMS automatically using the procedure described in this document.
 
 
 This document shows by means of an example the possibilities offered by the package in this context. First, the starting data sets are presented. The next section shows how to generate the refresh structures. The following section shows how to perform the incremental refresh. Finally, we present how to make changes to the transformation functions and add these changes for future refresh operations. Finish with the conclusions.
 
-# Starting data sets
 
-The starting data set is the content in the variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`. It contains the constellation, formed by two star databases. Next we get their names.
+# Starting star database and deployment
+
+This section shows the starting star database and its deployment process.
+
+## Star database
+
+The starting star database is the content in the variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`. It contains the constellation, formed by two star databases. Next we get their names.
 
 ```{r}
 library(rolap)
@@ -50,34 +55,36 @@ db_dm |>
 ```
 
 
+## Deployment
 
-
+To deploy, we need a file to store the star database. In a real case, it would be a file under our control in our folder tree: we only need a file name. For the vignette, let's get a temporary one. 
 
 ```{r}
 mrs_rdb_file <- tempfile("mrs", fileext = ".rdb")
 ```
 
+We are going to carry out the deployment on SQLite. We will also need a file to store the database. As before, if we use this RDBMS, we would use a file under our control. For the vignette we will use a temporary one.
 
 ```{r}
 mrs_sqlite_file <- tempfile("mrs", fileext = ".sqlite")
 ```
 
+The deployment functions must be able to access the database that we use. To give them access to the database, we provide a connection function (it must return an object of class `DBIConnection`) and another disconnection function (it must accept a parameter of class `DBIConnection`).
 
 ```{r}
 mrs_sqlite_connect <- function() {
   DBI::dbConnect(RSQLite::SQLite(),
                  dbname = mrs_sqlite_file)
 }
-```
 
-
-```{r}
 mrs_sqlite_disconnect <- function(con) {
   DBI::dbDisconnect(con)
 }
 ```
 
+If the disconnection function is like the previous one, we could not indicate it because it is the default one.
 
+With these parameters, we deploy with the `deploy` function, as shown below.
 
 ```{r}
 mrs_db <- mrs_db |>
@@ -89,7 +96,9 @@ mrs_db <- mrs_db |>
   )
 ```
 
+As a result, fact tables and dimensions are explored to the database. The star database object is stored (in the file indicated) in a way that corresponds to the version stored in the relational database. Additionally, from this moment on, the star database and the relational database are linked so that  refresh update operations to the star database will automatically be propagated to the relational database.
 
+## Relational database content
 
 ```{r}
 mrs_con <- mrs_sqlite_connect()
