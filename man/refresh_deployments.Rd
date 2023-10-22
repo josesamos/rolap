@@ -4,10 +4,12 @@
 \alias{refresh_deployments}
 \title{Refresh deployments}
 \usage{
-refresh_deployments(db)
+refresh_deployments(db, internal)
 }
 \arguments{
 \item{db}{A \code{star_database} object.}
+
+\item{internal}{A boolean.}
 }
 \value{
 A \code{star_database} object.

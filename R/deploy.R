@@ -151,11 +151,12 @@ cancel_deployment.star_database <- function(db, name) {
 #' Generate sql code for the first refresh operation.
 #'
 #' @param db A `star_database` object.
+#' @param internal A boolean.
 #'
 #' @return A `star_database` object.
 #'
 #' @keywords internal
-refresh_deployments <- function(db) {
+refresh_deployments <- function(db, internal) {
   if (length(db$deploy$databases) > 0) {
     sql <- NULL
     for (r in seq_along(db$refresh)) {
@@ -172,6 +173,14 @@ refresh_deployments <- function(db) {
       db$deploy$databases[[d]]$disconnect(con)
       # end
       db$deploy$databases[[d]]$pending_sql <- NULL
+    }
+  }
+
+  if (length(internal) == 0) {
+    db$refresh <- list()
+  } else {
+    if (internal != 'DONTDELETE') {
+      db$refresh <- list()
     }
   }
   if (length(db$deploy$file) > 0) {

@@ -105,67 +105,68 @@ incremental_refresh.star_database <-
       dplyr::select(-tidyselect::all_of('existing_fact'))
 
     # new facts
-    db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_new)
-    facts_new <- list(facts_new)
-    names(facts_new) <- star
-    db$refresh[[length(db$refresh)]][['insert']] <-
-      c(db$refresh[[length(db$refresh)]][['insert']], facts_new)
+    if (nrow(facts_new) > 0) {
+      db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_new)
+      facts_new <- list(facts_new)
+      names(facts_new) <- star
+      db$refresh[[length(db$refresh)]][['insert']] <-
+        c(db$refresh[[length(db$refresh)]][['insert']], facts_new)
+    }
 
     # existing facts: 'replace', 'group' or 'delete'
-    if (existing_instances == 'group') {
-      db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_exist)
-      db$facts[[star]]$table <-
-        group_by_keys(
-          table = db$facts[[star]]$table,
-          keys = db$facts[[star]]$surrogate_keys,
-          measures = names(db$facts[[star]]$agg),
-          agg_functions = db$facts[[star]]$agg,
-          nrow_agg = NULL
-        )
-      facts_exist <- facts_exist |>
-        dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)) |>
-        dplyr::left_join(db$facts[[star]]$table, by = db$facts[[star]]$surrogate_keys)
-      facts_exist <- list(db$facts[[star]]$surrogate_keys, facts_exist)
-      names(facts_exist) <- c('surrogate_keys', 'table')
-      facts_exist <- list(facts_exist)
-      names(facts_exist) <- star
-      db$refresh[[length(db$refresh)]][['replace']] <-
-        c(db$refresh[[length(db$refresh)]][['replace']], facts_exist)
-    } else {
-      only_key <- facts_exist |>
-        dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
-      only_key$existing_fact <- TRUE
-      t <- db$facts[[star]]$table |>
-        dplyr::left_join(only_key, by = db$facts[[star]]$surrogate_keys)
-      t$existing_fact[is.na(t$existing_fact)] <-  FALSE
-
-      if (existing_instances == 'replace') {
-        db$facts[[star]]$table[t$existing_fact, ] <- facts_exist
+    if (nrow(facts_exist) > 0) {
+      if (existing_instances == 'group') {
+        db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_exist)
+        db$facts[[star]]$table <-
+          group_by_keys(
+            table = db$facts[[star]]$table,
+            keys = db$facts[[star]]$surrogate_keys,
+            measures = names(db$facts[[star]]$agg),
+            agg_functions = db$facts[[star]]$agg,
+            nrow_agg = NULL
+          )
+        facts_exist <- facts_exist |>
+          dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)) |>
+          dplyr::left_join(db$facts[[star]]$table, by = db$facts[[star]]$surrogate_keys)
         facts_exist <- list(db$facts[[star]]$surrogate_keys, facts_exist)
         names(facts_exist) <- c('surrogate_keys', 'table')
         facts_exist <- list(facts_exist)
         names(facts_exist) <- star
         db$refresh[[length(db$refresh)]][['replace']] <-
           c(db$refresh[[length(db$refresh)]][['replace']], facts_exist)
-      } else if (existing_instances == 'delete') {
-        db$facts[[star]]$table <- db$facts[[star]]$table[!(t$existing_fact), ]
-        facts_exist <- list(facts_exist |>
-                              dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)))
-        names(facts_exist) <- star
-        db$refresh[[length(db$refresh)]][['delete']] <-
-          c(db$refresh[[length(db$refresh)]][['delete']], facts_exist)
-        db <- purge_dimension_instances(db)
-      }
-    }
-    db <- refresh_deployments(db)
+      } else {
+        only_key <- facts_exist |>
+          dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
+        only_key$existing_fact <- TRUE
+        t <- db$facts[[star]]$table |>
+          dplyr::left_join(only_key, by = db$facts[[star]]$surrogate_keys)
+        t$existing_fact[is.na(t$existing_fact)] <-  FALSE
 
-    if (length(internal) == 0) {
-      db$refresh <- list()
-    } else {
-      if (internal[[1]] != 'DONTDELETE') {
-        db$refresh <- list()
+        if (existing_instances == 'replace') {
+          db$facts[[star]]$table[t$existing_fact, ] <- facts_exist
+          facts_exist <- list(db$facts[[star]]$surrogate_keys, facts_exist)
+          names(facts_exist) <- c('surrogate_keys', 'table')
+          facts_exist <- list(facts_exist)
+          names(facts_exist) <- star
+          db$refresh[[length(db$refresh)]][['replace']] <-
+            c(db$refresh[[length(db$refresh)]][['replace']], facts_exist)
+        } else if (existing_instances == 'delete') {
+          db$facts[[star]]$table <- db$facts[[star]]$table[!(t$existing_fact), ]
+          facts_exist <- list(facts_exist |>
+                                dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)))
+          names(facts_exist) <- star
+          db$refresh[[length(db$refresh)]][['delete']] <-
+            c(db$refresh[[length(db$refresh)]][['delete']], facts_exist)
+          db <- purge_dimension_instances(db)
+        }
       }
     }
+    if (length(internal) == 0) {
+      del <- FALSE
+    } else {
+      del <- internal[[1]]
+    }
+    db <- refresh_deployments(db, del)
     db
   }
 
@@ -185,20 +186,28 @@ generate_refresh_sql <- function(refresh) {
     if (length(refresh[[op]]) > 0) {
       if (op == "insert") {
         for (table in names(refresh[[op]])) {
-          sql <- generate_table_sql_insert(table, instances = refresh[[op]][[table]])
-          res <- c(res, sql)
+          instances <- refresh[[op]][[table]]
+          if (nrow(instances) > 0) {
+            sql <- generate_table_sql_insert(table, instances)
+            res <- c(res, sql)
+          }
         }
       } else if (op == "replace") {
         for (table in names(refresh[[op]])) {
           surrogate_keys <- refresh[[op]][[table]]$surrogate_keys
           instances <- refresh[[op]][[table]]$table
-          sql <- generate_table_sql_update(table, surrogate_keys, instances)
-          res <- c(res, sql)
+          if (nrow(instances) > 0) {
+            sql <- generate_table_sql_update(table, surrogate_keys, instances)
+            res <- c(res, sql)
+          }
         }
       } else if (op == "delete") {
         for (table in names(refresh[[op]])) {
-          sql <- generate_table_sql_delete(table, instances = refresh[[op]][[table]])
-          res <- c(res, sql)
+          instances <- refresh[[op]][[table]]
+          if (nrow(instances) > 0) {
+            sql <- generate_table_sql_delete(table, instances)
+            res <- c(res, sql)
+          }
         }
       }
     }
