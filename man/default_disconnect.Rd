@@ -13,6 +13,7 @@ default_disconnect(con)
 TRUE, invisibly.
 }
 \description{
-Generate sql code for the first refresh operation.
+Disconnect function that is used if no other is indicated in the parameter of
+the deploy function.
 }
 \keyword{internal}

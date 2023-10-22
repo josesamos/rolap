@@ -34,8 +34,10 @@ test_that("refresh", {
     incremental_refresh(mrs_db_cause_refresh, existing_instances = "group")
 
   mrs_db2 <- mrs_db2 |>
-    incremental_refresh(mrs_db_age_refresh, existing_instances = "delete") |>
-    incremental_refresh(mrs_db_cause_refresh, existing_instances = "delete")
+    incremental_refresh(mrs_db_age_refresh, existing_instances = "delete",
+                        replace_transformations = FALSE, 'DONTDELETE') |>
+    incremental_refresh(mrs_db_cause_refresh, existing_instances = "delete",
+                        replace_transformations = FALSE, 'DONTDELETE')
 
   ## ---------------------------------------------------------------------------------------
   transform_instance_table <-

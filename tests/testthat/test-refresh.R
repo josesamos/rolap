@@ -207,7 +207,9 @@ test_that("incremental_refresh() update_according_to", {
       update_according_to(f1)
 
     f1 <- f1 |>
-      incremental_refresh(f2)
+      incremental_refresh(f2,
+                          existing_instances = "ignore",
+                          replace_transformations = FALSE, 'DONTDELETE')
     f1$refresh[[1]]
   }, {
     list(
@@ -594,7 +596,8 @@ test_that("incremental_refresh() update_according_to",
               update_according_to(f1)
 
             f1 <- f1 |>
-              incremental_refresh(f2, existing_instances = "delete")
+              incremental_refresh(f2, existing_instances = "delete",
+                                  replace_transformations = FALSE, 'DONTDELETE')
 
             expect_equal({
               f1$facts

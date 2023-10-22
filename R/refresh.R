@@ -20,6 +20,7 @@
 #' "group" and "delete".
 #' @param replace_transformations A boolean, replace the `star_database`
 #' transformation code with the `star_database_update` one.
+#' @param ... internal test parameters.
 #'
 #' @return A `star_database` object.
 #'
@@ -27,7 +28,7 @@
 #'
 #' @examples
 #'
-#' f1 <-
+#' db <-
 #'   flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
 #'                                       ft_cause_rpd$WEEK != '4',]) |>
 #'   as_star_database(mrs_cause_schema_rpd) |>
@@ -36,13 +37,13 @@
 #' f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
 #'                                            ft_cause_rpd$WEEK != '2',])
 #' f2 <- f2 |>
-#'   update_according_to(f1)
+#'   update_according_to(db)
 #'
-#' f1 <- f1 |>
+#' db <- db |>
 #'   incremental_refresh(f2)
 #'
 #' @export
-incremental_refresh <- function(db, sdbu, existing_instances, replace_transformations)
+incremental_refresh <- function(db, sdbu, existing_instances, replace_transformations, ...)
   UseMethod("incremental_refresh")
 
 #' @rdname incremental_refresh
@@ -52,8 +53,9 @@ incremental_refresh.star_database <-
   function(db,
            sdbu,
            existing_instances = "ignore",
-           replace_transformations = FALSE) {
-
+           replace_transformations = FALSE,
+           ...) {
+    internal <- list(...)
     if (!(existing_instances %in% c("ignore", "replace", "group", "delete"))) {
       stop(
         sprintf(
@@ -155,6 +157,15 @@ incremental_refresh.star_database <-
         db <- purge_dimension_instances(db)
       }
     }
+    db <- refresh_deployments(db)
+
+    if (length(internal) == 0) {
+      db$refresh <- list()
+    } else {
+      if (internal[[1]] != 'DONTDELETE') {
+        db$refresh <- list()
+      }
+    }
     db
   }
 
@@ -196,7 +207,6 @@ generate_refresh_sql <- function(refresh) {
 }
 
 
-
 #' Generate table sql delete
 #'
 #' Generate sql code for deleting instances in a table.
@@ -221,7 +231,7 @@ generate_table_sql_delete <- function(table, instances) {
       }
       sql <- paste(sql, sprintf("`%s` = %s", s, instances[i, s]), sep = sep)
     }
-    sql <- paste0(sql, ";")
+    # sql <- paste0(sql, ";")
     res <- c(res, sql)
   }
   res
@@ -262,7 +272,7 @@ generate_table_sql_update <- function(table, surrogate_keys, instances) {
       }
       sql <- paste(sql, sprintf("`%s` = %s", s, instances[i, s]), sep = sep)
     }
-    sql <- paste0(sql, ";")
+    # sql <- paste0(sql, ";")
     res <- c(res, sql)
   }
   res
@@ -300,7 +310,7 @@ generate_table_sql_insert <- function(table, instances) {
     }
     dt <- paste(dt, ")", sep = "")
     if (i == n_ins) {
-      dt <- paste0(dt, ";")
+      # dt <- paste0(dt, ";")
     } else {
       dt <- paste0(dt, ", ")
     }

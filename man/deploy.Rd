@@ -25,27 +25,41 @@ parameter and close the connection.}
 A \code{star_database} object.
 }
 \description{
-Deploy a star database in a relational database
+To deploy the star database, we must indicate a name for the deployment, a
+connection function and a disconnection function from the database. If it is
+the first deployment, we must also indicate the name of a local file where the
+star database will be stored.
+}
+\details{
+If the disconnection function consists only of calling \code{DBI::dbDisconnect(con)},
+there is no need to indicate it, it is taken by default.
+
+As a result, it exports the tables from the star database to the connection
+database and from now on will keep them updated with each periodic refresh.
+Additionally, it will also keep a copy of the star database updated on file,
+which can be used when needed.
 }
 \examples{
 
-f1 <-
-  flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
-                                      ft_cause_rpd$WEEK != '4',]) |>
-  as_star_database(mrs_cause_schema_rpd) |>
-  role_playing_dimension(rpd = "When",
-                         roles = c("When Available", "When Received"))
-f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
-                                           ft_cause_rpd$WEEK != '2',])
-f2 <- f2 |>
-  update_according_to(f1)
+mrs_rdb_file <- tempfile("mrs", fileext = ".rdb")
+mrs_sqlite_file <- tempfile("mrs", fileext = ".sqlite")
 
-f1 <- f1 |>
-  incremental_refresh(f2)
+mrs_sqlite_connect <- function() {
+  DBI::dbConnect(RSQLite::SQLite(),
+                 dbname = mrs_sqlite_file)
+}
+
+mrs_db <- mrs_db |>
+  deploy(
+    name = "mrs",
+    connect = mrs_sqlite_connect,
+    file = mrs_rdb_file
+  )
 
 }
 \seealso{
 Other star database refresh functions: 
+\code{\link{cancel_deployment}()},
 \code{\link{get_existing_fact_instances}()},
 \code{\link{get_lookup_tables}()},
 \code{\link{get_new_dimension_instances}()},
@@ -54,6 +68,7 @@ Other star database refresh functions:
 \code{\link{get_transformation_code}()},
 \code{\link{get_transformation_file}()},
 \code{\link{incremental_refresh}()},
+\code{\link{load_star_database}()},
 \code{\link{update_according_to}()}
 }
 \concept{star database refresh functions}
