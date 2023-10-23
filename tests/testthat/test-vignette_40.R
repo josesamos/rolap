@@ -34,8 +34,10 @@ test_that("refresh", {
     incremental_refresh(mrs_db_cause_refresh, existing_instances = "group")
 
   mrs_db2 <- mrs_db2 |>
-    incremental_refresh(mrs_db_age_refresh, existing_instances = "delete") |>
-    incremental_refresh(mrs_db_cause_refresh, existing_instances = "delete")
+    incremental_refresh(mrs_db_age_refresh, existing_instances = "delete",
+                        replace_transformations = FALSE, 'DONTDELETE') |>
+    incremental_refresh(mrs_db_cause_refresh, existing_instances = "delete",
+                        replace_transformations = FALSE, 'DONTDELETE')
 
   ## ---------------------------------------------------------------------------------------
   transform_instance_table <-
@@ -261,6 +263,7 @@ test_that("refresh", {
 
   #############################################################
   expect_equal({
+    names(mrs_db_seg$refresh) <- names(mrs_db$refresh)
     mrs_db_seg
   },
   {
@@ -320,7 +323,7 @@ test_that("refresh", {
 
   #############################################################
   expect_equal({
-    mrs_db2$refresh$delete$when
+    mrs_db2$refresh[[2]]$delete$when
   },
   {
     structure(
@@ -337,34 +340,6 @@ test_that("refresh", {
           1332L,
           1851L,
           1901L
-        ),
-        year = c(
-          "1963",
-          "1966",
-          "1971",
-          "1976",
-          "1982",
-          "1983",
-          "1991",
-          "1996",
-          "1999",
-          "2013",
-          "2014"
-        ),
-        week = c("25", "35", "28", "48", " 5", "49", "49", "21",
-                 " 1", "26", "53"),
-        week_ending_date = c(
-          "06/22/1963",
-          "09/03/1966",
-          "07/17/1971",
-          "12/04/1976",
-          "02/06/1982",
-          "12/10/1983",
-          "12/07/1991",
-          "05/25/1996",
-          "01/09/1999",
-          "06/29/2013",
-          "01/03/2015"
         )
       ),
       row.names = c(NA,-11L),

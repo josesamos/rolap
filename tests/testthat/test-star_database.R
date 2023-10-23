@@ -59,6 +59,7 @@ test_that("star_database() define a a star database", {
         ), class = "star_schema"
       )),
       refresh = list(),
+      deploy = list(),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
@@ -182,6 +183,7 @@ test_that("star_database() define a a star database", {
         ), class = "star_schema"
       )),
       refresh = list(),
+      deploy = list(),
       facts = list(mrs_cause = structure(
         list(
           name = "MRS Cause",
@@ -307,6 +309,7 @@ test_that("snake_case() transform a a star database in snake case", {
         ), class = "star_schema"
       )),
       refresh = list(),
+      deploy = list(),
       facts = list(mrs_cause = structure(
         list(
           name = "mrs_cause",
@@ -408,6 +411,28 @@ test_that("set_attribute_names() and get_attribute_names()",
                   old = c("REGION"),
                   new = c("Region")
                 )
+              c(
+                db$operations$mrs_cause$operation$operation,
+                db |>
+                  get_attribute_names(name = "where")
+              )
+            }, {
+              c("star_database",
+                "set_attribute_names",
+                "Region",
+                "State",
+                "City")
+            })
+          })
+
+test_that("set_attribute_names() and get_attribute_names()",
+          {
+            expect_equal({
+              new <- "Region"
+              names(new) <- "REGION"
+              db <- star_database(mrs_cause_schema, ft_num) |>
+                set_attribute_names(name = "where",
+                                    new = new)
               c(
                 db$operations$mrs_cause$operation$operation,
                 db |>

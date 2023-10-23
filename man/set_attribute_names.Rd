@@ -27,6 +27,12 @@ A \code{flat_table} or \code{star_database} object.
 \description{
 Rename attributes in a flat table or a dimension in a star database.
 }
+\details{
+To rename the attributes there are three possibilities: 1) give only one vector
+with the new names for all the attributes; 2) a vector of old names and another
+of new names that must correspond; 3) a vector of new names whose names are
+the old names they replace.
+}
 \examples{
 
 db <- star_database(mrs_cause_schema, ft_num) |>
@@ -41,13 +47,25 @@ db <- star_database(mrs_cause_schema, ft_num) |>
 
 db <- star_database(mrs_cause_schema, ft_num) |>
   set_attribute_names(name = "where",
-                      old = c("REGION"),
-                      new = c("Region"))
+                      old = "REGION",
+                      new = "Region")
+
+new <- "Region"
+names(new) <- "REGION"
+db <- star_database(mrs_cause_schema, ft_num) |>
+  set_attribute_names(name = "where",
+                      new = new)
 
 ft <- flat_table('iris', iris) |>
   set_attribute_names(
-    old = c('Species'),
-    new = c('species'))
+    old = 'Species',
+    new = 'species')
+
+new <- "species"
+names(new) <- "Species"
+ft <- flat_table('iris', iris) |>
+  set_attribute_names(
+    new = new)
 
 }
 \seealso{

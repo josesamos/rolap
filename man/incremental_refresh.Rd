@@ -5,13 +5,14 @@
 \alias{incremental_refresh.star_database}
 \title{Refresh a star database in a constellation}
 \usage{
-incremental_refresh(db, sdbu, existing_instances, replace_transformations)
+incremental_refresh(db, sdbu, existing_instances, replace_transformations, ...)
 
 \method{incremental_refresh}{star_database}(
   db,
   sdbu,
   existing_instances = "ignore",
-  replace_transformations = FALSE
+  replace_transformations = FALSE,
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ of already existing facts. The possible values are: "ignore", "replace",
 
 \item{replace_transformations}{A boolean, replace the \code{star_database}
 transformation code with the \code{star_database_update} one.}
+
+\item{...}{internal test parameters.}
 }
 \value{
 A \code{star_database} object.
@@ -46,7 +49,7 @@ updates.
 }
 \examples{
 
-f1 <-
+db <-
   flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
                                       ft_cause_rpd$WEEK != '4',]) |>
   as_star_database(mrs_cause_schema_rpd) |>
@@ -55,14 +58,16 @@ f1 <-
 f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
                                            ft_cause_rpd$WEEK != '2',])
 f2 <- f2 |>
-  update_according_to(f1)
+  update_according_to(db)
 
-f1 <- f1 |>
+db <- db |>
   incremental_refresh(f2)
 
 }
 \seealso{
 Other star database refresh functions: 
+\code{\link{cancel_deployment}()},
+\code{\link{deploy}()},
 \code{\link{get_existing_fact_instances}()},
 \code{\link{get_lookup_tables}()},
 \code{\link{get_new_dimension_instances}()},
@@ -70,6 +75,7 @@ Other star database refresh functions:
 \code{\link{get_star_schema}()},
 \code{\link{get_transformation_code}()},
 \code{\link{get_transformation_file}()},
+\code{\link{load_star_database}()},
 \code{\link{update_according_to}()}
 }
 \concept{star database refresh functions}

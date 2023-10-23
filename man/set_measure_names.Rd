@@ -27,6 +27,12 @@ A \code{flat_table} or \code{star_database} object.
 \description{
 Rename measures in a flat table or in facts in a star database.
 }
+\details{
+To rename the measures there are three possibilities: 1) give only one vector
+with the new names for all the measures; 2) a vector of old names and another
+of new names that must correspond; 3) a vector of new names whose names are
+the old names they replace.
+}
 \examples{
 
 db <- star_database(mrs_cause_schema, ft_num) |>
@@ -42,6 +48,12 @@ ft <- flat_table('iris', iris) |>
   set_measure_names(
     old = c('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width'),
     new = c('pl', 'pw', 'ls', 'sw'))
+
+new <- c('pl', 'pw', 'ls', 'sw')
+names(new) <- c('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width')
+ft <- flat_table('iris', iris) |>
+  set_measure_names(
+    new = new)
 
 }
 \seealso{

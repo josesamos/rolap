@@ -119,6 +119,11 @@ get_measure_names <- function(db, name, ordered, as_definition) UseMethod("get_m
 #'
 #' Rename attributes in a flat table or a dimension in a star database.
 #'
+#' To rename the attributes there are three possibilities: 1) give only one vector
+#' with the new names for all the attributes; 2) a vector of old names and another
+#' of new names that must correspond; 3) a vector of new names whose names are
+#' the old names they replace.
+#'
 #' @param db A `flat_table` or `star_database` object.
 #' @param name A string, dimension name.
 #' @param old A vector of names.
@@ -143,13 +148,25 @@ get_measure_names <- function(db, name, ordered, as_definition) UseMethod("get_m
 #'
 #' db <- star_database(mrs_cause_schema, ft_num) |>
 #'   set_attribute_names(name = "where",
-#'                       old = c("REGION"),
-#'                       new = c("Region"))
+#'                       old = "REGION",
+#'                       new = "Region")
+#'
+#' new <- "Region"
+#' names(new) <- "REGION"
+#' db <- star_database(mrs_cause_schema, ft_num) |>
+#'   set_attribute_names(name = "where",
+#'                       new = new)
 #'
 #' ft <- flat_table('iris', iris) |>
 #'   set_attribute_names(
-#'     old = c('Species'),
-#'     new = c('species'))
+#'     old = 'Species',
+#'     new = 'species')
+#'
+#' new <- "species"
+#' names(new) <- "Species"
+#' ft <- flat_table('iris', iris) |>
+#'   set_attribute_names(
+#'     new = new)
 #'
 #' @export
 set_attribute_names <- function(db, name, old, new) UseMethod("set_attribute_names")
@@ -158,6 +175,11 @@ set_attribute_names <- function(db, name, old, new) UseMethod("set_attribute_nam
 #' Rename measures
 #'
 #' Rename measures in a flat table or in facts in a star database.
+#'
+#' To rename the measures there are three possibilities: 1) give only one vector
+#' with the new names for all the measures; 2) a vector of old names and another
+#' of new names that must correspond; 3) a vector of new names whose names are
+#' the old names they replace.
 #'
 #' @param db A `flat_table` or `star_database` object.
 #' @param name A string, fact name.
@@ -184,6 +206,12 @@ set_attribute_names <- function(db, name, old, new) UseMethod("set_attribute_nam
 #'   set_measure_names(
 #'     old = c('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width'),
 #'     new = c('pl', 'pw', 'ls', 'sw'))
+#'
+#' new <- c('pl', 'pw', 'ls', 'sw')
+#' names(new) <- c('Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width')
+#' ft <- flat_table('iris', iris) |>
+#'   set_measure_names(
+#'     new = new)
 #'
 #' @export
 set_measure_names <- function(db, name, old, new) UseMethod("set_measure_names")

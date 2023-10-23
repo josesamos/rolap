@@ -103,6 +103,7 @@ star_database_with_previous_operations <-
           lookup_tables = vector("list", length = length(schema$facts)),
           schemas = vector("list", length = length(schema$facts)),
           refresh = list(),
+          deploy = list(),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
           rpd = list()
@@ -187,6 +188,7 @@ get_star_database.star_database <- function(db, name) {
     db$lookup_tables <- db$lookup_tables[star]
     db$schemas <- db$schemas[star]
     db$refresh <- list()
+    db$deploy <- list()
     db$facts <- db$facts[star]
     dim <- NULL
     for (f in names(db$facts)) {
@@ -263,9 +265,12 @@ set_attribute_names.star_database <-
     stopifnot("Missing dimension name." = !is.null(name))
     name <- snakecase::to_snake_case(name)
     stopifnot("It is not a dimension name." = name %in% names(db$dimensions))
+    stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
+    if (is.null(old)) {
+      old <- names(new)
+    }
     att_names <- names(db$dimensions[[name]]$table)
     old <- validate_attributes(att_names[-1], old)
-    stopifnot("There are repeated attributes." = length(new) == length(unique(new)))
     stopifnot(
       "The number of new names must be equal to the number of names to replace." = length(old) == length(new)
     )
@@ -290,10 +295,13 @@ set_measure_names.star_database <-
     }
     name <- snakecase::to_snake_case(name)
     stopifnot("It is not a fact name." = name %in% names(db$facts))
+    stopifnot("There are repeated measures." = length(new) == length(unique(new)))
+    if (is.null(old)) {
+      old <- names(new)
+    }
     measure_names <-
       setdiff(names(db$facts[[name]]$table), db$facts[[name]]$surrogate_keys)
     old <- validate_measures(measure_names, old)
-    stopifnot("There are repeated measures." = length(new) == length(unique(new)))
     stopifnot(
       "The number of new names must be equal to the number of names to replace." = length(old) == length(new)
     )
@@ -681,7 +689,8 @@ add_dimension_instances <- function(db, name, table) {
     names_res <- c(names_res, d)
   }
   names(res) <- names_res
-  db$refresh[['insert']] <- c(db$refresh[['insert']], res)
+  db$refresh[[length(db$refresh)]][['insert']] <-
+    c(db$refresh[[length(db$refresh)]][['insert']], res)
   db
 }
 
@@ -749,11 +758,13 @@ purge_dimension_instances <- function(db) {
     db$dimensions[[dim]]$table <- purge_dimension(db, dim)
     deleted <- dplyr::setdiff(original, db$dimensions[[dim]]$table)
     if (nrow(deleted) > 0) {
-      res <- c(res, list(deleted))
+      res <- c(res, list(deleted |>
+                           dplyr::select(tidyselect::all_of(db$dimensions[[dim]]$surrogate_key))))
       res_names <- c(res_names, dim)
     }
   }
   names(res) <- res_names
-  db$refresh$delete <- c(db$refresh$delete, res)
+  db$refresh[[length(db$refresh)]][['delete']] <-
+    c(db$refresh[[length(db$refresh)]][['delete']], res)
   db
 }

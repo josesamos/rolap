@@ -20,6 +20,7 @@
 #' "group" and "delete".
 #' @param replace_transformations A boolean, replace the `star_database`
 #' transformation code with the `star_database_update` one.
+#' @param ... internal test parameters.
 #'
 #' @return A `star_database` object.
 #'
@@ -27,7 +28,7 @@
 #'
 #' @examples
 #'
-#' f1 <-
+#' db <-
 #'   flat_table('ft_num', ft_cause_rpd[ft_cause_rpd$City != 'Cambridge' &
 #'                                       ft_cause_rpd$WEEK != '4',]) |>
 #'   as_star_database(mrs_cause_schema_rpd) |>
@@ -36,13 +37,13 @@
 #' f2 <- flat_table('ft_num2', ft_cause_rpd[ft_cause_rpd$City != 'Bridgeport' &
 #'                                            ft_cause_rpd$WEEK != '2',])
 #' f2 <- f2 |>
-#'   update_according_to(f1)
+#'   update_according_to(db)
 #'
-#' f1 <- f1 |>
+#' db <- db |>
 #'   incremental_refresh(f2)
 #'
 #' @export
-incremental_refresh <- function(db, sdbu, existing_instances, replace_transformations)
+incremental_refresh <- function(db, sdbu, existing_instances, replace_transformations, ...)
   UseMethod("incremental_refresh")
 
 #' @rdname incremental_refresh
@@ -52,8 +53,9 @@ incremental_refresh.star_database <-
   function(db,
            sdbu,
            existing_instances = "ignore",
-           replace_transformations = FALSE) {
-
+           replace_transformations = FALSE,
+           ...) {
+    internal <- list(...)
     if (!(existing_instances %in% c("ignore", "replace", "group", "delete"))) {
       stop(
         sprintf(
@@ -72,10 +74,13 @@ incremental_refresh.star_database <-
     sdbu$combination <- check_refesh(db, sdbu$star_database)
 
     # refresh data
-    if (length(db$refresh) == 0) {
-      db$refresh <- vector("list", length = 3)
-      names(db$refresh) <- c('insert', 'replace', 'delete')
-    }
+    refresh_name <- paste0('r', snakecase::to_snake_case(paste0(Sys.time())))
+    names_refresh <- names(db$refresh)
+    names_refresh <- c(names_refresh, refresh_name)
+    l <- length(db$refresh) + 1
+    db$refresh[[l]] <- vector("list", length = 3)
+    names(db$refresh) <- names_refresh
+    names(db$refresh[[l]]) <- c('insert', 'replace', 'delete')
 
     new_dim <- get_new_dimension_instances(sdbu)
     for (d in names(new_dim)) {
@@ -100,52 +105,228 @@ incremental_refresh.star_database <-
       dplyr::select(-tidyselect::all_of('existing_fact'))
 
     # new facts
-    db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_new)
-    facts_new <- list(facts_new)
-    names(facts_new) <- star
-    db$refresh[['insert']] <- c(db$refresh[['insert']], facts_new)
+    if (nrow(facts_new) > 0) {
+      db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_new)
+      facts_new <- list(facts_new)
+      names(facts_new) <- star
+      db$refresh[[length(db$refresh)]][['insert']] <-
+        c(db$refresh[[length(db$refresh)]][['insert']], facts_new)
+    }
 
     # existing facts: 'replace', 'group' or 'delete'
-    if (existing_instances == 'group') {
-      db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_exist)
-      db$facts[[star]]$table <-
-        group_by_keys(
-          table = db$facts[[star]]$table,
-          keys = db$facts[[star]]$surrogate_keys,
-          measures = names(db$facts[[star]]$agg),
-          agg_functions = db$facts[[star]]$agg,
-          nrow_agg = NULL
-        )
-      facts_exist <- facts_exist |>
-        dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)) |>
-        dplyr::left_join(db$facts[[star]]$table, by = db$facts[[star]]$surrogate_keys)
-      facts_exist <- list(facts_exist)
-      names(facts_exist) <- star
-      db$refresh[['replace']] <- c(db$refresh[['replace']], facts_exist)
-    } else {
-      only_key <- facts_exist |>
-        dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
-      only_key$existing_fact <- TRUE
-      t <- db$facts[[star]]$table |>
-        dplyr::left_join(only_key, by = db$facts[[star]]$surrogate_keys)
-      t$existing_fact[is.na(t$existing_fact)] <-  FALSE
-
-      if (existing_instances == 'replace') {
-        db$facts[[star]]$table[t$existing_fact, ] <- facts_exist
+    if (nrow(facts_exist) > 0) {
+      if (existing_instances == 'group') {
+        db$facts[[star]]$table <- rbind(db$facts[[star]]$table, facts_exist)
+        db$facts[[star]]$table <-
+          group_by_keys(
+            table = db$facts[[star]]$table,
+            keys = db$facts[[star]]$surrogate_keys,
+            measures = names(db$facts[[star]]$agg),
+            agg_functions = db$facts[[star]]$agg,
+            nrow_agg = NULL
+          )
+        facts_exist <- facts_exist |>
+          dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)) |>
+          dplyr::left_join(db$facts[[star]]$table, by = db$facts[[star]]$surrogate_keys)
+        facts_exist <- list(db$facts[[star]]$surrogate_keys, facts_exist)
+        names(facts_exist) <- c('surrogate_keys', 'table')
         facts_exist <- list(facts_exist)
         names(facts_exist) <- star
-        db$refresh[['replace']] <- c(db$refresh[['replace']], facts_exist)
-      } else if (existing_instances == 'delete') {
-        db$facts[[star]]$table <- db$facts[[star]]$table[!(t$existing_fact), ]
-        facts_exist <- list(facts_exist |>
-                              dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)))
-        names(facts_exist) <- star
-        db$refresh[['delete']] <- c(db$refresh[['delete']], facts_exist)
-        db <- purge_dimension_instances(db)
+        db$refresh[[length(db$refresh)]][['replace']] <-
+          c(db$refresh[[length(db$refresh)]][['replace']], facts_exist)
+      } else {
+        only_key <- facts_exist |>
+          dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys))
+        only_key$existing_fact <- TRUE
+        t <- db$facts[[star]]$table |>
+          dplyr::left_join(only_key, by = db$facts[[star]]$surrogate_keys)
+        t$existing_fact[is.na(t$existing_fact)] <-  FALSE
+
+        if (existing_instances == 'replace') {
+          db$facts[[star]]$table[t$existing_fact, ] <- facts_exist
+          facts_exist <- list(db$facts[[star]]$surrogate_keys, facts_exist)
+          names(facts_exist) <- c('surrogate_keys', 'table')
+          facts_exist <- list(facts_exist)
+          names(facts_exist) <- star
+          db$refresh[[length(db$refresh)]][['replace']] <-
+            c(db$refresh[[length(db$refresh)]][['replace']], facts_exist)
+        } else if (existing_instances == 'delete') {
+          db$facts[[star]]$table <- db$facts[[star]]$table[!(t$existing_fact), ]
+          facts_exist <- list(facts_exist |>
+                                dplyr::select(tidyselect::all_of(db$facts[[star]]$surrogate_keys)))
+          names(facts_exist) <- star
+          db$refresh[[length(db$refresh)]][['delete']] <-
+            c(db$refresh[[length(db$refresh)]][['delete']], facts_exist)
+          db <- purge_dimension_instances(db)
+        }
       }
     }
+    if (length(internal) == 0) {
+      del <- FALSE
+    } else {
+      del <- internal[[1]]
+    }
+    db <- refresh_deployments(db, del)
     db
   }
+
+#' Generate refresh sql
+#'
+#' Generate sql code for the first refresh operation.
+#'
+#' @param db A list of operations over tables.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+generate_refresh_sql <- function(refresh) {
+  operations <- names(refresh)
+  res <- NULL
+  for (op in operations) {
+    if (length(refresh[[op]]) > 0) {
+      if (op == "insert") {
+        for (table in names(refresh[[op]])) {
+          instances <- refresh[[op]][[table]]
+          if (nrow(instances) > 0) {
+            sql <- generate_table_sql_insert(table, instances)
+            res <- c(res, sql)
+          }
+        }
+      } else if (op == "replace") {
+        for (table in names(refresh[[op]])) {
+          surrogate_keys <- refresh[[op]][[table]]$surrogate_keys
+          instances <- refresh[[op]][[table]]$table
+          if (nrow(instances) > 0) {
+            sql <- generate_table_sql_update(table, surrogate_keys, instances)
+            res <- c(res, sql)
+          }
+        }
+      } else if (op == "delete") {
+        for (table in names(refresh[[op]])) {
+          instances <- refresh[[op]][[table]]
+          if (nrow(instances) > 0) {
+            sql <- generate_table_sql_delete(table, instances)
+            res <- c(res, sql)
+          }
+        }
+      }
+    }
+  }
+  res
+}
+
+
+#' Generate table sql delete
+#'
+#' Generate sql code for deleting instances in a table.
+#'
+#' @param table A string, table name.
+#' @param instances A `tibble`.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+generate_table_sql_delete <- function(table, instances) {
+  surrogate_keys <- names(instances)
+  res <- NULL
+  n_ins <- nrow(instances)
+  for (i in 1:n_ins) {
+    sql <- paste0("DELETE FROM `", table, "` WHERE ")
+    for (s in surrogate_keys) {
+      if (s == surrogate_keys[1]) {
+        sep = ""
+      } else {
+        sep = " AND "
+      }
+      sql <- paste(sql, sprintf("`%s` = %s", s, instances[i, s]), sep = sep)
+    }
+    # sql <- paste0(sql, ";")
+    res <- c(res, sql)
+  }
+  res
+}
+
+
+#' Generate table sql update
+#'
+#' Generate sql code for updating a table.
+#'
+#' @param table A string, table name.
+#' @param surrogate_keys A string.
+#' @param instances A `tibble`.
+#'
+#' @return A vector of strings.
+#'
+#' @keywords internal
+generate_table_sql_update <- function(table, surrogate_keys, instances) {
+  measures <- setdiff(names(instances), surrogate_keys)
+  res <- NULL
+  n_ins <- nrow(instances)
+  for (i in 1:n_ins) {
+    sql <- paste0("UPDATE `", table, "` SET ")
+    for (m in measures) {
+      if (m == measures[1]) {
+        sep = ""
+      } else {
+        sep = ", "
+      }
+      sql <- paste(sql, sprintf("`%s` = %s", m, instances[i, m]), sep = sep)
+    }
+    sql <- paste(sql, " WHERE ", sep = "")
+    for (s in surrogate_keys) {
+      if (s == surrogate_keys[1]) {
+        sep = ""
+      } else {
+        sep = " AND "
+      }
+      sql <- paste(sql, sprintf("`%s` = %s", s, instances[i, s]), sep = sep)
+    }
+    # sql <- paste0(sql, ";")
+    res <- c(res, sql)
+  }
+  res
+}
+
+
+#' Generate table sql insert
+#'
+#' Generate sql code for inserting a table.
+#'
+#' @param table A string, table name.
+#' @param instances A `tibble`.
+#'
+#' @return A string.
+#'
+#' @keywords internal
+generate_table_sql_insert <- function(table, instances) {
+  res <-
+    paste0("INSERT INTO `",
+           table,
+           "`(`",
+           paste(names(instances), collapse = "`, `"),
+           "`) VALUES ")
+  n_att <- ncol(instances)
+  n_ins <- nrow(instances)
+  for (i in 1:n_ins) {
+    dt <- "("
+    for (j in 1:n_att) {
+      if (j == 1) {
+        sep = ""
+      } else {
+        sep = ", "
+      }
+      dt <- paste(dt, sprintf("'%s'", instances[i, j]), sep = sep)
+    }
+    dt <- paste(dt, ")", sep = "")
+    if (i == n_ins) {
+      # dt <- paste0(dt, ";")
+    } else {
+      dt <- paste0(dt, ", ")
+    }
+    res <- paste0(res, dt)
+  }
+  res
+}
 
 
 
