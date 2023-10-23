@@ -130,6 +130,15 @@ test_that("refresh", {
 
   #############################################################
   expect_equal({
+    mrs_db |> get_deployment_names()
+  },
+  {
+    "mrs"
+  })
+
+
+  #############################################################
+  expect_equal({
     names(mrs_db)
   },
   {
@@ -409,6 +418,14 @@ test_that("refresh", {
     row.names = c(NA,-15L))
   })
 
+  #############################################################
+  expect_equal({
+    res <-  mrs_db |> cancel_deployment(name = "mrs")
+    res |> get_deployment_names()
+  },
+  {
+    character(0)
+  })
 
 
   #############################################################

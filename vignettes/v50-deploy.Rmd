@@ -63,7 +63,7 @@ To deploy, we need a file to store the star database. In a real case, it would b
 mrs_rdb_file <- tempfile("mrs", fileext = ".rdb")
 ```
 
-We are going to carry out the deployment on SQLite. We will also need a file to store the database. As before, if we use this RDBMS, we would use a file under our control. For the vignette we will use a temporary one.
+We are going to carry out the deployment on *SQLite*. We will also need a file to store the database. As before, if we use this RDBMS, we would use a file under our control. For the vignette we will use a temporary one.
 
 ```{r}
 mrs_sqlite_file <- tempfile("mrs", fileext = ".sqlite")
@@ -89,7 +89,7 @@ With these parameters, we deploy with the `deploy` function, as shown below.
 ```{r}
 mrs_db <- mrs_db |>
   deploy(
-    name = "mrs",
+    name = "mrs_sqlite",
     connect = mrs_sqlite_connect,
     disconnect = mrs_sqlite_disconnect,
     file = mrs_rdb_file
@@ -150,8 +150,43 @@ mrs_sqlite_disconnect(mrs_con)
 ```
 
 
+## Another deployment
+
+We are going to carry out the deployment on *SQLite*. We will also need a file to store the database. As before, if we use this RDBMS, we would use a file under our control. For the vignette we will use a temporary one.
+
+```{r}
+mrs_sqlite_file_2 <- tempfile("mrs", fileext = ".sqlite")
+```
+
+```{r}
+mrs_sqlite_connect_2 <- function() {
+  DBI::dbConnect(RSQLite::SQLite(),
+                 dbname = mrs_sqlite_file_2)
+}
+```
+
+If the disconnection function is like the previous one, we could not indicate it because it is the default one.
+
+With these parameters, we deploy with the `deploy` function, as shown below.
+
+```{r}
+mrs_db <- mrs_db |>
+  deploy(
+    name = "mrs_sqlite_2",
+    connect = mrs_sqlite_connect_2
+  )
+```
 
 
+```{r}
+mrs_db |>
+  get_deployment_names()
+```
+
+
+# Incremental refresh
+
+## New data
 
 ```{r, echo=FALSE}
 #  mrs_ft_new: Declared as a variable instead of reading from the file due to problem building macos-latest (release)
@@ -179,7 +214,7 @@ ft <- mrs_ft_new |>
 pander::pandoc.table(head(ft), split.table = Inf)
 ```
 
-
+## Incremental refresh
 
 ```{r}
 mrs_db_age_refresh <- mrs_ft_new |>
@@ -194,15 +229,13 @@ mrs_db_cause_refresh <- mrs_ft_new |>
 
 
 
-
-
-
 ```{r}
 mrs_db <- mrs_db |>
   incremental_refresh(mrs_db_age_refresh) |>
   incremental_refresh(mrs_db_cause_refresh, existing_instances = "group")
 ```
 
+## Incremental refresh result
 
 Finally, we consult the same data as before again.
 
@@ -245,20 +278,25 @@ mrs_sqlite_disconnect(mrs_con)
 ```
 
 
+## Copy synchronization
 
 ```{r}
-saveRDS(mrs_db, mrs_rdb_file)
-# mrs_db_new <- load_star_database(mrs_rdb_file)
-mrs_db_new <- readRDS(mrs_rdb_file)
+mrs_db_new <- load_star_database(mrs_rdb_file)
 identical(mrs_db, mrs_db_new)
 ```
 
 
-
-
 ```{r}
+mrs_db_new |>
+  get_deployment_names()
+```
+
+
+
+```{r, echo = FALSE}
 unlink(mrs_rdb_file)
 unlink(mrs_sqlite_file)
+unlink(mrs_sqlite_file_2)
 ```
 
 

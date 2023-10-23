@@ -51,12 +51,12 @@ deploy <- function(db, name, connect, disconnect, file)
 deploy.star_database <-
   function(db, name, connect, disconnect = NULL, file = NULL) {
     stopifnot("Missing deployment name." = !is.null(name))
-    if (length(db$deploy) == 0 & is.null(file)) {
-      stop("Missing deployment file.")
-    }
     if (length(db$deploy) == 0) {
       db$deploy <- vector("list", length = 2)
       names(db$deploy) <- c('file', 'databases')
+      stopifnot("Missing deployment file." = !is.null(file))
+    }
+    if (!is.null(file)) {
       file <- tools::file_path_sans_ext(file)
       file <- paste0(file, '.rds')
       db$deploy$file <- file
@@ -70,7 +70,7 @@ deploy.star_database <-
       database <- vector("list", length = 3)
       names(database) <- c('connect', 'disconnect', 'pending_sql')
       db$deploy$databases <- c(db$deploy$databases, list(database))
-      names(db$deploy$databases) <- c(names(db$deploy$databases), name)
+      names(db$deploy$databases) <- c(database_names, name)
     }
     db$deploy$databases[[name]]$connect <- connect
     db$deploy$databases[[name]]$disconnect <- disconnect
@@ -143,6 +143,50 @@ cancel_deployment.star_database <- function(db, name) {
     db$deploy$databases <- db$deploy$databases[-i]
   }
   db
+}
+
+
+#' Get the names of the facts of a star database
+#'
+#' Obtain the names of the facts of a star database.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A vector of strings, fact names.
+#'
+#' @family star database definition functions
+#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#'
+#' @examples
+#'
+#'
+#' mrs_rdb_file <- tempfile("mrs", fileext = ".rdb")
+#' mrs_sqlite_file <- tempfile("mrs", fileext = ".sqlite")
+#'
+#' mrs_sqlite_connect <- function() {
+#'   DBI::dbConnect(RSQLite::SQLite(),
+#'                  dbname = mrs_sqlite_file)
+#' }
+#'
+#' mrs_db <- mrs_db |>
+#'   deploy(
+#'     name = "mrs",
+#'     connect = mrs_sqlite_connect,
+#'     file = mrs_rdb_file
+#'   )
+#'
+#' names <- mrs_db |>
+#'   get_deployment_names()
+#'
+#' @export
+get_deployment_names <- function(db)
+  UseMethod("get_deployment_names")
+
+#' @rdname get_deployment_names
+#'
+#' @export
+get_deployment_names.star_database <- function(db) {
+  sort(names(db$deploy$databases))
 }
 
 
