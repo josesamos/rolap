@@ -9,7 +9,8 @@ articles:
   v30-dim-instances: v30-dim-instances.html
   v40-refresh: v40-refresh.html
   v50-deploy: v50-deploy.html
-last_built: 2023-10-23T11:01Z
+  v60-export: v60-export.html
+last_built: 2023-10-23T19:02Z
 urls:
   reference: https://josesamos.github.io/rolap/reference
   article: https://josesamos.github.io/rolap/articles
