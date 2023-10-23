@@ -17,7 +17,7 @@ as_rdb(db, con, overwrite)
 \item{overwrite}{A boolean, allow overwriting tables in the database.}
 }
 \value{
-A list of \code{tibble}
+Invisible NULL.
 }
 \description{
 Given a connection to a relational database, it stores the facts and
@@ -29,7 +29,7 @@ my_db <- DBI::dbConnect(RSQLite::SQLite())
 
 db <- star_database(mrs_cause_schema, ft_num) |>
   snake_case()
-db <- db |>
+db |>
   as_rdb(my_db)
 
 DBI::dbDisconnect(my_db)

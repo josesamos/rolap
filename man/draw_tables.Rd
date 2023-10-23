@@ -13,7 +13,7 @@ draw_tables(db)
 \item{db}{A \code{star_database} object.}
 }
 \value{
-A \code{star_database} object.
+An object with a \code{print()} method.
 }
 \description{
 Draw the tables of the ROLAP star diagrams.
@@ -23,7 +23,7 @@ Draw the tables of the ROLAP star diagrams.
 db <- star_database(mrs_cause_schema, ft_num) |>
   snake_case()
 \donttest{
-db <- db |>
+db |>
   draw_tables()
 }
 
