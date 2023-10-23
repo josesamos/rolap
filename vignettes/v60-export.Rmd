@@ -1,0 +1,164 @@
+---
+title: "Star databases export functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Star databases export functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, message=FALSE}
+library(rolap)
+```
+
+# Introduction
+
+Once we developed a star database in R, we would like to exploit it directly in R to develop multidimensional queries, but that is part of a future project. Currently we need to export the result to other formats to be able to use other OLAP query tools. 
+
+This document shows the possibilities offered by the package in this context: Export an object of the `star_database` class to other formats. After presenting the object that we will use as an example and how to select it, a section is dedicated to each type of element obtained: `dm`, list of `tibble` objects, relational databases, *xlsx* and *csv* files. Finally, it finish with the conclusions.
+
+# Example `star_database` object
+
+The variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`, contains an object of class `star_database` that we will use in the examples.
+
+```{r}
+class(mrs_db)
+```
+
+We can see a representation of the tables it contains using the `draw_tables()` function, as shown below.
+
+```{r}
+mrs_db |>
+  draw_tables()
+```
+
+
+# Select only one star database
+
+Strictly speaking, a star database is composed of a fact table and several associated dimension tables. A constellation is made up of several star databases that can share dimensions. In the `rolap` package they are treated in a unified way under the `star_database` class: It is used both to define star databases and to define constellations.
+
+It is possible that we are interested in exporting only a star database of the constellation, or a subset of it (also a constellation). For this reason, in this situation, the first step before performing the export operation would be to select the star databases that interest us from the constellation. This operation can be carried out using the `get_star_database()` function, where the names of the star databases are indicated. The names can be obtained using the `get_fact_names()` function.
+
+```{r}
+library(rolap)
+
+mrs_db |> 
+  get_fact_names()
+```
+
+Next, we select one of the star databases (also an object of class `star_database`) and display its tables.
+
+```{r}
+mrs_cause <- mrs_db |> 
+  get_star_database("mrs_cause")
+
+class(mrs_cause)
+
+mrs_cause |>
+  draw_tables()
+```
+
+
+# `dm` class object
+
+The [`dm`](https://cran.r-project.org/package=dm) package allows us to work in R with tables that correspond to others from relational databases, both to import and export them. It also allows them to be represented graphically (the graphical representations of the tables presented in the previous section have been made using the `dm` package). 
+
+We can directly obtain an object of the `dm` class from the tables of our star databases using the `as_dm_class`() function.
+
+
+```{r}
+mrs_dm <- mrs_db |>
+  as_dm_class()
+
+class(mrs_dm)
+
+mrs_dm
+```
+
+
+# List of `tibble` objects
+
+We can generate a `tibble` list from the component tables or from the flat tables obtained from them.
+
+## From component tables
+
+Using the `as_tibble_list()` function, we get a `tibble` list with the dimension and fact tables, as shown below.
+
+```{r}
+tl <- mrs_db |>
+  as_tibble_list()
+
+tl
+```
+
+
+## From flat tables
+
+Using the `as_single_tibble_list()` function, we also get a `tibble` list but in this case the fact and dimension tables have been merged to form a flat table as shown below.
+
+
+```{r}
+tl <- mrs_db |>
+  as_single_tibble_list()
+
+tl
+```
+
+
+# Relational database
+
+To export the component tables to a relational database, we can use the `as_rdb()` function. We have to pass it as a parameter a connection to the database, which we manage.
+
+```{r}
+con <- DBI::dbConnect(RSQLite::SQLite())
+
+mrs_db |>
+  as_rdb(con)
+
+DBI::dbListTables(con)
+
+DBI::dbDisconnect(con)
+```
+
+
+Additionally, in the the vignette titled *Deployment of star databases with incremental refresh*, `vignette("v50-deploy")`, it is described how to deploy a star database in a relational database so that it is automatically updated through periodic refresh operations.
+
+
+# *xlsx* file
+
+Using the `as_xlsx_file()` function, we get an *xslx* file where each table is stored in a sheet. We have to indicate the name of the file. For the example, we select a temporary file.
+
+```{r}
+f <- mrs_db |>
+  as_xlsx_file(file = tempfile())
+
+f
+```
+
+As we can see, it is responsible for assigning the appropriate extension.
+
+# *csv* files
+
+Using the `as_csv_files()` function we can store each table in a different csv file, in the indicated folder, as shown below.
+
+```{r}
+d <- mrs_db |>
+  as_csv_files(dir = tempdir())
+
+list.files(d, pattern = "*.csv")
+```
+
+
+# Conclusions
+
+This document presents the functions to export the tables that make up the star databases to other types of formats.
+
+The objective of these functions is that the `rolap` package can be used to transform the data and that other tools can be easily used to analyse it.
+

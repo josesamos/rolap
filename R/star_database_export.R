@@ -170,7 +170,7 @@ as_single_tibble_list.star_database <- function(db) {
 #' @param con A `DBI::DBIConnection` object.
 #' @param overwrite A boolean, allow overwriting tables in the database.
 #'
-#' @return A list of `tibble`
+#' @return Invisible NULL.
 #'
 #' @family star database exportation functions
 #' @seealso \code{\link{star_database}}
@@ -181,7 +181,7 @@ as_single_tibble_list.star_database <- function(db) {
 #'
 #' db <- star_database(mrs_cause_schema, ft_num) |>
 #'   snake_case()
-#' db <- db |>
+#' db |>
 #'   as_rdb(my_db)
 #'
 #' DBI::dbDisconnect(my_db)
@@ -208,7 +208,7 @@ as_rdb.star_database <- function(db, con, overwrite = FALSE) {
   }
   db_dm <- as_dm_class(db)
   dm::copy_dm_to(con, db_dm, temporary = FALSE)
-  db
+  invisible(NULL)
 }
 
 
@@ -218,7 +218,7 @@ as_rdb.star_database <- function(db, con, overwrite = FALSE) {
 #'
 #' @param db A `star_database` object.
 #'
-#' @return A `star_database` object.
+#' @return An object with a `print()` method.
 #'
 #' @family star database exportation functions
 #' @seealso \code{\link{star_database}}
@@ -228,7 +228,7 @@ as_rdb.star_database <- function(db, con, overwrite = FALSE) {
 #' db <- star_database(mrs_cause_schema, ft_num) |>
 #'   snake_case()
 #' \donttest{
-#' db <- db |>
+#' db |>
 #'   draw_tables()
 #' }
 #'
@@ -243,7 +243,6 @@ draw_tables.star_database <- function(db) {
     as_dm_class(pk_facts = FALSE)
   db_dm |>
     dm::dm_draw(rankdir = "LR", view_type = "all")
-  db
 }
 
 
@@ -271,7 +270,7 @@ draw_tables.star_database <- function(db) {
 #'   snake_case()
 #'
 #' ct <- constellation("MRS", db1, db2)
-#' tl <- ct |>
+#' f <- ct |>
 #'   as_xlsx_file(file = tempfile())
 #'
 #' @export
@@ -339,7 +338,7 @@ as_xlsx_file.star_database <- function(db, file = NULL) {
 #'   snake_case()
 #'
 #' ct <- constellation("MRS", db1, db2)
-#' tl <- ct |>
+#' d <- ct |>
 #'   as_csv_files(dir = tempdir())
 #'
 #' @export
