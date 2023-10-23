@@ -69,7 +69,7 @@ We are going to carry out the deployment on *SQLite*. We will also need a file t
 mrs_sqlite_file <- tempfile("mrs", fileext = ".sqlite")
 ```
 
-The deployment functions must be able to access the database that we use. To give them access to the database, we provide a connection function (it must return an object of class `DBIConnection`) and another disconnection function (it must accept a parameter of class `DBIConnection`).
+The deployment functions must be able to access the database that we use. To give them access to the database, we provide a connection function (it must return an object of class `DBIConnection`) and a disconnection function (it must accept a parameter of class `DBIConnection`).
 
 ```{r}
 mrs_sqlite_connect <- function() {
@@ -96,24 +96,13 @@ mrs_db <- mrs_db |>
   )
 ```
 
-As a result, fact tables and dimensions are explored to the database. The star database object is stored (in the file indicated) in a way that corresponds to the version stored in the relational database. Additionally, from this moment on, the star database and the relational database are linked so that  refresh update operations to the star database will automatically be propagated to the relational database.
+As a result, fact and dimension tables are explored to the database. The star database object is stored (in the file indicated) so that corresponds to the version stored in the relational database. Additionally, from this moment on, the star database and the relational database are linked: refresh operations to the star database will automatically be propagated to the relational database.
 
 ## Relational database content
 
-```{r}
-mrs_con <- mrs_sqlite_connect()
-```
+Next, we are going to show the content of the star database and the associated relational database.
 
-
-
-```{r}
-mrs_sqlite_dm <- dm::dm_from_con(mrs_con, learn_keys = FALSE)
-mrs_sqlite_dm |> 
-  dm::dm_draw(rankdir = "LR", view_type = "all")
-```
-
-
-To better appreciate the update made, we are going to perform the same query before and after the incremental refresh operation: We obtain the design tables, along with the number of instances of each one. For the *where* dimension table, we get the names of the first cities to check that *Baltimore* and *Boston* were not included.
+For facts and dimensions the number of instances in the star database is shown.
 
 ```{r}
 l_db <- mrs_db |>
@@ -123,40 +112,33 @@ names <- sort(names(l_db))
 for (name in names){
   cat(sprintf("name: %s, %d rows\n", name, nrow(l_db[[name]])))
 }
-
-cat(paste0(head(sort(l_db[['where']]$city), 15), '\n'))
 ```
 
-
-
+We get the same information for the relational database.
 
 ```{r}
+mrs_con <- mrs_sqlite_connect()
+
 tables <- DBI::dbListTables(mrs_con)
 for (t in tables) {
   res <- DBI::dbGetQuery(mrs_con, sprintf('SELECT COUNT(*) FROM `%s`', t))
-  cat(sprintf("%s: %d\n",t, res[[1]]))
+  cat(sprintf("name: %s, %d rows\n", t, res[[1]]))
 }
-```
 
-
-```{r}
-DBI::dbGetQuery(mrs_con, 'SELECT city FROM `where` ORDER BY city LIMIT 15')
-```
-
-
-
-```{r}
 mrs_sqlite_disconnect(mrs_con)
 ```
 
+We can see that the tables and their number of instances are the same in both cases.
 
 ## Another deployment
 
-We are going to carry out the deployment on *SQLite*. We will also need a file to store the database. As before, if we use this RDBMS, we would use a file under our control. For the vignette we will use a temporary one.
+We can perform more than one deployment associated with a star database. Next, we get a second temporary file for the new *SQLite* relational database.
 
 ```{r}
 mrs_sqlite_file_2 <- tempfile("mrs", fileext = ".sqlite")
 ```
+
+We need a new connection function to use the new file. We define it below.
 
 ```{r}
 mrs_sqlite_connect_2 <- function() {
@@ -165,9 +147,7 @@ mrs_sqlite_connect_2 <- function() {
 }
 ```
 
-If the disconnection function is like the previous one, we could not indicate it because it is the default one.
-
-With these parameters, we deploy with the `deploy` function, as shown below.
+In this case we are going to use the default disconnection function and, since a previous deployment has already been carried out, we do not need to indicate any file to store the star database. The call to the display function is as shown below.
 
 ```{r}
 mrs_db <- mrs_db |>
