@@ -31,6 +31,9 @@
     <loc>https://josesamos.github.io/rolap/articles/v40-refresh.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/articles/v50-deploy.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/authors.html</loc>
   </url>
   <url>
@@ -76,6 +79,9 @@
     <loc>https://josesamos.github.io/rolap/reference/as_xlsx_file.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/cancel_deployment.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/check_lookup_table.html</loc>
   </url>
   <url>
@@ -94,10 +100,16 @@
     <loc>https://josesamos.github.io/rolap/reference/db_summary.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/default_disconnect.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/define_dimension.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/define_facts.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/deploy.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/dimension_schema.html</loc>
@@ -136,6 +148,18 @@
     <loc>https://josesamos.github.io/rolap/reference/ft_num.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/generate_refresh_sql.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/generate_table_sql_delete.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/generate_table_sql_insert.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/generate_table_sql_update.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_agg_functions.fact_schema.html</loc>
   </url>
   <url>
@@ -152,6 +176,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_default_unknown_value.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_deployment_names.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_dimension_name.dimension_schema.html</loc>
@@ -340,6 +367,9 @@
     <loc>https://josesamos.github.io/rolap/reference/line_last_op.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/load_star_database.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/lookup_table.html</loc>
   </url>
   <url>
@@ -383,6 +413,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/reformat_file.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/refresh_deployments.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/remove_all_measures_na.html</loc>
