@@ -20,9 +20,9 @@ Data base in \code{dm} format with a summary from the data available at the sour
 The development has been done in the vignette \code{vignette("v20-rdbms-dm")}.
 }
 \seealso{
-Other database example data: 
+Other debit card example data: 
 \code{\link{db_finest}},
 \code{\link{db_summary}}
 }
-\concept{database example data}
+\concept{debit card example data}
 \keyword{datasets}

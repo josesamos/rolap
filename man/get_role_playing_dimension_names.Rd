@@ -38,9 +38,14 @@ rpd <- constellation("MRS", db1, db2) |>
 
 }
 \seealso{
-\code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+\code{\link{star_schema}}, \code{\link{flat_table}}
 
-Other star database and constellation definition functions: 
-\code{\link{constellation}()}
+Other star database definition functions: 
+\code{\link{get_dimension_names}()},
+\code{\link{get_fact_names}()},
+\code{\link{get_table_names}()},
+\code{\link{group_dimension_instances}()},
+\code{\link{role_playing_dimension}()},
+\code{\link{star_database}()}
 }
-\concept{star database and constellation definition functions}
+\concept{star database definition functions}

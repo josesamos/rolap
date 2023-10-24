@@ -9,6 +9,7 @@
 #' @return A `star_database` object.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'

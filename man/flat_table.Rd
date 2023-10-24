@@ -23,7 +23,8 @@ Creates a \code{flat_table} object.
 \details{
 The objective is to allow the transformation of flat tables.
 
-We can also indicate the value that is used in the data with undefined values.
+We indicate the name of the flat table and we can also give the value that
+will be used to replace NA or empty values.
 }
 \examples{
 

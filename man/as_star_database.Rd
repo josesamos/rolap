@@ -27,7 +27,7 @@ db <- flat_table('ft_num', ft_num) |>
 
 }
 \seealso{
-\code{\link{star_schema}}, \code{\link{star_database}}
+\code{\link{star_database}}
 
 Other flat table definition functions: 
 \code{\link{flat_table}()},

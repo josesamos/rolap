@@ -52,7 +52,7 @@ star_schema <- function() {
 #' @return A `star_schema` object.
 #'
 #' @family star schema definition functions
-#' @seealso \code{\link{fact_schema}}
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -119,7 +119,7 @@ define_facts.star_schema <-
 #' @return A `star_schema` object.
 #'
 #' @family star schema definition functions
-#' @seealso \code{\link{dimension_schema}}
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'

@@ -72,7 +72,7 @@ s <- s |>
   define_facts(f)
 }
 \seealso{
-\code{\link{fact_schema}}
+\code{\link{star_database}}
 
 Other star schema definition functions: 
 \code{\link{define_dimension}()},

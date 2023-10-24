@@ -50,7 +50,7 @@ s <- s |>
   define_dimension(d)
 }
 \seealso{
-\code{\link{dimension_schema}}
+\code{\link{star_database}}
 
 Other star schema definition functions: 
 \code{\link{define_facts}()},

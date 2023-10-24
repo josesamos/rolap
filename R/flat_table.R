@@ -4,7 +4,8 @@
 #'
 #' The objective is to allow the transformation of flat tables.
 #'
-#' We can also indicate the value that is used in the data with undefined values.
+#' We indicate the name of the flat table and we can also give the value that
+#' will be used to replace NA or empty values.
 #'
 #' @param name A string.
 #' @param instances A `tibble`, table of instances.
@@ -263,7 +264,7 @@ replace_attribute_values.flat_table <- function(db, name = NULL, attributes = NU
 #' @return A `tibble`, the table.
 #'
 #' @family flat table definition functions
-#' @seealso \code{\link{select_attributes}}, \code{\link{select_measures}}
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -289,7 +290,7 @@ get_table.flat_table <- function(ft) {
 #' @return A string.
 #'
 #' @family flat table definition functions
-#' @seealso \code{\link{select_attributes}}, \code{\link{select_measures}}
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -322,7 +323,7 @@ get_unknown_value_defined.flat_table <- function(ft) {
 #' @return A `tibble` with unknown values in instances.
 #'
 #' @family flat table definition functions
-#' @seealso \code{\link{replace_empty_values}}
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -364,7 +365,7 @@ get_unknown_values.flat_table <- function(ft, attributes = NULL, col_as_vector =
 #' @return A `star_database` object.
 #'
 #' @family flat table definition functions
-#' @seealso \code{\link{star_schema}}, \code{\link{star_database}}
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'

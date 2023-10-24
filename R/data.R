@@ -329,7 +329,7 @@
 #'
 #' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
-#' @family database example data
+#' @family debit card example data
 #'
 #' @format A `star_database`.
 #' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
@@ -342,7 +342,7 @@
 #'
 #' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
-#' @family database example data
+#' @family debit card example data
 #'
 #' @format A `star_database`.
 #' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
@@ -354,7 +354,7 @@
 #'
 #' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
 #'
-#' @family database example data
+#' @family debit card example data
 #'
 #' @format A `star_database`.
 #' @source \url{https://relational.fit.cvut.cz/dataset/CCS}

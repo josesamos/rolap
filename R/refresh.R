@@ -25,6 +25,7 @@
 #' @return A `star_database` object.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -399,6 +400,7 @@ check_refesh <- function(db, refresh_db) {
 #' @return A `tibble` object.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -451,6 +453,7 @@ get_existing_fact_instances.star_database_update <- function(sdbu) {
 #' @return A list of `tibble` objects.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -506,6 +509,7 @@ get_new_dimension_instances.star_database_update <- function(sdbu) {
 #' @return A vector of strings.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -544,6 +548,7 @@ get_transformation_code.star_database_update <- function(sdbu) {
 #' @return A string, file name.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -594,6 +599,7 @@ get_star_database.star_database_update <- function(db, name = NULL) {
 #' @return A list of `flat_table` objects.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -625,6 +631,7 @@ get_lookup_tables.star_database_update <- function(sdbu) {
 #' @return A `star_schema` object.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
