@@ -17,7 +17,7 @@
 #' @return A `star_database` object.
 #'
 #' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}, \code{\link{star_schema}}, \code{\link{flat_table}}
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
 #'
 #' @examples
 #'
@@ -134,7 +134,7 @@ star_database_with_previous_operations <-
     keys <- c()
     for (d in names(schema$dimensions)) {
       # generate dimension table
-      dim_name <- get_dimension_name(schema$dimensions[[d]])
+      dim_name <- schema$dimensions[[d]]$name
       dim_attributes <-
         get_attribute_names_schema(schema$dimensions[[d]])
       db$dimensions[[d]] <-
@@ -494,7 +494,7 @@ replace_attribute_values.star_database <-
 #' @return A vector of strings, dimension names.
 #'
 #' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
 #'
 #' @examples
 #'
@@ -522,7 +522,7 @@ get_dimension_names.star_database <- function(db, star = NULL) {
 #' @return A vector of strings, fact names.
 #'
 #' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
 #'
 #' @examples
 #'
@@ -550,7 +550,7 @@ get_fact_names.star_database <- function(db) {
 #' @return A vector of strings, table names.
 #'
 #' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
 #'
 #' @examples
 #'
@@ -580,7 +580,7 @@ get_table_names.star_database <- function(db) {
 #' @return A `star_database` object.
 #'
 #' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
 #'
 #' @examples
 #'

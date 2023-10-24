@@ -25,7 +25,7 @@ table <- flat_table('iris', iris) |>
 
 }
 \seealso{
-\code{\link{select_attributes}}, \code{\link{select_measures}}
+\code{\link{star_database}}
 
 Other flat table definition functions: 
 \code{\link{as_star_database}()},

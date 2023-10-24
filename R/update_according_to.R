@@ -13,6 +13,7 @@
 #' @return A `star_database_update` object.
 #'
 #' @family star database refresh functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'

@@ -36,7 +36,7 @@ instances <- flat_table('iris', iris2) |>
 
 }
 \seealso{
-\code{\link{replace_empty_values}}
+\code{\link{star_database}}
 
 Other flat table definition functions: 
 \code{\link{as_star_database}()},

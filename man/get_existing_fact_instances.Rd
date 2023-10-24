@@ -43,9 +43,9 @@ fact_instances <- f2 |>
 
 }
 \seealso{
+\code{\link{star_database}}
+
 Other star database refresh functions: 
-\code{\link{cancel_deployment}()},
-\code{\link{deploy}()},
 \code{\link{get_lookup_tables}()},
 \code{\link{get_new_dimension_instances}()},
 \code{\link{get_star_database}()},
@@ -53,7 +53,6 @@ Other star database refresh functions:
 \code{\link{get_transformation_code}()},
 \code{\link{get_transformation_file}()},
 \code{\link{incremental_refresh}()},
-\code{\link{load_star_database}()},
 \code{\link{update_according_to}()}
 }
 \concept{star database refresh functions}

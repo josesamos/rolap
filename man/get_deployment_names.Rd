@@ -41,14 +41,11 @@ names <- mrs_db |>
 
 }
 \seealso{
-\code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+\code{\link{star_database}}
 
-Other star database definition functions: 
-\code{\link{get_dimension_names}()},
-\code{\link{get_fact_names}()},
-\code{\link{get_table_names}()},
-\code{\link{group_dimension_instances}()},
-\code{\link{role_playing_dimension}()},
-\code{\link{star_database}()}
+Other star database deployment functions: 
+\code{\link{cancel_deployment}()},
+\code{\link{deploy}()},
+\code{\link{load_star_database}()}
 }
-\concept{star database definition functions}
+\concept{star database deployment functions}

@@ -20,9 +20,9 @@ Multidimensional design with a summary from the data available at the source.
 The development has been done in the vignette \code{vignette("v20-rdbms-dm")}.
 }
 \seealso{
-Other database example data: 
+Other debit card example data: 
 \code{\link{db_finest}},
 \code{\link{transactions_db}}
 }
-\concept{database example data}
+\concept{debit card example data}
 \keyword{datasets}

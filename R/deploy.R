@@ -22,7 +22,8 @@
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database refresh functions
+#' @family star database deployment functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -105,7 +106,8 @@ default_disconnect <- function(con) {
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database refresh functions
+#' @family star database deployment functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -154,8 +156,8 @@ cancel_deployment.star_database <- function(db, name) {
 #'
 #' @return A vector of strings, fact names.
 #'
-#' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#' @family star database deployment functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'
@@ -241,7 +243,8 @@ refresh_deployments <- function(db, internal) {
 #'
 #' @return A `star_database` object.
 #'
-#' @family star database refresh functions
+#' @family star database deployment functions
+#' @seealso \code{\link{star_database}}
 #'
 #' @examples
 #'

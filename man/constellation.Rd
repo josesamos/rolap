@@ -15,9 +15,10 @@ constellation(name = NULL, ...)
 A \code{star_database} object.
 }
 \description{
-Creates a constellation from a list of \code{star_database} objects. All
-dimensions with the same name in the star schemas have to be conformable
-(share the same structure, even though they have different instances).
+Creates a constellation from a list of \code{star_database} objects. A constellation
+is also represented by a \code{star_database} object. All dimensions with the same
+name in the star schemas have to be conformable (share the same structure, even
+though they have different instances).
 }
 \examples{
 
@@ -44,8 +45,5 @@ ct2 <- constellation("MRS", db3, db4)
 }
 \seealso{
 \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
-
-Other star database and constellation definition functions: 
-\code{\link{get_role_playing_dimension_names}()}
 }
 \concept{star database and constellation definition functions}

@@ -15,7 +15,7 @@
 #' @return A `star_database` object.
 #'
 #' @family star database definition functions
-#' @seealso \code{\link{as_tibble_list}}, \code{\link{as_dm_class}}
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
 #'
 #' @examples
 #'

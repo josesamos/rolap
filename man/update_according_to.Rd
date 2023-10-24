@@ -41,9 +41,9 @@ f2 <- flat_table('ft_num2', ft_cause_rpd) |>
 
 }
 \seealso{
+\code{\link{star_database}}
+
 Other star database refresh functions: 
-\code{\link{cancel_deployment}()},
-\code{\link{deploy}()},
 \code{\link{get_existing_fact_instances}()},
 \code{\link{get_lookup_tables}()},
 \code{\link{get_new_dimension_instances}()},
@@ -51,7 +51,6 @@ Other star database refresh functions:
 \code{\link{get_star_schema}()},
 \code{\link{get_transformation_code}()},
 \code{\link{get_transformation_file}()},
-\code{\link{incremental_refresh}()},
-\code{\link{load_star_database}()}
+\code{\link{incremental_refresh}()}
 }
 \concept{star database refresh functions}

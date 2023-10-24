@@ -36,17 +36,11 @@ mrs_db2 <- load_star_database(mrs_rdb_file)
 
 }
 \seealso{
-Other star database refresh functions: 
+\code{\link{star_database}}
+
+Other star database deployment functions: 
 \code{\link{cancel_deployment}()},
 \code{\link{deploy}()},
-\code{\link{get_existing_fact_instances}()},
-\code{\link{get_lookup_tables}()},
-\code{\link{get_new_dimension_instances}()},
-\code{\link{get_star_database}()},
-\code{\link{get_star_schema}()},
-\code{\link{get_transformation_code}()},
-\code{\link{get_transformation_file}()},
-\code{\link{incremental_refresh}()},
-\code{\link{update_according_to}()}
+\code{\link{get_deployment_names}()}
 }
-\concept{star database refresh functions}
+\concept{star database deployment functions}

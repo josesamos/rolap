@@ -38,9 +38,9 @@ file <- f2 |>
 
 }
 \seealso{
+\code{\link{star_database}}
+
 Other star database refresh functions: 
-\code{\link{cancel_deployment}()},
-\code{\link{deploy}()},
 \code{\link{get_existing_fact_instances}()},
 \code{\link{get_lookup_tables}()},
 \code{\link{get_new_dimension_instances}()},
@@ -48,7 +48,6 @@ Other star database refresh functions:
 \code{\link{get_star_schema}()},
 \code{\link{get_transformation_code}()},
 \code{\link{incremental_refresh}()},
-\code{\link{load_star_database}()},
 \code{\link{update_according_to}()}
 }
 \concept{star database refresh functions}
