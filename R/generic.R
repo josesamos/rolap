@@ -388,12 +388,3 @@ get_unique_attribute_values <- function(db, name, attributes, col_as_vector) Use
 #' @export
 replace_attribute_values <- function(db, name, attributes, old, new) UseMethod("replace_attribute_values")
 
-
-# Internal ---------------------------------------------------------------------
-
-get_measure_names_schema <- function(schema) UseMethod("get_measure_names_schema")
-
-get_attribute_names_schema <- function(schema) UseMethod("get_attribute_names_schema")
-
-snake_case_table <- function(table) UseMethod("snake_case_table")
-

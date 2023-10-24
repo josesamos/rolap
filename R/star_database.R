@@ -134,7 +134,7 @@ star_database_with_previous_operations <-
     keys <- c()
     for (d in names(schema$dimensions)) {
       # generate dimension table
-      dim_name <- get_dimension_name(schema$dimensions[[d]])
+      dim_name <- schema$dimensions[[d]]$name
       dim_attributes <-
         get_attribute_names_schema(schema$dimensions[[d]])
       db$dimensions[[d]] <-
