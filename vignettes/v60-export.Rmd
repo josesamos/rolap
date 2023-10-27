@@ -1,8 +1,8 @@
 ---
-title: "Star databases export functions"
+title: "Star Database Export Features"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Star databases export functions}
+  %\VignetteIndexEntry{Star Database Export Features}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

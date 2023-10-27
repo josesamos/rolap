@@ -361,3 +361,17 @@
 "transactions_db"
 
 
+#' Census of US States, by sex and age
+#'
+#' Census of US States, by sex and age, obtained from the United States Census
+#' Bureau (USCB), American Community Survey (ACS).
+#'
+#' Obtained from the variables defined in reports, classifying the concepts
+#' according to the defined subjects.
+#'
+#' @format A `tibble`.
+#' @source
+#'   \url{https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-data.2021.html}
+"us_census_state"
+
+

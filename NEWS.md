@@ -1,6 +1,8 @@
 # rolap (development version)
 * Functions to deploy a star database in one or more relational databases: `deploy()`, `cancel_deployment()`, `get_deployment_names()`, `load_star_database()`.
-* Vignette about star databases deployment process.
+* Vignette about star database deployment process.
+* Vignette about star database export features.
+* US census flat table dataset.
 * New functions: `get_star_database()`, `as_rdb()`, `draw_tables()`.
 * Fix `snake_case()` register refresh operation for constellation case.
 * Fix `constellation()` refresh structure integration.
