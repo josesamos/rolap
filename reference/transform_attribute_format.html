@@ -72,7 +72,8 @@
 <span>  <span class="va">width</span>,</span>
 <span>  <span class="va">decimal_places</span>,</span>
 <span>  <span class="va">k_sep</span>,</span>
-<span>  <span class="va">decimal_sep</span></span>
+<span>  <span class="va">decimal_sep</span>,</span>
+<span>  <span class="va">space_filling</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for flat_table</span></span>
@@ -82,7 +83,8 @@
 <span>  width <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  decimal_places <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  k_sep <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  decimal_sep <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  decimal_sep <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  space_filling <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -110,6 +112,10 @@
 
 <dt>decimal_sep</dt>
 <dd><p>A character, indicates decimal separator.</p></dd>
+
+
+<dt>space_filling</dt>
+<dd><p>A boolean, fill on the left with spaces (with '0' otherwise).</p></dd>
 
 </dl></div>
     <div class="section level2">
