@@ -20,6 +20,6 @@ A flat table.
 }
 \description{
 operation,                   name,       details,                  details2
-"transform_attribute_format", attributes, c(width, decimal_places), c(k_sep, decimal_sep)
+"transform_attribute_format", attributes, c(width, decimal_places), c(k_sep, decimal_sep, space_filling)
 }
 \keyword{internal}

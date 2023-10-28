@@ -11,7 +11,8 @@ transform_attribute_format(
   width,
   decimal_places,
   k_sep,
-  decimal_sep
+  decimal_sep,
+  space_filling
 )
 
 \method{transform_attribute_format}{flat_table}(
@@ -20,7 +21,8 @@ transform_attribute_format(
   width = 1,
   decimal_places = 0,
   k_sep = NULL,
-  decimal_sep = NULL
+  decimal_sep = NULL,
+  space_filling = TRUE
 )
 }
 \arguments{
@@ -35,6 +37,8 @@ transform_attribute_format(
 \item{k_sep}{A character, indicates thousands separator.}
 
 \item{decimal_sep}{A character, indicates decimal separator.}
+
+\item{space_filling}{A boolean, fill on the left with spaces (with '0' otherwise).}
 }
 \value{
 ft A \code{flat_table} object.

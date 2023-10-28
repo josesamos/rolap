@@ -478,6 +478,7 @@ transform_to_measure.flat_table <-
 #' @param decimal_places An integer, number of decimal places.
 #' @param k_sep A character, indicates thousands separator.
 #' @param decimal_sep A character, indicates decimal separator.
+#' @param space_filling A boolean, fill on the left with spaces (with '0' otherwise).
 #'
 #' @return ft A `flat_table` object.
 #'
@@ -495,7 +496,7 @@ transform_to_measure.flat_table <-
 #'   )
 #'
 #' @export
-transform_attribute_format <- function(ft, attributes, width, decimal_places, k_sep, decimal_sep) UseMethod("transform_attribute_format")
+transform_attribute_format <- function(ft, attributes, width, decimal_places, k_sep, decimal_sep, space_filling) UseMethod("transform_attribute_format")
 
 #' @rdname transform_attribute_format
 #'
@@ -506,7 +507,8 @@ transform_attribute_format.flat_table <-
            width = 1,
            decimal_places = 0,
            k_sep = NULL,
-           decimal_sep = NULL) {
+           decimal_sep = NULL,
+           space_filling = TRUE) {
     if (decimal_places > 0 & is.null(decimal_sep)) {
       decimal_sep = '.'
     }
@@ -604,6 +606,9 @@ transform_attribute_format.flat_table <-
           }
         }
       }
+      if (!space_filling) {
+        values2 <- gsub(" ", "0", values2)
+      }
       ft$table[, measure][[1]] <-
         gsub("NA", ft$unknown_value, values2)
     }
@@ -615,7 +620,7 @@ transform_attribute_format.flat_table <-
         c(width,
           decimal_places),
         c(k_sep,
-          decimal_sep)
+          decimal_sep, space_filling)
       )
     ft
   }

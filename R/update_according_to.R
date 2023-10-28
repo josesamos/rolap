@@ -198,7 +198,7 @@ interpret_operation_transform_to_measure <- function(ft, op, file, last_op) {
 #' Interpret operation
 #'
 #'  operation,                   name,       details,                  details2
-#' "transform_attribute_format", attributes, c(width, decimal_places), c(k_sep, decimal_sep)
+#' "transform_attribute_format", attributes, c(width, decimal_places), c(k_sep, decimal_sep, space_filling)
 #'
 #' @param ft flat table
 #' @param op operation
@@ -215,6 +215,7 @@ interpret_operation_transform_attribute_format <- function(ft, op, file, last_op
   details2 <- string_to_vector(op$details2)
   k_sep <- details2[1]
   decimal_sep <- details2[2]
+  space_filling <- as.logical(string_to_vector(details2[3]))
   if (!is.null(file)) {
     l <- c(
       paste0("  ", op$operation, "("),
@@ -222,13 +223,14 @@ interpret_operation_transform_attribute_format <- function(ft, op, file, last_op
       paste0("    width = ", sprintf('%d,', width)),
       paste0("    decimal_places = ", sprintf('%d,', decimal_places)),
       paste0("    k_sep = ", string_or_null(k_sep)),
-      paste0("    decimal_sep = ", string_or_null(decimal_sep, last = TRUE)),
+      paste0("    decimal_sep = ", string_or_null(decimal_sep)),
+      paste0("    space_filling = ", sprintf('%s', deparse(space_filling))),
       line_last_op(last_op)
     )
     l <- gsub("c('')", "NULL", l, fixed = TRUE)
     writeLines(l, file)
   }
-  transform_attribute_format(ft, attributes, width, decimal_places, k_sep, decimal_sep)
+  transform_attribute_format(ft, attributes, width, decimal_places, k_sep, decimal_sep, space_filling)
 }
 
 
