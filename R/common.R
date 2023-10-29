@@ -132,6 +132,9 @@ transform_names <- function(names, ordered, as_definition) {
     v <- add_dput_column(v, column = 'vector')
     names <- v$vector
   }
+  if (length(names) == 0) {
+    names <- NULL
+  }
   names
 }
 

@@ -4,6 +4,9 @@
 #' group the records so that they form a primary key. To carry out the groupings,
 #' aggregation functions for attributes and measures must be provided.
 #'
+#' If the table does not have measures, attributes with equal values are grouped
+#' without the need to indicate a grouping function.
+#'
 #' If no attribute is indicated, all the attributes are considered to form the
 #' primary key.
 #'
@@ -43,6 +46,9 @@ lookup_table.flat_table <-
     pk_attributes <- validate_attributes(ft$attributes, pk_attributes)
     ft$pk_attributes <- pk_attributes
     ft$table <- replace_empty_values_table(ft$table, pk_attributes, unknown_value = ft$unknown_value)
+    if (length(ft$measures) == 0) {
+      ft$table <- unique(ft$table)
+    }
     pk <- unique(ft$table[, pk_attributes])
     if (nrow(pk) < nrow(ft$table)) {
       if (length(pk_attributes) == length(ft$attributes) + length(ft$measures)) {

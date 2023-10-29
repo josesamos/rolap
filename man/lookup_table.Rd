@@ -45,6 +45,9 @@ group the records so that they form a primary key. To carry out the groupings,
 aggregation functions for attributes and measures must be provided.
 }
 \details{
+If the table does not have measures, attributes with equal values are grouped
+without the need to indicate a grouping function.
+
 If no attribute is indicated, all the attributes are considered to form the
 primary key.
 }
