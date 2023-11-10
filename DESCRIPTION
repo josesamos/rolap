@@ -22,6 +22,7 @@ Depends:
 Imports: 
     dm,
     dplyr,
+    geomultistar,
     methods,
     purrr,
     readr,

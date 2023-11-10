@@ -22,7 +22,7 @@ library(rolap)
 
 Once we developed a star database in R, we would like to exploit it directly in R to develop multidimensional queries, but that is part of a future project. Currently we need to export the result to other formats to be able to use other OLAP query tools. 
 
-This document shows the possibilities offered by the package in this context: Export an object of the `star_database` class to other formats. After presenting the object that we will use as an example and how to select it, a section is dedicated to each type of element obtained: `dm`, list of `tibble` objects, relational databases, *xlsx* and *csv* files. Finally, it finish with the conclusions.
+This document shows the possibilities offered by the package in this context: Export an object of the `star_database` class to other formats. After presenting the object that we will use as an example and how to select it, a section is dedicated to each type of element obtained: `dm`, list of `tibble` objects, relational databases, *xlsx* and *csv* files, and `geomultistar::multistar` object. Finally, it finish with the conclusions.
 
 # Example `star_database` object
 
@@ -153,6 +153,18 @@ d <- mrs_db |>
   as_csv_files(dir = tempdir())
 
 list.files(d, pattern = "*.csv")
+```
+
+
+# `geomultistar::multistar` object
+
+Using the `as_multistar()` function we can get a `geomultistar::multistar` object; with this object we can use the query and integration functions with geographic information offered by the [`geomultistar`](https://CRAN.R-project.org/package=geomultistar) package. 
+
+```{r}
+ms <- mrs_db |>
+  as_multistar()
+
+class(ms)
 ```
 
 

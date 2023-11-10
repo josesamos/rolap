@@ -363,3 +363,59 @@ as_csv_files.star_database <- function(db, dir = NULL, type = 1) {
   }
   dir
 }
+
+
+
+#' Generate a `geomultistar::multistar` object
+#'
+#' In order to be able to use the query and integration functions with geographic
+#' information offered by the `geomultistar` package, we can obtain a `multistar`
+#' object from a star database or a constellation.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `geomultistar::multistar` object.
+#'
+#' @family star database exportation functions
+#' @seealso \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' ms1 <- db1 |>
+#'   as_multistar()
+#'
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#'
+#' ct <- constellation("MRS", db1, db2)
+#' ms <- ct |>
+#'   as_multistar()
+#'
+#' @export
+as_multistar <- function(db) UseMethod("as_multistar")
+
+#' @rdname as_multistar
+#'
+#' @export
+as_multistar.star_database <- function(db) {
+  dim <- NULL
+  dim_names <- NULL
+  for (d in names(db$dimensions)) {
+    dim <- c(dim, list(db$dimensions[[d]]$table))
+    dim_names <- c(dim_names, d)
+  }
+  names(dim) <- dim_names
+
+  fct <- NULL
+  fct_names <- NULL
+  for (f in names(db$facts)) {
+    fct <- c(fct, list(db$facts[[f]]$table))
+    fct_names <- c(fct_names, f)
+  }
+  names(fct) <- fct_names
+
+  geomultistar:::new_multistar(fct, dim)
+}
+

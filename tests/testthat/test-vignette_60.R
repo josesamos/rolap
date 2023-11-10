@@ -105,3 +105,51 @@ test_that("refresh", {
 
   #############################################################
 })
+
+
+test_that("as_multistar()",
+          {
+            db1 <- star_database(mrs_cause_schema, ft_num) |>
+              snake_case()
+            ms1 <- db1 |>
+              as_multistar()
+
+            db2 <- star_database(mrs_age_schema, ft_age) |>
+              snake_case()
+
+            ct <- constellation("MRS", db1, db2)
+            ms <- ct |>
+              as_multistar()
+
+            expect_equal({
+              class(ms1) == "multistar" & class(ms) == "multistar"
+            }, {
+              TRUE
+            })
+
+            expect_equal({
+              names(ms1)
+            }, {
+              c("fact", "dimension")
+            })
+
+            expect_equal({
+              names(ms)
+            }, {
+              c("fact", "dimension")
+            })
+
+            expect_equal({
+              names(ms$fact)
+            }, {
+              c("mrs_cause", "mrs_age")
+            })
+
+            expect_equal({
+              names(ms$dimension)
+            }, {
+              c("when", "where", "who")
+            })
+
+          })
+
