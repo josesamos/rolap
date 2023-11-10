@@ -403,7 +403,14 @@ as_multistar.star_database <- function(db) {
   dim <- NULL
   dim_names <- NULL
   for (d in names(db$dimensions)) {
-    dim <- c(dim, list(db$dimensions[[d]]$table))
+    dimension <-
+      structure(
+        db$dimensions[[d]]$table,
+        class = unique(append(class(db$dimensions[[d]]$table), "dimension_table")),
+        name = d,
+        type = "general"
+      )
+    dim <- c(dim, list(dimension))
     dim_names <- c(dim_names, d)
   }
   names(dim) <- dim_names
@@ -411,7 +418,18 @@ as_multistar.star_database <- function(db) {
   fct <- NULL
   fct_names <- NULL
   for (f in names(db$facts)) {
-    fct <- c(fct, list(db$facts[[f]]$table))
+    measures <- names(db$facts[[f]]$agg)
+    fact <-
+      structure(
+        db$facts[[f]]$table,
+        class = unique(append(class(db$facts[[f]]$table), "fact_table")),
+        name = f,
+        foreign_keys = db$facts[[f]]$surrogate_keys,
+        measures = measures,
+        agg_functions = db$facts[[f]]$agg,
+        nrow_agg = measures[length(measures)]
+      )
+    fct <- c(fct, list(fact))
     fct_names <- c(fct_names, f)
   }
   names(fct) <- fct_names

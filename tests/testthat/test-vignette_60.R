@@ -151,5 +151,17 @@ test_that("as_multistar()",
               c("when", "where", "who")
             })
 
+            expect_equal({
+              class(ms1$fact[[1]])
+            }, {
+              c("tbl_df", "tbl", "data.frame", "fact_table")
+            })
+
+            expect_equal({
+              class(ms1$dimension[[1]])
+            }, {
+              c("tbl_df", "tbl", "data.frame", "dimension_table")
+            })
+
           })
 
