@@ -22,7 +22,6 @@ Depends:
 Imports: 
     dm,
     dplyr,
-    geomultistar,
     methods,
     purrr,
     readr,
@@ -39,6 +38,7 @@ Suggests:
     dbplyr,
     DiagrammeR,
     DiagrammeRsvg,
+    geomultistar,
     knitr,
     lubridate,
     magrittr,
