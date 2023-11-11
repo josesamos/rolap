@@ -1,0 +1,211 @@
+---
+title: "Performing queries using the `geomultistar` package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Performing queries using the `geomultistar` package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, message=FALSE}
+library(rolap)
+```
+
+# Introduction
+
+Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R. 
+
+The [`geomultistar`](https://cran.r-project.org/package=geomultistar) package offers the possibility of formulating simple queries on a multidimensional schema and integrating the result with geographic information. We can present the result obtained using the [`sf`](https://cran.r-project.org/package=sf) package and we can also obtain a vector layer of geographic data in *GeoPackage* format.
+
+To use it, we will export an object of class `star_database` to obtain another of class `multistar`, defined in the [`geomultistar`](https://cran.r-project.org/package=geomultistar) package. In this document we are going to show an example of use.
+
+
+# Classes `star_database` and `geomultistar::multistar`
+
+The variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`, contains an object of class `star_database` that we will use in the example.
+
+```{r}
+class(mrs_db)
+```
+
+We can see a representation of the tables it contains using the `draw_tables()` function, as shown below.
+
+```{r}
+mrs_db |>
+  draw_tables()
+```
+
+
+## Star databases and constellations
+
+Strictly speaking, a *star database* is composed of a fact table and several associated dimension tables. A *constellation* is made up of several star databases that can share dimensions. In the `rolap` package they are treated in a unified way under the `star_database` class: It is used both to define star databases and to define constellations.
+
+It is possible that we are interested in exporting only a star database of the constellation, or a subset of it (also a constellation). For this reason, in this situation, the first step before performing the export operation would be to select the star databases that interest us from the constellation. This operation can be carried out using the `get_star_database()` function, where the names of the star databases are indicated. The names can be obtained using the `get_fact_names()` function.
+
+```{r}
+mrs_db |> 
+  get_fact_names()
+```
+
+Next, we select one of the star databases (also an object of class `star_database`) and display its tables.
+
+```{r}
+mrs_cause <- mrs_db |> 
+  get_star_database("mrs_cause")
+class(mrs_cause)
+
+mrs_cause |>
+  draw_tables()
+```
+
+## Class `geomultistar::multistar`
+
+Using the `as_multistar()` function we can get a `geomultistar::multistar` object from an object of class `star_database`.  
+
+```{r}
+ms_mrs <- mrs_db |>
+  as_multistar()
+class(ms_mrs)
+
+ms_cause <- mrs_cause |>
+  as_multistar()
+class(ms_cause)
+```
+
+Like the `star_database` class, the `multistar` class allows us to model both star databases and constellations.
+
+
+
+## Query functions
+
+The main motivation of the query functions of this package is to have the possibility to select subsets of data to be exported or presented through other packages.
+
+We can define queries on data in `multistar` format. Data in this format can be obtained from a star or a constellation.
+
+The query is created using `dimensional_query` and executed using `run_query.` We can refine it using `select_dimension`, `select_fact` and `filter_dimension` as much as we deem appropriate.
+
+```{r}
+library(geomultistar)
+
+ms <- dimensional_query(ms_mrs) |>
+  select_dimension(name = "where",
+                   attributes = c("city", "state")) |>
+  select_dimension(name = "when",
+                   attributes = c("year")) |>
+  select_fact(name = "mrs_age",
+              measures = c("all_deaths")) |>
+  select_fact(
+    name = "mrs_cause",
+    measures = c("pneumonia_and_influenza_deaths", "all_deaths")
+  ) |>
+  filter_dimension(name = "when", week <= "03") |>
+  filter_dimension(name = "where", city == "Bridgeport") |>
+  run_query()
+```
+
+The result of a query is a `multistar` structure. In this way, we can define queries on the result of others. The result can also be transformed into a flat table.
+
+```{r}
+ft <- ms |>
+  multistar_as_flat_table()
+```
+
+The content of the flat table is shown below.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(head(ft), split.table = Inf)
+```
+
+In the result it can be seen that, as the query has been defined at the year and city level, for a single city, with data available for a single year, there is only one row. Columns `nrow_agg` and `mrs_cause_nrow_agg` show the number of original rows that make up the result row.
+
+
+
+From the result in the form of a flat table, [`pivottabler`](https://CRAN.R-project.org/package=pivottabler) package can be used to present it in the form of a pivot table.
+
+
+
+
+### `multistar`
+
+- `multistar_as_flat_table()`: We can obtain a flat table, implemented using a `tibble`, from a `multistar` (which can be the result of a query). If it only has one fact table, it is not necessary to provide its name. Example:
+```{r}
+ft <- ms_mrs |>
+  multistar_as_flat_table(fact = "mrs_age")
+```
+
+
+
+## Query functions
+
+There are many multidimensional query tools available. The exported data, once stored in files, can be used directly from them. You can also perform basic queries from R on data in the `multistar` format, mainly for selecting the data to export, using the following functions:
+
+- `dimensional_query()`: An empty `dimensional_query` object is created where you can select fact measures, dimension attributes and filter dimension rows. Example:
+
+- `select_fact()`: To define the fact to be consulted, its name is indicated, optionally, a vector of names of selected measures and another of aggregation functions are also indicated. If the name of any measure is not indicated, only the one corresponding to the number of aggregated rows is included, which is always included. If no aggregation function is included, those defined for the measures are considered. Examples:
+```{r}
+dq <- dimensional_query(ms_mrs) |>
+  select_fact(
+    name = "mrs_age",
+    measures = c("all_deaths"),
+    agg_functions = c("MAX")
+  )
+
+dq <- dimensional_query(ms_mrs) |>
+  select_fact(name = "mrs_age",
+              measures = c("all_deaths"))
+
+dq <- dimensional_query(ms_mrs) |>
+  select_fact(name = "mrs_age")
+```
+
+- `select_dimension()`: To add a dimension in a `dimensional_query` object, we have to define its name and a subset of the dimension attributes. If only the name of the dimension is indicated, it is considered that all its attributes should be added. Example:
+```{r}
+dq <- dimensional_query(ms_mrs) |>
+  select_dimension(name = "where",
+                   attributes = c("city", "state")) |>
+  select_dimension(name = "when")
+```
+
+- `filter_dimension()`: Allows you to define selection conditions for dimension rows. Conditions can be defined on any attribute of the dimension (not only on attributes selected in the query for the dimension). The selection is made based on the function `dplyr::filter`. Conditions are defined in exactly the same way as in that function. Example:
+```{r}
+dq <- dimensional_query(ms_mrs) |>
+  filter_dimension(name = "when", week <= "03") |>
+  filter_dimension(name = "where", city == "Boston")
+```
+
+- `run_query()`: Once we have selected the facts, dimensions and defined the conditions on the instances, we can execute the query to obtain the result. As an option, we can indicate if we do not want to unify the facts in the case of having the same grain. Example:
+```{r}
+ms <- dimensional_query(ms_mrs) |>
+  select_dimension(name = "where",
+                   attributes = c("city", "state")) |>
+  select_dimension(name = "when",
+                   attributes = c("year")) |>
+  select_fact(
+    name = "mrs_age",
+    measures = c("all_deaths")
+  ) |>
+  select_fact(
+    name = "mrs_cause",
+    measures = c("pneumonia_and_influenza_deaths", "all_deaths")
+  ) |>
+  filter_dimension(name = "when", week <= "03") |>
+  filter_dimension(name = "where", city == "Boston") |>
+  run_query()
+```
+
+
+
+
+# Conclusions
+
+This document presents the functions to export the tables that make up the star databases to other types of formats.
+
+The objective of these functions is that the `rolap` package can be used to transform the data and that other tools can be easily used to analyse it.
+

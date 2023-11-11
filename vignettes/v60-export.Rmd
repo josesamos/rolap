@@ -47,8 +47,6 @@ Strictly speaking, a star database is composed of a fact table and several assoc
 It is possible that we are interested in exporting only a star database of the constellation, or a subset of it (also a constellation). For this reason, in this situation, the first step before performing the export operation would be to select the star databases that interest us from the constellation. This operation can be carried out using the `get_star_database()` function, where the names of the star databases are indicated. The names can be obtained using the `get_fact_names()` function.
 
 ```{r}
-library(rolap)
-
 mrs_db |> 
   get_fact_names()
 ```
