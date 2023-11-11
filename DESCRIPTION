@@ -44,9 +44,11 @@ Suggests:
     magrittr,
     maps,
     pander,
+    pivottabler,
     RMariaDB,
     rmarkdown,
     RSQLite,
+    sf,
     stringr,
     testthat (>= 3.0.0)
 VignetteBuilder: 
