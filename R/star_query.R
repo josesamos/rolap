@@ -390,6 +390,18 @@ apply_select_dimension <- function(db, sq) {
     }
   }
   db$dimensions <- db$dimensions[sel_names]
+
+  FILTRAR LOS HECHOS CON sel_names
+  for (f in names(db$facts)) {
+    if (d %in% db$facts[[f]]$dim_int_names) {
+      pk <- db$dimensions[[d]]$surrogate_key
+      db$facts[[f]]$table <-
+        dplyr::inner_join(db$facts[[f]]$table, db$dimensions[[d]]$table[, pk], by = pk)
+    }
+  }
+
+
+
   db
 }
 
