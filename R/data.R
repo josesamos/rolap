@@ -327,8 +327,6 @@
 #'
 #' Multidimensional design with finest detail from the data available at the source.
 #'
-#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
-#'
 #' @family debit card example data
 #'
 #' @format A `star_database`.
@@ -340,25 +338,11 @@
 #'
 #' Multidimensional design with a summary from the data available at the source.
 #'
-#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
-#'
 #' @family debit card example data
 #'
 #' @format A `star_database`.
 #' @source \url{https://fit.cvut.cz/cs}
 "db_summary"
-
-#' Czech debit card company specialising on payments at gas stations (tables)
-#'
-#' Data base in `dm` format with a summary from the data available at the source.
-#'
-#' The development has been done in the vignette `vignette("v20-rdbms-dm")`.
-#'
-#' @family debit card example data
-#'
-#' @format A `star_database`.
-#' @source \url{https://fit.cvut.cz/cs}
-"transactions_db"
 
 
 #' Census of US States, by sex and age

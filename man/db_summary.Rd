@@ -21,8 +21,7 @@ The development has been done in the vignette \code{vignette("v20-rdbms-dm")}.
 }
 \seealso{
 Other debit card example data: 
-\code{\link{db_finest}},
-\code{\link{transactions_db}}
+\code{\link{db_finest}}
 }
 \concept{debit card example data}
 \keyword{datasets}
