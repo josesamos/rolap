@@ -22,7 +22,7 @@ library(rolap)
 
 Once we developed a star database in R, we would like to exploit it directly in R to develop multidimensional queries, but that is part of a future project. Currently we need to export the result to other formats to be able to use other OLAP query tools. 
 
-This document shows the possibilities offered by the package in this context: Export an object of the `star_database` class to other formats. After presenting the object that we will use as an example and how to select it, a section is dedicated to each type of element obtained: `dm`, list of `tibble` objects, relational databases, *xlsx* and *csv* files. Finally, it finish with the conclusions.
+This document shows the possibilities offered by the package in this context: Export an object of the `star_database` class to other formats. After presenting the object that we will use as an example and how to select it, a section is dedicated to each type of element obtained: `dm`, list of `tibble` objects, relational databases, *xlsx* and *csv* files, and `geomultistar::multistar` object. Finally, it finish with the conclusions.
 
 # Example `star_database` object
 
@@ -47,8 +47,6 @@ Strictly speaking, a star database is composed of a fact table and several assoc
 It is possible that we are interested in exporting only a star database of the constellation, or a subset of it (also a constellation). For this reason, in this situation, the first step before performing the export operation would be to select the star databases that interest us from the constellation. This operation can be carried out using the `get_star_database()` function, where the names of the star databases are indicated. The names can be obtained using the `get_fact_names()` function.
 
 ```{r}
-library(rolap)
-
 mrs_db |> 
   get_fact_names()
 ```
@@ -153,6 +151,18 @@ d <- mrs_db |>
   as_csv_files(dir = tempdir())
 
 list.files(d, pattern = "*.csv")
+```
+
+
+# `geomultistar::multistar` object
+
+Using the `as_multistar()` function we can get a `geomultistar::multistar` object; with this object we can use the query and integration functions with geographic information offered by the [`geomultistar`](https://CRAN.R-project.org/package=geomultistar) package. 
+
+```{r}
+ms <- mrs_db |>
+  as_multistar()
+
+class(ms)
 ```
 
 

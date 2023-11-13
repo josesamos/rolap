@@ -363,3 +363,119 @@ as_csv_files.star_database <- function(db, dir = NULL, type = 1) {
   }
   dir
 }
+
+
+
+#' Generate a `geomultistar::multistar` object
+#'
+#' In order to be able to use the query and integration functions with geographic
+#' information offered by the `geomultistar` package, we can obtain a `multistar`
+#' object from a star database or a constellation.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A `geomultistar::multistar` object.
+#'
+#' @family star database exportation functions
+#' @seealso \code{\link{star_database}}
+#'
+#' @examples
+#'
+#' db1 <- star_database(mrs_cause_schema, ft_num) |>
+#'   snake_case()
+#' ms1 <- db1 |>
+#'   as_multistar()
+#'
+#' db2 <- star_database(mrs_age_schema, ft_age) |>
+#'   snake_case()
+#'
+#' ct <- constellation("MRS", db1, db2)
+#' ms <- ct |>
+#'   as_multistar()
+#'
+#' @export
+as_multistar <- function(db) UseMethod("as_multistar")
+
+#' @rdname as_multistar
+#'
+#' @export
+as_multistar.star_database <- function(db) {
+  dim <- NULL
+  dim_names <- NULL
+  for (d in names(db$dimensions)) {
+    dimension <-
+      structure(
+        db$dimensions[[d]]$table,
+        class = unique(append(class(db$dimensions[[d]]$table), "dimension_table")),
+        name = d,
+        type = "general"
+      )
+    dim <- c(dim, list(dimension))
+    dim_names <- c(dim_names, d)
+  }
+  names(dim) <- dim_names
+
+  fct <- NULL
+  fct_names <- NULL
+  for (f in names(db$facts)) {
+    measures <- names(db$facts[[f]]$agg)
+    fact <-
+      structure(
+        db$facts[[f]]$table,
+        class = unique(append(class(db$facts[[f]]$table), "fact_table")),
+        name = f,
+        foreign_keys = db$facts[[f]]$surrogate_keys,
+        measures = measures,
+        agg_functions = db$facts[[f]]$agg,
+        nrow_agg = measures[length(measures)]
+      )
+    fct <- c(fct, list(fact))
+    fct_names <- c(fct_names, f)
+  }
+  names(fct) <- fct_names
+
+  new_multistar(fct, dim)
+}
+
+#' `multistar` S3 class
+#'
+#' Internal low-level constructor that creates new objects with the correct
+#' structure.
+#'
+#' It only distinguishes between general and conformed dimensions, each
+#' dimension has its own data. It can contain multiple fact tables.
+#'
+#' @param fl A `fact_table` list.
+#' @param dl A `dimension_table` list.
+#'
+#' @return A `multistar` object.
+#' @keywords internal
+new_multistar <-
+  function(fl = list(), dl = list()) {
+    star <-
+      list(
+        fact = vector("list", length = length(fl)),
+        dimension =  vector("list", length = length(dl))
+      )
+    names(star$fact) <- names(fl)
+    names(star$dimension) <- names(dl)
+    for (f in seq_along(fl)) {
+      star$fact[[f]] <- fl[[f]]
+      attr(star$fact[[f]], "spec") <- NULL
+    }
+
+    for (d in seq_along(dl)) {
+      star$dimension[[d]] <- dl[[d]]
+      attr(star$dimension[[d]], "role_playing") <- NULL
+      attr(star$dimension[[d]], "spec") <- NULL
+      if ("conformed" %in% attr(star$dimension[[d]], "type")) {
+        attr(star$dimension[[d]], "type") <- "conformed"
+      } else {
+        attr(star$dimension[[d]], "type") <- "general"
+      }
+    }
+
+    structure(star,
+              class = "multistar")
+  }
+

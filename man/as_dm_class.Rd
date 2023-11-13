@@ -44,6 +44,7 @@ dm <- ct |>
 
 Other star database exportation functions: 
 \code{\link{as_csv_files}()},
+\code{\link{as_multistar}()},
 \code{\link{as_rdb}()},
 \code{\link{as_single_tibble_list}()},
 \code{\link{as_tibble_list}()},

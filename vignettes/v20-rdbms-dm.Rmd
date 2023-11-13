@@ -1,8 +1,8 @@
 ---
-title: "Star databases and RDBMS through the dm and rolap packages"
+title: "Star databases and RDBMS through the `dm` and `rolap` packages"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Star databases and RDBMS through the dm and rolap packages}
+  %\VignetteIndexEntry{Star databases and RDBMS through the `dm` and `rolap` packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
