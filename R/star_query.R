@@ -299,6 +299,14 @@ run_query.star_database <- function(db, sq) {
   db <- apply_select_dimension(db, sq)
   db <- remove_duplicate_dimension_rows(db)
   db <- group_facts(db)
+
+  db$operations <- star_operation()
+  db$lookup_tables <- list()
+  db$schemas <- list()
+  db$refresh <- list()
+  db$deploy <- list()
+  db$rpd <- list()
+
   db
 }
 
