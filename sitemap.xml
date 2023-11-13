@@ -37,6 +37,9 @@
     <loc>https://josesamos.github.io/rolap/articles/v60-export.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/articles/v70-star_query.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/authors.html</loc>
   </url>
   <url>
@@ -59,6 +62,15 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/add_surrogate_key.dimension_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/apply_filter_dimension.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/apply_select_dimension.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/apply_select_fact.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/as_csv_files.html</loc>
@@ -131,6 +143,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/fact_table.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/filter_dimension.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/filter_rpd_dimensions.html</loc>
@@ -241,6 +256,9 @@
     <loc>https://josesamos.github.io/rolap/reference/get_star_database.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_star_query_schema.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_star_schema.html</loc>
   </url>
   <url>
@@ -275,6 +293,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/group_dimension_instances.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/group_facts.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/incremental_refresh.html</loc>
@@ -430,6 +451,9 @@
     <loc>https://josesamos.github.io/rolap/reference/remove_all_measures_na.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/remove_duplicate_dimension_rows.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/remove_instances_without_measures.html</loc>
   </url>
   <url>
@@ -457,7 +481,16 @@
     <loc>https://josesamos.github.io/rolap/reference/rpd_in_constellation.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/run_query.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/select_attributes.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/select_dimension.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/select_fact.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/select_instances.html</loc>
@@ -503,6 +536,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/star_operation.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/star_query.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/star_schema.html</loc>
@@ -557,6 +593,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_measures.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/validate_names.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/vector_presentation.html</loc>
