@@ -298,10 +298,7 @@ run_query.star_database <- function(db, sq) {
   db <- apply_filter_dimension(db, sq)
   db <- apply_select_dimension(db, sq)
   db <- remove_duplicate_dimension_rows(db)
-
-
   db <- group_facts(db)
-
   db
 }
 
@@ -401,10 +398,6 @@ apply_select_dimension <- function(db, sq) {
 }
 
 
-
-
-
-
 #' Remove duplicate dimension rows
 #'
 #' After selecting only a few columns of the dimensions, there may be rows with
@@ -467,75 +460,29 @@ remove_duplicate_dimension_rows <- function(db) {
   db
 }
 
+
 #' Group facts
 #'
 #' Once the external keys have been possibly replaced, group the rows of facts.
 #'
-#' @param sq A `star_query` object.
+#' @param db A `star_database` object.
 #'
-#' @return A `star_query` object.
-#'
-#' @keywords internal
-group_facts <- function(sq) {
-  for (d in names(sq$output$fact)) {
-    sq$output$fact[[d]] <- group_table(sq$output$fact[[d]])
-  }
-  sq
-}
-
-#' Unify facts by grain
-#'
-#' @param sq A `star_query` object.
-#'
-#' @return A `star_query` object.
+#' @param db A `star_database` object.
 #'
 #' @keywords internal
-unify_facts_by_grain <- function(sq) {
-  fact <- NULL
-  unified_fact <- NULL
-  names_fact <- names(sq$output$fact)
-  for (i in seq_along(names_fact)) {
-    if (!(names_fact[i] %in% unified_fact)) {
-      fact[[names_fact[i]]] <- sq$output$fact[[names_fact[i]]]
-      fk_i <- attr(sq$output$fact[[names_fact[i]]], "foreign_keys")
-      agg <- list(fact[[names_fact[i]]])
-      for (j in seq_along(names_fact)[seq_along(names_fact) > i]) {
-        fk_j <- attr(sq$output$fact[[names_fact[j]]], "foreign_keys")
-        if (generics::setequal(fk_i, fk_j)) {
-          unified_fact <- c(unified_fact, names_fact[j])
-          fact2 <- sq$output$fact[[names_fact[j]]][, c(fk_i, attr(sq$output$fact[[names_fact[j]]], "measures"))]
-
-          for (m in attr(fact2, "measures")) {
-            m_new <- sprintf("%s_%s", names_fact[j], m)
-            names(fact2)[which(names(fact2) == m)] <- m_new
-            attr(fact2, "measures")[which(attr(fact2, "measures") == m)] <- m_new
-            names(attr(fact2, "agg_functions"))[which(names(attr(fact2, "agg_functions")) == m)] <- m_new
-          }
-
-          attr(fact[[names_fact[i]]], "measures") <-
-            c(attr(fact[[names_fact[i]]], "measures"), attr(fact2, "measures"))
-          attr(fact[[names_fact[i]]], "agg_functions") <-
-            c(attr(fact[[names_fact[i]]], "agg_functions"), attr(fact2, "agg_functions"))
-
-          agg <- c(agg, list(fact2))
-        }
-      }
-      if (length(agg) > 1) {
-        if (is.null(fk_i)) {
-          par_by = character()
-        } else {
-          par_by = fk_i
-        }
-        at <- attributes(fact[[names_fact[i]]])
-        fact[[names_fact[i]]] <- purrr::reduce(agg, dplyr::inner_join, by = par_by)
-        class(fact[[names_fact[i]]]) <- at$class
-        attr(fact[[names_fact[i]]], "name") <- at$name
-        attr(fact[[names_fact[i]]], "measures") <- at$measures
-        attr(fact[[names_fact[i]]], "agg_functions") <- at$agg_functions
-        attr(fact[[names_fact[i]]], "nrow_agg") <- at$nrow_agg
-      }
-    }
+group_facts <- function(db) {
+  for (f in names(db$facts)) {
+    fk <- db$facts[[f]]$surrogate_keys
+    measures <- names(db$facts[[f]]$table)
+    measures <- setdiff(measures, fk)
+    db$facts[[f]]$table <-
+      group_by_keys(
+        table = db$facts[[f]]$table[, c(fk, measures)],
+        keys = fk,
+        measures = measures,
+        agg_function = db$facts[[f]]$agg[measures],
+        nrow_agg = NULL
+      )
   }
-  sq$output$fact <- fact
-  sq
+  db
 }
