@@ -16,9 +16,6 @@ db_finest
 \description{
 Multidimensional design with finest detail from the data available at the source.
 }
-\details{
-The development has been done in the vignette \code{vignette("v20-rdbms-dm")}.
-}
 \seealso{
 Other debit card example data: 
 \code{\link{db_summary}}
