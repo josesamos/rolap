@@ -22,7 +22,7 @@ To port databases to other work environments it is useful to be able to
 export them as a xlsx file, as this function does.
 }
 \examples{
-
+\donttest{
 db1 <- star_database(mrs_cause_schema, ft_num) |>
   snake_case()
 tl1 <- db1 |>
@@ -34,7 +34,7 @@ db2 <- star_database(mrs_age_schema, ft_age) |>
 ct <- constellation("MRS", db1, db2)
 f <- ct |>
   as_xlsx_file(file = tempfile())
-
+}
 }
 \seealso{
 \code{\link{star_database}}

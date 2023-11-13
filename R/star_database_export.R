@@ -260,7 +260,7 @@ draw_tables.star_database <- function(db) {
 #' @seealso \code{\link{star_database}}
 #'
 #' @examples
-#'
+#' \donttest{
 #' db1 <- star_database(mrs_cause_schema, ft_num) |>
 #'   snake_case()
 #' tl1 <- db1 |>
@@ -272,7 +272,7 @@ draw_tables.star_database <- function(db) {
 #' ct <- constellation("MRS", db1, db2)
 #' f <- ct |>
 #'   as_xlsx_file(file = tempfile())
-#'
+#' }
 #' @export
 as_xlsx_file <- function(db, file) UseMethod("as_xlsx_file")
 
