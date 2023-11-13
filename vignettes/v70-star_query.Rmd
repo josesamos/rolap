@@ -21,8 +21,9 @@ library(rolap)
 
 # Introduction
 
-Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R: The `rolap` package offers the possibility of formulating simple queries on a multidimensional schema.
+Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R: The `rolap` package offers the possibility of formulating and running simple queries on a multidimensional schema.
 
+The main objective of this document is to show the multidimensional query formulation and execution functionality offered by this package. First, the data model is briefly discussed: the possibility of defining stars and constellations. Next, the functions defined to support multidimensional queries are presented. Finally, finish with the conclusions.
 
 # Stars and constellations
 
@@ -192,7 +193,7 @@ Below are the rows of from one of the result tables.
 pander::pandoc.table(ft_age, split.table = Inf)
 ```
 
-From the result in the form of a flat table, [`pivottabler`](https://CRAN.R-project.org/package=pivottabler) package can be used to present it in the form of a pivot table.
+From the results in the form of flat tables, [`pivottabler`](https://CRAN.R-project.org/package=pivottabler) package can be used to present it in the form of pivot tables.
 
 ```{r}
 pt <- pivottabler::qpvt(
@@ -206,10 +207,8 @@ pt$renderPivot()
 ```
 
 
-
 # Conclusions
 
-This document presents some of the querying possibilities that we obtain by combining the star databases obtained using the `rolap` package with the functions offered by the `geostar_database` package.
+This document presents some of the querying possibilities that offers the `rolap` package. The queries are formulated on an object of class `star_database` and the result is another object of the same class on which additional queries can be made.
 
-The result is that from R we can define multidimensional queries that can be enriched with geographic information.
-
+Queries can be formulated about a star or set of stars or constellation.

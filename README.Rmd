@@ -115,6 +115,44 @@ DBI::dbListTables(con)
 DBI::dbDisconnect(con)
 ```
 
-In addition to exporting it, using the [`geomultistar`](https://cran.r-project.org/package=geomultistar) package, we can formulate multidimensional queries from R and integrate them with geographic information.
+In addition to exporting it, we can formulate multidimensional queries from R. Below is an example.
+
+```{r}
+sq <- star_query(db) |>
+  select_dimension(name = "where",
+                   attributes = "state") |>
+  select_dimension(name = "when",
+                   attributes = "year") |>
+  select_fact(name = "mrs_cause",
+              measures = "all_deaths") |>
+  filter_dimension(name = "when", year >= "1963") |>
+  filter_dimension(name = "where", city == "Bridgeport" | city == "Boston")
+
+db_2 <- db |>
+  run_query(sq)
+```
+
+The result can also be displayed using the [`pivottabler`](https://CRAN.R-project.org/package=pivottabler) package.
+
+```{r, eval=FALSE}
+ft <- db_2 |>
+  as_single_tibble_list()
+ft_cause <- ft[["mrs_cause"]]
+
+pt <- pivottabler::qpvt(
+  ft_cause,
+  c("=", "state"),
+  c("year"),
+  c("Number of Deaths" = "sum(all_deaths)")
+)
+
+pt$renderPivot()
+```
+
+
+```{r, echo = FALSE, fig.align = 'center', out.width = "70%"}
+knitr::include_graphics("inst/figures/pivottabler.png")
+```
+
 
 We can work with several star databases to form a *constellation*. It supports the definition of *role-playing* and *role* dimensions, as well as *incremental refresh* operations and automatic deployment on any RDBMS (*Relational Database Management System*). Examples and detailed information of these functionalities can be found in the documentation and vignettes of the package.
