@@ -22,12 +22,6 @@
     <loc>https://josesamos.github.io/rolap/articles/v10-rpd.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/articles/v20-rdbms-dm.html</loc>
-  </url>
-  <url>
-    <loc>https://josesamos.github.io/rolap/articles/v30-dim-instances.html</loc>
-  </url>
-  <url>
     <loc>https://josesamos.github.io/rolap/articles/v40-refresh.html</loc>
   </url>
   <url>
@@ -548,9 +542,6 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/string_to_vector.html</loc>
-  </url>
-  <url>
-    <loc>https://josesamos.github.io/rolap/reference/transactions_db.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/transform_attribute_format.html</loc>
