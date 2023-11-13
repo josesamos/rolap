@@ -385,6 +385,7 @@ apply_select_dimension <- function(db, sq) {
     for (f in names(db$facts)) {
       if (d %in% db$facts[[f]]$dim_int_names) {
         db$facts[[f]]$dim_int_names <- setdiff(db$facts[[f]]$dim_int_names, d)
+        stopifnot("At least one dimension must be selected for each fact table." = length(db$facts[[f]]$dim_int_names) > 0)
         pk <- db$dimensions[[d]]$surrogate_key
         db$facts[[f]]$surrogate_keys <- setdiff(db$facts[[f]]$surrogate_keys, pk)
         table_fields <- names(db$facts[[f]]$table)
