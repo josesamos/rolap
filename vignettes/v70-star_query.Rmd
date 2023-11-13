@@ -1,0 +1,215 @@
+---
+title: "Performing Multidimensional Queries with the `rolap` Package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Performing Multidimensional Queries with the `rolap` Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, message=FALSE}
+library(rolap)
+```
+
+
+# Introduction
+
+Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R: The `rolap` package offers the possibility of formulating simple queries on a multidimensional schema.
+
+
+# Stars and constellations
+
+Strictly speaking, a *star* is composed of a fact table and several associated dimension tables. A *constellation* is made up of several stars that can share dimensions. In the `rolap` package they are treated in a unified way under the `star_database` class: It is used both to define stars and constellations.
+
+The variable `mrs_db`, obtained in the vignette titled *Obtaining and transforming flat tables*, `vignette("v05-flat-table-op")`, contains an object of class `star_database` that we will use in the example.
+
+```{r}
+class(mrs_db)
+```
+
+We can see a representation of the tables it contains using the `draw_tables()` function, as shown below.
+
+```{r}
+mrs_db |>
+  draw_tables()
+```
+
+We can see that it is a constellation because it contains more than one fact table.
+
+
+# Query functions
+
+A query is defined on a `star_database` object and the result of executing it is another `star_database` object.
+
+This section presents the functions available to define queries.
+
+## `star_query()`
+
+From a `star_database` object, an empty `star_query` object is created where we can select fact measures, dimension attributes and filter dimension rows. 
+
+Example:
+
+```{r}
+sq <- mrs_db |>
+  star_query()
+```
+
+At least one fact table with one dimension must be included in each query.
+
+## `select_fact()`
+
+To define the fact table to be consulted, its name is indicated, optionally, a vector of names of selected measures and another of aggregation functions are also indicated. If the name of any of the measures is not indicated, the measure corresponding to the number of rows added will be included, which is always included. If no aggregation function is included, those defined for the measures are considered.
+
+Examples:
+
+```{r}
+sq_1 <- sq |>
+  select_fact(
+    name = "mrs_age",
+    measures = "all_deaths",
+    agg_functions = "MAX"
+  )
+```
+
+The measure is considered with the indicated aggregation function. In addition, the measure corresponding to the number of grouped records that make up the result is automatically included.
+
+```{r}
+sq_2 <- sq |>
+  select_fact(name = "mrs_age",
+              measures = "all_deaths")
+```
+
+The measure is considered with the aggregation function defined in the multidimensional scheme.
+
+```{r}
+sq_3 <- sq |>
+  select_fact(name = "mrs_age")
+```
+
+Only the measure corresponding to the number of grouped records is included.
+
+```{r}
+sq_4 <- sq |>
+  select_fact(name = "mrs_age",
+              measures = "all_deaths") |>
+  select_fact(name = "mrs_cause")
+```
+
+In a query we can select several fact tables, at least we have to select one.
+
+## `select_dimension()`
+
+To include a dimension in a `star_query` object, we have to define its name and a subset of the dimension attributes. If only the name of the dimension is indicated, it is considered that all its attributes should be added. 
+
+Example:
+
+```{r}
+sq_1 <- sq |>
+  select_dimension(name = "where",
+                   attributes = c("city", "state"))
+```
+
+Only the indicated attributes of the dimension will be included.
+
+```{r}
+sq_2 <- sq |>
+  select_dimension(name = "where")
+```
+
+All attributes of the dimension will be included.
+
+
+## `filter_dimension()`
+
+Allows us to define selection conditions for dimension rows. Conditions can be defined on any attribute of the dimension, not only on attributes selected in the query for the dimension. They can also be defined on unselected dimensions. Filtering is done using the function `dplyr::filter()`. Conditions are defined in exactly the same way as in that function. 
+
+Example:
+
+```{r}
+sq <- sq |>
+  filter_dimension(name = "when", week <= " 3") |>
+  filter_dimension(name = "where", city == "Bridgeport")
+```
+
+## `run_query()`
+
+Once we have selected the facts, dimensions and defined the conditions on the instances of dimensions, we can execute the query to obtain the result. 
+
+The query can be executed on any `star_database` object that has in its structure the elements that appear in it.
+
+Example:
+
+```{r}
+sq <- star_query(mrs_db) |>
+  select_dimension(name = "where",
+                   attributes = c("region", "state")) |>
+  select_dimension(name = "when",
+                   attributes = "year") |>
+  select_fact(name = "mrs_age",
+              measures = "all_deaths") |>
+  select_fact(name = "mrs_cause",
+              measures = "all_deaths") |>
+  filter_dimension(name = "when", week <= " 3" & year >= "2010")
+
+mrs_db_2 <- mrs_db |>
+  run_query(sq)
+
+class(mrs_db_2)
+```
+
+The result of running a query is an object of the `star_database` class that meets the conditions defined in the query: Other queries can continue to be defined on this object.
+
+We can see a representation of the tables of the result, as shown below.
+
+```{r}
+mrs_db_2 |>
+  draw_tables()
+```
+
+
+## Exploitation of the result
+
+This section shows an example of how to exploit the result of the  multidimensional query.
+
+The first thing we do is transform it into flat tables.
+
+```{r}
+ft <- mrs_db_2 |>
+  as_single_tibble_list()
+ft_age <- ft[["mrs_age"]]
+```
+
+Below are the rows of from one of the result tables.
+
+```{r, results = "asis", echo = FALSE}
+pander::pandoc.table(ft_age, split.table = Inf)
+```
+
+From the result in the form of a flat table, [`pivottabler`](https://CRAN.R-project.org/package=pivottabler) package can be used to present it in the form of a pivot table.
+
+```{r}
+pt <- pivottabler::qpvt(
+  ft_age,
+  c("=", "region"),
+  c("year"),
+  c("Number of Deaths" = "sum(all_deaths)")
+)
+
+pt$renderPivot()
+```
+
+
+
+# Conclusions
+
+This document presents some of the querying possibilities that we obtain by combining the star databases obtained using the `rolap` package with the functions offered by the `geostar_database` package.
+
+The result is that from R we can define multidimensional queries that can be enriched with geographic information.
+
