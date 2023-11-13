@@ -481,7 +481,7 @@ group_facts <- function(db) {
         table = db$facts[[f]]$table[, c(fk, measures)],
         keys = fk,
         measures = measures,
-        agg_function = db$facts[[f]]$agg[measures],
+        agg_functions = db$facts[[f]]$agg[measures],
         nrow_agg = NULL
       )
   }
