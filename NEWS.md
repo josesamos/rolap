@@ -5,6 +5,7 @@
 * Vignette about star database deployment process.
 * Vignette about star database export features.
 * Vignette about multidimensional queries.
+* Include new items in the README file.
 * US census flat table dataset.
 * Fix `snake_case()` register refresh operation for constellation case.
 * Fix `constellation()` refresh structure integration.

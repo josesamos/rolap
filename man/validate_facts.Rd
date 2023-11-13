@@ -9,7 +9,7 @@ validate_facts(defined_facts, facts)
 \arguments{
 \item{defined_facts}{A vector of strings, defined fact names.}
 
-\item{measures}{A vector of strings, fact names.}
+\item{facts}{A vector of strings, fact names.}
 }
 \value{
 A vector of strings, fact names.

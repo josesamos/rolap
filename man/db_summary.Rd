@@ -8,7 +8,7 @@
 A \code{star_database}.
 }
 \source{
-\url{https://relational.fit.cvut.cz/dataset/CCS}
+\url{https://fit.cvut.cz/cs}
 }
 \usage{
 db_summary

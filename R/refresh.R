@@ -175,7 +175,7 @@ incremental_refresh.star_database <-
 #'
 #' Generate sql code for the first refresh operation.
 #'
-#' @param db A list of operations over tables.
+#' @param refresh A list of operations over tables.
 #'
 #' @return A vector of strings.
 #'

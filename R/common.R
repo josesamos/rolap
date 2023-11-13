@@ -77,7 +77,7 @@ validate_measures <- function(defined_measures, measures) {
 #' Validate fact names
 #'
 #' @param defined_facts A vector of strings, defined fact names.
-#' @param measures A vector of strings, fact names.
+#' @param facts A vector of strings, fact names.
 #'
 #' @return A vector of strings, fact names.
 #'

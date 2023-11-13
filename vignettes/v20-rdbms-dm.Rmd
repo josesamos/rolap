@@ -30,7 +30,7 @@ First, the initial transactional data is presented. The following shows the impl
 
 # Transactional data
 
-We will build on a dataset with transactional data from Czech debit card company specialising on payments at gas stations called [CCS](https://relational.fit.cvut.cz/dataset/CCS), publicly available in a RDBMS.
+We will build on a dataset with transactional data from Czech debit card company specialising on payments at gas stations called [CCS](https://fit.cvut.cz/cs), publicly available in a RDBMS.
 
 First, we make a connection by following the instructions they offer, as shown below^[In the R code that is included, for each function it is indicated by the prefix the package where it is defined.].
 

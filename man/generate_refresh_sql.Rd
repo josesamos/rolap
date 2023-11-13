@@ -7,7 +7,7 @@
 generate_refresh_sql(refresh)
 }
 \arguments{
-\item{db}{A list of operations over tables.}
+\item{refresh}{A list of operations over tables.}
 }
 \value{
 A vector of strings.

@@ -332,7 +332,7 @@
 #' @family debit card example data
 #'
 #' @format A `star_database`.
-#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
+#' @source \url{https://fit.cvut.cz/cs}
 "db_finest"
 
 
@@ -345,7 +345,7 @@
 #' @family debit card example data
 #'
 #' @format A `star_database`.
-#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
+#' @source \url{https://fit.cvut.cz/cs}
 "db_summary"
 
 #' Czech debit card company specialising on payments at gas stations (tables)
@@ -357,7 +357,7 @@
 #' @family debit card example data
 #'
 #' @format A `star_database`.
-#' @source \url{https://relational.fit.cvut.cz/dataset/CCS}
+#' @source \url{https://fit.cvut.cz/cs}
 "transactions_db"
 
 
