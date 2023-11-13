@@ -257,8 +257,6 @@ filter_dimension.star_query <- function(sq, name = NULL, ...) {
 #'
 #' @param db A `star_database` object.
 #' @param sq A `star_query` object.
-#' @param group_by_granularity A boolean, group fact tables with the same
-#' granularity.
 #'
 #' @return A `star_database` object.
 #'
@@ -288,27 +286,21 @@ filter_dimension.star_query <- function(sq, name = NULL, ...) {
 #'   run_query(sq)
 #'
 #' @export
-run_query <- function(db, sq, group_by_granularity)
+run_query <- function(db, sq)
   UseMethod("run_query")
 
 #' @rdname run_query
 #'
 #' @export
-run_query.star_database <- function(db, sq, group_by_granularity = TRUE) {
+run_query.star_database <- function(db, sq) {
   stopifnot("At least one fact table must be selected." = length(sq$query$fact) > 0)
   db <- apply_select_fact(db, sq)
   db <- apply_filter_dimension(db, sq)
   db <- apply_select_dimension(db, sq)
+  db <- remove_duplicate_dimension_rows(db)
 
 
-  sq <- delete_unused_foreign_keys(sq)
-  sq <- remove_duplicate_dimension_rows(sq)
-  sq <- group_facts(sq)
-  if (unify_by_grain) {
-    sq <- unify_facts_by_grain (sq)
-  }
-  class(sq$output) <- class(sq$input)[1]
-  sq$output
+  db <- group_facts(db)
 
   db
 }
@@ -413,69 +405,66 @@ apply_select_dimension <- function(db, sq) {
 
 
 
-
-#' Delete unused foreign keys
-#'
-#' In facts, remove foreign keys from dimensions not included in the result.
-#'
-#' @param sq A `star_query` object.
-#'
-#' @return A `star_query` object.
-#'
-#' @keywords internal
-delete_unused_foreign_keys <- function(sq) {
-  for (name in names(sq$output$fact)) {
-    fk <- attr(sq$output$fact[[name]], "foreign_keys")
-    key_dimensions <- sprintf("%s_key", names(sq$dimension))
-    col <-
-      which(names(sq$output$fact[[name]]) %in% generics::setdiff(fk, key_dimensions))
-    if (length(col) > 0) {
-      sq$output$fact[[name]] <- sq$output$fact[[name]][,-c(col)]
-    }
-    attr(sq$output$fact[[name]], "foreign_keys") <-
-      generics::intersect(fk, key_dimensions)
-  }
-  sq
-}
-
 #' Remove duplicate dimension rows
 #'
 #' After selecting only a few columns of the dimensions, there may be rows with
 #' duplicate values. We eliminate duplicates and adapt facts to the new
 #' dimensions.
 #'
-#' @param sq A `star_query` object.
+#' @param db A `star_database` object.
 #'
-#' @return A `star_query` object.
+#' @param db A `star_database` object.
 #'
 #' @keywords internal
-remove_duplicate_dimension_rows <- function(sq) {
+remove_duplicate_dimension_rows <- function(db) {
   # remove duplicate dimension rows
-  for (name in names(sq$dimension)) {
+  for (d in names(db$dimensions)) {
     # remove duplicates and sort
+    pk <- db$dimensions[[d]]$surrogate_key
+    attributes <- names(db$dimensions[[d]]$table)
+    i <- which(attributes == pk)
+    attributes <- attributes[-i]
+    tpk <- NULL
+    for (f in names(db$facts)) {
+      if (pk %in% db$facts[[f]]$surrogate_keys) {
+        tpk <- rbind(tpk, db$facts[[f]]$table[, pk])
+      }
+    }
+    tpk <- unique(tpk)
+    db$dimensions[[d]]$table <-
+      dplyr::inner_join(db$dimensions[[d]]$table, tpk, by = pk)
     ft <-
-      dplyr::arrange_all(tibble::as_tibble(unique(sq$output$dimension[[name]][, -1])))
-    if (nrow(ft) < nrow(sq$output$dimension[[name]])) {
+      dplyr::arrange_all(unique(db$dimensions[[d]]$table[, -i]))
+    if (nrow(db$dimensions[[d]]$table) > nrow(ft)) {
       # add surrogate primary key
       # := variables for parameter names
       # !! expands the expression into a string
       ft <-
-        tibble::add_column(ft,!!sprintf("%s_key", name) := 1:nrow(ft), .before = 1)
-      for (f in names(sq$output$fact)) {
-        key <- sprintf("%s_key", name)
-        if (key %in% names(sq$output$fact[[f]])) {
-          sq$output$fact[[f]] <-
-            dereference_dimension(sq$output$fact[[f]], sq$output$dimension[[name]])
-          sq$output$fact[[f]] <-
-            reference_dimension(sq$output$fact[[f]], ft, names(ft)[-1])
+        tibble::add_column(ft, !!pk := 1:nrow(ft), .before = 1)
+      for (f in names(db$facts)) {
+        if (pk %in% db$facts[[f]]$surrogate_keys) {
+          # join facts to original dimension
+          db$facts[[f]]$table <-
+            dplyr::select(
+              dplyr::inner_join(db$facts[[f]]$table,
+                                db$dimensions[[d]]$table,
+                                by = pk),
+              -tidyselect::all_of(pk)
+            )
+          # join new dimension to facts
+          db$facts[[f]]$table <-
+            dplyr::select(
+              dplyr::inner_join(db$facts[[f]]$table,
+                                ft,
+                                by = attributes),
+              -tidyselect::all_of(attributes)
+            )
         }
       }
-      class <- class(sq$output$dimension[[name]])
-      sq$output$dimension[[name]] <- ft
-      class(sq$output$dimension[[name]]) <- class
+      db$dimensions[[d]]$table <- ft
     }
   }
-  sq
+  db
 }
 
 #' Group facts
@@ -488,8 +477,8 @@ remove_duplicate_dimension_rows <- function(sq) {
 #'
 #' @keywords internal
 group_facts <- function(sq) {
-  for (name in names(sq$output$fact)) {
-    sq$output$fact[[name]] <- group_table(sq$output$fact[[name]])
+  for (d in names(sq$output$fact)) {
+    sq$output$fact[[d]] <- group_table(sq$output$fact[[d]])
   }
   sq
 }
