@@ -106,7 +106,8 @@ star_database_with_previous_operations <-
           deploy = list(),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
-          rpd = list()
+          rpd = list(),
+          geo = list()
         ),
         class = "star_database"
       )
@@ -197,6 +198,7 @@ get_star_database.star_database <- function(db, name) {
     dim <- unique(dim)
     db$dimensions <- db$dimensions[dim]
     db$rpd <- filter_rpd_dimensions(db, dim)
+    db$geo <- list()
     db <- purge_dimension_instances_star_database(db)
   }
   db
@@ -363,8 +365,7 @@ get_similar_attribute_values_individually.star_database <-
     names(rv) <- name
     original_att <- attributes
     for (dn in name) {
-      attributes <-
-        validate_attributes(colnames(db$dimensions[[dn]]$table)[-1], original_att)
+      attributes <- validate_dimension_attributes(db, dn, original_att)
       l <- list()
       for (at in attributes) {
         la <-
@@ -661,6 +662,20 @@ validate_dimension_names <- function(db, name) {
     }
   }
   name
+}
+
+
+#' Validate dimension attributes
+#'
+#' @param db A `star_database` object.
+#' @param dimension A dimension name.
+#' @param attributes Attribute names.
+#'
+#' @return A vector of strings, dimension names.
+#'
+#' @keywords internal
+validate_dimension_attributes <- function(db, dimension, attributes) {
+  validate_attributes(colnames(db$dimensions[[dimension]]$table)[-1], attributes)
 }
 
 
