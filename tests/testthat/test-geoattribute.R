@@ -1,21 +1,12 @@
-test_that("multiple_value_key()", {
-  file <-
-    system.file(
-      "extdata",
-      "layer_us_level.gpkg",
-      package = "rolap"
-    )
-  layer_us_state <- sf::st_read(file, 'layer_us_state',
-                                quiet = TRUE)
-
-  layer_us_state_incomplet <-
-    layer_us_state[!(layer_us_state$STUSPS %in% c("IL", "MN", "OR")),]
+test_that("geoattribute", {
+  us_layer_state_incomplet <-
+    us_layer_state[!(us_layer_state$STUSPS %in% c("IL", "MN", "OR")),]
 
   db_2 <- mrs_db |>
     define_geoattribute(
       dimension = "where",
       attribute = "state",
-      from_layer = layer_us_state,
+      from_layer = us_layer_state,
       by = "STUSPS"
     )
 
@@ -32,7 +23,7 @@ test_that("multiple_value_key()", {
     define_geoattribute(
       dimension = "where",
       attribute = "state",
-      from_layer = layer_us_state_incomplet,
+      from_layer = us_layer_state_incomplet,
       by = "STUSPS"
     )
 
@@ -44,7 +35,7 @@ test_that("multiple_value_key()", {
     define_geoattribute(
       dimension = "where",
       attribute = "state",
-      from_layer = layer_us_state_incomplet,
+      from_layer = us_layer_state_incomplet,
       by = "STUSPS"
     )
 
@@ -67,6 +58,19 @@ test_that("multiple_value_key()", {
       from_attribute = "state"
     )
 
+  us_state_point <-
+    coordinates_to_point(us_layer_state,
+                         lon_lat = c("INTPTLON", "INTPTLAT"))
+
+
+  expect_equal({
+    c(get_geometry(us_state_point),
+      nrow(us_state_point))
+  },
+  c(
+    "point",
+    "52"
+  ))
 
   expect_equal({
     c(names(db_7$geo$where$region$point),
@@ -94,7 +98,7 @@ test_that("multiple_value_key()", {
   ))
 
   expect_equal({
-    get_geometry(layer_us_state)
+    get_geometry(us_layer_state)
   },
   "polygon"
   )

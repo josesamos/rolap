@@ -42,6 +42,7 @@ rpd <- constellation("MRS", db1, db2) |>
 
 Other star database definition functions: 
 \code{\link{get_dimension_names}()},
+\code{\link{get_dimension_table}()},
 \code{\link{get_fact_names}()},
 \code{\link{get_table_names}()},
 \code{\link{group_dimension_instances}()},

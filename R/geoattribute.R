@@ -19,9 +19,10 @@
 #' @family level definition functions
 #'
 #' @examples
+#'
 #' us_state_point <-
-#'   coordinates_to_point(layer_us_state,
-#'                           lon_lat = c("intptlon", "intptlat"))
+#'   coordinates_to_point(us_layer_state,
+#'                        lon_lat = c("INTPTLON", "INTPTLAT"))
 #'
 #' @export
 coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs = NULL) {
@@ -45,15 +46,9 @@ coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs
     sf::st_as_sf(
       coords = names[c(lon, lat)],
       crs = crs,
+      agr = "constant",
       remove = TRUE
     )
-
-  # # sf version 0.3-4, 0.4-0
-  # DT_sf = st_as_sf(DT, coords = c("longitude", "latitude"),
-  #                  crs = 4326, agr = "constant")
-  # https://gis.stackexchange.com/questions/222978/lon-lat-to-simple-features-sfg-and-sfc-in-r
-
-
 }
 
 
@@ -74,16 +69,7 @@ coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs
 #'
 #' @examples
 #'
-#' file <-
-#'   system.file(
-#'     "extdata",
-#'     "layer_us_level.gpkg",
-#'     package = "rolap"
-#'   )
-#' layer_us_state <- sf::st_read(file, 'layer_us_state',
-#'                               quiet = TRUE)
-#'
-#' geometry <- get_geometry(layer_us_state)
+#' geometry <- get_geometry(us_layer_state)
 #'
 #' @export
 get_geometry <- function(layer) {
@@ -113,17 +99,8 @@ get_geometry <- function(layer) {
 #'
 #' @examples
 #'
-#' file <-
-#'   system.file(
-#'     "extdata",
-#'     "layer_us_level.gpkg",
-#'     package = "rolap"
-#'   )
-#' layer_us_state <- sf::st_read(file, 'layer_us_state',
-#'                               quiet = TRUE)
-#'
 #' layer <-
-#'   summarize_layer(layer = layer_us_state, attribute = "REGION")
+#'   summarize_layer(us_layer_state, "REGION")
 #'
 #' @export
 summarize_layer <- function(layer, attribute) {
@@ -158,17 +135,8 @@ summarize_layer <- function(layer, attribute) {
 #'
 #' @examples
 #'
-#' file <-
-#'   system.file(
-#'     "extdata",
-#'     "layer_us_level.gpkg",
-#'     package = "rolap"
-#'   )
-#' layer_us_state <- sf::st_read(file, 'layer_us_state',
-#'                               quiet = TRUE)
-#'
 #' layer <-
-#'   get_point_geometry(layer_us_state)
+#'   get_point_geometry(us_layer_state)
 #'
 #' @export
 get_point_geometry <- function(layer) {
@@ -204,20 +172,11 @@ get_point_geometry <- function(layer) {
 #'
 #' @examples
 #'
-#' file <-
-#'   system.file(
-#'     "extdata",
-#'     "layer_us_level.gpkg",
-#'     package = "rolap"
-#'   )
-#' layer_us_state <- sf::st_read(file, 'layer_us_state',
-#'                               quiet = TRUE)
-#'
 #' db <- mrs_db |>
 #'   define_geoattribute(
 #'     dimension = "where",
 #'     attribute = "state",
-#'     from_layer = layer_us_state,
+#'     from_layer = us_layer_state,
 #'     by = "STUSPS"
 #'   )
 #'
@@ -293,20 +252,11 @@ get_unrelated_instances.star_database <- function(db,
 #'
 #' @examples
 #'
-#' file <-
-#'   system.file(
-#'     "extdata",
-#'     "layer_us_level.gpkg",
-#'     package = "rolap"
-#'   )
-#' layer_us_state <- sf::st_read(file, 'layer_us_state',
-#'                               quiet = TRUE)
-#'
 #' db <- mrs_db |>
 #'   define_geoattribute(
 #'     dimension = "where",
 #'     attribute = "state",
-#'     from_layer = layer_us_state,
+#'     from_layer = us_layer_state,
 #'     by = "STUSPS"
 #'   ) |>
 #'   define_geoattribute(

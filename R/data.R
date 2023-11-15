@@ -363,3 +363,15 @@
 "us_census_state"
 
 
+#' Geographic layer of US States
+#'
+#' Geographic layer with data from the States of the USA in polygon format, with
+#' simplified geometry so that it takes up less space.
+#'
+#' It has been obtained from the geographic data included in the US census prepared
+#' by the U.S. Census Bureau.
+#'
+#' @format A `sf`.
+#' @source
+#'   \url{https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-data.2021.html}
+"us_layer_state"

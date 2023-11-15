@@ -570,6 +570,36 @@ get_table_names.star_database <- function(db) {
 }
 
 
+#' Get dimension table
+#'
+#' Get the table for the dimension indicated by its name.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#'
+#' @return A `tibble`, dimension table.
+#'
+#' @family star database definition functions
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' table <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_dimension_table("where")
+#'
+#' @export
+get_dimension_table <- function(db, name)
+  UseMethod("get_dimension_table")
+
+#' @rdname get_dimension_table
+#'
+#' @export
+get_dimension_table.star_database <- function(db, name = NULL) {
+  validate_dimension_names(db, name)
+  db$dimensions[[name]]$table[, -1]
+}
+
+
 #' Group instances of a dimension
 #'
 #' After changes in values in the instances of a dimension, groups the instances

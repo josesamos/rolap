@@ -32,20 +32,11 @@ geographic element of the indicated geometry.
 }
 \examples{
 
-file <-
-  system.file(
-    "extdata",
-    "layer_us_level.gpkg",
-    package = "rolap"
-  )
-layer_us_state <- sf::st_read(file, 'layer_us_state',
-                              quiet = TRUE)
-
 db <- mrs_db |>
   define_geoattribute(
     dimension = "where",
     attribute = "state",
-    from_layer = layer_us_state,
+    from_layer = us_layer_state,
     by = "STUSPS"
   )
 

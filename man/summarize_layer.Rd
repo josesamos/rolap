@@ -20,17 +20,8 @@ attribute.
 }
 \examples{
 
-file <-
-  system.file(
-    "extdata",
-    "layer_us_level.gpkg",
-    package = "rolap"
-  )
-layer_us_state <- sf::st_read(file, 'layer_us_state',
-                              quiet = TRUE)
-
 layer <-
-  summarize_layer(layer = layer_us_state, attribute = "REGION")
+  summarize_layer(us_layer_state, "REGION")
 
 }
 \seealso{

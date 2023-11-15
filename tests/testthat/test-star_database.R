@@ -1154,4 +1154,22 @@ test_that("get_dimension_names()", {
   }, {
     c("mrs_age", "mrs_cause", "when", "where", "who")
   })
+
+  expect_equal({
+    t <- ct |>
+      get_dimension_table("where")
+  }, {
+    structure(
+      list(
+        region = c("1", "1", "1", "1"),
+        state = c("CT",
+                  "CT", "MA", "MA"),
+        city = c("Bridgeport", "Hartford", "Boston",
+                 "Cambridge")
+      ),
+      row.names = c(NA,-4L),
+      class = c("tbl_df", "tbl",
+                "data.frame")
+    )
+  })
 })

@@ -17,17 +17,8 @@ Obtain point geometry from polygon geometry using the centroid.
 }
 \examples{
 
-file <-
-  system.file(
-    "extdata",
-    "layer_us_level.gpkg",
-    package = "rolap"
-  )
-layer_us_state <- sf::st_read(file, 'layer_us_state',
-                              quiet = TRUE)
-
 layer <-
-  get_point_geometry(layer_us_state)
+  get_point_geometry(us_layer_state)
 
 }
 \seealso{

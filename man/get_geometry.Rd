@@ -22,16 +22,7 @@ or \emph{polygon}.
 }
 \examples{
 
-file <-
-  system.file(
-    "extdata",
-    "layer_us_level.gpkg",
-    package = "rolap"
-  )
-layer_us_state <- sf::st_read(file, 'layer_us_state',
-                              quiet = TRUE)
-
-geometry <- get_geometry(layer_us_state)
+geometry <- get_geometry(us_layer_state)
 
 }
 \seealso{
