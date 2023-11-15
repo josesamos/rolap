@@ -4,10 +4,10 @@
 \alias{summarize_layer}
 \title{Summarize geometry of a layer}
 \usage{
-summarize_layer(from_layer, attribute)
+summarize_layer(layer, attribute)
 }
 \arguments{
-\item{from_layer}{A \code{sf} object.}
+\item{layer}{A \code{sf} object.}
 
 \item{attribute}{A string, attribute name.}
 }
@@ -18,4 +18,26 @@ A \code{sf} object.
 Groups the geometric elements of a layer according to the values of the indicated
 attribute.
 }
-\keyword{internal}
+\examples{
+
+file <-
+  system.file(
+    "extdata",
+    "layer_us_level.gpkg",
+    package = "rolap"
+  )
+layer_us_state <- sf::st_read(file, 'layer_us_state',
+                              quiet = TRUE)
+
+layer <-
+  summarize_layer(layer = layer_us_state, attribute = "REGION")
+
+}
+\seealso{
+Other star database geographic attributes: 
+\code{\link{define_geoattribute}()},
+\code{\link{get_geometry}()},
+\code{\link{get_point_geometry}()},
+\code{\link{get_unrelated_instances}()}
+}
+\concept{star database geographic attributes}

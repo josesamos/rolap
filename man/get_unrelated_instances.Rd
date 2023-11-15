@@ -57,6 +57,8 @@ instances <- get_unrelated_instances (db,
 \seealso{
 Other star database geographic attributes: 
 \code{\link{define_geoattribute}()},
-\code{\link{get_geometry}()}
+\code{\link{get_geometry}()},
+\code{\link{get_point_geometry}()},
+\code{\link{summarize_layer}()}
 }
 \concept{star database geographic attributes}

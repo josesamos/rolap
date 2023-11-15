@@ -39,6 +39,95 @@ get_geometry <- function(layer) {
 }
 
 
+#' Summarize geometry of a layer
+#'
+#' Groups the geometric elements of a layer according to the values of the indicated
+#' attribute.
+#'
+#' @param layer A `sf` object.
+#' @param attribute A string, attribute name.
+#'
+#' @return A `sf` object.
+#'
+#' @family star database geographic attributes
+#'
+#' @examples
+#'
+#' file <-
+#'   system.file(
+#'     "extdata",
+#'     "layer_us_level.gpkg",
+#'     package = "rolap"
+#'   )
+#' layer_us_state <- sf::st_read(file, 'layer_us_state',
+#'                               quiet = TRUE)
+#'
+#' layer <-
+#'   summarize_layer(layer = layer_us_state, attribute = "REGION")
+#'
+#' @export
+summarize_layer <- function(layer, attribute) {
+  geometry <- get_geometry(layer)
+  if (!(geometry %in% c("polygon", "point"))) {
+    stop(sprintf('layer has unsupported geometry: %s.', geometry[1]))
+  }
+  layer <- layer|>
+    dplyr::group_by_at(attribute)
+  if (geometry == "polygon") {
+    layer <- layer |>
+      dplyr::summarize(.groups = "drop")
+  } else {
+    geocol <- attr(layer, "sf_column")
+    layer <- layer |>
+      dplyr::summarize(geom = sf::st_union(eval(parse(text = geocol)))) |>
+      sf::st_centroid()
+  }
+  layer
+}
+
+
+#' Get point geometry
+#'
+#' Obtain point geometry from polygon geometry using the centroid.
+#'
+#' @param layer A `sf` object.
+#'
+#' @return A `sf` object.
+#'
+#' @family star database geographic attributes
+#'
+#' @examples
+#'
+#' file <-
+#'   system.file(
+#'     "extdata",
+#'     "layer_us_level.gpkg",
+#'     package = "rolap"
+#'   )
+#' layer_us_state <- sf::st_read(file, 'layer_us_state',
+#'                               quiet = TRUE)
+#'
+#' layer <-
+#'   get_point_geometry(layer_us_state)
+#'
+#' @export
+get_point_geometry <- function(layer) {
+  geometry <- get_geometry(layer)
+  if (geometry == "polygon") {
+    # suppress warning message
+    sf::st_agr(layer) = "constant"
+    crs <- sf::st_crs(layer)
+    layer <-
+      sf::st_transform(layer, 3857) |>
+      sf::st_centroid() |>
+      sf::st_transform(crs)
+  } else {
+    stop("The geometry of the layer must be polygon.")
+  }
+  layer
+}
+
+
 #' Get unrelated instances of a `geoattribute`
 #'
 #' We obtain the values of the dimension attribute that do not have an associated
@@ -246,35 +335,6 @@ get_layer_from_attribute <- function(db,
 }
 
 
-#' Summarize geometry of a layer
-#'
-#' Groups the geometric elements of a layer according to the values of the indicated
-#' attribute.
-#'
-#' @param from_layer A `sf` object.
-#' @param attribute A string, attribute name.
-#'
-#' @return A `sf` object.
-#'
-#' @keywords internal
-summarize_layer <- function(from_layer, attribute) {
-  geometry <- get_geometry(from_layer)
-  if (!(geometry %in% c("polygon", "point"))) {
-    stop(sprintf('from_layer has unsupported geometry: %s.', geometry[1]))
-  }
-  from_layer <- from_layer|>
-    dplyr::group_by_at(attribute)
-  if (geometry == "polygon") {
-    from_layer <- from_layer |>
-      dplyr::summarize(.groups = "drop")
-  } else {
-    from_layer <- from_layer |>
-      dplyr::summarize(geometry = sf::st_union(geometry)) |>
-      sf::st_centroid()
-  }
-  from_layer
-}
-
 #' Define geoattribute from a layer
 #'
 #' @param db A `star_database` object.
@@ -325,11 +385,7 @@ define_geoattribute_from_layer <- function(db,
   }
   db$geo[[dimension]][[geoatt]][[geometry]] <- from_layer
   if (geometry == "polygon") {
-    crs <- sf::st_crs(from_layer)
-    from_layer_point <-
-      sf::st_transform(from_layer, 3857) |>
-      sf::st_centroid() |>
-      sf::st_transform(crs)
+    from_layer_point <- get_point_geometry(from_layer)
     if (is.null(db$geo[[dimension]][[geoatt]][["point"]])) {
       db$geo[[dimension]][[geoatt]][["point"]] <- from_layer_point
     } else {
