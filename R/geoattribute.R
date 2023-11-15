@@ -1,3 +1,63 @@
+#' Transform coordinates to point geometry
+#'
+#' From the coordinates defined in fields such as latitude and longitude, it
+#' returns a layer of points.
+#'
+#' If we start from a geographic layer, it initially transforms it into a table.
+#'
+#' The CRS of the new layer is indicated. If a CRS is not indicated, it
+#' considers the layer's CRS by default and, if it is not a layer, it considers
+#' 4326 CRS (WGS84).
+#'
+#' @param table A `tibble` object.
+#' @param lon_lat A vector, name of longitude and latitude attributes.
+#' @param crs A coordinate reference system: integer with the EPSG code, or
+#'   character with proj4string.
+#'
+#' @return A `sf` object.
+#'
+#' @family level definition functions
+#'
+#' @examples
+#' us_state_point <-
+#'   coordinates_to_point(layer_us_state,
+#'                           lon_lat = c("intptlon", "intptlat"))
+#'
+#' @export
+coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs = NULL) {
+  if ("sf" %in% class(table)) {
+    if (is.null(crs)) {
+      crs <- sf::st_crs(table)
+    }
+    table <- tibble::tibble((sf::st_drop_geometry(table)))
+  }
+  lon_lat <- unique(lon_lat)
+  stopifnot("Two attributes must be indicated: longitude and latitude." = length(lon_lat) == 2)
+  names <- names(table)
+  lon <- grep(lon_lat[1], names, ignore.case = TRUE)
+  lat <- grep(lon_lat[2], names, ignore.case = TRUE)
+  stopifnot("Two attributes of the table must be indicated." = length(lon) > 0 & length(lat) > 0)
+  if (is.null(crs)) {
+    crs <- 4326 # WGS84
+  }
+
+  table |>
+    sf::st_as_sf(
+      coords = names[c(lon, lat)],
+      crs = crs,
+      remove = TRUE
+    )
+
+  # # sf version 0.3-4, 0.4-0
+  # DT_sf = st_as_sf(DT, coords = c("longitude", "latitude"),
+  #                  crs = 4326, agr = "constant")
+  # https://gis.stackexchange.com/questions/222978/lon-lat-to-simple-features-sfg-and-sfc-in-r
+
+
+}
+
+
+
 #' Get geometry
 #'
 #' Get the geometry of a layer, as it is interpreted to define a `geolevel`
