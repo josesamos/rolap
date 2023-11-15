@@ -20,6 +20,20 @@ object.
 It will only be valid if one of the two geometries is interpreted: \emph{point}
 or \emph{polygon}.
 }
+\examples{
+
+file <-
+  system.file(
+    "extdata",
+    "layer_us_level.gpkg",
+    package = "rolap"
+  )
+layer_us_state <- sf::st_read(file, 'layer_us_state',
+                              quiet = TRUE)
+
+geometry <- get_geometry(layer_us_state)
+
+}
 \seealso{
 Other star database geographic attributes: 
 \code{\link{define_geoattribute}()},

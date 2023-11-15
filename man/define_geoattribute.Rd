@@ -58,6 +58,31 @@ is provided are also added.
 
 If the geometry provided is polygons, a point layer is also generated.
 }
+\examples{
+
+file <-
+  system.file(
+    "extdata",
+    "layer_us_level.gpkg",
+    package = "rolap"
+  )
+layer_us_state <- sf::st_read(file, 'layer_us_state',
+                              quiet = TRUE)
+
+db <- mrs_db |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "state",
+    from_layer = layer_us_state,
+    by = "STUSPS"
+  ) |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "region",
+    from_attribute = "state"
+  )
+
+}
 \seealso{
 Other star database geographic attributes: 
 \code{\link{get_geometry}()},

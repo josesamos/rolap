@@ -14,6 +14,16 @@
 #'
 #' @examples
 #'
+#' file <-
+#'   system.file(
+#'     "extdata",
+#'     "layer_us_level.gpkg",
+#'     package = "rolap"
+#'   )
+#' layer_us_state <- sf::st_read(file, 'layer_us_state',
+#'                               quiet = TRUE)
+#'
+#' geometry <- get_geometry(layer_us_state)
 #'
 #' @export
 get_geometry <- function(layer) {
@@ -45,6 +55,26 @@ get_geometry <- function(layer) {
 #'
 #' @examples
 #'
+#' file <-
+#'   system.file(
+#'     "extdata",
+#'     "layer_us_level.gpkg",
+#'     package = "rolap"
+#'   )
+#' layer_us_state <- sf::st_read(file, 'layer_us_state',
+#'                               quiet = TRUE)
+#'
+#' db <- mrs_db |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "state",
+#'     from_layer = layer_us_state,
+#'     by = "STUSPS"
+#'   )
+#'
+#' instances <- get_unrelated_instances (db,
+#'                                       dimension = "where",
+#'                                       attribute = "state")
 #'
 #' @export
 get_unrelated_instances <-
@@ -114,6 +144,27 @@ get_unrelated_instances.star_database <- function(db,
 #'
 #' @examples
 #'
+#' file <-
+#'   system.file(
+#'     "extdata",
+#'     "layer_us_level.gpkg",
+#'     package = "rolap"
+#'   )
+#' layer_us_state <- sf::st_read(file, 'layer_us_state',
+#'                               quiet = TRUE)
+#'
+#' db <- mrs_db |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "state",
+#'     from_layer = layer_us_state,
+#'     by = "STUSPS"
+#'   ) |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "region",
+#'     from_attribute = "state"
+#'   )
 #'
 #' @export
 define_geoattribute <-

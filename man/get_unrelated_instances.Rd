@@ -30,6 +30,30 @@ A \code{tibble}.
 We obtain the values of the dimension attribute that do not have an associated
 geographic element of the indicated geometry.
 }
+\examples{
+
+file <-
+  system.file(
+    "extdata",
+    "layer_us_level.gpkg",
+    package = "rolap"
+  )
+layer_us_state <- sf::st_read(file, 'layer_us_state',
+                              quiet = TRUE)
+
+db <- mrs_db |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "state",
+    from_layer = layer_us_state,
+    by = "STUSPS"
+  )
+
+instances <- get_unrelated_instances (db,
+                                      dimension = "where",
+                                      attribute = "state")
+
+}
 \seealso{
 Other star database geographic attributes: 
 \code{\link{define_geoattribute}()},
