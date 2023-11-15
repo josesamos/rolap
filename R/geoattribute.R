@@ -73,15 +73,16 @@ coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs
 #'
 #' @export
 get_geometry <- function(layer) {
-  geo <- unique(as.character(sf::st_geometry_type(layer, by_geometry = TRUE)))
-  if (length(intersect(geo, c("CIRCULARSTRING", "CURVEPOLYGON", "MULTIPOLYGON", "TRIANGLE", "POLYGON"))) > 0) {
+  layer <- sf::st_as_sf(layer)
+  res <- unique(as.character(sf::st_geometry_type(layer, by_geometry = TRUE)))
+  if (length(intersect(res, c("CIRCULARSTRING", "CURVEPOLYGON", "MULTIPOLYGON", "TRIANGLE", "POLYGON"))) > 0) {
     return("polygon")
-  } else if (length(intersect(geo, c("LINESTRING", "MULTILINESTRING", "CURVE", "MULTICURVE", "COMPOUNDCURVE"))) > 0) {
+  } else if (length(intersect(res, c("LINESTRING", "MULTILINESTRING", "CURVE", "MULTICURVE", "COMPOUNDCURVE"))) > 0) {
     return("line")
-  } else if (length(intersect(geo, c("POINT", "MULTIPOINT"))) > 0) {
+  } else if (length(intersect(res, c("POINT", "MULTIPOINT"))) > 0) {
     return("point")
   }
-  geo
+  res
 }
 
 
@@ -208,7 +209,7 @@ get_unrelated_instances.star_database <- function(db,
   data_lay <- sf::st_drop_geometry(db$geo[[dimension]][[geoatt]][[geometry]])
   data_dim <- unique(db$dimensions[[dimension]]$table[, attribute])
   out <- dplyr::setdiff(data_dim, data_lay) |>
-    dplyr::arrange(tidyselect::all_of(attribute))
+    dplyr::arrange()
   out
 }
 

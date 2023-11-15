@@ -198,7 +198,15 @@ get_star_database.star_database <- function(db, name) {
     dim <- unique(dim)
     db$dimensions <- db$dimensions[dim]
     db$rpd <- filter_rpd_dimensions(db, dim)
+    geo <- db$geo[dim]
     db$geo <- list()
+    j <- 1
+    for (i in seq_along(geo)) {
+      if (!is.null(geo[[i]])) {
+        db$geo[[j]] <- geo[[i]]
+        j <- j + 1
+      }
+    }
     db <- purge_dimension_instances_star_database(db)
   }
   db

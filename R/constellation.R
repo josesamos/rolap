@@ -88,6 +88,9 @@ constellation <- function(name = NULL, ...) {
     for (s in seq_along(stars)) {
       if (dn %in% names(stars[[s]]$dimensions)) {
         dimensions[dn] <- stars[[s]]$dimensions[dn]
+        if (!is.null(stars[[s]]$geo[[dn]])) {
+          geo[[dn]] <- stars[[s]]$geo[[dn]]
+        }
         break # dim_freq == 1 and found
       }
     }
@@ -98,6 +101,10 @@ constellation <- function(name = NULL, ...) {
     surrogate_key <- NULL
     attributes <- NULL
     for (s in seq_along(stars)) {
+      # dimension with more geoattributes defined
+      if (length(stars[[s]]$geo[[dn]]) > length(geo[[dn]])) {
+        geo[[dn]] <- stars[[s]]$geo[[dn]]
+      }
       for (f in seq_along(stars[[s]]$facts)) {
         if (dn %in% stars[[s]]$facts[[f]]$dim_int_names) {
           dim <- stars[[s]]$dimensions[dn]
