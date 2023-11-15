@@ -178,9 +178,6 @@ define_geoattribute_from_layer <- function(db,
   if (!(geometry %in% c("polygon", "point"))) {
     stop(sprintf('from_layer has unsupported geometry: %s.', geometry[1]))
   }
-  if (is.null(db$geo[[dimension]][[geoatt]][[geometry]])) {
-    db$geo[[dimension]][[geoatt]][[geometry]] <- list()
-  }
   from_layer <- from_layer[, by]
   from_layer <- from_layer |>
     dplyr::group_by_at(by) |>
@@ -191,7 +188,27 @@ define_geoattribute_from_layer <- function(db,
     names[j] <- attribute[i]
   }
   names(from_layer) <- names
+
+  # add new instances to old ones
+  if (!is.null(db$geo[[dimension]][[geoatt]][[geometry]])) {
+    no_new <- dplyr::setdiff(db$geo[[dimension]][[geoatt]][[geometry]], from_layer)
+    if (nrow(no_new > 0)) {
+      from_layer <- rbind(from_layer, no_new)
+    }
+  }
   db$geo[[dimension]][[geoatt]][[geometry]] <- from_layer
+  if (is.null(db$geo[[dimension]][[geoatt]][["point"]])) {
+    crs <- sf::st_crs(from_layer)
+    tryCatch(
+      from_layer_point <-
+        sf::st_transform(from_layer, 3857) |>
+        sf::st_centroid() |>
+        sf::st_transform(crs),
+      warning = function(w)
+        1
+    )
+    db$geo[[dimension]][[geoatt]][["point"]] <- from_layer_point
+  }
   data_lay <- sf::st_drop_geometry(from_layer)
   data_dim <- unique(db$dimensions[[dimension]]$table[, attribute])
   out <- dplyr::setdiff(data_dim, data_lay)
@@ -238,10 +255,26 @@ define_geoattribute_from_attribute <- function(db,
       dplyr::summarize(.groups = "drop")
     db$geo[[dimension]][[geoatt]][["polygon"]] <- from_layer
 
-    # obtener los centroides
-
+    crs <- sf::st_crs(from_layer)
+    tryCatch(
+      from_layer_point <-
+        sf::st_transform(from_layer, 3857) |>
+        sf::st_centroid() |>
+        sf::st_transform(crs),
+      warning = function(w)
+        1
+    )
+    db$geo[[dimension]][[geoatt]][["point"]] <- from_layer_point
   } else {
-    # obtener de varios puntos uno
+    from_layer <- db$geo[[dimension]][[from_geoatt]][["point"]]
+    from_layer <- dplyr::inner_join(data_dim, from_layer, by = from_attribute)
+    from_layer <- sf::st_as_sf(from_layer)
+    from_layer <- from_layer[, attribute]
+    from_layer <- from_layer |>
+      dplyr::group_by_at(attribute) |>
+      dplyr::summarize(geometry = sf::st_union(geometry)) |>
+      sf::st_centroid()
+    db$geo[[dimension]][[geoatt]][["point"]] <- from_layer
   }
   data_lay <- sf::st_drop_geometry(from_layer)
   out <- dplyr::setdiff(data_dim, data_lay)
