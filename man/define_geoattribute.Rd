@@ -40,20 +40,27 @@ values must uniquely designate the instances of the given geographic layer.
 \details{
 The definition can be done in two ways: Associates the instances of the attributes
 with the instances of a geographic layer or defines it from the geometry of
-previously defined geographic attributes. Multiple attributes can be specified in the
-\code{attribute} parameter.
+previously defined geographic attributes.
+
+Multiple attributes can be specified in the \code{attribute} parameter, the geographical
+attribute is the combination of all of them.
 
 If defined from a layer (\code{from_layer} parameter), additionally the attributes
 used for the join between the tables (dimension and layer tables) must be
 indicated (\code{by} parameter).
 
-If defined from another attribute, it should have a finer granularity, to
-obtain the result by grouping its instances.
+If defined from another attribute, it should have a finer granularity, to obtain
+the result by grouping its instances.
+
+If other geographic information has previously been associated with that attribute,
+the new information is considered and previous instances for which no new information
+is provided are also added.
+
+If the geometry provided is polygons, a point layer is also generated.
 }
-\examples{
-
-geo_mrs_db <- mrs_db |>
-  define_geoattribute()
-
+\seealso{
+Other star database geographic attributes: 
+\code{\link{get_geometry}()},
+\code{\link{get_unrelated_instances}()}
 }
 \concept{star database geographic attributes}
