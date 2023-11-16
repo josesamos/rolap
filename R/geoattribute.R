@@ -246,7 +246,18 @@ get_geoattribute_geometries.star_database <- function(db,
                                                       dimension = NULL,
                                                       attribute = NULL) {
   if (is.null(dimension)) {
-    dimension <- names(db$geo)[1]
+    if (length(db$geo) == 1) {
+      dimension <- names(db$geo)
+    } else {
+      stop("A geodimension name must be indicated since there is more than one.")
+    }
+  }
+  if (is.null(attribute)) {
+    if (length(db$geo[[dimension]]) == 1) {
+      attribute <- names(db$geo[[dimension]])
+    } else {
+      stop("A geoattribute name must be indicated since there is more than one.")
+    }
   }
   geoatt <- get_geoattribute_name(attribute)
   names(db$geo[[dimension]][[geoatt]])
