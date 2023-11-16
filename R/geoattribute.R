@@ -436,10 +436,9 @@ define_geoattribute_from_layer <- function(db,
 #' @keywords internal
 get_geoattribute_name <- function(attribute) {
   attribute <- snakecase::to_snake_case(attribute)
-  attribute <- sort(attribute)
-  attribute <- paste(attribute, collapse = "<|>", sep = "")
-  attribute
+  vector_to_string(attribute)
 }
+
 
 #' From geodimensions, leave only contained in vector of names
 #'
@@ -459,6 +458,27 @@ filter_geo_dimensions <- function(db, dim) {
   geo
 }
 
+
+#' From attributes, leave only these contained in dimensions
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A list of geodimensions.
+#'
+#' @keywords internal
+filter_geo_attributes <- function(db) {
+  geo <- list()
+  for (d in names(db$geo)) {
+    dim_att <- snakecase::to_snake_case(names(get_dimension_table(db, d)))
+    for (n in names(db$geo[[d]])) {
+      attributes <- string_to_vector(n)
+      if (length(intersect(dim_att, attributes)) == length(attributes)) {
+        geo[[d]][[n]] <- db$geo[[d]][[n]]
+      }
+    }
+  }
+  geo
+}
 
 
 #' Integrate two geodimensions

@@ -78,7 +78,42 @@ test_that("geoattribute", {
   gd1 = db_4$geo$where
   igd2 <- integrate_geo_dimensions(gd1, gd2)
 
+  db_8 <- db_3
+  db_8$dimensions$where$table <- db_8$dimensions$where$table[, -2]
+  db_9 <- db_3
+  db_9$dimensions$where$table <- db_9$dimensions$where$table[, -3]
+  db_10 <- db_3
+  db_10$dimensions$where$table <- db_10$dimensions$where$table[, -c(2, 3)]
+  r1 <- filter_geo_attributes(db_3)
+  r1 <- names(r1$where)
+  r2 <- filter_geo_attributes(db_8)
+  r2 <- names(r2$where)
+  r3 <- filter_geo_attributes(db_9)
+  r3 <- names(r3$where)
+  r4 <- filter_geo_attributes(db_10)
+  r4 <- names(r4$where)
 
+
+
+  expect_equal({
+    r1
+  },
+  c("state", "region"))
+
+  expect_equal({
+    r2
+  },
+  "state")
+
+  expect_equal({
+    r3
+  },
+  "region")
+
+  expect_equal({
+    r4
+  },
+  NULL)
 
   expect_equal({
     igd2$state$polygon$state
