@@ -95,13 +95,13 @@ test_that("geoattribute", {
 
   ga <- get_geoattributes(db_3)
 
-  geometries <- db |>
+  geometries <- db_3 |>
     get_geoattribute_geometries(
       dimension = "where",
       attribute = "state"
     )
 
-  geometries2 <- db |>
+  geometries2 <- db_3 |>
     get_geoattribute_geometries(
       attribute = "state"
     )
