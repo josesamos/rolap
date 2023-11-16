@@ -101,9 +101,12 @@ constellation <- function(name = NULL, ...) {
     surrogate_key <- NULL
     attributes <- NULL
     for (s in seq_along(stars)) {
-      # dimension with more geoattributes defined
-      if (length(stars[[s]]$geo[[dn]]) > length(geo[[dn]])) {
-        geo[[dn]] <- stars[[s]]$geo[[dn]]
+      if (!is.null(stars[[s]]$geo[[dn]])) {
+        if (is.null(geo[[dn]])) {
+          geo[[dn]] <- stars[[s]]$geo[[dn]]
+        } else {
+          geo[[dn]] <- integrate_geo_dimensions(geo[[dn]], stars[[s]]$geo[[dn]])
+        }
       }
       for (f in seq_along(stars[[s]]$facts)) {
         if (dn %in% stars[[s]]$facts[[f]]$dim_int_names) {

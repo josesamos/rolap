@@ -440,3 +440,55 @@ get_geoattribute_name <- function(attribute) {
   attribute <- paste(attribute, collapse = "<|>", sep = "")
   attribute
 }
+
+#' From geodimensions, leave only contained in vector of names
+#'
+#' @param db A `star_database` object.
+#' @param names A vector of strings, dimension names.
+#'
+#' @return A list of geodimensions.
+#'
+#' @keywords internal
+filter_geo_dimensions <- function(db, dim) {
+  geo <- list()
+  for (d in dim) {
+    if (!is.null(db$geo[[d]])) {
+      geo[[d]] <- db$geo[[d]]
+    }
+  }
+  geo
+}
+
+
+
+#' Integrate two geodimensions
+#'
+#' @param gd1 A geodimension.
+#' @param gd2 A geodimension.
+#'
+#' @return A geodimension.
+#'
+#' @keywords internal
+integrate_geo_dimensions <- function(gd1, gd2) {
+  for (geoatt in names(gd2)) {
+    if (!(geoatt %in% names(gd1))) {
+      gd1[[geoatt]] <- gd2[[geoatt]]
+    } else {
+      for(geo in names(gd2[[geoatt]])) {
+        if (!(geo %in% names(gd1[[geoatt]]))) {
+          gd1[[geoatt]][[geo]] <- gd2[[geoatt]][[geo]]
+        } else {
+          t1 <- sf::st_drop_geometry(gd1[[geoatt]][[geo]])
+          t2 <- sf::st_drop_geometry(gd2[[geoatt]][[geo]])
+          td <- dplyr::setdiff(t2, t1)
+          if (nrow(td > 0)) {
+            td <- dplyr::inner_join(td, gd2[[geoatt]][[geo]], by = names(td))
+            td <- sf::st_as_sf(td)
+            gd1[[geoatt]][[geo]] <- rbind(gd1[[geoatt]][[geo]], td)
+          }
+        }
+      }
+    }
+  }
+  gd1
+}
