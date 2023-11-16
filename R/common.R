@@ -195,3 +195,26 @@ validate_names <- function(defined_names, names, concept = 'name', repeated = FA
   }
   names
 }
+
+
+#' Name with nexus
+#'
+#' Given a name, if it ends in "/" the nexus is the empty string, otherwise it
+#' is "/". Add the nexus.
+#'
+#' @param name A string.
+#'
+#' @return A string.
+#'
+#' @keywords internal
+name_with_nexus <- function(name) {
+  l <- nchar(name)
+  c <- substr(name, start = l, stop = l)
+  res <- name
+  for (i in seq_along(c)) {
+    if (c[i] != "/") {
+      res[i] <- paste0(name[i], "/")
+    }
+  }
+  res
+}

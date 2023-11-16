@@ -18,8 +18,6 @@
 #'
 #' @examples
 #'
-#' geo <- db |>
-#'   as_geolayer()
 #'
 #' @export
 as_geolayer <- function(db,
@@ -85,6 +83,7 @@ as_geolayer.star_database <- function(db,
   data <- sf::st_as_sf(data)
 
   structure(list(
+    geoattribute = gt_att,
     variables = metadata,
     geolayer = data
   ),
@@ -96,7 +95,7 @@ as_geolayer.star_database <- function(db,
 #'
 #' Get the geographic layer.
 #'
-#' @param geo A `geolayer` object.
+#' @param gl A `geolayer` object.
 #'
 #' @return A `sf` object.
 #'
@@ -104,29 +103,28 @@ as_geolayer.star_database <- function(db,
 #'
 #' @examples
 #'
-#'   get_geolayer()
 #'
 #' @export
-get_geolayer <- function(geo)
+get_geolayer <- function(gl)
   UseMethod("get_geolayer")
 
 #' @rdname get_geolayer
 #' @export
-get_geolayer.geolayer <- function(geo) {
-  geo$geolayer
+get_geolayer.geolayer <- function(gl) {
+  gl$geolayer
 }
 
 
 #' Get the variables layer
 #'
 #' The variables layer includes the names and description through various fields
-#' of the variables contained in the reports.
+#' of the variables contained in the geolayer.
 #'
 #' The way to select the variables we want to work with is to filter this layer
 #' and subsequently set it as the object's variables layer using the `set_variables()`
 #' function.
 #'
-#' @param geo A `geolayer` object.
+#' @param gl A `geolayer` object.
 #'
 #' @return A `tibble` object.
 #'
@@ -134,23 +132,15 @@ get_geolayer.geolayer <- function(geo) {
 #'
 #' @examples
 #'
-#' db <- anrc_2021_x01 |>
-#'   select_report(report = "B01002-Median Age By Sex")
-#'
-#' geo <- db |>
-#'   as_geolayer()
-#'
-#' variables <- geo |>
-#'   get_variables()
 #'
 #' @export
-get_variables <- function(geo)
+get_variables <- function(gl)
   UseMethod("get_variables")
 
 #' @rdname get_variables
 #' @export
-get_variables.geolayer <- function(geo) {
-  geo$variables
+get_variables.geolayer <- function(gl) {
+  gl$variables
 }
 
 #' Set variables layer
@@ -161,8 +151,11 @@ get_variables.geolayer <- function(geo) {
 #' When we set the variables layer, after filtering it, the data layer is also
 #' filtered keeping only the variables from the variables layer.
 #'
-#' @param geo A `geolayer` object.
+#' By default, rows that are NA for all variables are eliminated.
+#'
+#' @param gl A `geolayer` object.
 #' @param variables A `tibble` object.
+#' @param keep_all_na A boolean, keep rows with all variables NA.
 #'
 #' @return A `sf` object.
 #'
@@ -170,48 +163,40 @@ get_variables.geolayer <- function(geo) {
 #'
 #' @examples
 #'
-#' db <- anrc_2021_x01 |>
-#'   select_report(report = "B01002-Median Age By Sex")
-#'
-#' geo <- db |>
-#'   as_geolayer()
-#'
-#' variables <- geo |>
-#'   get_variables()
-#'
-#' variables <- dplyr::filter(variables, item2 == "Female")
-#'
-#' geo2 <- geo |>
-#'   set_variables(variables)
 #'
 #' @export
-set_variables <- function(geo, variables)
+set_variables <- function(gl, variables)
   UseMethod("set_variables")
 
 #' @rdname set_variables
 #' @export
-set_variables.geolayer <- function(geo, variables) {
-  geo$variables <- variables
+set_variables.geolayer <- function(gl, variables, keep_all_na = FALSE) {
+  gl$variables <- variables
   variable <- unique(variables$variable)
-  names <- names(geo$geolayer)
-  i <- grep('GEOID_Data', names, fixed = TRUE)
-  names <- c(names[1:i], variable)
-  geo$geolayer <- geo$geolayer[, names]
-  geo
+  vars <- intersect(names(gl$geolayer), c(gl$geoattribute, variable))
+  gl$geolayer <- gl$geolayer |>
+    dplyr::select(tidyselect::all_of(vars))
+  if (!keep_all_na) {
+    gl$geolayer <- gl$geolayer |>
+      dplyr::filter(!dplyr::if_all(variable, is.na))
+  }
+  gl
 }
+
 
 
 #' Save as `GeoPackage`
 #'
-#' Save the data layer (geographic information layer), the variables layer and the
-#' data source description layer in a file in `GeoPackage` format to be able to
-#' work with other tools.
+#' Save the geolayer (geographic information layer) and the variables layer in a
+#' file in `GeoPackage` format to be able to work with other tools.
+#'
+#' If the file name is not indicated, it defaults to the name of the geovariable.
 #'
 #' The `GeoPackage` format only allows defining a maximum of 1998 columns. If the
 #' number of variables and columns in the geographic layer exceeds this number,
 #' it cannot be saved in this format.
 #'
-#' @param geo A `geolayer` object.
+#' @param gl A `geolayer` object.
 #' @param dir A string.
 #' @param name A string, file name.
 #'
@@ -221,53 +206,37 @@ set_variables.geolayer <- function(geo, variables) {
 #'
 #' @examples
 #'
-#' db <- anrc_2021_x01 |>
-#'   select_report(report = "B01002-Median Age By Sex")
-#'
-#' geo <- db |>
-#'   as_geolayer()
-#'
-#' dir <- tempdir()
-#' file <- geo |>
-#'   as_GeoPackage(dir)
 #'
 #' @export
-as_GeoPackage <- function(geo, dir, name)
+as_GeoPackage <- function(gl, dir, name)
   UseMethod("as_GeoPackage")
 
 #' @rdname as_GeoPackage
 #' @export
-as_GeoPackage.geolayer <- function(geo, dir = NULL, name = NULL) {
+as_GeoPackage.geolayer <- function(gl, dir = NULL, name = NULL) {
   stopifnot(
-    "The maximum number of columns supported by this format (1998 cols.) has been exceeded." = ncol(geo$geolayer) < 1999
+    "The maximum number of columns supported by this format (1998 cols.) has been exceeded." = ncol(gl$geolayer) < 1999
   )
-  if (is.null(name)) {
-    name <- geo$origin[1, "area_code"]
-  }
   if (!is.null(dir)) {
     dir <- name_with_nexus(dir)
+  }
+  if (is.null(name)) {
+    name <- paste(gl$geoattribute, collapse = "_")
   }
   name <- tools::file_path_sans_ext(name)
   file <- paste0(dir, name, '.gpkg')
 
   sf::st_write(
-    obj = geo$geolayer,
+    obj = gl$geolayer,
     dsn = file,
-    layer = "data",
+    layer = "geolayer",
     append = FALSE,
     quiet = TRUE
   )
   sf::st_write(
-    obj = geo$variables,
+    obj = gl$variables,
     dsn = file,
     layer = "variables",
-    append = FALSE,
-    quiet = TRUE
-  )
-  sf::st_write(
-    obj = geo$origin,
-    dsn = file,
-    layer = "origin",
     append = FALSE,
     quiet = TRUE
   )
