@@ -157,6 +157,102 @@ get_point_geometry <- function(layer) {
 }
 
 
+#' Get geoattributes
+#'
+#' For each dimension, get a list of available geoattributes.
+#'
+#' @param db A `star_database` object.
+#'
+#' @return A list of dimension geoattributes.
+#'
+#' @family star database geographic attributes
+#'
+#' @examples
+#'
+#' db <- mrs_db |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "state",
+#'     from_layer = us_layer_state,
+#'     by = "STUSPS"
+#'   )
+#'
+#' attributes <- db |>
+#'     get_geoattributes()
+#'
+#' @export
+get_geoattributes <- function(db)
+    UseMethod("get_geoattributes")
+
+#' @rdname get_geoattributes
+#'
+#' @export
+get_geoattributes.star_database <- function(db) {
+  res <- list()
+  for (d in names(db$geo)) {
+    att <- names(db$geo[[d]])
+    if (length(att) > 0) {
+      res[[d]] <- list()
+      for (n in att) {
+        attributes <- string_to_vector(n)
+        res[[d]] <- c(res[[d]], attributes)
+      }
+    }
+  }
+  res
+}
+
+#' Get geoattribute geometries
+#'
+#' For each geoattribute, get its geometries.
+#'
+#' If the name of the dimension is not indicated, it is considered the first one
+#' that has geoattributes defined.
+#'
+#' @param db A `star_database` object.
+#' @param dimension A string, dimension name.
+#' @param attribute A vector, attribute names.
+#'
+#' @return A vector of strings.
+#'
+#' @family star database geographic attributes
+#'
+#' @examples
+#'
+#' db <- mrs_db |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "state",
+#'     from_layer = us_layer_state,
+#'     by = "STUSPS"
+#'   )
+#'
+#' geometries <- db |>
+#'   get_geoattribute_geometries(
+#'     dimension = "where",
+#'     attribute = "state"
+#'   )
+#'
+#' @export
+get_geoattribute_geometries <- function(db,
+                                        dimension,
+                                        attribute)
+  UseMethod("get_geoattribute_geometries")
+
+#' @rdname get_geoattribute_geometries
+#'
+#' @export
+get_geoattribute_geometries.star_database <- function(db,
+                                                      dimension = NULL,
+                                                      attribute = NULL) {
+  if (is.null(dimension)) {
+    dimension <- names(db$geo)[1]
+  }
+  geoatt <- get_geoattribute_name(attribute)
+  names(db$geo[[dimension]][[geoatt]])
+}
+
+
 #' Get unrelated instances of a `geoattribute`
 #'
 #' We obtain the values of the dimension attribute that do not have an associated
@@ -181,9 +277,9 @@ get_point_geometry <- function(layer) {
 #'     by = "STUSPS"
 #'   )
 #'
-#' instances <- get_unrelated_instances (db,
-#'                                       dimension = "where",
-#'                                       attribute = "state")
+#' instances <- get_unrelated_instances(db,
+#'                                      dimension = "where",
+#'                                      attribute = "state")
 #'
 #' @export
 get_unrelated_instances <-

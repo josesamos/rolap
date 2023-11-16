@@ -27,6 +27,8 @@ layer <-
 \seealso{
 Other star database geographic attributes: 
 \code{\link{define_geoattribute}()},
+\code{\link{get_geoattribute_geometries}()},
+\code{\link{get_geoattributes}()},
 \code{\link{get_geometry}()},
 \code{\link{get_point_geometry}()},
 \code{\link{get_unrelated_instances}()}

@@ -76,6 +76,8 @@ db <- mrs_db |>
 }
 \seealso{
 Other star database geographic attributes: 
+\code{\link{get_geoattribute_geometries}()},
+\code{\link{get_geoattributes}()},
 \code{\link{get_geometry}()},
 \code{\link{get_point_geometry}()},
 \code{\link{get_unrelated_instances}()},

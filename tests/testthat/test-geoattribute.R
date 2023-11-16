@@ -93,7 +93,34 @@ test_that("geoattribute", {
   r4 <- filter_geo_attributes(db_10)
   r4 <- names(r4$where)
 
+  ga <- get_geoattributes(db_3)
 
+  geometries <- db |>
+    get_geoattribute_geometries(
+      dimension = "where",
+      attribute = "state"
+    )
+
+  geometries2 <- db |>
+    get_geoattribute_geometries(
+      attribute = "state"
+    )
+
+
+  expect_equal({
+    geometries2
+  },
+  c("polygon", "point"))
+
+  expect_equal({
+    geometries
+  },
+  c("polygon", "point"))
+
+  expect_equal({
+    ga
+  },
+  list(where = list("state", "region")))
 
   expect_equal({
     r1
