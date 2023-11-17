@@ -213,7 +213,7 @@ set_variables.geolayer <- function(gl, variables, keep_all_variables_na = FALSE)
     dplyr::select(tidyselect::all_of(vars))
   if (!keep_all_variables_na) {
     gl$geolayer <- gl$geolayer |>
-      dplyr::filter(!dplyr::if_all(variable, is.na))
+      dplyr::filter(!dplyr::if_all(tidyselect::all_of(variable), is.na))
   }
   gl
 }
@@ -334,8 +334,8 @@ unify_facts_and_dimensions <- function(db, dimension, include_nrow_agg) {
     if (end < lnt) {
       t <- t[, -lnt]
     }
-    i <- begin:end
-    t <-  tidyr::gather(t, "measure", "value", i)
+    v <- names(t)[begin:end]
+    t <-  tidyr::gather(t, "measure", "value", tidyselect::all_of(v))
     if (include_fact_name) {
       t <-
         tibble::add_column(t, facts = db$facts[[f]]$name, .before = 1)

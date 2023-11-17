@@ -40,7 +40,7 @@ the dimension or the attribute. By default, polygon geometry is considered.
 }
 \examples{
 
-gl_poligon <- mrs_db_geo |>
+gl_polygon <- mrs_db_geo |>
   as_geolayer()
 
 gl_point <- mrs_db_geo |>
