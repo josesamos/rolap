@@ -63,6 +63,7 @@ constellation <- function(name = NULL, ...) {
   schemas <- vector("list", length = num_stars)
   dimensions = vector("list", length = length(dim_freq))
   rpd <- list()
+  geo <- list()
   names(facts) <- fct_names
   names(operations) <- fct_names
   names(lookup_tables) <- fct_names
@@ -87,6 +88,9 @@ constellation <- function(name = NULL, ...) {
     for (s in seq_along(stars)) {
       if (dn %in% names(stars[[s]]$dimensions)) {
         dimensions[dn] <- stars[[s]]$dimensions[dn]
+        if (!is.null(stars[[s]]$geo[[dn]])) {
+          geo[[dn]] <- stars[[s]]$geo[[dn]]
+        }
         break # dim_freq == 1 and found
       }
     }
@@ -97,6 +101,13 @@ constellation <- function(name = NULL, ...) {
     surrogate_key <- NULL
     attributes <- NULL
     for (s in seq_along(stars)) {
+      if (!is.null(stars[[s]]$geo[[dn]])) {
+        if (is.null(geo[[dn]])) {
+          geo[[dn]] <- stars[[s]]$geo[[dn]]
+        } else {
+          geo[[dn]] <- integrate_geo_dimensions(geo[[dn]], stars[[s]]$geo[[dn]])
+        }
+      }
       for (f in seq_along(stars[[s]]$facts)) {
         if (dn %in% stars[[s]]$facts[[f]]$dim_int_names) {
           dim <- stars[[s]]$dimensions[dn]
@@ -152,7 +163,8 @@ constellation <- function(name = NULL, ...) {
     deploy = list(),
     facts = facts,
     dimensions = dimensions,
-    rpd = rpd
+    rpd = rpd,
+    geo = geo
   ), class = "star_database")
   c <- rpd_in_constellation(c)
   purge_dimension_instances_star_database(c)

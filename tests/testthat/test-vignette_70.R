@@ -404,7 +404,8 @@ test_that("query", {
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )

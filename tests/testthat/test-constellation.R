@@ -218,7 +218,8 @@ test_that("constellation() define constellation", {
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )
@@ -520,7 +521,8 @@ test_that("constellation() define constellation", {
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )
@@ -823,7 +825,8 @@ test_that("constellation() define constellation", {
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )

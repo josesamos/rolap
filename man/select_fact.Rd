@@ -58,9 +58,14 @@ sq_3 <- sq |>
 }
 \seealso{
 Other query functions: 
+\code{\link{as_GeoPackage}()},
+\code{\link{as_geolayer}()},
 \code{\link{filter_dimension}()},
+\code{\link{get_geolayer}()},
+\code{\link{get_variables}()},
 \code{\link{run_query}()},
 \code{\link{select_dimension}()},
+\code{\link{set_variables}()},
 \code{\link{star_query}()}
 }
 \concept{query functions}

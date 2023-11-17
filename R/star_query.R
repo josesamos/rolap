@@ -306,6 +306,7 @@ run_query.star_database <- function(db, sq) {
   db$refresh <- list()
   db$deploy <- list()
   db$rpd <- list()
+  db$geo <- filter_geo_attributes(db)
 
   db
 }
