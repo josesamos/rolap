@@ -6,6 +6,9 @@
 #' object that allows us to select the data to obtain a vector layer with
 #' geographic information.
 #'
+#' If only one geographic attribute is defined, it is not necessary to indicate
+#' the dimension or the attribute. By default, polygon geometry is considered.
+#'
 #' @param db An `star_database` object.
 #' @param dimension A string, dimension name.
 #' @param attribute A vector, attribute names.
@@ -18,6 +21,11 @@
 #'
 #' @examples
 #'
+#' gl_poligon <- mrs_db_geo |>
+#'   as_geolayer()
+#'
+#' gl_point <- mrs_db_geo |>
+#'   as_geolayer(geometry = "point")
 #'
 #' @export
 as_geolayer <- function(db,
@@ -32,7 +40,7 @@ as_geolayer <- function(db,
 as_geolayer.star_database <- function(db,
                                       dimension = NULL,
                                       attribute = NULL,
-                                      geometry = "polygon",
+                                      geometry = NULL,
                                       include_nrow_agg = FALSE) {
   if (is.null(dimension)) {
     if (length(db$geo) == 1) {
@@ -51,8 +59,14 @@ as_geolayer.star_database <- function(db,
   geoatt <- get_geoattribute_name(attribute)
   validate_names(names(db$geo), dimension, concept = 'geodimension')
   validate_names(names(db$geo[[dimension]]), geoatt, concept = 'geoattribute')
+  if (is.null(geometry)) {
+    if (length(db$geo[[dimension]][[geoatt]]) == 1) {
+      geometry <- names(db$geo[[dimension]][[geoatt]])
+    } else {
+      geometry <- "polygon"
+    }
+  }
   stopifnot("gometry must be 'point' or 'polygon'." = geometry %in% c("polygon", "point"))
-
   geo <- db$geo[[dimension]][[geoatt]][[geometry]]
   gt <- sf::st_drop_geometry(geo)
   gt_att <- names(gt)
@@ -93,7 +107,7 @@ as_geolayer.star_database <- function(db,
 
 #' Get geographic layer
 #'
-#' Get the geographic layer.
+#' Get the geographic layer from a `geolayer` object.
 #'
 #' @param gl A `geolayer` object.
 #'
@@ -103,6 +117,11 @@ as_geolayer.star_database <- function(db,
 #'
 #' @examples
 #'
+#' gl <- mrs_db_geo |>
+#'   as_geolayer()
+#'
+#' l <- gl |>
+#'   get_geolayer()
 #'
 #' @export
 get_geolayer <- function(gl)
@@ -132,6 +151,11 @@ get_geolayer.geolayer <- function(gl) {
 #'
 #' @examples
 #'
+#' gl <- mrs_db_geo |>
+#'   as_geolayer()
+#'
+#' v <- gl |>
+#'   get_variables()
 #'
 #' @export
 get_variables <- function(gl)
@@ -155,7 +179,7 @@ get_variables.geolayer <- function(gl) {
 #'
 #' @param gl A `geolayer` object.
 #' @param variables A `tibble` object.
-#' @param keep_all_na A boolean, keep rows with all variables NA.
+#' @param keep_all_variables_na A boolean, keep rows with all variables NA.
 #'
 #' @return A `sf` object.
 #'
@@ -163,20 +187,31 @@ get_variables.geolayer <- function(gl) {
 #'
 #' @examples
 #'
+#' gl <- mrs_db_geo |>
+#'   as_geolayer()
+#'
+#' v <- gl |>
+#'   get_variables()
+#'
+#' v <- v |>
+#'   dplyr::filter(year == '1966' | year == '2016')
+#'
+#' gl_sel <- gl |>
+#'   set_variables(v)
 #'
 #' @export
-set_variables <- function(gl, variables)
+set_variables <- function(gl, variables, keep_all_variables_na)
   UseMethod("set_variables")
 
 #' @rdname set_variables
 #' @export
-set_variables.geolayer <- function(gl, variables, keep_all_na = FALSE) {
+set_variables.geolayer <- function(gl, variables, keep_all_variables_na = FALSE) {
   gl$variables <- variables
   variable <- unique(variables$variable)
   vars <- intersect(names(gl$geolayer), c(gl$geoattribute, variable))
   gl$geolayer <- gl$geolayer |>
     dplyr::select(tidyselect::all_of(vars))
-  if (!keep_all_na) {
+  if (!keep_all_variables_na) {
     gl$geolayer <- gl$geolayer |>
       dplyr::filter(!dplyr::if_all(variable, is.na))
   }
@@ -206,6 +241,11 @@ set_variables.geolayer <- function(gl, variables, keep_all_na = FALSE) {
 #'
 #' @examples
 #'
+#' gl <- mrs_db_geo |>
+#'   as_geolayer()
+#'
+#' f <- gl |>
+#'   as_GeoPackage(dir = tempdir())
 #'
 #' @export
 as_GeoPackage <- function(gl, dir, name)

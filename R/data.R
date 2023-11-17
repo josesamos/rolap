@@ -323,6 +323,52 @@
 "mrs_db"
 
 
+#' Constellation generated from MRS file through a query and with geographic information
+#'
+#' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
+#' from the original file, we have stored in the package a file with the same
+#' format as the original file but that includes only 1% of its data, selected at
+#' random.
+#'
+#' From these data the constellation in the vignette titled 'Obtaining and
+#' transforming flat tables' has been generated. This variable contains the defined
+#' constellation.
+#'
+#' @family mrs example data
+#' @examples
+#' # Defined by:
+#'
+#' sq <- mrs_db |>
+#'   star_query() |>
+#'   select_dimension(name = "where",
+#'                    attributes = "state") |>
+#'   select_dimension(name = "when",
+#'                    attributes = "year") |>
+#'   select_fact(
+#'     name = "mrs_age",
+#'     measures = "all_deaths"
+#'   )  |>
+#'   select_fact(
+#'     name = "mrs_cause",
+#'     measures = "pneumonia_and_influenza_deaths"
+#'   )
+#'
+#' db <- mrs_db |>
+#'   run_query(sq)
+#'
+#' mrs_db_geo <- db |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "state",
+#'     from_layer = us_layer_state,
+#'     by = "STUSPS"
+#'   )
+#'
+#' @format A `star_database`.
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"mrs_db_geo"
+
+
 #' Czech debit card company specialising on payments at gas stations (finest detail)
 #'
 #' Multidimensional design with finest detail from the data available at the source.
@@ -343,24 +389,6 @@
 #' @format A `star_database`.
 #' @source \url{https://fit.cvut.cz/cs}
 "db_summary"
-
-
-#' Census of US States, by sex and age
-#'
-#' Census of US States, by sex and age, obtained from the United States Census
-#' Bureau (USCB), American Community Survey (ACS). Obtained from the variables
-#' defined in reports, classifying the concepts according to the defined subjects.
-#'
-#' U.S. Census Bureau. “Government Units: US and State: Census Years 1942 - 2022.”
-#' Public Sector, PUB Public Sector Annual Surveys and Census of Governments,
-#' Table CG00ORG01, 2022,
-#' https://data.census.gov/table/GOVSTIMESERIES.CG00ORG01?q=census+state+year.
-#' Accessed on October 25, 2023.
-#'
-#' @format A `tibble`.
-#' @source
-#'   \url{https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-data.2021.html}
-"us_census_state"
 
 
 #' Geographic layer of US States
