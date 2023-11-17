@@ -67,10 +67,16 @@
     <loc>https://josesamos.github.io/rolap/reference/apply_select_fact.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/as_GeoPackage.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/as_csv_files.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/as_dm_class.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/as_geolayer.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/as_multistar.html</loc>
@@ -106,6 +112,9 @@
     <loc>https://josesamos.github.io/rolap/reference/constellation.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/coordinates_to_point.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/db_finest.html</loc>
   </url>
   <url>
@@ -119,6 +128,12 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/define_facts.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/define_geoattribute.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/define_geoattribute_from_layer.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/deploy.html</loc>
@@ -140,6 +155,12 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/filter_dimension.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/filter_geo_attributes.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/filter_geo_dimensions.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/filter_rpd_dimensions.html</loc>
@@ -199,6 +220,9 @@
     <loc>https://josesamos.github.io/rolap/reference/get_dimension_names.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_dimension_table.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_existing_fact_instances.html</loc>
   </url>
   <url>
@@ -206,6 +230,24 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_fact_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_geoattribute_geometries.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_geoattribute_name.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_geoattributes.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_geolayer.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_geometry.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_layer_from_attribute.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_lookup_tables.html</loc>
@@ -230,6 +272,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_pk_attribute_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_point_geometry.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_role_playing_dimension_names.html</loc>
@@ -283,6 +328,12 @@
     <loc>https://josesamos.github.io/rolap/reference/get_unknown_values.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_unrelated_instances.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_variables.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/group_by_keys.html</loc>
   </url>
   <url>
@@ -296,6 +347,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/integrate_geo_dimensions.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/interpret_operation_add_custom_column.html</loc>
@@ -406,6 +460,9 @@
     <loc>https://josesamos.github.io/rolap/reference/mrs_db.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/mrs_db_geo.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/mrs_ft.html</loc>
   </url>
   <url>
@@ -413,6 +470,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/multiple_value_key.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/name_with_nexus.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/new_multistar.html</loc>
@@ -478,6 +538,9 @@
     <loc>https://josesamos.github.io/rolap/reference/run_query.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/same_granularity_facts.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/select_attributes.html</loc>
   </url>
   <url>
@@ -503,6 +566,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/set_measure_names.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/set_variables.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/share_dimension_instance_operations.html</loc>
@@ -544,6 +610,9 @@
     <loc>https://josesamos.github.io/rolap/reference/string_to_vector.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/summarize_layer.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/transform_attribute_format.html</loc>
   </url>
   <url>
@@ -571,7 +640,13 @@
     <loc>https://josesamos.github.io/rolap/reference/us_census_state.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/us_layer_state.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_attributes.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/validate_dimension_attributes.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/validate_dimension_names.html</loc>
