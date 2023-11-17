@@ -550,7 +550,7 @@ get_geoattribute_name <- function(attribute) {
 #' From geodimensions, leave only contained in vector of names
 #'
 #' @param db A `star_database` object.
-#' @param names A vector of strings, dimension names.
+#' @param dim A vector of strings, dimension names.
 #'
 #' @return A list of geodimensions.
 #'
