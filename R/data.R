@@ -391,6 +391,24 @@
 "db_summary"
 
 
+#' Census of US States, by sex and age
+#'
+#' Census of US States, by sex and age, obtained from the United States Census
+#' Bureau (USCB), American Community Survey (ACS). Obtained from the variables
+#' defined in reports, classifying the concepts according to the defined subjects.
+#'
+#' U.S. Census Bureau. “Government Units: US and State: Census Years 1942 - 2022.”
+#' Public Sector, PUB Public Sector Annual Surveys and Census of Governments,
+#' Table CG00ORG01, 2022,
+#' https://data.census.gov/table/GOVSTIMESERIES.CG00ORG01?q=census+state+year.
+#' Accessed on October 25, 2023.
+#'
+#' @format A `tibble`.
+#' @source
+#'   \url{https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-data.2021.html}
+"us_census_state"
+
+
 #' Geographic layer of US States
 #'
 #' Geographic layer with data from the States of the USA in polygon format, with
