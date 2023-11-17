@@ -36,7 +36,12 @@ We can also indicate the value that is used in the data with undefined values.
 }
 \examples{
 
-# pt <- read_flat_table_file('file_ft', file, sep = ';', page = 'page')
+file <-
+  system.file("extdata",
+              "mrs_122_us_cities_1962_2016_new.csv",
+              package = "rolap")
+
+ft <- read_flat_table_file('mrs_new', file)
 
 }
 \seealso{

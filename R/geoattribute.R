@@ -269,6 +269,9 @@ get_geoattribute_geometries.star_database <- function(db,
 #' We obtain the values of the dimension attribute that do not have an associated
 #' geographic element of the indicated geometry.
 #'
+#' If there is only one geoattribute defined, neither the dimension nor the attribute
+#' must be indicated.
+#'
 #' @param db A `star_database` object.
 #' @param dimension A string, dimension name.
 #' @param attribute A vector, attribute names.
@@ -307,11 +310,32 @@ get_unrelated_instances.star_database <- function(db,
                                                   dimension = NULL,
                                                   attribute = NULL,
                                                   geometry = "polygon") {
+  if (is.null(dimension)) {
+    if (length(db$geo) == 1) {
+      dimension <- names(db$geo)
+    } else {
+      stop("A dimension name must be indicated.")
+    }
+  }
   stopifnot("One dimension must be indicated (only one)." = length(dimension) == 1)
   validate_dimension_names(db, dimension)
+  if (is.null(attribute)) {
+    if (length(db$geo[[dimension]]) == 1) {
+      attribute <- names(db$geo[[dimension]])
+    } else {
+      stop("An attribute name must be indicated.")
+    }
+  }
   validate_dimension_attributes(db, dimension, attribute)
-  stopifnot("gometry must be 'point' or 'polygon'." = geometry %in% c("polygon", "point"))
   geoatt <- get_geoattribute_name(attribute)
+  if (is.null(geometry)) {
+    if (length(db$geo[[dimension]][[geoatt]]) == 1) {
+      geometry <- names(db$geo[[dimension]][[geoatt]])
+    } else {
+      geometry <- "polygon"
+    }
+  }
+  stopifnot("gometry must be 'point' or 'polygon'." = geometry %in% c("polygon", "point"))
   stopifnot("That geometry is not defined for the attribute." = !is.null(db$geo[[dimension]][[geoatt]][[geometry]]))
   data_lay <- sf::st_drop_geometry(db$geo[[dimension]][[geoatt]][[geometry]])
   data_dim <- unique(db$dimensions[[dimension]]$table[, attribute])

@@ -46,18 +46,19 @@ as_geolayer.star_database <- function(db,
     if (length(db$geo) == 1) {
       dimension <- names(db$geo)
     } else {
-      stop("A dimension name must be indicated since there is more than one.")
+      stop("A dimension name must be indicated.")
     }
   }
+  stopifnot("One dimension must be indicated (only one)." = length(dimension) == 1)
+  validate_names(names(db$geo), dimension, concept = 'geodimension')
   if (is.null(attribute)) {
     if (length(db$geo[[dimension]]) == 1) {
       attribute <- names(db$geo[[dimension]])
     } else {
-      stop("An attribute name must be indicated since there is more than one.")
+      stop("An attribute name must be indicated.")
     }
   }
   geoatt <- get_geoattribute_name(attribute)
-  validate_names(names(db$geo), dimension, concept = 'geodimension')
   validate_names(names(db$geo[[dimension]]), geoatt, concept = 'geoattribute')
   if (is.null(geometry)) {
     if (length(db$geo[[dimension]][[geoatt]]) == 1) {

@@ -225,7 +225,7 @@ share_dimension_instance_operations <- function(stars, dim_freq) {
 }
 
 
-#' Gets the operations performed on a element in all `star_database` objects
+#' Gets the operations performed on an element in all `star_database` objects
 #'
 #' @param op_name A string, operation name.
 #' @param name A string, element name.

@@ -56,7 +56,9 @@ one. These operations can be indicated by the corresponding parameters.
 }
 \examples{
 
-# lpt <- read_flat_table_folder('folder_ft',folder, sep = ';', page = 'page')
+file <- system.file("extdata", package = "rolap")
+
+ft <- read_flat_table_folder('mrs_new', file)
 
 }
 \seealso{

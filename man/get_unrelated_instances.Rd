@@ -30,6 +30,10 @@ A \code{tibble}.
 We obtain the values of the dimension attribute that do not have an associated
 geographic element of the indicated geometry.
 }
+\details{
+If there is only one geoattribute defined, neither the dimension nor the attribute
+must be indicated.
+}
 \examples{
 
 db <- mrs_db |>
