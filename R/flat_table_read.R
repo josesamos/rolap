@@ -25,7 +25,12 @@
 #'
 #' @examples
 #'
-#' # pt <- read_flat_table_file('file_ft', file, sep = ';', page = 'page')
+#' file <-
+#'   system.file("extdata",
+#'               "mrs_122_us_cities_1962_2016_new.csv",
+#'               package = "rolap")
+#'
+#' ft <- read_flat_table_file('mrs_new', file)
 #'
 #' @export
 read_flat_table_file <-
@@ -75,7 +80,9 @@ read_flat_table_file <-
 #'
 #' @examples
 #'
-#' # lpt <- read_flat_table_folder('folder_ft',folder, sep = ';', page = 'page')
+#' file <- system.file("extdata", package = "rolap")
+#'
+#' ft <- read_flat_table_folder('mrs_new', file)
 #'
 #' @export
 read_flat_table_folder <-

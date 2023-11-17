@@ -106,6 +106,82 @@ test_that("geoattribute", {
       attribute = "state"
     )
 
+  geometries3 <- db_2 |>
+    get_geoattribute_geometries()
+
+
+  db_11 <- db_4 |>
+    define_geoattribute(
+      dimension = "where",
+      attribute = "state",
+      from_layer = us_layer_state,
+      by = "STUSPS"
+    )
+
+
+  expect_equal({
+    db_11$geo$where$state$point$state
+  },
+  c(
+    "AK",
+    "AL",
+    "AR",
+    "AZ",
+    "CA",
+    "CO",
+    "CT",
+    "DC",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "IA",
+    "ID",
+    "IN",
+    "KS",
+    "KY",
+    "LA",
+    "MA",
+    "MD",
+    "ME",
+    "MI",
+    "MO",
+    "MS",
+    "MT",
+    "NC",
+    "ND",
+    "NE",
+    "NH",
+    "NJ",
+    "NM",
+    "NV",
+    "NY",
+    "OH",
+    "OK",
+    "PA",
+    "PR",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VA",
+    "VT",
+    "WA",
+    "WI",
+    "WV",
+    "WY",
+    "IL",
+    "MN",
+    "OR"
+  ))
+
+
+  expect_equal({
+    geometries3
+  },
+  c("polygon", "point"))
 
   expect_equal({
     geometries2

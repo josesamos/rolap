@@ -1230,3 +1230,44 @@ test_that("get_unknown_values() ", {
   ), class = c("tbl_df", "tbl", "data.frame")))
 })
 
+
+test_that("get_unknown_values() ", {
+  expect_equal({
+    file <-
+      system.file("extdata",
+                  "mrs_122_us_cities_1962_2016_new.csv",
+                  package = "rolap")
+
+    ft <- read_flat_table_file('mrs_new', file)
+    names(ft)
+  }, c(
+    "name",
+    "table",
+    "unknown_value",
+    "operations",
+    "pk_attributes",
+    "lookup_tables",
+    "attributes",
+    "measures"
+  ))
+})
+
+
+test_that("get_unknown_values() ", {
+  expect_equal({
+    file <- system.file("extdata", package = "rolap")
+
+    ft <- read_flat_table_folder('mrs_new', file)
+    names(ft)
+  }, c(
+    "name",
+    "table",
+    "unknown_value",
+    "operations",
+    "pk_attributes",
+    "lookup_tables",
+    "attributes",
+    "measures"
+  ))
+})
+
