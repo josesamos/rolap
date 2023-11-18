@@ -8,7 +8,7 @@ test_that("geolayer", {
 
   gl <- gl_polygon
   l <- gl |>
-    get_geolayer()
+    get_layer()
 
   v <- gl |>
     get_variables()
@@ -22,6 +22,41 @@ test_that("geolayer", {
   f <- gl |>
     as_GeoPackage(dir = tempdir())
 
+  vd1 <- gl |>
+    get_variable_description(name = c("var_009", "var_109"))
+
+  vd2 <- gl_sel |>
+    get_variable_description()
+
+  vd3 <- gl_sel |>
+    get_variable_description(only_values = TRUE)
+
+
+  expect_equal({
+    vd1
+  },
+  c(var_009 = "year = 1966, facts = mrs_age, measure = all_deaths",
+    var_109 = "year = 2016, facts = mrs_age, measure = all_deaths"))
+
+  expect_equal({
+    vd2
+  },
+  c(
+    var_009 = "year = 1966, facts = mrs_age, measure = all_deaths",
+    var_010 = "year = 1966, facts = mrs_cause, measure = pneumonia_and_influenza_deaths",
+    var_109 = "year = 2016, facts = mrs_age, measure = all_deaths",
+    var_110 = "year = 2016, facts = mrs_cause, measure = pneumonia_and_influenza_deaths"
+  ))
+
+  expect_equal({
+    vd3
+  },
+  c(
+    var_009 = "1966, mrs_age, all_deaths",
+    var_010 = "1966, mrs_cause, pneumonia_and_influenza_deaths",
+    var_109 = "2016, mrs_age, all_deaths",
+    var_110 = "2016, mrs_cause, pneumonia_and_influenza_deaths"
+  ))
 
 
   expect_equal({

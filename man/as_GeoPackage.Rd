@@ -5,9 +5,9 @@
 \alias{as_GeoPackage.geolayer}
 \title{Save as \code{GeoPackage}}
 \usage{
-as_GeoPackage(gl, dir, name)
+as_GeoPackage(gl, dir, name, keep_all_variables_na)
 
-\method{as_GeoPackage}{geolayer}(gl, dir = NULL, name = NULL)
+\method{as_GeoPackage}{geolayer}(gl, dir = NULL, name = NULL, keep_all_variables_na = FALSE)
 }
 \arguments{
 \item{gl}{A \code{geolayer} object.}
@@ -15,6 +15,8 @@ as_GeoPackage(gl, dir, name)
 \item{dir}{A string.}
 
 \item{name}{A string, file name.}
+
+\item{keep_all_variables_na}{A boolean, keep rows with all variables NA.}
 }
 \value{
 A string, file name.
@@ -25,6 +27,8 @@ file in \code{GeoPackage} format to be able to work with other tools.
 }
 \details{
 If the file name is not indicated, it defaults to the name of the geovariable.
+
+By default, rows that are NA for all variables are eliminated.
 
 The \code{GeoPackage} format only allows defining a maximum of 1998 columns. If the
 number of variables and columns in the geographic layer exceeds this number,
@@ -43,7 +47,8 @@ f <- gl |>
 Other query functions: 
 \code{\link{as_geolayer}()},
 \code{\link{filter_dimension}()},
-\code{\link{get_geolayer}()},
+\code{\link{get_layer}()},
+\code{\link{get_variable_description}()},
 \code{\link{get_variables}()},
 \code{\link{run_query}()},
 \code{\link{select_dimension}()},

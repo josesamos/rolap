@@ -40,7 +40,8 @@ sq <- mrs_db |>
 Other query functions: 
 \code{\link{as_GeoPackage}()},
 \code{\link{as_geolayer}()},
-\code{\link{get_geolayer}()},
+\code{\link{get_layer}()},
+\code{\link{get_variable_description}()},
 \code{\link{get_variables}()},
 \code{\link{run_query}()},
 \code{\link{select_dimension}()},

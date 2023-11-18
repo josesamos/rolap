@@ -1,5 +1,5 @@
 # rolap (development version)
-* Geographic information query functions: `as_geolayer()`, `get_geolayer()`, `get_variables()`, `set_variables()`, `as_GeoPackage()`.
+* Geographic information query functions: `as_geolayer()`, `get_layer()`, `get_variables()`, `set_variables()`, `as_GeoPackage()`.
 * Functions to define geoattributes: `define_geoattribute()`, `get_unrelated_instances()`, `get_geoattributes()`, `get_geoattribute_geometries()`.
 * Geographic information processing functions: `coordinates_to_point()`, `get_geometry()`, `summarize_layer()`, `get_point_geometry()`.
 
