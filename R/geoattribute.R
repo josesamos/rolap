@@ -361,8 +361,9 @@ get_unrelated_instances.star_database <- function(db,
 #' used for the join between the tables (dimension and layer tables) must be
 #' indicated (`by` parameter).
 #'
-#' If defined from another attribute, it should have a finer granularity, to obtain
-#' the result by grouping its instances.
+#' If defined from another attribute, it should have the same or finer granularity,
+#' to obtain the result by grouping its instances. The considered attribute can be
+#' the pair that defines longitude and latitude.
 #'
 #' If other geographic information has previously been associated with that attribute,
 #' the new information is considered and previous instances for which no new information
@@ -376,7 +377,7 @@ get_unrelated_instances.star_database <- function(db,
 #' @param from_layer A `sf` object.
 #' @param by a vector of correspondence of attributes of the dimension with the
 #'   `sf` layer structure.
-#' @param from_attribute A string, attribute name.
+#' @param from_attribute A vector, attribute names.
 #'
 #' @return A `star_database` object.
 #'
@@ -395,6 +396,11 @@ get_unrelated_instances.star_database <- function(db,
 #'     dimension = "where",
 #'     attribute = "region",
 #'     from_attribute = "state"
+#'   )  |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "city",
+#'     from_attribute = c("long", "lat")
 #'   )
 #'
 #' @export
@@ -461,18 +467,22 @@ get_layer_from_attribute <- function(db,
                                      attribute = NULL,
                                      from_attribute = NULL) {
   from_geoatt <- get_geoattribute_name(from_attribute)
-  stopifnot("No geometry is defined for the attribute." = !is.null(db$geo[[dimension]][[from_geoatt]]))
-  geometries <- names(db$geo[[dimension]][[from_geoatt]])
-  if ("polygon" %in% geometries) {
-    tg <- "polygon"
+  if (is.null(db$geo[[dimension]][[from_geoatt]])) {
+    from_layer <- coordinates_to_point(db$dimensions[[dimension]]$table, lon_lat = from_attribute)
+    # stopifnot("No geometry is defined for the attribute." = !is.null(db$geo[[dimension]][[from_geoatt]]))
   } else {
-    tg <- "point"
+    geometries <- names(db$geo[[dimension]][[from_geoatt]])
+    if ("polygon" %in% geometries) {
+      tg <- "polygon"
+    } else {
+      tg <- "point"
+    }
+    all_attributes <- union(from_attribute, attribute)
+    data_dim <- unique(db$dimensions[[dimension]]$table[, all_attributes])
+    from_layer <- db$geo[[dimension]][[from_geoatt]][[tg]]
+    from_layer <- dplyr::inner_join(data_dim, from_layer, by = from_attribute)
+    from_layer <- sf::st_as_sf(from_layer)
   }
-  all_attributes <- union(from_attribute, attribute)
-  data_dim <- unique(db$dimensions[[dimension]]$table[, all_attributes])
-  from_layer <- db$geo[[dimension]][[from_geoatt]][[tg]]
-  from_layer <- dplyr::inner_join(data_dim, from_layer, by = from_attribute)
-  from_layer <- sf::st_as_sf(from_layer)
   summarize_layer(from_layer[, attribute], attribute)
 }
 

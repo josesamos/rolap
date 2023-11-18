@@ -28,7 +28,7 @@ define_geoattribute(db, dimension, attribute, from_layer, by, from_attribute)
 \item{by}{a vector of correspondence of attributes of the dimension with the
 \code{sf} layer structure.}
 
-\item{from_attribute}{A string, attribute name.}
+\item{from_attribute}{A vector, attribute names.}
 }
 \value{
 A \code{star_database} object.
@@ -49,8 +49,9 @@ If defined from a layer (\code{from_layer} parameter), additionally the attribut
 used for the join between the tables (dimension and layer tables) must be
 indicated (\code{by} parameter).
 
-If defined from another attribute, it should have a finer granularity, to obtain
-the result by grouping its instances.
+If defined from another attribute, it should have the same or finer granularity,
+to obtain the result by grouping its instances. The considered attribute can be
+the pair that defines longitude and latitude.
 
 If other geographic information has previously been associated with that attribute,
 the new information is considered and previous instances for which no new information
@@ -71,6 +72,11 @@ db <- mrs_db |>
     dimension = "where",
     attribute = "region",
     from_attribute = "state"
+  )  |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "city",
+    from_attribute = c("long", "lat")
   )
 
 }

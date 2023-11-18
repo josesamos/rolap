@@ -1,8 +1,8 @@
 ---
-title: "Performing Multidimensional Queries with the `rolap` Package"
+title: "Performing Multidimensional Queries with Geographic Attributes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Performing Multidimensional Queries with the `rolap` Package}
+  %\VignetteIndexEntry{Performing Multidimensional Queries with Geographic Attributes}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,9 +21,9 @@ library(rolap)
 
 # Introduction
 
-Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R: The `rolap` package offers the possibility of formulating and running simple queries on a multidimensional schema.
+Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R: The `rolap` package provides the functionality to define geographic attributes and formulate and execute simple queries on a multidimensional schema that includes them.
 
-The main objective of this document is to show the multidimensional query formulation and execution functionality offered by this package. First, the data model is briefly discussed: the possibility of defining stars and constellations. Next, the functions defined to support multidimensional queries are presented. Finally, finish with the conclusions.
+The main objective of this document is to show the multidimensional query formulation and execution functionality offered by this package. First, the data model is briefly discussed: the possibility of defining stars and constellations. Then, the geographic attributes definition functionality is also shown. Next, the functions defined to support multidimensional queries are presented. Finally, finish with the conclusions.
 
 # Stars and constellations
 
@@ -43,6 +43,58 @@ mrs_db |>
 ```
 
 We can see that it is a constellation because it contains more than one fact table.
+
+# Include geographic information layers
+
+The `rolap` package allows us to include layers of geographic information associated with dimension attributes. The objective is to be able to obtain layers of geographic information with the data contained in the multidimensional database.
+
+
+In the considered case, the table of dimension *where* contains geographical information in the form of the coordinates (latitude and longitude) of each city. We can define the `city` field as a geographic attribute.
+
+```{r}
+mrs_db_geo <- mrs_db |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "city",
+    from_attribute = c("long", "lat")
+  )
+```
+
+We can also associate the geographic information of a vector layer of points or polygons to an attribute (or set of attributes), using the same function.
+
+```{r}
+mrs_db_geo <- mrs_db_geo |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "state",
+    from_layer = us_layer_state,
+    by = "STUSPS"
+  )
+```
+
+The vector layer used is defined at the state level. If there is another field at another level of detail in the layer, the same layer can be used to define other attributes of coarser granularity.
+
+```{r}
+mrs_db_geo <- mrs_db_geo |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "region",
+    from_layer = us_layer_state,
+    by = "DIVISION"
+  )
+```
+
+If there is no field in the layer that allows us to establish the relationship, the information associated with other attributes of the dimension can be used.
+
+```{r}
+mrs_db_geo_2 <- mrs_db_geo |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "region",
+    from_attribute = "state"
+  )
+```
+
 
 
 # Query functions
