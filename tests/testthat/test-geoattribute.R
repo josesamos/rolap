@@ -17,6 +17,9 @@ test_that("geoattribute", {
       by = "STUSPS"
     )
 
+  ui <- db_2 |>
+    get_unrelated_instances()
+
   db_3 <- db_2 |>
     define_geoattribute(
       dimension = "where",
@@ -118,6 +121,24 @@ test_that("geoattribute", {
       by = "STUSPS"
     )
 
+  db_12 <- mrs_db |>
+    define_geoattribute(
+      dimension = "where",
+      attribute = "city",
+      from_attribute = c("long", "lat")
+    )
+
+
+
+  expect_equal({
+    nrow(db_12$geo$where$city$point)
+  },
+  119)
+
+  expect_equal({
+    nrow(ui)
+  },
+  0)
 
   expect_equal({
     db_11$geo$where$state$point$state
