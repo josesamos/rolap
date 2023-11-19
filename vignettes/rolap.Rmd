@@ -296,7 +296,7 @@ The same can be seen in the `num` field in the fact table which shows the number
 
 In this case it has not been considered necessary, but if desired, it is possible to rename both the dimension attributes and the fact measures.
 
-To do this, the functions `get_dimension_attribute_names()` and `get_measure_names()` are available to consult the current names, and `set_dimension_attribute_names()` and `set_measure_names()` to change them if necessary.
+To do this, the functions `get_attribute_names()` and `get_measure_names()` are available to consult the current names, and `set_attribute_names()` and `set_measure_names()` to change them if necessary.
 
 ### Constellations
 
