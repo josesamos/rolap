@@ -241,10 +241,10 @@
     <loc>https://josesamos.github.io/rolap/reference/get_geoattributes.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/reference/get_geolayer.html</loc>
+    <loc>https://josesamos.github.io/rolap/reference/get_geometry.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/reference/get_geometry.html</loc>
+    <loc>https://josesamos.github.io/rolap/reference/get_layer.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_layer_from_attribute.html</loc>
@@ -329,6 +329,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_unrelated_instances.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_variable_description.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_variables.html</loc>
@@ -565,6 +568,9 @@
     <loc>https://josesamos.github.io/rolap/reference/set_attribute_names.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/set_layer.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/set_measure_names.html</loc>
   </url>
   <url>
@@ -629,6 +635,9 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/transform_to_values.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/unify_facts_and_dimensions.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/unify_rpd.html</loc>
