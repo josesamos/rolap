@@ -53,6 +53,7 @@ Other query functions:
 \code{\link{run_query}()},
 \code{\link{select_dimension}()},
 \code{\link{select_fact}()},
+\code{\link{set_layer}()},
 \code{\link{set_variables}()},
 \code{\link{star_query}()}
 }

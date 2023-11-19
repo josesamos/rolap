@@ -7,7 +7,9 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
 )
 ```
 
@@ -200,7 +202,8 @@ Or export it in *GeoPackage* format.
 ```{r}
 f <- gl |>
   as_GeoPackage(dir = tempdir())
-f
+
+sf::st_layers(f)
 ```
 
 

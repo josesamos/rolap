@@ -254,7 +254,7 @@ text(
 )
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 We can also include all geographic instances originally present in the
 layer.
@@ -266,15 +266,20 @@ l2 <- gl |>
 plot(sf::st_shift_longitude(l2[, "var_1"]), axes = TRUE, main = title)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 Or export it in *GeoPackage* format.
 
 ``` r
 f <- gl |>
   as_GeoPackage(dir = tempdir())
-f
-#> [1] "C:\\Users\\joses\\AppData\\Local\\Temp\\RtmpSkxdXO/state.gpkg"
+
+sf::st_layers(f)
+#> Driver: GPKG 
+#> Available layers:
+#>   layer_name geometry_type features fields crs_name
+#> 1   geolayer       Polygon        2      3   WGS 84
+#> 2  variables            NA        2      3     <NA>
 ```
 
 We can work with several star databases to form a *constellation*. It

@@ -43,6 +43,7 @@ Other query functions:
 \code{\link{get_variables}()},
 \code{\link{run_query}()},
 \code{\link{select_fact}()},
+\code{\link{set_layer}()},
 \code{\link{set_variables}()},
 \code{\link{star_query}()}
 }

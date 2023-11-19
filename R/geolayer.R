@@ -143,6 +143,46 @@ get_layer.geolayer <- function(gl, keep_all_variables_na = FALSE) {
 }
 
 
+#' Set geographic layer
+#'
+#' If for some reason we modify the geographic layer, for example, to add a new
+#' calculated variable, we can set that layer to become the new geographic layer
+#' of the `geolayer` object using this function.
+#'
+#' @param gl A `geolayer` object.
+#' @param layer A `sf` object.
+#'
+#' @return A `geolayer` object.
+#'
+#' @family query functions
+#'
+#' @examples
+#'
+#' gl <- mrs_db_geo |>
+#'   as_geolayer()
+#'
+#' l <- gl |>
+#'   get_layer()
+#'
+#' l$tpc_001 <- l$var_002 * 100 / l$var_001
+#'
+#' gl <- gl |>
+#'   set_layer(l)
+#'
+#' @export
+set_layer <- function(gl, layer)
+  UseMethod("set_layer")
+
+#' @rdname set_layer
+#' @export
+set_layer.geolayer <- function(gl, layer) {
+  gl$geolayer <- layer
+  vars <- names(layer)
+  gl$variables <- gl$variables[gl$variables$variable %in% vars,]
+  gl
+}
+
+
 #' Get the variables layer
 #'
 #' The variables layer includes the names and description through various fields
@@ -175,6 +215,7 @@ get_variables <- function(gl)
 get_variables.geolayer <- function(gl) {
   gl$variables
 }
+
 
 #' Set variables layer
 #'
@@ -215,11 +256,14 @@ set_variables <- function(gl, variables, keep_all_variables_na)
 #' @rdname set_variables
 #' @export
 set_variables.geolayer <- function(gl, variables, keep_all_variables_na = FALSE) {
+  original_vars <- gl$variables$variable
   gl$variables <- variables
-  variable <- unique(variables$variable)
-  vars <- intersect(names(gl$geolayer), c(gl$geoattribute, variable))
+  new_vars <- gl$variables$variable
+  vars_to_delete <- setdiff(original_vars, new_vars)
+  layer_vars <- names(gl$geolayer)
+  remaining_vars <- setdiff(layer_vars, vars_to_delete)
   gl$geolayer <- gl$geolayer |>
-    dplyr::select(tidyselect::all_of(vars))
+    dplyr::select(tidyselect::all_of(remaining_vars))
   gl$geolayer <- gl |>
     get_layer(keep_all_variables_na)
   gl

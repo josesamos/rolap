@@ -31,6 +31,26 @@ test_that("geolayer", {
   vd3 <- gl_sel |>
     get_variable_description(only_values = TRUE)
 
+  l3 <- l
+
+  l3$tpc_001 <- l3$var_002 * 100 / l3$var_001
+
+  gl3 <- gl |>
+    set_layer(l3)
+
+  v3 <- gl3 |>
+    get_variables()
+
+  v3 <- v3 |>
+    dplyr::filter(year == '2016')
+
+  gl_sel_3 <- gl3 |>
+    set_variables(v3)
+
+  expect_equal({
+    "tpc_001" %in% names(gl3$geolayer)
+  },
+  TRUE)
 
   expect_equal({
     vd1
