@@ -330,7 +330,7 @@ The variables are a `tibble` and we can select them using the `dplyr::filter()` 
 
 ```{r}
 var_state_2 <- var_state |>
-  dplyr::filter(year == '2016' & (region == '1' | region == '2'))
+  dplyr::filter(year == '2016')
 ```
 
 Once the variables we need have been filtered, we can filter the geographic information layer so that it will only contain these variables.
@@ -384,6 +384,9 @@ gl_state_3 <- mrs_db_geo_3 |>
 Finally, we represent it.
 
 ```{r}
+gl_state_3 |>
+  get_variable_description()
+
 layer <- gl_state_3 |>
   get_layer()
 

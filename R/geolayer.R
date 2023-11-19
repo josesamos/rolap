@@ -72,6 +72,8 @@ as_geolayer.star_database <- function(db,
   gt <- sf::st_drop_geometry(geo)
   gt_att <- names(gt)
   data <- unify_facts_and_dimensions(db, dimension, include_nrow_agg)
+  dim_att <- get_attribute_names(db, dimension)
+  gt_att <- union(gt_att, dim_att)
   data_att <- setdiff(names(data), gt_att)
   data <- data[, c(gt_att, data_att)]
   metadata <- data |>
@@ -94,11 +96,18 @@ as_geolayer.star_database <- function(db,
   # data$value <- as.numeric(data$value)
   data <- data |>
     tidyr::spread("variable", "value")
-  data <- dplyr::full_join(data, geo, by = gt_att)
+  data <- dplyr::full_join(data, geo, by = names(gt))
   data <- sf::st_as_sf(data)
 
+  ned <- nrow(dplyr::filter(data, !sf::st_is_empty(data)))
+  if (ned > nrow(geo)) {
+    warning(
+      "The resulting layer has a finer granularity than the starting geographic layer. One of that granularity should be used as a geographic attribute."
+    )
+  }
+
   structure(list(
-    geoattribute = gt_att,
+    geoattribute = names(gt),
     variables = metadata,
     geolayer = data
   ),
