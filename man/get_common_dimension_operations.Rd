@@ -2,7 +2,7 @@
 % Please edit documentation in R/constellation.R
 \name{get_common_dimension_operations}
 \alias{get_common_dimension_operations}
-\title{Gets the operations performed on a element in all \code{star_database} objects}
+\title{Gets the operations performed on an element in all \code{star_database} objects}
 \usage{
 get_common_dimension_operations(op_name, name, stars)
 }
@@ -17,6 +17,6 @@ get_common_dimension_operations(op_name, name, stars)
 A \code{star_operations} object.
 }
 \description{
-Gets the operations performed on a element in all \code{star_database} objects
+Gets the operations performed on an element in all \code{star_database} objects
 }
 \keyword{internal}

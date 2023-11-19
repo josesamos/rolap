@@ -1,8 +1,8 @@
 ---
-title: "Performing Multidimensional Queries with the `rolap` Package"
+title: "Performing Multidimensional Queries with Geographic Attributes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Performing Multidimensional Queries with the `rolap` Package}
+  %\VignetteIndexEntry{Performing Multidimensional Queries with Geographic Attributes}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,9 +21,9 @@ library(rolap)
 
 # Introduction
 
-Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R: The `rolap` package offers the possibility of formulating and running simple queries on a multidimensional schema.
+Once we developed a star database in R using the `rolap` package, in addition to exporting it to exploit it with other tools, we can perform multidimensional queries from R: The `rolap` package provides the functionality to define geographic attributes and formulate and execute simple queries on a multidimensional schema that includes them.
 
-The main objective of this document is to show the multidimensional query formulation and execution functionality offered by this package. First, the data model is briefly discussed: the possibility of defining stars and constellations. Next, the functions defined to support multidimensional queries are presented. Finally, finish with the conclusions.
+The main objective of this document is to show the multidimensional query formulation and execution functionality offered by this package. First, the data model is briefly discussed: the possibility of defining stars and constellations. Then, the geographic attributes definition functionality is also shown. Next, the functions defined to support multidimensional queries are presented. Finally, finish with the conclusions.
 
 # Stars and constellations
 
@@ -44,6 +44,61 @@ mrs_db |>
 
 We can see that it is a constellation because it contains more than one fact table.
 
+# Include geographic information layers
+
+The `rolap` package allows us to include layers of geographic information associated with dimension attributes. The objective is to be able to obtain layers of geographic information with the data contained in the multidimensional database.
+
+
+In the considered case, the table of dimension *where* contains geographical information in the form of the coordinates (latitude and longitude) of each city. We can define the `city` field as a geographic attribute.
+
+```{r}
+mrs_db_geo <- mrs_db |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "city",
+    from_attribute = c("long", "lat")
+  )
+```
+
+We can also associate the geographic information of a vector layer of points or polygons to an attribute (or set of attributes), using the same function.
+
+```{r}
+mrs_db_geo <- mrs_db_geo |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "state",
+    from_layer = us_layer_state,
+    by = "STUSPS"
+  )
+```
+
+The vector layer used is defined at the state level. If there is another field at another level of detail in the layer, the same layer can be used to define other attributes of coarser granularity.
+
+```{r}
+mrs_db_geo <- mrs_db_geo |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "region",
+    from_layer = us_layer_state,
+    by = "DIVISION"
+  )
+```
+
+If there is no field in the layer that allows us to establish the relationship, the information associated with other attributes of the dimension can be used.
+
+```{r}
+mrs_db_geo_2 <- mrs_db_geo |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "region",
+    from_attribute = "state"
+  )
+```
+
+If there are still unrelated instances of the dimension, the `define_geoattribute()` function warns and the instances can be consulted using the `get_unrelated_instances()` function.
+
+Through these functions we have defined relationships between the attributes and vector layers of geographic information, at the level of detail we need, which we can later take advantage of.
+
 
 # Query functions
 
@@ -58,7 +113,7 @@ From a `star_database` object, an empty `star_query` object is created where we 
 Example:
 
 ```{r}
-sq <- mrs_db |>
+sq <- mrs_db_geo |>
   star_query()
 ```
 
@@ -143,12 +198,12 @@ sq <- sq |>
 
 Once we have selected the facts, dimensions and defined the conditions on the instances of dimensions, we can execute the query to obtain the result. 
 
-The query can be executed on any `star_database` object that has in its structure the elements that appear in it.
+The query can be executed on any `star_database` object that has in its structure the elements that appear in it. If the `star_database` has geographic information associated with it, this will be filtered according to its conditions.
 
 Example:
 
 ```{r}
-sq <- star_query(mrs_db) |>
+sq <- star_query(mrs_db_geo) |>
   select_dimension(name = "where",
                    attributes = c("region", "state")) |>
   select_dimension(name = "when",
@@ -159,10 +214,10 @@ sq <- star_query(mrs_db) |>
               measures = "all_deaths") |>
   filter_dimension(name = "when", week <= " 3" & year >= "2010")
 
-mrs_db_2 <- mrs_db |>
+mrs_db_geo_3 <- mrs_db_geo |>
   run_query(sq)
 
-class(mrs_db_2)
+class(mrs_db_geo_3)
 ```
 
 The result of running a query is an object of the `star_database` class that meets the conditions defined in the query: Other queries can continue to be defined on this object.
@@ -170,7 +225,7 @@ The result of running a query is an object of the `star_database` class that mee
 We can see a representation of the tables of the result, as shown below.
 
 ```{r}
-mrs_db_2 |>
+mrs_db_geo_3 |>
   draw_tables()
 ```
 
@@ -182,7 +237,7 @@ This section shows an example of how to exploit the result of the  multidimensio
 The first thing we do is transform it into flat tables.
 
 ```{r}
-ft <- mrs_db_2 |>
+ft <- mrs_db_geo_3 |>
   as_single_tibble_list()
 ft_age <- ft[["mrs_age"]]
 ```
@@ -204,6 +259,153 @@ pt <- pivottabler::qpvt(
 )
 
 pt$renderPivot()
+```
+
+# Obtaining layers with geographic information
+
+If in a `star_database` object we have attributes to which geographic information has been associated, we can obtain geographic information layers that include fact and dimension data.
+
+To include only the data we need, using query operations we can previously filter the `star_database` object. Once the geographic information layer is obtained, it can also be filtered to select the variables represented.
+
+The following sections show how to obtain a geographic information layer and the operations that we can perform on it.
+
+
+## Get a `geolayer` object
+
+From a `star_database` object with some attribute to which we have associated geographic information (*geoattribute*), we can obtain a `geolayer` object. If there is more than one, we have to indicate the layer granularity geoattribute.
+
+```{r}
+gl_state <- mrs_db_geo_3 |>
+  as_geolayer(attribute = "state")
+```
+
+The `geolayer` object is composed of a layer of geographic information at the level of detail of the geoattribute and another where the variables of the recorded data are described.
+
+```{r}
+layer_state <- gl_state |>
+  get_layer()
+layer_state
+
+var_state <- gl_state |>
+  get_variables()
+var_state
+```
+
+We can generate the geographic information layer so that it contains only the objects for which we have additional information, as we have done.
+
+```{r}
+plot(sf::st_geometry(layer_state))
+text(
+  sf::st_coordinates(sf::st_centroid(sf::st_geometry(layer_state))),
+  labels = layer_state$state,
+  pos = 3,
+  cex = 0.5
+)
+```
+
+We can also generate it for all objects in the original layer, even if they do not contain information.
+
+```{r}
+layer_state_all <- gl_state |>
+  get_layer(keep_all_variables_na = TRUE)
+
+plot(sf::st_shift_longitude(sf::st_geometry(layer_state_all)))
+```
+
+
+## Operations on variables
+
+For the variables, in addition to being able to obtain them in `tibble` format, we can consult for those whose name we indicate or for all of their meaning, as shown below.
+
+```{r}
+gl_state |>
+  get_variable_description(c("var_01", "var_10"))
+
+vd <- gl_state |>
+  get_variable_description()
+vd[c("var_01", "var_10")]
+```
+
+The variables are a `tibble` and we can select them using the `dplyr::filter()` function.
+
+```{r}
+var_state_2 <- var_state |>
+  dplyr::filter(year == '2016' & (region == '1' | region == '2'))
+```
+
+Once the variables we need have been filtered, we can filter the geographic information layer so that it will only contain these variables.
+
+```{r}
+gl_state_2 <- gl_state |>
+  set_variables(var_state_2)
+
+layer_state_2 <- gl_state_2 |>
+  get_layer()
+```
+
+```{r}
+plot(sf::st_geometry(layer_state_2))
+text(
+  sf::st_coordinates(sf::st_centroid(sf::st_geometry(layer_state_2))),
+  labels = layer_state_2$state,
+  pos = 3,
+  cex = 0.5
+)
+```
+
+## Data representation
+
+For example, for each state we are going to represent the percentage of pneumonia and influenza deaths registered, starting in 2010. First of all, we must define the query.
+
+```{r}
+sq_2 <- star_query(mrs_db_geo) |>
+  select_dimension(name = "where",
+                   attributes = "state") |>
+  select_fact(name = "mrs_cause",
+              measures = c("pneumonia_and_influenza_deaths", "all_deaths")) |>
+  filter_dimension(name = "when", year >= "2010")
+```
+
+We run the query and get a `star_database` object as a result.
+
+```{r}
+mrs_db_geo_3 <- mrs_db_geo |>
+  run_query(sq_2)
+```
+
+We obtain a `geolayer` object.
+
+```{r}
+gl_state_3 <- mrs_db_geo_3 |>
+  as_geolayer(attribute = "state")
+```
+
+
+Finally, we represent it.
+
+```{r}
+layer <- gl_state_3 |>
+  get_layer()
+
+layer$tpc_deaths <- (layer$var_2 / layer$var_1) * 100
+
+plot(layer[, "tpc_deaths"], main = "% pneumonia and influenza")
+```
+
+To maintain the definition of the new variable in the `geolayer` object, we can define that this is the new geographic information layer of it.
+
+```{r}
+gl_state_3 <- gl_state_3 |>
+  set_layer(layer)
+```
+
+If we want to treat the geographic information layer with another tool, we can export it along with the variable definition table in *GeoPackage* format.
+
+```{r}
+f <- gl_state_3 |>
+  as_GeoPackage(dir = tempdir())
+
+sf::st_layers(f)
 ```
 
 

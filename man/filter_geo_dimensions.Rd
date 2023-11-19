@@ -9,7 +9,7 @@ filter_geo_dimensions(db, dim)
 \arguments{
 \item{db}{A \code{star_database} object.}
 
-\item{names}{A vector of strings, dimension names.}
+\item{dim}{A vector of strings, dimension names.}
 }
 \value{
 A list of geodimensions.
