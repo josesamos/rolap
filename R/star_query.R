@@ -40,7 +40,7 @@ star_query.star_database <- function(db) {
 #'
 #' @param db A `star_database` object.
 #'
-#' @return A list of objects (facts and dimensions schemes).
+#' @return A star database schema, list of fact and dimension schemes.
 #'
 #' @keywords internal
 get_star_query_schema <- function(db) {
@@ -73,8 +73,8 @@ get_star_query_schema <- function(db) {
 #' Select fact
 #'
 #' To define the fact to be consulted, its name is indicated, optionally, a
-#' vector of names of selected measures and another of aggregation functions are
-#' also indicated.
+#' vector of names of selected measures, another of aggregation functions and
+#' another of new names for measures are also indicated.
 #'
 #' If there is only one fact table, it is the one that is considered if no name
 #' is indicated.
@@ -83,6 +83,10 @@ get_star_query_schema <- function(db) {
 #' rows will be included (it is always included).
 #'
 #' If no aggregation function is given, those defined for the measures are considered.
+#'
+#' If no new names are given, the original names will be considered; If the
+#' aggregation function is different from the one defined by default, it will be
+#' included as a prefix to the name.
 #'
 #' @param sq A `star_query` object.
 #' @param name A string, name of the fact.
