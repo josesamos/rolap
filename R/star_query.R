@@ -143,8 +143,8 @@ select_fact.star_query <- function(sq,
     validate_names(names(sq$schema$fact), name, concept = 'fact name')
   }
   stopifnot("The fact had already been selected." = !(name %in% names(sq$query$fact)))
+  measure_names <- c(sq$schema$fact[[name]]$measure, sq$schema$fact[[name]]$nrow_agg)
   if (!is.null(measures)) {
-    measure_names <- c(sq$schema$fact[[name]]$measure, sq$schema$fact[[name]]$nrow_agg)
     validate_names(names(measure_names), measures, concept = 'measure', repeated = TRUE)
   }
   if (!is.null(agg_functions)) {
@@ -159,13 +159,24 @@ select_fact.star_query <- function(sq,
   } else {
     agg_functions <- measure_names[measures]
   }
-  agg_functions[nrow_agg] <- 'SUM'
+  if (!is.null(new)) {
+    stopifnot("There are repeated names among the new measure names." = length(new) == length(unique(new)))
+    stopifnot(
+      "Measures and new measure names do not correspond." = length(measures) == length(new)
+    )
+  }
+  if (!(nrow_agg %in% names(agg_functions))) {
+    agg_functions[nrow_agg] <- 'SUM'
+  } else {
+    stop("The name of the new measure that represents the COUNT corresponds to another measure already defined.")
+  }
 
   mnames <- paste0(tolower(agg_functions), '_', names(agg_functions))
   stopifnot("There are repeated measures with the same aggregation function." = length(mnames) == length(unique(mnames)))
 
   fact_names <- names(sq$query$fact)
-  sq$query$fact <- c(sq$query$fact, list(measure = agg_functions))
+  sq$query$fact <-
+    c(sq$query$fact, list(list(measure = agg_functions, new = new)))
   names(sq$query$fact) <- c(fact_names, name)
 
   sq
@@ -338,9 +349,24 @@ apply_select_fact <- function(db, sq) {
   names <- names(sq$query$fact)
   db$facts <- db$facts[names]
   for (f in names) {
-    agg <- sq$query$fact[[f]]
+    agg <- sq$query$fact[[f]]$measure
     pk <- db$facts[[f]]$surrogate_keys
+    countvar <- names(agg)[length(agg)]
+    db$facts[[f]]$table[countvar] <- 1L
     db$facts[[f]]$table <- db$facts[[f]]$table[c(pk, names(agg))]
+    new <- sq$query$fact[[f]]$new
+    if (!is.null(new)) {
+      measure_names <- c(new, countvar)
+    } else {
+      measure_names <- names(agg)
+      for (i in seq_along(measure_names[-length(measure_names)])) {
+        if (agg[i] != db$facts[[f]]$agg[measure_names[i]]) {
+          measure_names[i] <- paste0(tolower(agg[i]), '_',  measure_names[i])
+        }
+      }
+    }
+    names(db$facts[[f]]$table) <- c(pk, measure_names)
+    names(agg) <- measure_names
     db$facts[[f]]$agg <- agg
   }
   db
@@ -495,8 +521,7 @@ remove_duplicate_dimension_rows <- function(db) {
 group_facts <- function(db) {
   for (f in names(db$facts)) {
     fk <- db$facts[[f]]$surrogate_keys
-    measures <- names(db$facts[[f]]$table)
-    measures <- setdiff(measures, fk)
+    measures <- setdiff(names(db$facts[[f]]$table), fk)
     db$facts[[f]]$table <-
       group_by_keys(
         table = db$facts[[f]]$table[, c(fk, measures)],
