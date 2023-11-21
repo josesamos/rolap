@@ -145,7 +145,7 @@ select_fact.star_query <- function(sq,
   stopifnot("The fact had already been selected." = !(name %in% names(sq$query$fact)))
   if (!is.null(measures)) {
     measure_names <- c(sq$schema$fact[[name]]$measure, sq$schema$fact[[name]]$nrow_agg)
-    validate_names(names(measure_names), measures, concept = 'measure')
+    validate_names(names(measure_names), measures, concept = 'measure', repeated = TRUE)
   }
   if (!is.null(agg_functions)) {
     validate_names(c("SUM", "MAX", "MIN"),
@@ -157,9 +157,12 @@ select_fact.star_query <- function(sq,
     )
     names(agg_functions) <- measures
   } else {
-    agg_functions <- sq$schema$fact[[name]]$measure[measures]
+    agg_functions <- measure_names[measures]
   }
-  agg_functions <- c(agg_functions, sq$schema$fact[[name]]$nrow_agg)
+  agg_functions[nrow_agg] <- 'SUM'
+
+  mnames <- paste0(tolower(agg_functions), '_', names(agg_functions))
+  stopifnot("There are repeated measures with the same aggregation function." = length(mnames) == length(unique(mnames)))
 
   fact_names <- names(sq$query$fact)
   sq$query$fact <- c(sq$query$fact, list(measure = agg_functions))
