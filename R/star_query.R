@@ -79,12 +79,9 @@ get_star_query_schema <- function(db) {
 #' If there is only one fact table, it is the one that is considered if no name
 #' is indicated.
 #'
-#' If no measure is given, only the one corresponding to the number of aggregated
-#' rows will be included (it is always included).
-#'
 #' If no aggregation function is given, those defined for the measures are considered.
 #'
-#' If no new names are given, the original names will be considered; If the
+#' If no new names are given, the original names will be considered. If the
 #' aggregation function is different from the one defined by default, it will be
 #' included as a prefix to the name.
 #'
@@ -93,6 +90,9 @@ get_star_query_schema <- function(db) {
 #' @param measures A vector of measure names.
 #' @param agg_functions A vector of aggregation function names, each one for its
 #'   corresponding measure. They can be SUM, MAX or MIN.
+#' @param new A vector of measure new names.
+#' @param nrow_agg A string, name of a new measure that represents the COUNT
+#'   of rows aggregated for each resulting row.
 #'
 #' @return A `star_query` object.
 #'
@@ -118,7 +118,7 @@ get_star_query_schema <- function(db) {
 #'   select_fact(name = "mrs_age")
 #'
 #' @export
-select_fact <- function(sq, name, measures, agg_functions) {
+select_fact <- function(sq, name, measures, agg_functions, new, nrow_agg) {
   UseMethod("select_fact")
 }
 
@@ -127,7 +127,12 @@ select_fact <- function(sq, name, measures, agg_functions) {
 select_fact.star_query <- function(sq,
                                    name = NULL,
                                    measures = NULL,
-                                   agg_functions = NULL) {
+                                   agg_functions = NULL,
+                                   new = NULL,
+                                   nrow_agg = NULL) {
+  if (is.null(nrow_agg)) {
+    nrow_agg <- 'nrow_agg_sq'
+  }
   if (is.null(name)) {
     if (length(sq$schema$fact) == 1) {
       name <- names(sq$schema$fact)
@@ -138,9 +143,9 @@ select_fact.star_query <- function(sq,
     validate_names(names(sq$schema$fact), name, concept = 'fact name')
   }
   stopifnot("The fact had already been selected." = !(name %in% names(sq$query$fact)))
-  stopifnot("There are repeated measures" = length(measures) == length(unique(measures)))
   if (!is.null(measures)) {
-    validate_names(names(sq$schema$fact[[name]]$measure), measures, concept = 'measure')
+    measure_names <- c(sq$schema$fact[[name]]$measure, sq$schema$fact[[name]]$nrow_agg)
+    validate_names(names(measure_names), measures, concept = 'measure')
   }
   if (!is.null(agg_functions)) {
     validate_names(c("SUM", "MAX", "MIN"),
