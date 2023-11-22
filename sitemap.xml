@@ -52,7 +52,7 @@
     <loc>https://josesamos.github.io/rolap/reference/add_dput_column.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/reference/add_operation.star_operation.html</loc>
+    <loc>https://josesamos.github.io/rolap/reference/add_operation.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/add_surrogate_key.dimension_table.html</loc>
@@ -115,12 +115,6 @@
     <loc>https://josesamos.github.io/rolap/reference/coordinates_to_point.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/reference/db_finest.html</loc>
-  </url>
-  <url>
-    <loc>https://josesamos.github.io/rolap/reference/db_summary.html</loc>
-  </url>
-  <url>
     <loc>https://josesamos.github.io/rolap/reference/default_disconnect.html</loc>
   </url>
   <url>
@@ -134,6 +128,15 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/define_geoattribute_from_layer.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/delete_all_operations_found.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/delete_operation.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/delete_operation_set.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/deploy.html</loc>
@@ -199,6 +202,9 @@
     <loc>https://josesamos.github.io/rolap/reference/get_agg_functions.fact_schema.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_all_dimension_operations.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_attribute_names.html</loc>
   </url>
   <url>
@@ -206,9 +212,6 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_attribute_names_schema.star_schema.html</loc>
-  </url>
-  <url>
-    <loc>https://josesamos.github.io/rolap/reference/get_common_dimension_operations.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_default_unknown_value.html</loc>
@@ -265,7 +268,7 @@
     <loc>https://josesamos.github.io/rolap/reference/get_new_dimension_instances.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/reference/get_next_operation.star_operation.html</loc>
+    <loc>https://josesamos.github.io/rolap/reference/get_next_operation.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_nrow_agg.fact_schema.html</loc>
@@ -433,7 +436,7 @@
     <loc>https://josesamos.github.io/rolap/reference/is_empty_string.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/reference/is_new_operation.star_operation.html</loc>
+    <loc>https://josesamos.github.io/rolap/reference/is_new_operation.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/join_lookup_table.html</loc>
