@@ -37,6 +37,9 @@
 #'
 #' @export
 constellation <- function(name = NULL, ...) {
+
+  browser()
+
   stars <- list(...)
   stopifnot("Missing constellation name." = !is.null(name))
   stopifnot("A constellation must be made up of more than one star." = length(stars) > 1)
