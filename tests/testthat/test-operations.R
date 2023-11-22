@@ -66,6 +66,45 @@ test_that("operations in constellation 2", {
 })
 
 
+test_that("operations in constellation 3", {
+  db1 <- star_database(mrs_cause_schema, ft_num) |>
+    snake_case()
+
+  db1 <- db1 |>
+    replace_attribute_values(name = "where",
+                             old = c('1', 'CT', 'Bridgeport'),
+                             new = c('1', 'CT', 'Hartford'))
+
+
+
+  db2 <- star_database(mrs_age_schema, ft_age) |>
+    snake_case()
+  db2 <- db2 |>
+    replace_attribute_values(name = "where",
+                             old = c('1', 'CT', 'Hartford'),
+                             new = c('1', 'CT', 'Bridgeport'))
+
+
+  ct1 <- constellation("MRS", db1, db2)
+
+  expect_equal(ct1$operations$mrs_cause$operations[3:4, ],
+               ct1$operations$mrs_age$operations[3:4, ])
+
+  expect_equal(ct1$dimensions$where$table,
+               structure(
+                 list(
+                   where_key = 1:3,
+                   region = c("1", "1", "1"),
+                   state = c("CT",
+                             "MA", "MA"),
+                   city = c("Bridgeport", "Boston", "Cambridge")
+                 ),
+                 row.names = c(NA,-3L),
+                 class = c("tbl_df", "tbl", "data.frame")
+               ))
+})
+
+
 
 
 test_that("operations", {
