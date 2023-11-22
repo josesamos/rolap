@@ -94,6 +94,9 @@ is_new_operation <- function(op, op_name, name = NULL, details = NULL, details2 
 #' @keywords internal
 get_next_operation <- function(op, op_name, name = NULL, actual = NULL) {
   res <- op$operations[op$operations$operation == op_name, ]
+  if (length(name) == 1) {
+    name <- c(name, "|")
+  }
   name <- vector_to_string(name)
   res <- res[startsWith(res$name, name), ]
   if (!is.null(actual)) {
