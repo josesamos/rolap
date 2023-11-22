@@ -21,15 +21,6 @@ star_operation <- function() {
   structure(list(operations = operations), class = "star_operation")
 }
 
-# generic
-#' @keywords internal
-add_operation <- function(op, op_name, name, details, details2) UseMethod("add_operation")
-#' @keywords internal
-is_new_operation <- function(op, op_name, name, details, details2) UseMethod("is_new_operation")
-#' @keywords internal
-get_next_operation <- function(op, op_name, name, actual) UseMethod("get_next_operation")
-
-
 #' A `star_operation` object row is added with a new operation
 #'
 #' @param op A `star_operation` object.
@@ -40,7 +31,7 @@ get_next_operation <- function(op, op_name, name, actual) UseMethod("get_next_op
 #'
 #' @return A `star_operation` object.
 #' @keywords internal
-add_operation.star_operation <- function(op, op_name, name = NULL, details = NULL, details2 = NULL) {
+add_operation <- function(op, op_name, name = NULL, details = NULL, details2 = NULL) {
   if (is_new_operation(op, op_name, name, details, details2)) {
     if (length(op$operations$order) == 0) {
       order <- 1
@@ -79,7 +70,7 @@ add_operation.star_operation <- function(op, op_name, name = NULL, details = NUL
 #'
 #' @return A boolean.
 #' @keywords internal
-is_new_operation.star_operation <- function(op, op_name, name = NULL, details = NULL, details2 = NULL) {
+is_new_operation <- function(op, op_name, name = NULL, details = NULL, details2 = NULL) {
   name <- vector_to_string(name)
   details <- vector_to_string(details)
   details2 <- vector_to_string(details2)
@@ -101,9 +92,10 @@ is_new_operation.star_operation <- function(op, op_name, name = NULL, details = 
 #'
 #' @return A data frame.
 #' @keywords internal
-get_next_operation.star_operation <- function(op, op_name, name = NULL, actual = NULL) {
+get_next_operation <- function(op, op_name, name = NULL, actual = NULL) {
   res <- op$operations[op$operations$operation == op_name, ]
-  res <- res[res$name == name, ]
+  name <- vector_to_string(name)
+  res <- res[startsWith(res$name, name), ]
   if (!is.null(actual)) {
     res <- res[res$order > actual$order, ]
   }
