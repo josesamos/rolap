@@ -162,7 +162,7 @@ pt$renderPivot()
 
 
 ```{r, echo = FALSE, fig.align = 'center', out.width = "40%"}
-knitr::include_graphics("inst/figures/pivottabler.png")
+knitr::include_graphics("man/figures/README-pivottabler.png")
 ```
 
 We can obtain a geographic information layer that includes it, to use it in R as an object of class `sf`.

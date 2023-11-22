@@ -228,7 +228,7 @@ pt <- pivottabler::qpvt(
 pt$renderPivot()
 ```
 
-<img src="inst/figures/pivottabler.png" width="40%" style="display: block; margin: auto;" />
+<img src="man/figures/README-pivottabler.png" width="40%" style="display: block; margin: auto;" />
 
 We can obtain a geographic information layer that includes it, to use it
 in R as an object of class `sf`.

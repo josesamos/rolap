@@ -369,28 +369,6 @@
 "mrs_db_geo"
 
 
-#' Czech debit card company specialising on payments at gas stations (finest detail)
-#'
-#' Multidimensional design with finest detail from the data available at the source.
-#'
-#' @family debit card example data
-#'
-#' @format A `star_database`.
-#' @source \url{https://fit.cvut.cz/cs}
-"db_finest"
-
-
-#' Czech debit card company specialising on payments at gas stations (summary)
-#'
-#' Multidimensional design with a summary from the data available at the source.
-#'
-#' @family debit card example data
-#'
-#' @format A `star_database`.
-#' @source \url{https://fit.cvut.cz/cs}
-"db_summary"
-
-
 #' Census of US States, by sex and age
 #'
 #' Census of US States, by sex and age, obtained from the United States Census
