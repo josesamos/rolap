@@ -341,7 +341,7 @@ get_similar_attribute_values.star_database <-
       attributes <-
         validate_attributes(colnames(dt)[-1], original_att)
       rv[[dn]] <-
-        get_similar_values_table(dt[, attributes], attributes, exclude_numbers, col_as_vector)
+        get_similar_values_table(dt, attributes, exclude_numbers, col_as_vector)
     }
     if (length(rv) == 1) {
       rv[[1]]
@@ -401,7 +401,7 @@ get_unique_attribute_values.star_database <-
       attributes <-
         validate_attributes(colnames(dt)[-1], original_att)
       rv[[dn]] <-
-        get_unique_values_table(dt[, attributes], col_as_vector)
+        get_unique_values_table(dt, attributes, col_as_vector)
     }
     if (length(rv) == 1) {
       rv[[1]]
