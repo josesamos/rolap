@@ -1231,7 +1231,7 @@ test_that("get_unknown_values() ", {
 })
 
 
-test_that("get_unknown_values() ", {
+test_that("read_flat_table_file() ", {
   expect_equal({
     file <-
       system.file("extdata",
@@ -1253,11 +1253,33 @@ test_that("get_unknown_values() ", {
 })
 
 
-test_that("get_unknown_values() ", {
+test_that("read_flat_table_folder() ", {
   expect_equal({
     file <- system.file("extdata", package = "rolap")
 
     ft <- read_flat_table_folder('mrs_new', file)
+    names(ft)
+  }, c(
+    "name",
+    "table",
+    "unknown_value",
+    "operations",
+    "pk_attributes",
+    "lookup_tables",
+    "attributes",
+    "measures"
+  ))
+})
+
+
+
+test_that("read_flat_table_folder() ", {
+  expect_equal({
+    file <- system.file("extdata", package = "rolap")
+
+    ft <- read_flat_table_folder('mrs_new', file,
+                                 same_columns = TRUE,
+                                 snake_case = TRUE)
     names(ft)
   }, c(
     "name",
