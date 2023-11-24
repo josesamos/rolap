@@ -9,7 +9,7 @@
 #'
 #' @keywords internal
 get_similar_values_table <- function(table, attributes, exclude_numbers, col_as_vector) {
-  table <- data.frame(table, stringsAsFactors = FALSE)
+  table <- data.frame(table[, attributes], stringsAsFactors = FALSE)
   # in one column
   dt <- do.call(paste, c(table, sep = ""))
   # clean values
@@ -44,13 +44,14 @@ get_similar_values_table <- function(table, attributes, exclude_numbers, col_as_
 #' Get unique values in a table
 #'
 #' @param table A `tibble` object.
+#' @param attributes A vector of strings, attribute names.
 #' @param col_as_vector A string, name of the column to include a vector of values.
 #'
 #' @return A vector of `tibble` objects with similar instances.
 #'
 #' @keywords internal
-get_unique_values_table <- function(table, col_as_vector) {
-  dt <- data.frame(table, stringsAsFactors = FALSE)
+get_unique_values_table <- function(table, attributes, col_as_vector) {
+  dt <- data.frame(table[, attributes], stringsAsFactors = FALSE)
   dt <- dplyr::arrange_all(unique(tibble::as_tibble(dt)))
   if (!is.null(col_as_vector)) {
     dt <- add_dput_column(dt, col_as_vector)

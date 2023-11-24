@@ -166,7 +166,7 @@ get_similar_attribute_values.flat_table <-
            exclude_numbers = FALSE,
            col_as_vector = NULL) {
     attributes <- validate_attributes(db$attributes, attributes)
-    get_similar_values_table(db$table[, attributes], attributes, exclude_numbers, col_as_vector)
+    get_similar_values_table(db$table, attributes, exclude_numbers, col_as_vector)
   }
 
 
@@ -199,7 +199,7 @@ get_unique_attribute_values.flat_table <- function(db,
                                                    attributes = NULL,
                                                    col_as_vector = NULL) {
   attributes <- validate_attributes(db$attributes, attributes)
-  get_unique_values_table(db$table[, attributes], col_as_vector)
+  get_unique_values_table(db$table, attributes, col_as_vector)
 }
 
 
