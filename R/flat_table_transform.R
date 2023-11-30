@@ -324,6 +324,9 @@ transform_to_attribute.flat_table <-
       } else {
         values <- suppressWarnings(as.integer(ft$table[, measure][[1]]))
       }
+      if (is.null(k_sep)) {
+        k_sep = ''
+      }
       if (decimal_places > 0) {
         values2 <- formatC(
           values,
@@ -476,8 +479,8 @@ transform_to_measure.flat_table <-
 #' @param attributes A vector of strings, attribute names.
 #' @param width An integer, string length.
 #' @param decimal_places An integer, number of decimal places.
-#' @param k_sep A character, indicates thousands separator.
-#' @param decimal_sep A character, indicates decimal separator.
+#' @param k_sep A character, thousands separator used (It can not be changed).
+#' @param decimal_sep A character, decimal separator used (It can not be changed).
 #' @param space_filling A boolean, fill on the left with spaces (with '0' otherwise).
 #'
 #' @return ft A `flat_table` object.
@@ -525,24 +528,15 @@ transform_attribute_format.flat_table <-
       }
       ft$table[, attributes] <-
         apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-          stringr::str_replace_all(x, pattern, ""))
+          gsub(pattern, "", x))
     }
     if (!is.null(decimal_sep)) {
-      if (decimal_sep == ".") {
-        pattern <- ","
-      } else {
-        pattern <- "\\."
-        decimal_sep <- ','
+      if (decimal_sep != ".") {
+        pattern <- decimal_sep
+        ft$table[, attributes] <-
+          apply(ft$table[, attributes, drop = FALSE], 2, function(x)
+            stringr::str_replace(x, pattern, "."))
       }
-      ft$table[, attributes] <-
-        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-          sub("^\\.$", "0", x))
-      ft$table[, attributes] <-
-        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-          sub("^,$", "0", x))
-      ft$table[, attributes] <-
-        apply(ft$table[, attributes, drop = FALSE], 2, function(x)
-          stringr::str_replace(x, pattern, decimal_sep))
       ft$table[, attributes] <-
         apply(ft$table[, attributes, drop = FALSE], 2, function(x)
           suppressWarnings(as.double(x)))
