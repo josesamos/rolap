@@ -11,6 +11,7 @@ status](https://www.r-pkg.org/badges/version/rolap)](https://CRAN.R-project.org/
 [![Codecov test
 coverage](https://codecov.io/gh/josesamos/rolap/branch/master/graph/badge.svg)](https://app.codecov.io/gh/josesamos/rolap?branch=master)
 [![Downloads](http://cranlogs.r-pkg.org/badges/rolap?color=brightgreen)](https://www.r-pkg.org:443/pkg/rolap)
+[![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/rolap?color=brightgreen)](https://www.r-pkg.org:443/pkg/rolap)
 <!-- badges: end -->
 
 The aim of the *multidimensional data model* is organize data for
