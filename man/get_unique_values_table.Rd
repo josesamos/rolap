@@ -4,10 +4,12 @@
 \alias{get_unique_values_table}
 \title{Get unique values in a table}
 \usage{
-get_unique_values_table(table, col_as_vector)
+get_unique_values_table(table, attributes, col_as_vector)
 }
 \arguments{
 \item{table}{A \code{tibble} object.}
+
+\item{attributes}{A vector of strings, attribute names.}
 
 \item{col_as_vector}{A string, name of the column to include a vector of values.}
 }

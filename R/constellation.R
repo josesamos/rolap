@@ -63,6 +63,7 @@ constellation <- function(name = NULL, ...) {
   schemas <- vector("list", length = num_stars)
   dimensions = vector("list", length = length(dim_freq))
   rpd <- list()
+  geo <- list()
   names(facts) <- fct_names
   names(operations) <- fct_names
   names(lookup_tables) <- fct_names
@@ -87,6 +88,9 @@ constellation <- function(name = NULL, ...) {
     for (s in seq_along(stars)) {
       if (dn %in% names(stars[[s]]$dimensions)) {
         dimensions[dn] <- stars[[s]]$dimensions[dn]
+        if (!is.null(stars[[s]]$geo[[dn]])) {
+          geo[[dn]] <- stars[[s]]$geo[[dn]]
+        }
         break # dim_freq == 1 and found
       }
     }
@@ -97,6 +101,13 @@ constellation <- function(name = NULL, ...) {
     surrogate_key <- NULL
     attributes <- NULL
     for (s in seq_along(stars)) {
+      if (!is.null(stars[[s]]$geo[[dn]])) {
+        if (is.null(geo[[dn]])) {
+          geo[[dn]] <- stars[[s]]$geo[[dn]]
+        } else {
+          geo[[dn]] <- integrate_geo_dimensions(geo[[dn]], stars[[s]]$geo[[dn]])
+        }
+      }
       for (f in seq_along(stars[[s]]$facts)) {
         if (dn %in% stars[[s]]$facts[[f]]$dim_int_names) {
           dim <- stars[[s]]$dimensions[dn]
@@ -152,7 +163,8 @@ constellation <- function(name = NULL, ...) {
     deploy = list(),
     facts = facts,
     dimensions = dimensions,
-    rpd = rpd
+    rpd = rpd,
+    geo = geo
   ), class = "star_database")
   c <- rpd_in_constellation(c)
   purge_dimension_instances_star_database(c)
@@ -169,37 +181,26 @@ constellation <- function(name = NULL, ...) {
 share_dimension_instance_operations <- function(stars, dim_freq) {
   op_name  <- 'replace_attribute_values'
   for (dn in names(dim_freq[dim_freq > 1])) {
-    op <- get_common_dimension_operations(op_name = op_name, name = dn, stars)
+    op <- get_all_dimension_operations(op_name = op_name, name = dn, stars)
     if (nrow(op$operations) > 0) {
+      stars <- delete_all_operations_found(stars, op)
       for (s in seq_along(stars)) {
         for (f in seq_along(stars[[s]]$facts)) {
           if (dn %in% stars[[s]]$facts[[f]]$dim_int_names) {
             next_op <- get_next_operation(op, op_name = op_name, name = dn, actual = NULL)
             while (!is.null(next_op)) {
-              details <- next_op$details
-              details2 <- next_op$details2
-              if (is_new_operation(stars[[s]]$operations[[f]], op_name, dn, details, details2)) {
-                details <- string_to_vector(details)
-                details2 <- string_to_vector(details2)
-                pos_att <- as.integer(details)
-                attributes <- colnames(stars[[s]]$dimensions[[dn]]$table)[pos_att]
-                # c(old, "-->>", new)
-                old <- c()
-                new <- c()
-                sep_found <- FALSE
-                for (i in seq_along(details2)) {
-                  if (details2[i] == "-->>") {
-                    sep_found <- TRUE
-                  } else {
-                    if (!sep_found) {
-                      old <- c(old, details2[i])
-                    } else {
-                      new <- c(new, details2[i])
-                    }
-                  }
-                }
-                stars[[s]] <- replace_attribute_values(stars[[s]], dn, attributes, old, new)
-              }
+              name <- string_to_vector(next_op$name)
+              details <- string_to_vector(next_op$details)
+              details2 <- string_to_vector(next_op$details2)
+              # c(name, "|", attributes)
+              stars[[s]] <-
+                replace_attribute_values(
+                  stars[[s]],
+                  name = name[1],
+                  attributes = name[-c(1, 2)],
+                  old = details,
+                  new = details2
+                )
               next_op <- get_next_operation(op, op_name = op_name, name = dn, actual = next_op)
             }
             # all operations for a dimension have been carried out
@@ -213,7 +214,7 @@ share_dimension_instance_operations <- function(stars, dim_freq) {
 }
 
 
-#' Gets the operations performed on a element in all `star_database` objects
+#' Gets the operations performed on a dimension in all `star_database` objects
 #'
 #' @param op_name A string, operation name.
 #' @param name A string, element name.
@@ -222,7 +223,7 @@ share_dimension_instance_operations <- function(stars, dim_freq) {
 #' @return A `star_operations` object.
 #'
 #' @keywords internal
-get_common_dimension_operations <- function(op_name, name, stars) {
+get_all_dimension_operations <- function(op_name, name, stars) {
   op <- star_operation()
   for (s in seq_along(stars)) {
     for (f in seq_along(stars[[s]]$facts)) {
@@ -239,7 +240,7 @@ get_common_dimension_operations <- function(op_name, name, stars) {
             add_operation(
               op,
               op_name,
-              name,
+              name = next_op$name,
               details = next_op$details,
               details2 = next_op$details2
             )
@@ -255,6 +256,25 @@ get_common_dimension_operations <- function(op_name, name, stars) {
     }
   }
   op
+}
+
+
+#' Delete in stars all operations found
+#'
+#' @param stars A list of `star_database` objects.
+#' @param op A `star_operations` object.
+#'
+#' @return A list of `star_database` objects.
+#'
+#' @keywords internal
+delete_all_operations_found <- function(stars, op) {
+  for (s in seq_along(stars)) {
+    for (f in seq_along(stars[[s]]$facts)) {
+      stars[[s]]$operations[[f]] <-
+        delete_operation_set(stars[[s]]$operations[[f]], op)
+    }
+  }
+  stars
 }
 
 

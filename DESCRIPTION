@@ -26,6 +26,7 @@ Imports:
     purrr,
     readr,
     rlang,
+    sf,
     snakecase,
     tibble,
     tidyr,

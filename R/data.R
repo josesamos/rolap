@@ -323,26 +323,50 @@
 "mrs_db"
 
 
-#' Czech debit card company specialising on payments at gas stations (finest detail)
+#' Constellation generated from MRS file through a query and with geographic information
 #'
-#' Multidimensional design with finest detail from the data available at the source.
+#' The original dataset covers from 1962 to 2016. For each week, in 122 US cities,
+#' from the original file, we have stored in the package a file with the same
+#' format as the original file but that includes only 1% of its data, selected at
+#' random.
 #'
-#' @family debit card example data
+#' From these data the constellation in the vignette titled 'Obtaining and
+#' transforming flat tables' has been generated. This variable contains the defined
+#' constellation.
+#'
+#' @family mrs example data
+#' @examples
+#' # Defined by:
+#'
+#' sq <- mrs_db |>
+#'   star_query() |>
+#'   select_dimension(name = "where",
+#'                    attributes = "state") |>
+#'   select_dimension(name = "when",
+#'                    attributes = "year") |>
+#'   select_fact(
+#'     name = "mrs_age",
+#'     measures = "all_deaths"
+#'   )  |>
+#'   select_fact(
+#'     name = "mrs_cause",
+#'     measures = "pneumonia_and_influenza_deaths"
+#'   )
+#'
+#' db <- mrs_db |>
+#'   run_query(sq)
+#'
+#' mrs_db_geo <- db |>
+#'   define_geoattribute(
+#'     dimension = "where",
+#'     attribute = "state",
+#'     from_layer = us_layer_state,
+#'     by = "STUSPS"
+#'   )
 #'
 #' @format A `star_database`.
-#' @source \url{https://fit.cvut.cz/cs}
-"db_finest"
-
-
-#' Czech debit card company specialising on payments at gas stations (summary)
-#'
-#' Multidimensional design with a summary from the data available at the source.
-#'
-#' @family debit card example data
-#'
-#' @format A `star_database`.
-#' @source \url{https://fit.cvut.cz/cs}
-"db_summary"
+#' @source \url{https://catalog.data.gov/dataset/deaths-in-122-u-s-cities-1962-2016-122-cities-mortality-reporting-system}
+"mrs_db_geo"
 
 
 #' Census of US States, by sex and age
@@ -363,3 +387,15 @@
 "us_census_state"
 
 
+#' Geographic layer of US States
+#'
+#' Geographic layer with data from the States of the USA in polygon format, with
+#' simplified geometry so that it takes up less space.
+#'
+#' It has been obtained from the geographic data included in the US census prepared
+#' by the U.S. Census Bureau.
+#'
+#' @format A `sf`.
+#' @source
+#'   \url{https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-data.2021.html}
+"us_layer_state"

@@ -1,3 +1,139 @@
+test_that("constellation geo operations", {
+
+  t <- sf::st_drop_geometry(us_layer_state)
+  t <- t |>
+    dplyr::filter(!(STUSPS %in% c("IL", "MN", "OR")))
+  t <- dplyr::inner_join(t, us_layer_state, by = "STUSPS")
+  us_layer_state_incomplet <- sf::st_as_sf(t)
+
+  mrs_age <- mrs_db |>
+    get_star_database("mrs_age")  |>
+    define_geoattribute(
+      dimension = "where",
+      attribute = "state",
+      from_layer = us_layer_state,
+      by = "STUSPS"
+    )
+
+  mrs_cause <- mrs_db |>
+    get_star_database("mrs_cause")  |>
+    define_geoattribute(
+      dimension = "where",
+      attribute = "region",
+      from_layer = us_layer_state,
+      by = "DIVISION"
+    )
+
+  mrs_cause_2 <- mrs_db |>
+    get_star_database("mrs_cause")  |>
+    define_geoattribute(
+      dimension = "where",
+      attribute = "state",
+      from_layer = us_layer_state,
+      by = "STUSPS"
+    )
+
+  mrs_age_2 <- mrs_db |>
+    get_star_database("mrs_age")  |>
+    define_geoattribute(
+      dimension = "where",
+      attribute = "state",
+      from_layer = us_layer_state_incomplet,
+      by = "STUSPS"
+    )
+
+  ct_geo_1 <- constellation("MRS", mrs_age, mrs_cause)
+  ct_geo_2 <- constellation("MRS", mrs_age, mrs_cause_2)
+  ct_geo_2 <- constellation("MRS", mrs_age_2, mrs_cause_2)
+
+  mrs_age_3 <- mrs_db |>
+    define_geoattribute(
+      dimension = "where",
+      attribute = "state",
+      from_layer = us_layer_state,
+      by = "STUSPS"
+    ) |>
+    get_star_database("mrs_age")
+
+
+
+  expect_equal({
+    names(mrs_age_3$geo$where$state)
+  },
+  c("polygon", "point"))
+
+  expect_equal({
+    names(ct_geo_1$geo$where)
+  },
+  c("state", "region"))
+
+  expect_equal({
+    names(ct_geo_2$geo$where)
+  },
+  "state")
+
+  expect_equal({
+    ct_geo_2$geo$where$state$polygon$state
+  },
+  c(
+    "AK",
+    "AL",
+    "AR",
+    "AZ",
+    "CA",
+    "CO",
+    "CT",
+    "DC",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "IA",
+    "ID",
+    "IN",
+    "KS",
+    "KY",
+    "LA",
+    "MA",
+    "MD",
+    "ME",
+    "MI",
+    "MO",
+    "MS",
+    "MT",
+    "NC",
+    "ND",
+    "NE",
+    "NH",
+    "NJ",
+    "NM",
+    "NV",
+    "NY",
+    "OH",
+    "OK",
+    "PA",
+    "PR",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VA",
+    "VT",
+    "WA",
+    "WI",
+    "WV",
+    "WY",
+    "IL",
+    "MN",
+    "OR"
+  ))
+
+})
+
+
+
 test_that("constellation() define constellation", {
   expect_equal({
     ft1 <- ft_num  |>
@@ -218,7 +354,8 @@ test_that("constellation() define constellation", {
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )
@@ -520,7 +657,8 @@ test_that("constellation() define constellation", {
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )
@@ -823,7 +961,8 @@ test_that("constellation() define constellation", {
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )

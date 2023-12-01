@@ -123,17 +123,33 @@ be reused or directly in the star schema definition. To make it easier
 to work in a database environment we transform the table field names to
 snake case.
 
+Geographic attributes can be associated with vector layers of geographic
+information.
+
+``` r
+db <- db |>
+  define_geoattribute(
+    dimension = "where",
+    attribute = "state",
+    from_layer = us_layer_state,
+    by = "STUSPS"
+  )
+```
+
 ### Result
 
-To better appreciate the result, let’s export it as a `tibble` list.
+To better appreciate the result, let’s export it as a `tibble` list. The
+tables of dimensions and facts of the obtained star database are shown
+below.
 
 ``` r
 ls <- db |>
   as_tibble_list()
-```
 
-The tables of dimensions and facts of the obtained star database are
-shown below.
+for (i in 1:length(ls)) {
+  pander::pandoc.table(ls[[i]], split.table = Inf)
+}
+```
 
 | when_key | year |
 |:--------:|:----:|
@@ -195,7 +211,7 @@ db_2 <- db |>
   run_query(sq)
 ```
 
-The result can also be displayed using the
+The result can be displayed using the
 [`pivottabler`](https://CRAN.R-project.org/package=pivottabler) package.
 
 ``` r
@@ -213,7 +229,59 @@ pt <- pivottabler::qpvt(
 pt$renderPivot()
 ```
 
-<img src="inst/figures/pivottabler.png" width="70%" style="display: block; margin: auto;" />
+<img src="man/figures/README-pivottabler.png" width="40%" style="display: block; margin: auto;" />
+
+We can obtain a geographic information layer that includes it, to use it
+in R as an object of class `sf`.
+
+``` r
+gl <- db_2 |>
+  as_geolayer()
+
+l1 <- gl |>
+  get_layer()
+class(l1)
+#> [1] "sf"         "tbl_df"     "tbl"        "data.frame"
+
+title <- gl |>
+  get_variable_description("var_1")
+
+plot(sf::st_geometry(l1[, c("var_1")]), axes = TRUE, main = title)
+text(
+  sf::st_coordinates(sf::st_centroid(sf::st_geometry(l1))),
+  labels = paste0(l1$state, ": ", l1$var_1),
+  pos = 3,
+  cex = 1.5
+)
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+
+We can also include all geographic instances originally present in the
+layer.
+
+``` r
+l2 <- gl |>
+  get_layer(keep_all_variables_na = TRUE)
+
+plot(sf::st_shift_longitude(l2[, "var_1"]), axes = TRUE, main = title)
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+
+Or export it in *GeoPackage* format.
+
+``` r
+f <- gl |>
+  as_GeoPackage(dir = tempdir())
+
+sf::st_layers(f)
+#> Driver: GPKG 
+#> Available layers:
+#>   layer_name geometry_type features fields crs_name
+#> 1   geolayer       Polygon        2      3   WGS 84
+#> 2  variables            NA        2      3     <NA>
+```
 
 We can work with several star databases to form a *constellation*. It
 supports the definition of *role-playing* and *role* dimensions, as well

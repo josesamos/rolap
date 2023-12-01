@@ -5,9 +5,16 @@
 \alias{select_fact.star_query}
 \title{Select fact}
 \usage{
-select_fact(sq, name, measures, agg_functions)
+select_fact(sq, name, measures, agg_functions, new, nrow_agg)
 
-\method{select_fact}{star_query}(sq, name = NULL, measures = NULL, agg_functions = NULL)
+\method{select_fact}{star_query}(
+  sq,
+  name = NULL,
+  measures = NULL,
+  agg_functions = NULL,
+  new = NULL,
+  nrow_agg = NULL
+)
 }
 \arguments{
 \item{sq}{A \code{star_query} object.}
@@ -18,23 +25,29 @@ select_fact(sq, name, measures, agg_functions)
 
 \item{agg_functions}{A vector of aggregation function names, each one for its
 corresponding measure. They can be SUM, MAX or MIN.}
+
+\item{new}{A vector of measure new names.}
+
+\item{nrow_agg}{A string, name of a new measure that represents the COUNT
+of rows aggregated for each resulting row.}
 }
 \value{
 A \code{star_query} object.
 }
 \description{
 To define the fact to be consulted, its name is indicated, optionally, a
-vector of names of selected measures and another of aggregation functions are
-also indicated.
+vector of names of selected measures, another of aggregation functions and
+another of new names for measures are also indicated.
 }
 \details{
 If there is only one fact table, it is the one that is considered if no name
 is indicated.
 
-If no measure is given, only the one corresponding to the number of aggregated
-rows will be included (it is always included).
-
 If no aggregation function is given, those defined for the measures are considered.
+
+If no new names are given, the original names will be considered. If the
+aggregation function is different from the one defined by default, it will be
+included as a prefix to the name.
 }
 \examples{
 
@@ -58,9 +71,16 @@ sq_3 <- sq |>
 }
 \seealso{
 Other query functions: 
+\code{\link{as_GeoPackage}()},
+\code{\link{as_geolayer}()},
 \code{\link{filter_dimension}()},
+\code{\link{get_layer}()},
+\code{\link{get_variable_description}()},
+\code{\link{get_variables}()},
 \code{\link{run_query}()},
 \code{\link{select_dimension}()},
+\code{\link{set_layer}()},
+\code{\link{set_variables}()},
 \code{\link{star_query}()}
 }
 \concept{query functions}

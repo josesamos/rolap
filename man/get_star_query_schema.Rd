@@ -10,7 +10,7 @@ get_star_query_schema(db)
 \item{db}{A \code{star_database} object.}
 }
 \value{
-A list of objects (facts and dimensions schemes).
+A star database schema, list of fact and dimension schemes.
 }
 \description{
 Obtain the star database schema to perform queries.

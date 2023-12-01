@@ -34,9 +34,9 @@ transform_attribute_format(
 
 \item{decimal_places}{An integer, number of decimal places.}
 
-\item{k_sep}{A character, indicates thousands separator.}
+\item{k_sep}{A character, thousands separator used (It can not be changed).}
 
-\item{decimal_sep}{A character, indicates decimal separator.}
+\item{decimal_sep}{A character, decimal separator used (It can not be changed).}
 
 \item{space_filling}{A boolean, fill on the left with spaces (with '0' otherwise).}
 }

@@ -38,9 +38,16 @@ sq <- mrs_db |>
 }
 \seealso{
 Other query functions: 
+\code{\link{as_GeoPackage}()},
+\code{\link{as_geolayer}()},
+\code{\link{get_layer}()},
+\code{\link{get_variable_description}()},
+\code{\link{get_variables}()},
 \code{\link{run_query}()},
 \code{\link{select_dimension}()},
 \code{\link{select_fact}()},
+\code{\link{set_layer}()},
+\code{\link{set_variables}()},
 \code{\link{star_query}()}
 }
 \concept{query functions}

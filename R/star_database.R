@@ -106,7 +106,8 @@ star_database_with_previous_operations <-
           deploy = list(),
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
-          rpd = list()
+          rpd = list(),
+          geo = list()
         ),
         class = "star_database"
       )
@@ -197,6 +198,7 @@ get_star_database.star_database <- function(db, name) {
     dim <- unique(dim)
     db$dimensions <- db$dimensions[dim]
     db$rpd <- filter_rpd_dimensions(db, dim)
+    db$geo <- filter_geo_dimensions(db, dim)
     db <- purge_dimension_instances_star_database(db)
   }
   db
@@ -339,7 +341,7 @@ get_similar_attribute_values.star_database <-
       attributes <-
         validate_attributes(colnames(dt)[-1], original_att)
       rv[[dn]] <-
-        get_similar_values_table(dt[, attributes], attributes, exclude_numbers, col_as_vector)
+        get_similar_values_table(dt, attributes, exclude_numbers, col_as_vector)
     }
     if (length(rv) == 1) {
       rv[[1]]
@@ -363,8 +365,7 @@ get_similar_attribute_values_individually.star_database <-
     names(rv) <- name
     original_att <- attributes
     for (dn in name) {
-      attributes <-
-        validate_attributes(colnames(db$dimensions[[dn]]$table)[-1], original_att)
+      attributes <- validate_dimension_attributes(db, dn, original_att)
       l <- list()
       for (at in attributes) {
         la <-
@@ -400,7 +401,7 @@ get_unique_attribute_values.star_database <-
       attributes <-
         validate_attributes(colnames(dt)[-1], original_att)
       rv[[dn]] <-
-        get_unique_values_table(dt[, attributes], col_as_vector)
+        get_unique_values_table(dt, attributes, col_as_vector)
     }
     if (length(rv) == 1) {
       rv[[1]]
@@ -569,6 +570,36 @@ get_table_names.star_database <- function(db) {
 }
 
 
+#' Get dimension table
+#'
+#' Get the table for the dimension indicated by its name.
+#'
+#' @param db A `star_database` object.
+#' @param name A string, dimension name.
+#'
+#' @return A `tibble`, dimension table.
+#'
+#' @family star database definition functions
+#' @seealso \code{\link{star_schema}}, \code{\link{flat_table}}
+#'
+#' @examples
+#'
+#' table <- star_database(mrs_cause_schema, ft_num) |>
+#'   get_dimension_table("where")
+#'
+#' @export
+get_dimension_table <- function(db, name)
+  UseMethod("get_dimension_table")
+
+#' @rdname get_dimension_table
+#'
+#' @export
+get_dimension_table.star_database <- function(db, name = NULL) {
+  validate_dimension_names(db, name)
+  db$dimensions[[name]]$table[, -1]
+}
+
+
 #' Group instances of a dimension
 #'
 #' After changes in values in the instances of a dimension, groups the instances
@@ -661,6 +692,20 @@ validate_dimension_names <- function(db, name) {
     }
   }
   name
+}
+
+
+#' Validate dimension attributes
+#'
+#' @param db A `star_database` object.
+#' @param dimension A dimension name.
+#' @param attributes Attribute names.
+#'
+#' @return A vector of strings, dimension names.
+#'
+#' @keywords internal
+validate_dimension_attributes <- function(db, dimension, attributes) {
+  validate_attributes(colnames(db$dimensions[[dimension]]$table)[-1], attributes)
 }
 
 

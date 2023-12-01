@@ -20,6 +20,36 @@ is_empty_string <- function(string) {
 }
 
 
+#' Validate names
+#'
+#' @param defined_names A vector of strings, defined attribute names.
+#' @param names A vector of strings, new attribute names.
+#' @param concept A string, treated concept.
+#' @param repeated A boolean, repeated names allowed.
+#'
+#' @return A vector of strings, names.
+#'
+#' @keywords internal
+validate_names <- function(defined_names, names, concept = 'name', repeated = FALSE) {
+  if (length(names) == 0) {
+    names <- defined_names
+  } else {
+    if (!repeated) {
+      stopifnot("There are repeated values." = length(names) == length(unique(names)))
+    }
+    for (name in names) {
+      if (!(name %in% defined_names)) {
+        stop(sprintf(
+          "'%s' is not defined as %s.",
+          name, concept
+        ))
+      }
+    }
+  }
+  names
+}
+
+
 #' Validate attribute names
 #'
 #' @param defined_attributes A vector of strings, defined attribute names.
@@ -30,22 +60,7 @@ is_empty_string <- function(string) {
 #'
 #' @keywords internal
 validate_attributes <- function(defined_attributes, attributes, repeated = FALSE) {
-  if (is.null(attributes)) {
-    attributes <- defined_attributes
-  } else {
-    if (!repeated) {
-      stopifnot("There are repeated attributes." = length(attributes) == length(unique(attributes)))
-    }
-    for (attribute in attributes) {
-      if (!(attribute %in% defined_attributes)) {
-        stop(sprintf(
-          "'%s' is not defined as attribute.",
-          attribute
-        ))
-      }
-    }
-  }
-  attributes
+  validate_names(defined_attributes, attributes, concept = 'attribute', repeated)
 }
 
 #' Validate measure names
@@ -57,20 +72,7 @@ validate_attributes <- function(defined_attributes, attributes, repeated = FALSE
 #'
 #' @keywords internal
 validate_measures <- function(defined_measures, measures) {
-  if (length(measures) == 0) {
-    measures <- defined_measures
-  } else {
-    stopifnot("There are repeated measures." = length(measures) == length(unique(measures)))
-    for (measure in measures) {
-      if (!(measure %in% defined_measures)) {
-        stop(sprintf(
-          "'%s' is not defined as measure.",
-          measure
-        ))
-      }
-    }
-  }
-  measures
+  validate_names(defined_measures, measures, concept = 'measure', repeated = FALSE)
 }
 
 
@@ -85,13 +87,7 @@ validate_measures <- function(defined_measures, measures) {
 validate_facts <- function(defined_facts, facts) {
   stopifnot("Some fact name must be indicated." = length(facts) > 0)
   facts <- snakecase::to_snake_case(facts)
-  stopifnot("There are repeated fact names." = length(facts) == length(unique(facts)))
-  for (f in facts) {
-    if (!(f %in% defined_facts)) {
-      stop(sprintf("'%s' is not defined as fact name.", f))
-    }
-  }
-  facts
+  validate_names(defined_facts, facts, concept = 'fact', repeated = FALSE)
 }
 
 
@@ -167,31 +163,24 @@ add_dput_column <- function(v, column) {
 }
 
 
-#' Validate names
+#' Name with nexus
 #'
-#' @param defined_names A vector of strings, defined attribute names.
-#' @param names A vector of strings, new attribute names.
-#' @param concept A string, treated concept.
-#' @param repeated A boolean, repeated names allowed.
+#' Given a name, if it ends in "/" the nexus is the empty string, otherwise it
+#' is "/". Add the nexus.
 #'
-#' @return A vector of strings, names.
+#' @param name A string.
+#'
+#' @return A string.
 #'
 #' @keywords internal
-validate_names <- function(defined_names, names, concept = 'name', repeated = FALSE) {
-  if (is.null(names)) {
-    names <- defined_names
-  } else {
-    if (!repeated) {
-      stopifnot("There are repeated values." = length(names) == length(unique(names)))
-    }
-    for (name in names) {
-      if (!(name %in% defined_names)) {
-        stop(sprintf(
-          "'%s' is not defined as %s.",
-          name, concept
-        ))
-      }
+name_with_nexus <- function(name) {
+  l <- nchar(name)
+  c <- substr(name, start = l, stop = l)
+  res <- name
+  for (i in seq_along(c)) {
+    if (c[i] != "/") {
+      res[i] <- paste0(name[i], "/")
     }
   }
-  names
+  res
 }

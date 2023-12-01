@@ -70,8 +70,10 @@ test_that("query", {
     sq_1$query
   },
   {
-    list(fact = list(mrs_age = c(
-      all_deaths = "MAX", nrow_agg = "SUM"
+    list(fact = list(mrs_age = list(
+      measure = c(all_deaths = "MAX",
+                  nrow_agg_sq = "SUM"),
+      new = NULL
     )), dimension = list())
   })
 
@@ -176,15 +178,22 @@ test_that("query", {
       ),
       query = list(
         fact = list(
-          mrs_age = c(all_deaths = "SUM",
-                      nrow_agg = "SUM"),
-          mrs_cause = c(all_deaths = "SUM", nrow_agg = "SUM")
+          mrs_age = list(
+            measure = c(all_deaths = "SUM", nrow_agg_sq = "SUM"),
+            new = NULL
+          ),
+          mrs_cause = list(
+            measure = c(all_deaths = "SUM", nrow_agg_sq = "SUM"),
+            new = NULL
+          )
         ),
         dimension = list(
-          where = list(attribute = c("region", "state")),
+          where = list(attribute = c("region",
+                                     "state")),
           when = list(
             attribute = "year",
-            filter = c("alist", "week <= \" 3\" & year >= \"2010\"")
+            filter = c("alist",
+                       "week <= \" 3\" & year >= \"2010\"")
           )
         )
       )
@@ -223,12 +232,12 @@ test_that("query", {
               name = "mrs_age",
               surrogate_keys = c("when_key", "where_key"),
               agg = c(all_deaths = "SUM",
-                      nrow_agg = "SUM"),
+                      nrow_agg_sq = "SUM"),
               dim_int_names = c("when", "where"),
               table = structure(
                 list(
-                  when_key = c(1L, 1L, 2L, 2L, 2L,
-                               2L, 3L, 4L, 4L, 5L, 5L, 6L, 7L, 7L, 7L, 7L, 7L),
+                  when_key = c(1L, 1L, 2L, 2L,
+                               2L, 2L, 3L, 4L, 4L, 5L, 5L, 6L, 7L, 7L, 7L, 7L, 7L),
                   where_key = c(
                     2L,
                     8L,
@@ -267,12 +276,12 @@ test_that("query", {
                     58L,
                     14L
                   ),
-                  nrow_agg = c(1L, 5L, 4L, 5L, 5L, 5L, 5L, 5L,
-                               5L, 5L, 5L, 5L, 5L, 10L, 5L, 5L, 5L)
+                  nrow_agg_sq = c(1L,
+                                  5L, 4L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 10L,
+                                  5L, 5L, 5L)
                 ),
-                class = c("tbl_df",
-                          "tbl", "data.frame"),
-                row.names = c(NA, -17L)
+                class = c("tbl_df", "tbl", "data.frame"),
+                row.names = c(NA,-17L)
               )
             ),
             class = "fact_table"
@@ -282,7 +291,7 @@ test_that("query", {
               name = "mrs_cause",
               surrogate_keys = c("when_key",
                                  "where_key"),
-              agg = c(all_deaths = "SUM", nrow_agg = "SUM"),
+              agg = c(all_deaths = "SUM", nrow_agg_sq = "SUM"),
               dim_int_names = c("when", "where"),
               table = structure(
                 list(
@@ -326,12 +335,12 @@ test_that("query", {
                     58L,
                     14L
                   ),
-                  nrow_agg = c(1L, 1L, 1L,
-                               1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 1L, 1L,
-                               1L)
+                  nrow_agg_sq = c(1L, 1L,
+                                  1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 1L,
+                                  1L, 1L)
                 ),
                 class = c("tbl_df", "tbl", "data.frame"),
-                row.names = c(NA, -17L)
+                row.names = c(NA,-17L)
               )
             ),
             class = "fact_table"
@@ -380,9 +389,8 @@ test_that("query", {
                     "WA"
                   )
                 ),
-                row.names = c(NA, -15L),
-                class = c("tbl_df",
-                          "tbl", "data.frame")
+                row.names = c(NA,-15L),
+                class = c("tbl_df", "tbl", "data.frame")
               )
             ),
             class = "dimension_table"
@@ -394,17 +402,18 @@ test_that("query", {
               table = structure(
                 list(
                   when_key = 1:7,
-                  year = c("2010", "2011", "2012",
-                           "2013", "2014", "2015", "2016")
+                  year = c("2010",
+                           "2011", "2012", "2013", "2014", "2015", "2016")
                 ),
-                row.names = c(NA, -7L),
+                row.names = c(NA,-7L),
                 class = c("tbl_df", "tbl", "data.frame")
               )
             ),
             class = "dimension_table"
           )
         ),
-        rpd = list()
+        rpd = list(),
+        geo = list()
       ),
       class = "star_database"
     )
