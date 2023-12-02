@@ -100,6 +100,9 @@
     <loc>https://josesamos.github.io/rolap/reference/cancel_deployment.html</loc>
   </url>
   <url>
+    <loc>https://josesamos.github.io/rolap/reference/check_geoattribute_geometry.html</loc>
+  </url>
+  <url>
     <loc>https://josesamos.github.io/rolap/reference/check_lookup_table.html</loc>
   </url>
   <url>
@@ -244,13 +247,13 @@
     <loc>https://josesamos.github.io/rolap/reference/get_geoattributes.html</loc>
   </url>
   <url>
-    <loc>https://josesamos.github.io/rolap/reference/get_geometry.html</loc>
-  </url>
-  <url>
     <loc>https://josesamos.github.io/rolap/reference/get_layer.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_layer_from_attribute.html</loc>
+  </url>
+  <url>
+    <loc>https://josesamos.github.io/rolap/reference/get_layer_geometry.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_lookup_tables.html</loc>
@@ -329,9 +332,6 @@
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_unknown_values.html</loc>
-  </url>
-  <url>
-    <loc>https://josesamos.github.io/rolap/reference/get_unrelated_instances.html</loc>
   </url>
   <url>
     <loc>https://josesamos.github.io/rolap/reference/get_variable_description.html</loc>
