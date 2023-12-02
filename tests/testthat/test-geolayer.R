@@ -139,12 +139,12 @@ test_that("geolayer", {
   c("variable", "year", "facts", "measure"))
 
   expect_equal({
-    get_geometry(gl_polygon$geolayer$geom)
+    get_layer_geometry(gl_polygon$geolayer$geom)
   },
   "polygon")
 
   expect_equal({
-    get_geometry(gl_point$geolayer$geom)
+    get_layer_geometry(gl_point$geolayer$geom)
   },
   "point")
 
