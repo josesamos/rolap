@@ -18,7 +18,7 @@ test_that("geoattribute", {
     )
 
   ui <- db_2 |>
-    get_unrelated_instances()
+    check_geoattribute_geometry()
 
   db_3 <- db_2 |>
     define_geoattribute(
@@ -37,7 +37,7 @@ test_that("geoattribute", {
       by = "STUSPS"
     )
 
-  instances <- get_unrelated_instances (db_4,
+  instances <- check_geoattribute_geometry (db_4,
                                         dimension = "where",
                                         attribute = "state")
   db_5 <- db_2 |>
@@ -48,7 +48,7 @@ test_that("geoattribute", {
       by = "STUSPS"
     )
 
-  instances_2 <- get_unrelated_instances (db_5,
+  instances_2 <- check_geoattribute_geometry (db_5,
                                           dimension = "where",
                                           attribute = "state")
 
@@ -339,7 +339,7 @@ test_that("geoattribute", {
   ))
 
   expect_equal({
-    c(get_geometry(us_state_point),
+    c(get_layer_geometry(us_state_point),
       nrow(us_state_point))
   },
   c("point",
@@ -352,7 +352,7 @@ test_that("geoattribute", {
   c("region", "geom", "9"))
 
   expect_equal({
-    get_geometry(us_layer_state)
+    get_layer_geometry(us_layer_state)
   },
   "polygon")
 

@@ -53,13 +53,10 @@ coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs
 
 
 
-#' Get geometry
+#' Get layer geometry
 #'
-#' Get the geometry of a layer, as it is interpreted to define a `geolevel`
-#' object.
-#'
-#' It will only be valid if one of the two geometries is interpreted: *point*
-#' or *polygon*.
+#' Get the geometry of a layer. It will only be valid if one of the two geometries
+#' is interpreted: *point* or *polygon*.
 #'
 #' @param layer A `sf` object.
 #'
@@ -69,16 +66,14 @@ coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs
 #'
 #' @examples
 #'
-#' geometry <- get_geometry(us_layer_state)
+#' geometry <- get_layer_geometry(us_layer_state)
 #'
 #' @export
-get_geometry <- function(layer) {
+get_layer_geometry <- function(layer) {
   layer <- sf::st_as_sf(layer)
   res <- unique(as.character(sf::st_geometry_type(layer, by_geometry = TRUE)))
   if (length(intersect(res, c("CIRCULARSTRING", "CURVEPOLYGON", "MULTIPOLYGON", "TRIANGLE", "POLYGON"))) > 0) {
     return("polygon")
-  } else if (length(intersect(res, c("LINESTRING", "MULTILINESTRING", "CURVE", "MULTICURVE", "COMPOUNDCURVE"))) > 0) {
-    return("line")
   } else if (length(intersect(res, c("POINT", "MULTIPOINT"))) > 0) {
     return("point")
   }
@@ -105,7 +100,7 @@ get_geometry <- function(layer) {
 #'
 #' @export
 summarize_layer <- function(layer, attribute) {
-  geometry <- get_geometry(layer)
+  geometry <- get_layer_geometry(layer)
   if (!(geometry %in% c("polygon", "point"))) {
     stop(sprintf('layer has unsupported geometry: %s.', geometry[1]))
   }
@@ -141,7 +136,7 @@ summarize_layer <- function(layer, attribute) {
 #'
 #' @export
 get_point_geometry <- function(layer) {
-  geometry <- get_geometry(layer)
+  geometry <- get_layer_geometry(layer)
   if (geometry == "polygon") {
     # suppress warning message
     sf::st_agr(layer) = "constant"
@@ -264,7 +259,9 @@ get_geoattribute_geometries.star_database <- function(db,
 }
 
 
-#' Get unrelated instances of a `geoattribute`
+#' Check a `geoattribute` geometry instances.
+#'
+#' Get unrelated instances of a `geoattribute` for a geometry.
 #'
 #' We obtain the values of the dimension attribute that do not have an associated
 #' geographic element of the indicated geometry.
@@ -291,22 +288,22 @@ get_geoattribute_geometries.star_database <- function(db,
 #'     by = "STUSPS"
 #'   )
 #'
-#' instances <- get_unrelated_instances(db,
-#'                                      dimension = "where",
-#'                                      attribute = "state")
+#' instances <- check_geoattribute_geometry(db,
+#'                                          dimension = "where",
+#'                                          attribute = "state")
 #'
 #' @export
-get_unrelated_instances <-
+check_geoattribute_geometry <-
   function(db,
            dimension,
            attribute,
            geometry)
-    UseMethod("get_unrelated_instances")
+    UseMethod("check_geoattribute_geometry")
 
-#' @rdname get_unrelated_instances
+#' @rdname check_geoattribute_geometry
 #'
 #' @export
-get_unrelated_instances.star_database <- function(db,
+check_geoattribute_geometry.star_database <- function(db,
                                                   dimension = NULL,
                                                   attribute = NULL,
                                                   geometry = "polygon") {
@@ -510,7 +507,7 @@ define_geoattribute_from_layer <- function(db,
     "We must select the same number of attributes in the dimension as in the layer." = length(attribute) == length(by)
   )
   validate_attributes(colnames(from_layer), by)
-  geometry <- get_geometry(from_layer)
+  geometry <- get_layer_geometry(from_layer)
   if (!(geometry %in% c("polygon", "point"))) {
     stop(sprintf('from_layer has unsupported geometry: %s.', geometry[1]))
   }
@@ -560,7 +557,7 @@ define_geoattribute_from_layer <- function(db,
   out <- dplyr::setdiff(data_dim, data_lay)
   if (nrow(out) > 0) {
     warning(
-      "Instances of the dimension remain unrelated to the layer. Check them using `get_unrelated_instances()`."
+      "Instances of the dimension remain unrelated to the layer. Check them using `check_geoattribute_geometry()`."
     )
   }
   db

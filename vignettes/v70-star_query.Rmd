@@ -95,7 +95,7 @@ mrs_db_geo_2 <- mrs_db_geo |>
   )
 ```
 
-If there are still unrelated instances of the dimension, the `define_geoattribute()` function warns and the instances can be consulted using the `get_unrelated_instances()` function.
+If there are still unrelated instances of the dimension, the `define_geoattribute()` function warns and the instances can be consulted using the `check_geoattribute_geometry()` function.
 
 Through these functions we have defined relationships between the attributes and vector layers of geographic information, at the level of detail we need, which we can later take advantage of.
 

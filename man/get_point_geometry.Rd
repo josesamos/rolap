@@ -23,11 +23,11 @@ layer <-
 }
 \seealso{
 Other star database geographic attributes: 
+\code{\link{check_geoattribute_geometry}()},
 \code{\link{define_geoattribute}()},
 \code{\link{get_geoattribute_geometries}()},
 \code{\link{get_geoattributes}()},
-\code{\link{get_geometry}()},
-\code{\link{get_unrelated_instances}()},
+\code{\link{get_layer_geometry}()},
 \code{\link{summarize_layer}()}
 }
 \concept{star database geographic attributes}
