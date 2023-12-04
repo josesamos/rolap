@@ -1,8 +1,8 @@
 ---
-title: "Performing Multidimensional Queries with Geographic Attributes"
+title: "Performing Multidimensional Queries (also Including Geographic Attributes)"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Performing Multidimensional Queries with Geographic Attributes}
+  %\VignetteIndexEntry{Performing Multidimensional Queries (also Including Geographic Attributes)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

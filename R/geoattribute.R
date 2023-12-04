@@ -113,7 +113,7 @@ summarize_layer <- function(layer, attribute) {
     geocol <- attr(layer, "sf_column")
     layer <- layer |>
       dplyr::summarize(geom = sf::st_union(eval(parse(text = geocol)))) |>
-      sf::st_centroid()
+      sf::st_point_on_surface()
   }
   layer
 }
@@ -121,7 +121,7 @@ summarize_layer <- function(layer, attribute) {
 
 #' Get point geometry
 #'
-#' Obtain point geometry from polygon geometry using the centroid.
+#' Obtain point geometry from polygon geometry.
 #'
 #' @param layer A `sf` object.
 #'
@@ -143,7 +143,7 @@ get_point_geometry <- function(layer) {
     crs <- sf::st_crs(layer)
     layer <-
       sf::st_transform(layer, 3857) |>
-      sf::st_centroid() |>
+      sf::st_point_on_surface() |>
       sf::st_transform(crs)
   } else {
     stop("The geometry of the layer must be polygon.")
