@@ -113,7 +113,7 @@ summarize_layer <- function(layer, attribute) {
     geocol <- attr(layer, "sf_column")
     layer <- layer |>
       dplyr::summarize(geom = sf::st_union(eval(parse(text = geocol)))) |>
-      sf::st_point_on_surface()
+      sf::st_centroid()
   }
   layer
 }
