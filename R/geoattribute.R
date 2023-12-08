@@ -71,13 +71,15 @@ coordinates_to_point <- function(table, lon_lat = c("intptlon", "intptlat"), crs
 #' @export
 get_layer_geometry <- function(layer) {
   layer <- sf::st_as_sf(layer)
-  res <- unique(as.character(sf::st_geometry_type(layer, by_geometry = TRUE)))
-  if (length(intersect(res, c("CIRCULARSTRING", "CURVEPOLYGON", "MULTIPOLYGON", "TRIANGLE", "POLYGON"))) > 0) {
+  geo <- unique(as.character(sf::st_geometry_type(layer, by_geometry = TRUE)))
+  if (length(intersect(geo, c("CIRCULARSTRING", "CURVEPOLYGON", "MULTIPOLYGON", "TRIANGLE", "POLYGON"))) > 0) {
     return("polygon")
-  } else if (length(intersect(res, c("POINT", "MULTIPOINT"))) > 0) {
+  } else if (length(intersect(geo, c("LINESTRING", "MULTILINESTRING", "CURVE", "MULTICURVE", "COMPOUNDCURVE"))) > 0) {
+    return("line")
+  } else if (length(intersect(geo, c("POINT", "MULTIPOINT"))) > 0) {
     return("point")
   }
-  res
+  geo
 }
 
 
