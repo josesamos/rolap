@@ -13,7 +13,7 @@ get_point_geometry(layer)
 A \code{sf} object.
 }
 \description{
-Obtain point geometry from polygon geometry using the centroid.
+Obtain point geometry from polygon geometry.
 }
 \examples{
 
