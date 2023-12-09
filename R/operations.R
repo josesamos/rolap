@@ -64,10 +64,7 @@ add_operation <- function(op, op_name, name = NULL, details = NULL, details2 = N
 #' Delete a set of operations
 #'
 #' @param op A `star_operation` object.
-#' @param op_name A string, operation name.
-#' @param name A string, element name.
-#' @param details A vector of strings, operation details.
-#' @param details2 A vector of strings, operation additional details.
+#' @param op2 A `star_operation` object.
 #'
 #' @return op A `star_operation` object.
 #' @keywords internal

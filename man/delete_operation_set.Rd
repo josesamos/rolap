@@ -9,13 +9,7 @@ delete_operation_set(op, op2)
 \arguments{
 \item{op}{A \code{star_operation} object.}
 
-\item{op_name}{A string, operation name.}
-
-\item{name}{A string, element name.}
-
-\item{details}{A vector of strings, operation details.}
-
-\item{details2}{A vector of strings, operation additional details.}
+\item{op2}{A \code{star_operation} object.}
 }
 \value{
 op A \code{star_operation} object.
