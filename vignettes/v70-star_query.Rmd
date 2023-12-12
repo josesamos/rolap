@@ -242,7 +242,7 @@ ft <- mrs_db_geo_3 |>
 ft_age <- ft[["mrs_age"]]
 ```
 
-Below are the rows of from one of the result tables.
+Below are the rows of one of the result tables.
 
 ```{r, results = "asis", echo = FALSE}
 pander::pandoc.table(ft_age, split.table = Inf)
@@ -417,3 +417,5 @@ sf::st_layers(f)
 This document presents some of the querying possibilities that offers the `rolap` package. The queries are formulated on an object of class `star_database` and the result is another object of the same class on which additional queries can be made.
 
 Queries can be formulated about a star or set of stars or constellation.
+
+We can define attributes that have associated geographic information. If any of these geographic attributes are included in the result of a query, we obtain a geographic information layer in which the result of the query is defined in the form of variables that can be filtered and queried.
