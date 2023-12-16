@@ -56,7 +56,7 @@ one. These operations can be indicated by the corresponding parameters.
 }
 \examples{
 
-file <- system.file("extdata", package = "rolap")
+file <- system.file("extdata/mrs", package = "rolap")
 
 ft <- read_flat_table_folder('mrs_new', file)
 

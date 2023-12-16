@@ -413,7 +413,8 @@ test_that("query", {
           )
         ),
         rpd = list(),
-        geo = list()
+        geo = list(),
+        scd = list()
       ),
       class = "star_database"
     )

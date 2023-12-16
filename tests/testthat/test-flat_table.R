@@ -714,7 +714,7 @@ test_that("get_unknown_values() ", {
 test_that("read_flat_table_file() ", {
   expect_equal({
     file <-
-      system.file("extdata",
+      system.file("extdata/mrs",
                   "mrs_122_us_cities_1962_2016_new.csv",
                   package = "rolap")
 
@@ -735,7 +735,7 @@ test_that("read_flat_table_file() ", {
 
 test_that("read_flat_table_folder() ", {
   expect_equal({
-    file <- system.file("extdata", package = "rolap")
+    file <- system.file("extdata/mrs", package = "rolap")
 
     ft <- read_flat_table_folder('mrs_new', file)
     names(ft)
@@ -755,7 +755,7 @@ test_that("read_flat_table_folder() ", {
 
 test_that("read_flat_table_folder() ", {
   expect_equal({
-    file <- system.file("extdata", package = "rolap")
+    file <- system.file("extdata/mrs", package = "rolap")
 
     ft <- read_flat_table_folder('mrs_new', file,
                                  same_columns = TRUE,

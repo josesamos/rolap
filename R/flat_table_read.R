@@ -26,7 +26,7 @@
 #' @examples
 #'
 #' file <-
-#'   system.file("extdata",
+#'   system.file("extdata/mrs",
 #'               "mrs_122_us_cities_1962_2016_new.csv",
 #'               package = "rolap")
 #'
@@ -80,7 +80,7 @@ read_flat_table_file <-
 #'
 #' @examples
 #'
-#' file <- system.file("extdata", package = "rolap")
+#' file <- system.file("extdata/mrs", package = "rolap")
 #'
 #' ft <- read_flat_table_folder('mrs_new', file)
 #'

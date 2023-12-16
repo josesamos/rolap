@@ -125,7 +125,8 @@ test_that("star_database() define a a star database", {
         )
       ),
       rpd = list(),
-      geo = list()
+      geo = list(),
+      scd = list()
     ),
     class = "star_database"
   ))
@@ -242,7 +243,8 @@ test_that("star_database() define a a star database", {
         )
       ),
       rpd = list(),
-      geo = list()
+      geo = list(),
+      scd = list()
     ),
     class = "star_database"
   ))
@@ -377,7 +379,8 @@ test_that("snake_case() transform a a star database in snake case", {
         )
       ),
       rpd = list(),
-      geo = list()
+      geo = list(),
+      scd = list()
     ),
     class = "star_database"
   ))

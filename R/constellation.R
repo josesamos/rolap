@@ -64,6 +64,7 @@ constellation <- function(name = NULL, ...) {
   dimensions = vector("list", length = length(dim_freq))
   rpd <- list()
   geo <- list()
+  scd <- list()
   names(facts) <- fct_names
   names(operations) <- fct_names
   names(lookup_tables) <- fct_names
@@ -164,7 +165,8 @@ constellation <- function(name = NULL, ...) {
     facts = facts,
     dimensions = dimensions,
     rpd = rpd,
-    geo = geo
+    geo = geo,
+    scd = scd
   ), class = "star_database")
   c <- rpd_in_constellation(c)
   purge_dimension_instances_star_database(c)
