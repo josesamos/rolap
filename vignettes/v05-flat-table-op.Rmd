@@ -43,7 +43,7 @@ library(rolap)
 
 file <-
   system.file(
-    "extdata",
+    "extdata/mrs",
     "mrs_122_us_cities_1962_2016.csv",
     package = "rolap"
   )

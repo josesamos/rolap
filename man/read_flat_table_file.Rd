@@ -37,7 +37,7 @@ We can also indicate the value that is used in the data with undefined values.
 \examples{
 
 file <-
-  system.file("extdata",
+  system.file("extdata/mrs",
               "mrs_122_us_cities_1962_2016_new.csv",
               package = "rolap")
 

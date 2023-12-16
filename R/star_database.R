@@ -107,7 +107,8 @@ star_database_with_previous_operations <-
           facts = vector("list", length = length(schema$facts)),
           dimensions =  vector("list", length = length(schema$dimensions)),
           rpd = list(),
-          geo = list()
+          geo = list(),
+          scd = list()
         ),
         class = "star_database"
       )

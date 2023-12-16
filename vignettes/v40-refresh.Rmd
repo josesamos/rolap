@@ -59,7 +59,7 @@ We have stored it in the package, in a file with the same format as the original
 ```{r, eval=FALSE}
 file <-
   system.file(
-    "extdata",
+    "extdata/mrs",
     "mrs_122_us_cities_1962_2016_new.csv",
     package = "rolap"
   )
