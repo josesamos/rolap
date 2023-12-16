@@ -1,4 +1,6 @@
 # rolap (development version)
+* Include scd structure for star database. 
+* New test data for scd
 
 # rolap 2.5.0
 * Geographic information query functions: `as_geolayer()`, `get_layer()`, `get_variables()`, `set_variables()`, `as_GeoPackage()`.
