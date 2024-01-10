@@ -4,12 +4,39 @@
 \alias{dimension_schema}
 \title{\code{dimension_schema} S3 class}
 \usage{
-dimension_schema(name = NULL, attributes = NULL)
+dimension_schema(
+  name = NULL,
+  attributes = NULL,
+  scd_nk = NULL,
+  scd_t0 = NULL,
+  scd_t1 = NULL,
+  scd_t2 = NULL,
+  scd_t3 = NULL,
+  scd_t6 = NULL,
+  is_when = FALSE,
+  ...
+)
 }
 \arguments{
 \item{name}{A string, name of the dimension.}
 
 \item{attributes}{A vector of attribute names.}
+
+\item{scd_nk}{A vector of attribute names, scd natural key.}
+
+\item{scd_t0}{A vector of attribute names, scd T0 attributes.}
+
+\item{scd_t1}{A vector of attribute names, scd T1 attributes.}
+
+\item{scd_t2}{A vector of attribute names, scd T2 attributes.}
+
+\item{scd_t3}{A vector of attribute names, scd T3 attributes.}
+
+\item{scd_t6}{A vector of attribute names, scd T6 attributes.}
+
+\item{is_when}{A boolean, is when dimension.}
+
+\item{...}{When dimension configuration parameters.}
 }
 \value{
 A \code{dimension_schema} object.

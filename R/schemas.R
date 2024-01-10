@@ -115,6 +115,14 @@ define_facts.star_schema <-
 #' @param dimension A `dimension_schema` object.
 #' @param name A string, name of the dimension.
 #' @param attributes A vector of attribute names.
+#' @param scd_nk A vector of attribute names, scd natural key.
+#' @param scd_t0 A vector of attribute names, scd T0 attributes.
+#' @param scd_t1 A vector of attribute names, scd T1 attributes.
+#' @param scd_t2 A vector of attribute names, scd T2 attributes.
+#' @param scd_t3 A vector of attribute names, scd T3 attributes.
+#' @param scd_t6 A vector of attribute names, scd T6 attributes.
+#' @param is_when A boolean, is when dimension.
+#' @param ... When dimension configuration parameters.
 #'
 #' @return A `star_schema` object.
 #'
@@ -145,30 +153,82 @@ define_facts.star_schema <-
 #' s <- s |>
 #'   define_dimension(d)
 #' @export
-define_dimension <- function(schema, dimension, name, attributes) UseMethod("define_dimension")
+define_dimension <-
+  function(schema,
+           dimension,
+           name,
+           attributes,
+           scd_nk,
+           scd_t0,
+           scd_t1,
+           scd_t2,
+           scd_t3,
+           scd_t6,
+           is_when,
+           ...)
+    UseMethod("define_dimension")
 
 #' @rdname define_dimension
 #'
 #' @export
-define_dimension.star_schema <- function(schema, dimension = NULL, name = NULL, attributes = NULL) {
-  if (!is.null(dimension)) {
-    stopifnot("Schema does not include dimension_schema object." = methods::is(dimension, "dimension_schema"))
-    stopifnot("If a dimension_schema has been defined, the rest of the fields cannot be defined." = is.null(name) & is.null(attributes))
-  } else {
-    dimension <- dimension_schema(name = name, attributes = attributes)
+define_dimension.star_schema <-
+  function(schema,
+           dimension = NULL,
+           name = NULL,
+           attributes = NULL,
+           scd_nk = NULL,
+           scd_t0 = NULL,
+           scd_t1 = NULL,
+           scd_t2 = NULL,
+           scd_t3 = NULL,
+           scd_t6 = NULL,
+           is_when = FALSE,
+           ...) {
+    if (!is.null(dimension)) {
+      stopifnot(
+        "Schema does not include dimension_schema object." = methods::is(dimension, "dimension_schema")
+      )
+      stopifnot(
+        "If a dimension_schema has been defined, the rest of the fields cannot be defined." = is.null(name) &
+          is.null(attributes) &
+          is.null(scd_nk) &
+          is.null(scd_t0) &
+          is.null(scd_t1) &
+          is.null(scd_t2) &
+          is.null(scd_t3) &
+          is.null(scd_t6)
+      )
+    } else {
+      dimension <-
+        dimension_schema(
+          name = name,
+          attributes = attributes,
+          scd_nk = scd_nk,
+          scd_t0 = scd_t0,
+          scd_t1 = scd_t1,
+          scd_t2 = scd_t2,
+          scd_t3 = scd_t3,
+          scd_t6 = scd_t6,
+          is_when = is_when,
+          ...
+        )
+    }
+    if (is.null(schema$dimensions)) {
+      d <- list(dimension)
+      names(d) <- snakecase::to_snake_case(dimension$name)
+    } else {
+      stopifnot(
+        "The schema already contains a dimension of the same name." = !(
+          snakecase::to_snake_case(dimension$name) %in% names(schema$dimensions)
+        )
+      )
+      d <- schema$dimensions
+      n <- names(d)
+      d[[length(d) + 1]] <- dimension
+      names(d) <- c(n, snakecase::to_snake_case(dimension$name))
+    }
+    structure(list(facts = schema$facts, dimensions = d), class = "star_schema")
   }
-  if (is.null(schema$dimensions)) {
-    d <- list(dimension)
-    names(d) <- snakecase::to_snake_case(dimension$name)
-  } else {
-    stopifnot("The schema already contains a dimension of the same name." = !(snakecase::to_snake_case(dimension$name) %in% names(schema$dimensions)))
-    d <- schema$dimensions
-    n <- names(d)
-    d[[length(d) + 1]] <- dimension
-    names(d) <- c(n, snakecase::to_snake_case(dimension$name))
-  }
-  structure(list(facts = schema$facts, dimensions = d), class = "star_schema")
-}
 
 # generic
 get_measure_names_schema <- function(schema) UseMethod("get_measure_names_schema")
@@ -223,6 +283,14 @@ get_attribute_names_schema.star_schema <- function(schema) {
 #'
 #' @param name A string, name of the dimension.
 #' @param attributes A vector of attribute names.
+#' @param scd_nk A vector of attribute names, scd natural key.
+#' @param scd_t0 A vector of attribute names, scd T0 attributes.
+#' @param scd_t1 A vector of attribute names, scd T1 attributes.
+#' @param scd_t2 A vector of attribute names, scd T2 attributes.
+#' @param scd_t3 A vector of attribute names, scd T3 attributes.
+#' @param scd_t6 A vector of attribute names, scd T6 attributes.
+#' @param is_when A boolean, is when dimension.
+#' @param ... When dimension configuration parameters.
 #'
 #' @return A `dimension_schema` object.
 #'
@@ -241,17 +309,79 @@ get_attribute_names_schema.star_schema <- function(schema) {
 #' )
 #'
 #' @export
-dimension_schema <- function(name = NULL, attributes = NULL) {
+dimension_schema <- function(name = NULL,
+                             attributes = NULL,
+                             scd_nk = NULL,
+                             scd_t0 = NULL,
+                             scd_t1 = NULL,
+                             scd_t2 = NULL,
+                             scd_t3 = NULL,
+                             scd_t6 = NULL,
+                             is_when = FALSE,
+                             ...) {
   stopifnot("Missing dimension name." = !is.null(name))
-  if (!(length(attributes) > 0)) {
+  if (!(
+    length(attributes) +
+    length(scd_nk) +
+    length(scd_t0) +
+    length(scd_t1) +
+    length(scd_t2) +
+    length(scd_t3) +
+    length(scd_t6) > 0
+  )) {
     stop(sprintf("Missing the dimension '%s' attributes.", name))
   }
-  if (!(length(attributes) == length(unique(attributes)))) {
+  if (!(length(c(
+    attributes,
+    scd_nk,
+    scd_t0,
+    scd_t1,
+    scd_t2,
+    scd_t3,
+    scd_t6
+  )) == length(unique(
+    c(attributes,
+      scd_nk,
+      scd_t0,
+      scd_t1,
+      scd_t2,
+      scd_t3,
+      scd_t6)
+  )))) {
     stop(sprintf("There are repeated attributes in the '%s' dimension.", name))
   }
-  structure(list(name = name, attributes = attributes), class = "dimension_schema")
+  if (length(attributes) > 0) {
+    stopifnot("Generic attributes and scd components cannot be defined at the same time." = length(c(
+      scd_nk, scd_t0, scd_t1, scd_t2, scd_t3, scd_t6
+    )) == 0)
+  }
+  if (is_when) {
+    dots <- list(...)
+    w <- when::when()
+  }
+  if (length(attributes) > 0) {
+    res <-   structure(
+      list(
+        name = name,
+        attributes = attributes),
+      class = "dimension_schema"
+    )
+  } else {
+    res <-   structure(
+      list(
+        name = name,
+        scd_nk = scd_nk,
+        scd_t0 = scd_t0,
+        scd_t1 = scd_t1,
+        scd_t2 = scd_t2,
+        scd_t3 = scd_t3,
+        scd_t6 = scd_t6
+      ),
+      class = "dimension_schema"
+    )
+  }
+  res
 }
-
 
 
 #' Get attribute names
@@ -264,7 +394,40 @@ dimension_schema <- function(name = NULL, attributes = NULL) {
 #'
 #' @keywords internal
 get_attribute_names_schema.dimension_schema <- function(schema) {
-  schema$attributes
+  if (length(schema$attributes) > 0) {
+    res <- schema$attributes
+  } else {
+    res <-
+      c(
+        schema$scd_nk,
+        schema$scd_t0,
+        schema$scd_t1,
+        schema$scd_t2,
+        schema$scd_t3,
+        schema$scd_t6
+      )
+  }
+  res
+}
+
+
+#' Is a scd dimension
+#'
+#' @param schema A `dimension_schema` object.
+#'
+#' @return A boolean.
+#'
+#' @keywords internal
+is_scd <- function(schema) {
+  res <- !(
+    is.null(schema$scd_nk) &
+      is.null(schema$scd_t0) &
+      is.null(schema$scd_t1) &
+      is.null(schema$scd_t2) &
+      is.null(schema$scd_t3) &
+      is.null(schema$scd_t6)
+  )
+  res
 }
 
 ## ----------------------------------------------------------------------------------------------------------
