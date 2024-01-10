@@ -1,6 +1,6 @@
 Package: rolap
 Title: Obtaining Star Databases from Flat Tables
-Version: 2.5.1
+Version: 2.5.1.9000
 Authors@R: c(
     person("Jose", "Samos", , "jsamos@ugr.es", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4457-3439")),
