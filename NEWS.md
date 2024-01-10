@@ -1,4 +1,4 @@
-# rolap (development version)
+# rolap 2.5.1
 * Include scd structure for star database. 
 * New test data for scd.
 * Modify the cph field of the description.
