@@ -68,7 +68,18 @@ set of attributes that make it up.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dimension_schema</span><span class="op">(</span>name <span class="op">=</span> <span class="cn">NULL</span>, attributes <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dimension_schema</span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  attributes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scd_nk <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scd_t0 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scd_t1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scd_t2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scd_t3 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scd_t6 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  is_when <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,6 +90,38 @@ set of attributes that make it up.</p>
 
 <dt>attributes</dt>
 <dd><p>A vector of attribute names.</p></dd>
+
+
+<dt>scd_nk</dt>
+<dd><p>A vector of attribute names, scd natural key.</p></dd>
+
+
+<dt>scd_t0</dt>
+<dd><p>A vector of attribute names, scd T0 attributes.</p></dd>
+
+
+<dt>scd_t1</dt>
+<dd><p>A vector of attribute names, scd T1 attributes.</p></dd>
+
+
+<dt>scd_t2</dt>
+<dd><p>A vector of attribute names, scd T2 attributes.</p></dd>
+
+
+<dt>scd_t3</dt>
+<dd><p>A vector of attribute names, scd T3 attributes.</p></dd>
+
+
+<dt>scd_t6</dt>
+<dd><p>A vector of attribute names, scd T6 attributes.</p></dd>
+
+
+<dt>is_when</dt>
+<dd><p>A boolean, is when dimension.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>When dimension configuration parameters.</p></dd>
 
 </dl></div>
     <div class="section level2">
