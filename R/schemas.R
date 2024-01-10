@@ -114,12 +114,15 @@ define_facts.star_schema <-
 #' @param schema A `star_schema` object.
 #' @param dimension A `dimension_schema` object.
 #' @param name A string, name of the dimension.
-#' @param attributes A vector of attribute names, scd T2 attributes.
+#' @param attributes A vector of attribute names.
 #' @param scd_nk A vector of attribute names, scd natural key.
 #' @param scd_t0 A vector of attribute names, scd T0 attributes.
 #' @param scd_t1 A vector of attribute names, scd T1 attributes.
+#' @param scd_t2 A vector of attribute names, scd T2 attributes.
 #' @param scd_t3 A vector of attribute names, scd T3 attributes.
 #' @param scd_t6 A vector of attribute names, scd T6 attributes.
+#' @param is_when A boolean, is when dimension.
+#' @param ... When dimension configuration parameters.
 #'
 #' @return A `star_schema` object.
 #'
@@ -158,8 +161,11 @@ define_dimension <-
            scd_nk,
            scd_t0,
            scd_t1,
+           scd_t2,
            scd_t3,
-           scd_t6)
+           scd_t6,
+           is_when,
+           ...)
     UseMethod("define_dimension")
 
 #' @rdname define_dimension
@@ -173,8 +179,11 @@ define_dimension.star_schema <-
            scd_nk = NULL,
            scd_t0 = NULL,
            scd_t1 = NULL,
+           scd_t2 = NULL,
            scd_t3 = NULL,
-           scd_t6 = NULL) {
+           scd_t6 = NULL,
+           is_when = FALSE,
+           ...) {
     if (!is.null(dimension)) {
       stopifnot(
         "Schema does not include dimension_schema object." = methods::is(dimension, "dimension_schema")
@@ -185,6 +194,7 @@ define_dimension.star_schema <-
           is.null(scd_nk) &
           is.null(scd_t0) &
           is.null(scd_t1) &
+          is.null(scd_t2) &
           is.null(scd_t3) &
           is.null(scd_t6)
       )
@@ -196,8 +206,11 @@ define_dimension.star_schema <-
           scd_nk = scd_nk,
           scd_t0 = scd_t0,
           scd_t1 = scd_t1,
+          scd_t2 = scd_t2,
           scd_t3 = scd_t3,
-          scd_t6 = scd_t6
+          scd_t6 = scd_t6,
+          is_when = is_when,
+          ...
         )
     }
     if (is.null(schema$dimensions)) {
@@ -273,8 +286,11 @@ get_attribute_names_schema.star_schema <- function(schema) {
 #' @param scd_nk A vector of attribute names, scd natural key.
 #' @param scd_t0 A vector of attribute names, scd T0 attributes.
 #' @param scd_t1 A vector of attribute names, scd T1 attributes.
+#' @param scd_t2 A vector of attribute names, scd T2 attributes.
 #' @param scd_t3 A vector of attribute names, scd T3 attributes.
 #' @param scd_t6 A vector of attribute names, scd T6 attributes.
+#' @param is_when A boolean, is when dimension.
+#' @param ... When dimension configuration parameters.
 #'
 #' @return A `dimension_schema` object.
 #'
@@ -298,14 +314,18 @@ dimension_schema <- function(name = NULL,
                              scd_nk = NULL,
                              scd_t0 = NULL,
                              scd_t1 = NULL,
+                             scd_t2 = NULL,
                              scd_t3 = NULL,
-                             scd_t6 = NULL) {
+                             scd_t6 = NULL,
+                             is_when = FALSE,
+                             ...) {
   stopifnot("Missing dimension name." = !is.null(name))
   if (!(
     length(attributes) +
     length(scd_nk) +
     length(scd_t0) +
     length(scd_t1) +
+    length(scd_t2) +
     length(scd_t3) +
     length(scd_t6) > 0
   )) {
@@ -316,6 +336,7 @@ dimension_schema <- function(name = NULL,
     scd_nk,
     scd_t0,
     scd_t1,
+    scd_t2,
     scd_t3,
     scd_t6
   )) == length(unique(
@@ -323,23 +344,43 @@ dimension_schema <- function(name = NULL,
       scd_nk,
       scd_t0,
       scd_t1,
+      scd_t2,
       scd_t3,
       scd_t6)
   )))) {
     stop(sprintf("There are repeated attributes in the '%s' dimension.", name))
   }
-  structure(
-    list(
-      name = name,
-      attributes = attributes,
-      scd_nk = scd_nk,
-      scd_t0 = scd_t0,
-      scd_t1 = scd_t1,
-      scd_t3 = scd_t3,
-      scd_t6 = scd_t6
-    ),
-    class = "dimension_schema"
-  )
+  if (length(attributes) > 0) {
+    stopifnot("Generic attributes and scd components cannot be defined at the same time." = length(c(
+      scd_nk, scd_t0, scd_t1, scd_t2, scd_t3, scd_t6
+    )) == 0)
+  }
+  if (is_when) {
+    dots <- list(...)
+    w <- when::when()
+  }
+  if (length(attributes) > 0) {
+    res <-   structure(
+      list(
+        name = name,
+        attributes = attributes),
+      class = "dimension_schema"
+    )
+  } else {
+    res <-   structure(
+      list(
+        name = name,
+        scd_nk = scd_nk,
+        scd_t0 = scd_t0,
+        scd_t1 = scd_t1,
+        scd_t2 = scd_t2,
+        scd_t3 = scd_t3,
+        scd_t6 = scd_t6
+      ),
+      class = "dimension_schema"
+    )
+  }
+  res
 }
 
 
@@ -353,7 +394,20 @@ dimension_schema <- function(name = NULL,
 #'
 #' @keywords internal
 get_attribute_names_schema.dimension_schema <- function(schema) {
-  c(schema$scd_nk, schema$scd_t0, schema$scd_t1, schema$attributes, schema$scd_t3, schema$scd_t6)
+  if (length(schema$attributes) > 0) {
+    res <- schema$attributes
+  } else {
+    res <-
+      c(
+        schema$scd_nk,
+        schema$scd_t0,
+        schema$scd_t1,
+        schema$scd_t2,
+        schema$scd_t3,
+        schema$scd_t6
+      )
+  }
+  res
 }
 
 
@@ -369,6 +423,7 @@ is_scd <- function(schema) {
     is.null(schema$scd_nk) &
       is.null(schema$scd_t0) &
       is.null(schema$scd_t1) &
+      is.null(schema$scd_t2) &
       is.null(schema$scd_t3) &
       is.null(schema$scd_t6)
   )
