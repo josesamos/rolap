@@ -414,7 +414,6 @@ as_multistar.star_database <- function(db) {
     dim_names <- c(dim_names, d)
   }
   names(dim) <- dim_names
-  dm_mrs_age <- starschemar::dimensional_model()
 
   fct <- NULL
   fct_names <- NULL
