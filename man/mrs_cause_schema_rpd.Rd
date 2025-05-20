@@ -64,8 +64,8 @@ mrs_cause_schema_rpd <- star_schema() |>
 \code{\link{ft_cause_rpd}}
 
 Other mrs example schema: 
-\code{\link{mrs_age_schema_rpd}},
 \code{\link{mrs_age_schema}},
+\code{\link{mrs_age_schema_rpd}},
 \code{\link{mrs_cause_schema}}
 }
 \concept{mrs example schema}
