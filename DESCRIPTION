@@ -20,7 +20,7 @@ URL: https://josesamos.github.io/rolap/,
     https://github.com/josesamos/rolap
 BugReports: https://github.com/josesamos/rolap/issues
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1.0)
 Imports: 
     dm,
     dplyr,
