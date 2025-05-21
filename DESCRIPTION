@@ -30,7 +30,6 @@ Imports:
     rlang,
     sf,
     snakecase,
-    starschemar,
     tibble,
     tidyr,
     tidyselect,
@@ -62,4 +61,4 @@ Language: en-GB
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2

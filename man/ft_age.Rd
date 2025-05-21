@@ -36,14 +36,14 @@ if (rlang::is_installed("stringr")) {
 \code{\link{mrs_age_schema}}
 
 Other mrs example data: 
+\code{\link{ft}},
 \code{\link{ft_age_rpd}},
 \code{\link{ft_cause_rpd}},
 \code{\link{ft_num}},
-\code{\link{ft}},
-\code{\link{mrs_db_geo}},
 \code{\link{mrs_db}},
-\code{\link{mrs_ft_new}},
-\code{\link{mrs_ft}}
+\code{\link{mrs_db_geo}},
+\code{\link{mrs_ft}},
+\code{\link{mrs_ft_new}}
 }
 \concept{mrs example data}
 \keyword{datasets}

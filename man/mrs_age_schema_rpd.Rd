@@ -70,8 +70,8 @@ mrs_age_schema_rpd <- star_schema() |>
 
 Other mrs example schema: 
 \code{\link{mrs_age_schema}},
-\code{\link{mrs_cause_schema_rpd}},
-\code{\link{mrs_cause_schema}}
+\code{\link{mrs_cause_schema}},
+\code{\link{mrs_cause_schema_rpd}}
 }
 \concept{mrs example schema}
 \keyword{datasets}
